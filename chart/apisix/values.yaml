@@ -16,10 +16,11 @@
 
 replicaCount: 1
 image:
-  repository: apache/apisix
+  registry: docker.io
+  repository: api7/api7
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: 2.1-alpine
+  tag: dev
 
 imagePullSecrets: []
 nameOverride: ""
@@ -75,6 +76,7 @@ gateway:
 etcd:
   # install etcd(v3) by default, set false if do not want to install etcd(v3) together
   enabled: true
+  useSvcHost: true
   host:
     - http://etcd.host:2379 # host or ip e.g. http://172.20.128.89:2379
   prefix: "/apisix"
@@ -84,6 +86,29 @@ etcd:
     rbac:
       # No authentication by default
       enabled: false
+
+dashboard:
+  name: dashboard
+  autoscaling:
+    enabled: false
+  replicaCount: 1
+  image:
+    registry: docker.io
+    repository: api7/api7-dashboard
+    pullPolicy: IfNotPresent
+    tag: dev
+  http:
+    enabled: true
+    servicePort: 9000
+    containerPort: 9000
+  nodeSelector: {}
+  service:
+    type: NodePort
+    externalIPs: []
+    # loadBalancerIP: a.b.c.d
+    # loadBalancerSourceRanges:
+    #   - "143.231.0.0/16"
+
 
 dns:
   resolvers:

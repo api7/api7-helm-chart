@@ -15,7 +15,7 @@
 # limitations under the License.
 #
 apiVersion: v2
-name: apisix
+name: offline
 description: A Helm chart for Apache APISIX
 
 # A chart can be either an 'application' or a 'library' chart.

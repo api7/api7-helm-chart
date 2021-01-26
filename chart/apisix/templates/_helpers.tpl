@@ -61,3 +61,18 @@ Create the name of the service account to use
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Dashboard lables
+*/}}
+{{- define "dashboard.labels" -}}
+{{ include "dashboard.selectorLabels" . }}
+{{- end }}
+
+{{/*
+Dashboard selector labels
+*/}}
+{{- define "dashboard.selectorLabels" -}}
+app: {{ .Values.dashboard.name }}
+version: {{ .Values.dashboard.image.tag }}
+{{- end }}

@@ -21,23 +21,42 @@
 
 ## Dependencies
 
-Update the dependency chart 
+Need 4 docker images at least:
 
-```shell
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
-$ helm dependency update ./chart/apisix
+```log
+docker.io/bitnami/etcd:3.4.14-debian-10-r0
+api7/api7:dev
+api7/api7-dashboard:dev
+busybox:1.28
+```
+
+If `--set volumePermissions.enable=true`, we also need image blow:
+
+```log
+docker.io/bitnami/minideb:buster
 ```
 
 ## Install
 
+Please use custome image info, such as:
+
 ```shell
-$ helm install apisix ./chart/apisix -n default
+$ helm install api7 ./chart/apisix -n default \
+	--set image.registry=docker.io \
+	--set image.repository=api7/api7 \
+	--set image.tag=dev \
+	--set etcd.image.registry=docker.io \
+	--set etcd.image.repository=bitnami/etcd \
+	--set etcd.image.tag=3.4.14-debian-10-r0 \
+	--set dashboard.image.registry=docker.io \
+	--set dashboard.image.repository=api7/api7-dashboard \
+	--set dashboard.image.tag=dev
 ```
 
 ## Uninstall
 
 ```shell
-helm uninstall apisix ./chart/apisix -n default
+helm uninstall api7 ./chart/apisix -n default
 ```
 
 ## FAQ

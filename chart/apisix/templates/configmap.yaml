@@ -20,6 +20,42 @@ metadata:
   name: {{ include "apisix.fullname" . }}
   namespace: {{ .Release.Namespace }}
 data:
+  dashboard-conf.yaml: |-
+    conf:
+      listen:
+        host: 0.0.0.0     # `manager api` listening ip or host name
+        port: {{ .Values.dashboard.http.containerPort }}         # `manager api` listening port
+      etcd:
+      {{- if .Values.etcd.useSvcHost }}
+        endpoints:                                 # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
+          - "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }}:{{ .Values.etcd.defaultPort }}"
+      {{- else }}
+        host:                                 # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
+          {{- range $value := .Values.etcd.host }}
+          - "{{ $value }}"             # multiple etcd address
+          {{- end}}
+      {{- end }}
+
+                          # etcd basic auth info
+      # username: "root"    # ignore etcd username if not enable etcd auth
+      # password: "123456"  # ignore etcd password if not enable etcd auth
+      log:
+        error_log:
+          level: warn       # supports levels, lower to higher: debug, info, warn, error, panic, fatal
+          file_path:
+            logs/error.log  # supports relative path, absolute path, standard output
+                            # such as: logs/error.log, /tmp/logs/error.log, /dev/stdout, /dev/stderr
+    authentication:
+      secret:
+        secret              # secret for jwt token generation.
+                            # NOTE: Highly recommended to modify this value to protect `manager api`.
+                            # if it's default value, when `manager api` start , it will generate a random string to replace it.
+      expire_time: 3600     # jwt token expire time, in second
+      users:
+        - username: admin   # username and password for login `manager api`
+          password: admin
+        - username: user
+          password: user
   config.yaml: |-
     #
     # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -144,7 +180,7 @@ data:
         #  ipc_shared_dict: 100m        # custom shared cache, format: `cache-key: cache-size`
 
     etcd:
-    {{- if .Values.etcd.enabled }}
+    {{- if .Values.etcd.useSvcHost }}
       host:                                 # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
         - "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }}:{{ .Values.etcd.defaultPort }}"
     {{- else }}
