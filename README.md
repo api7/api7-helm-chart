@@ -36,6 +36,12 @@ If `--set volumePermissions.enable=true`, we also need image blow:
 docker.io/bitnami/minideb:buster
 ```
 
+Temporary download address: http://40.73.66.19/api7
+```log
+username: guest
+password: 276860309
+```
+
 ## Install
 
 Please use custome image info, such as:
