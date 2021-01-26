@@ -91,10 +91,3 @@ $ helm install apisix ./chart/apisix -n default \
     --set allow.ipList=""
 ```
 
-## Seeking help
-
-- Mailing List: Mail to dev-subscribe@apisix.apache.org, follow the reply to subscribe the mailing list.
-- QQ Group - 578997126, 552030619
-- [Slack Workspace](http://s.apache.org/slack-invite) - join `#apisix` on our Slack to meet the team and ask questions
-- ![Twitter Follow](https://img.shields.io/twitter/follow/ApacheAPISIX?style=social) - follow and interact with us using hashtag `#ApacheAPISIX`
-- [bilibili video](https://space.bilibili.com/551921247)
