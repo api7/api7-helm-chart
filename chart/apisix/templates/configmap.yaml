@@ -27,7 +27,7 @@ data:
         port: 9000          # `manager api` listening port
       prometheus:
         host:
-        - "https://{{ .Release.Name }}-prometheus-server.svc.{{ .Values.gateway.k8s_domain }}:80"
+        - "https://{{ .Release.Name }}-prometheus-server.{{ .Release.Name }}.svc.{{ .Values.gateway.k8s_domain }}:80"
       etcd_clusters:
         user_conf:           # etcd cluster_name, this is for store user info like user,role,workspace
           endpoints:
