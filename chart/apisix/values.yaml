@@ -185,6 +185,7 @@ plugins:
   - uri-blocker
   - wolf-rbac
   - zipkin
+  - server-info
 stream_plugins:
   - mqtt-proxy
 
