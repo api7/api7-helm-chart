@@ -167,7 +167,7 @@ plugins:
   - limit-req
   - node-status
   - openid-connect
-  - prometheus
+  - api7-prometheus
   - proxy-cache
   - proxy-mirror
   - proxy-rewrite
