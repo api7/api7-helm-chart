@@ -217,3 +217,8 @@ tolerations: []
 
 affinity: 
   enabled: false
+
+busybox:
+  registry: docker.io
+  repository: busybox
+  tag: 1.28

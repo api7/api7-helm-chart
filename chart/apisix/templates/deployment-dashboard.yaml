@@ -49,13 +49,13 @@ spec:
               port: {{ .Values.dashboard.http.containerPort }}
             timeoutSeconds: 1
           volumeMounts:
-            - mountPath: /usr/local/api7-dashboard/conf/conf.yaml
+            - mountPath: /usr/local/apisix-dashboard/conf/conf.yaml
               name: dashboard-config
               subPath: dashboard-conf.yaml
       {{- if .Values.etcd.useSvcHost }}
       initContainers:
       - name: wait-etcd
-        image: busybox:1.28
+        image: "{{ .Values.busybox.image.registry }}/{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
         command: ['sh', '-c', "until nc -z {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;"]
       {{- end }}
       volumes:

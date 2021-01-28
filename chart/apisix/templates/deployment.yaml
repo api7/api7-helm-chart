@@ -86,7 +86,7 @@ spec:
       {{- if .Values.etcd.useSvcHost }}
       initContainers:
       - name: wait-etcd
-        image: busybox:1.28
+        image: "{{ .Values.busybox.image.registry }}/{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
         command: ['sh', '-c', "until nc -z {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;"]
       {{- end }}
       volumes:
