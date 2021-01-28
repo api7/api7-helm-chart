@@ -246,7 +246,8 @@ prometheus:
       tag: v2.20.1
       pullPolicy: IfNotPresent
   extraScrapeConfigs: |
-   - job_name: "api7"
-     metrics_path: "/apisix/api7-prometheus/metrics"
-     static_configs:
-       - targets: ["api7-gateway:80"]
+    - job_name: apisix
+      metrics_path: /apisix/api7-prometheus/metrics
+      scrape_interval: 15s
+      static_configs:
+        - targets: ["api7-gateway:80"]
