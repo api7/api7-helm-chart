@@ -219,6 +219,33 @@ affinity:
   enabled: false
 
 busybox:
-  registry: docker.io
-  repository: busybox
-  tag: 1.28
+  image:
+    registry: docker.io
+    repository: busybox
+    tag: 1.28
+
+prometheus:
+  alertmanager:
+    enabled: false
+  pushgateway:
+    enabled: false
+  nodeExporter:
+    enabled: false
+  configmapReload:
+    prometheus:
+      enabled: false
+    alertmanager:
+      enalbed: false
+  kubeStateMetrics:
+    enabled: false
+  server:
+    enabled: true
+    image:
+      repository: prom/prometheus
+      tag: v2.20.1
+      pullPolicy: IfNotPresent
+  extraScrapeConfigs: |
+   - job_name: "api7"
+     metrics_path: "/apisix/api7-prometheus/metrics"
+     static_configs:
+       - targets: ["api7-gateway:80"]

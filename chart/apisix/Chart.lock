@@ -2,5 +2,8 @@ dependencies:
 - name: etcd
   repository: https://charts.bitnami.com/bitnami
   version: 5.2.1
-digest: sha256:66aa38a0b31190b5192e19cb6f5e620c799686834e2a97eee3ea908843cb25e9
-generated: "2020-12-21T17:25:22.549868+08:00"
+- name: prometheus
+  repository: https://charts.helm.sh/stable
+  version: 11.12.1
+digest: sha256:06f94f6c7c65f43728394b8398cec0ffd03d7c85275819ea14ae1984f5865241
+generated: "2021-01-28T19:47:25.105981+08:00"
