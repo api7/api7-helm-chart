@@ -48,7 +48,7 @@ data:
                             # log example: 2020-12-09T16:38:09.039+0800	INFO	filter/logging.go:46	/apisix/admin/routes/r1	{"status": 401, "host": "127.0.0.1:9000", "query": "asdfsafd=adf&a=a", "requestId": "3d50ecb8-758c-46d1-af5b-cd9d1c820156", "latency": 0, "remoteIP": "127.0.0.1", "method": "PUT", "errs": []}
     authentication:
       secret:
-        secret              # secret for jwt token generation.
+        qwerty              # secret for jwt token generation.
                             # NOTE: Highly recommended to modify this value to protect `manager api`.
                             # if it's default value, when `manager api` start , it will generate a random string to replace it.
       expire_time: 3600     # jwt token expire time, in second

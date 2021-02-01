@@ -39,7 +39,7 @@ docker.io/bitnami/minideb:buster
 Temporary download address: http://40.73.66.19/api7
 ```log
 username: guest
-password: 276860309
+password: 403754725
 ```
 
 ## Install
