@@ -21,23 +21,48 @@
 
 ## Dependencies
 
-Update the dependency chart 
+Need 4 docker images at least:
 
-```shell
-$ helm repo add bitnami https://charts.bitnami.com/bitnami
-$ helm dependency update ./chart/apisix
+```log
+docker.io/bitnami/etcd:3.4.14-debian-10-r0
+api7/api7:dev
+api7/api7-dashboard:dev
+busybox:1.28
+```
+
+If `--set volumePermissions.enable=true`, we also need image blow:
+
+```log
+docker.io/bitnami/minideb:buster
+```
+
+Temporary download address: http://40.73.66.19/api7
+```log
+username: guest
+password: 403754725
 ```
 
 ## Install
 
+Please use custome image info, such as:
+
 ```shell
-$ helm install apisix ./chart/apisix -n default
+$ helm install api7 ./chart/apisix -n default \
+	--set image.registry=docker.io \
+	--set image.repository=api7/api7 \
+	--set image.tag=dev \
+	--set etcd.image.registry=docker.io \
+	--set etcd.image.repository=bitnami/etcd \
+	--set etcd.image.tag=3.4.14-debian-10-r0 \
+	--set dashboard.image.registry=docker.io \
+	--set dashboard.image.repository=api7/api7-dashboard \
+	--set dashboard.image.tag=dev
 ```
 
 ## Uninstall
 
 ```shell
-helm uninstall apisix ./chart/apisix -n default
+helm uninstall api7 ./chart/apisix -n default
 ```
 
 ## FAQ
@@ -72,10 +97,3 @@ $ helm install apisix ./chart/apisix -n default \
     --set allow.ipList=""
 ```
 
-## Seeking help
-
-- Mailing List: Mail to dev-subscribe@apisix.apache.org, follow the reply to subscribe the mailing list.
-- QQ Group - 578997126, 552030619
-- [Slack Workspace](http://s.apache.org/slack-invite) - join `#apisix` on our Slack to meet the team and ask questions
-- ![Twitter Follow](https://img.shields.io/twitter/follow/ApacheAPISIX?style=social) - follow and interact with us using hashtag `#ApacheAPISIX`
-- [bilibili video](https://space.bilibili.com/551921247)

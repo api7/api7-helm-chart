@@ -15,8 +15,8 @@
 # limitations under the License.
 #
 apiVersion: v2
-name: apisix
-description: A Helm chart for Apache APISIX
+name: api7
+description: A Helm chart for Apache SEVEN
 
 # A chart can be either an 'application' or a 'library' chart.
 #
@@ -43,4 +43,7 @@ dependencies:
     version: 5.2.1
     repository: https://charts.bitnami.com/bitnami
     condition: etcd.enabled
+  - name: prometheus
+    version: 11.12.1
+    repository: https://charts.helm.sh/stable
 
