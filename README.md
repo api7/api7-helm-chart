@@ -59,10 +59,11 @@ $ helm install api7 ./chart/api7 -n default \
 	--set dashboard.image.tag=dev
 ```
 
-By default Promethues server will be installed, if you don't use it, just add another option:
+By default Promethues server will be installed, if you don't need it, just add these options:
 
 ```shell
 --set dashboard.prometheus.enabled=false
+--set prometheus.server.enabled=false
 ```
 
 If you want to integrate with external Prometheus server, add the following options:
