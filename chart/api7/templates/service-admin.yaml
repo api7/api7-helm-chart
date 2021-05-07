@@ -17,14 +17,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "apisix.fullname" . }}-admin
+  name: {{ include "api7.fullname" . }}-admin
   namespace: {{ .Release.Namespace }}
   annotations:
     {{- range $key, $value := .Values.admin.annotations }}
       {{ $key }}: {{ $value | quote }}
     {{- end }}
   labels:
-    {{- include "apisix.labels" . | nindent 4 }}
+    {{- include "api7.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.admin.type }}
   {{- if eq .Values.admin.type "LoadBalancer" }}
@@ -45,7 +45,7 @@ spec:
   {{- end }}
   {{- end }}
   ports:
-  - name: apisix-admin
+  - name: api7-admin
     port: {{ .Values.admin.servicePort }}
     targetPort: {{ .Values.admin.containerPort }}
   {{- if (and (eq .Values.admin.type "NodePort") (not (empty .Values.admin.nodePort))) }}
@@ -53,5 +53,5 @@ spec:
   {{- end }}
     protocol: TCP
   selector:
-    {{- include "apisix.selectorLabels" . | nindent 4 }}
+    {{- include "api7.selectorLabels" . | nindent 4 }}
 {{ end }}

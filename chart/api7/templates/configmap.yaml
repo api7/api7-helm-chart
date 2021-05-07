@@ -17,17 +17,24 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "apisix.fullname" . }}
+  name: {{ include "api7.fullname" . }}
   namespace: {{ .Release.Namespace }}
 data:
   dashboard-conf.yaml: |-
     conf:
       listen:
         host: 0.0.0.0     # `manager api` listening ip or host name
-        port: 9000          # `manager api` listening port
+        port: {{ .Values.dashboard.http.containerPort }} # `manager api` listening port
+      {{- if .Values.dashboard.prometheus.enabled }}
       prometheus:
+        {{- if gt (len .Values.dashboard.prometheus.external) 0 }}
+        host:
+        - {{ .Values.dashboard.prometheus.external }}
+        {{- else -}}
         host:
         - "https://{{ .Release.Name }}-prometheus-server.{{ .Release.Name }}.svc.{{ .Values.gateway.k8s_domain }}:80"
+        {{- end -}}
+      {{- end }}
       etcd_clusters:
         user_conf:           # etcd cluster_name, this is for store user info like user,role,workspace
           endpoints:

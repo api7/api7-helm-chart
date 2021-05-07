@@ -108,8 +108,9 @@ dashboard:
     # loadBalancerIP: a.b.c.d
     # loadBalancerSourceRanges:
     #   - "143.231.0.0/16"
-
-
+  prometheus:
+    enabled: true
+    external: ""
 dns:
   resolvers:
     - 127.0.0.1

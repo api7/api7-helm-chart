@@ -17,17 +17,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "apisix.fullname" . }}
+  name: {{ include "api7.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "apisix.labels" . | nindent 4 }}
+    {{- include "api7.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
 {{- end }}
   selector:
     matchLabels:
-      {{- include "apisix.selectorLabels" . | nindent 6 }}
+      {{- include "api7.selectorLabels" . | nindent 6 }}
   template:
     metadata:
     {{- with .Values.podAnnotations }}
@@ -36,7 +36,7 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     {{- end }}
       labels:
-        {{- include "apisix.selectorLabels" . | nindent 8 }}
+        {{- include "api7.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -91,7 +91,7 @@ spec:
       {{- end }}
       volumes:
         - configMap:
-            name: {{ include "apisix.fullname" . }}
+            name: {{ include "api7.fullname" . }}
           name: apisix-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -107,7 +107,7 @@ spec:
                 - key: app.kubernetes.io/name
                   operator: In
                   values:
-                  - {{ include "apisix.name" . }}
+                  - {{ include "api7.name" . }}
               topologyKey: kubernetes.io/hostname
             weight: 100'
       {{- end }}

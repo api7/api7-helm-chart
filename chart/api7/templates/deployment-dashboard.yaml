@@ -60,7 +60,7 @@ spec:
       {{- end }}
       volumes:
         - configMap:
-            name: {{ include "apisix.fullname" . }}
+            name: {{ include "api7.fullname" . }}
           name: dashboard-config
       {{- with .Values.dashboard.nodeSelector }}
       nodeSelector:
