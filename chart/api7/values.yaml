@@ -170,7 +170,6 @@ plugins:
   - limit-req
   - node-status
   - openid-connect
-  - api7-prometheus
   - proxy-cache
   - proxy-mirror
   - proxy-rewrite
@@ -219,7 +218,7 @@ nodeSelector: {}
 
 tolerations: []
 
-affinity: 
+affinity:
   enabled: false
 
 busybox:
@@ -250,7 +249,7 @@ prometheus:
       pullPolicy: IfNotPresent
   extraScrapeConfigs: |
     - job_name: apisix
-      metrics_path: /apisix/api7-prometheus/metrics
+      metrics_path: /apisix/prometheus/metrics
       scrape_interval: 15s
       static_configs:
         - targets: ["api7-gateway:80"]
