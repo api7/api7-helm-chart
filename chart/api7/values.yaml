@@ -92,6 +92,8 @@ dashboard:
   autoscaling:
     enabled: false
   replicaCount: 1
+  allowList:
+    - 127.0.0.0/24
   image:
     registry: docker.io
     repository: api7/api7-dashboard
