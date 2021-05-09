@@ -49,6 +49,7 @@ data:
         cluster_1:         # etcd cluster_name
           endpoints:
           - "{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }}:{{ .Values.etcd.defaultPort }}"
+          prefix: {{ .Values.etcd.prefix | quote }}
       log:
         error_log:
           level: warn       # supports levels, lower to higher: debug, info, warn, error, panic, fatal
