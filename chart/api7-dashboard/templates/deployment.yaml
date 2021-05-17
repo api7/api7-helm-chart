@@ -36,7 +36,7 @@ spec:
       initContainers:
         - name: wait-etcd
           image: {{ .Values.busybox.image.registry }}/{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}
-          command: [ 'sh', '-c', "until nc -z {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.domainSuffix }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;" ]
+          command: [ 'sh', '-c', "until nc -zw 1 {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }} {{ .Values.etcd.service.port }}; do echo waiting for etcd `date`; sleep 2; done;" ]
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"

@@ -25,6 +25,7 @@ image:
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+clusterDomain: cluster.local
 
 podAnnotations: {}
 
@@ -43,18 +44,17 @@ securityContext:
 
 gateway:
   type: NodePort
-  k8s_domain: cluster.local
   # type: LoadBalancer
   # annotations:
   #   service.beta.kubernetes.io/aws-load-balancer-type: nlb
   http:
     enabled: true
     servicePort: 80
-    containerPort: 9080
+    port: 9080
   tls:
-    enabled: false
+    enabled: true
     servicePort: 443
-    containerPort: 9443
+    port: 9443
     http2:
       enabled: true
 
@@ -74,9 +74,10 @@ gateway:
 # etcd configuration
 # use the FQDN address or the IP of the etcd
 etcd:
-  # install etcd(v3) by default, set false if do not want to install etcd(v3) together
-  enabled: true
-  useSvcHost: true
+  # install etcd(v3) by default, set false if do not want to install etcd(v3) together,
+  # in such a case, etcd.host should be configured so that existing ETCD cluster can be
+  # used.
+  builtin: true
   host:
     - http://etcd.host:2379 # host or ip e.g. http://172.20.128.89:2379
   prefix: "/apisix"
@@ -86,33 +87,6 @@ etcd:
     rbac:
       # No authentication by default
       enabled: false
-
-dashboard:
-  name: dashboard
-  autoscaling:
-    enabled: false
-  replicaCount: 1
-  allowList:
-    - 127.0.0.0/24
-  image:
-    registry: docker.io
-    repository: api7/api7-dashboard
-    pullPolicy: IfNotPresent
-    tag: dev
-  http:
-    enabled: true
-    servicePort: 9000
-    containerPort: 9000
-  nodeSelector: {}
-  service:
-    type: NodePort
-    externalIPs: []
-    # loadBalancerIP: a.b.c.d
-    # loadBalancerSourceRanges:
-    #   - "143.231.0.0/16"
-  prometheus:
-    enabled: true
-    external: ""
 dns:
   resolvers:
     - 127.0.0.1
@@ -123,25 +97,6 @@ dns:
     - 8.8.8.8
   validity: 30
   timeout: 5
-
-admin:
-  # Enable Admin API
-  enabled: true
-  # admin service type
-  type: ClusterIP
-  # loadBalancerIP: a.b.c.d
-  # loadBalancerSourceRanges:
-  #   - "143.231.0.0/16"
-  externalIPs: []
-  #
-  port: 9180
-  servicePort: 9180
-  # Admin API support CORS response headers
-  cors: true
-  # Admin API credentials
-  credentials:
-    admin: edd1c9f034335f136f87ad84b625c8f1
-    viewer: 4054f7cf07e344346cd3f287985e76a2
 
 allow:
   # The ip range for allowing access to Apache APISIX
@@ -221,35 +176,12 @@ tolerations: []
 affinity:
   enabled: false
 
+api7-dashboard:
+  # Whether to install api7-dashboard at the same time.
+  enabled: false
+
 busybox:
   image:
     registry: docker.io
     repository: busybox
     tag: 1.28
-
-prometheus:
-  alertmanager:
-    enabled: false
-  pushgateway:
-    enabled: false
-  nodeExporter:
-    enabled: false
-  configmapReload:
-    prometheus:
-      enabled: false
-    alertmanager:
-      enalbed: false
-  kubeStateMetrics:
-    enabled: false
-  server:
-    enabled: true
-    image:
-      repository: prom/prometheus
-      tag: v2.20.1
-      pullPolicy: IfNotPresent
-  extraScrapeConfigs: |
-    - job_name: apisix
-      metrics_path: /apisix/prometheus/metrics
-      scrape_interval: 15s
-      static_configs:
-        - targets: ["api7-gateway:80"]

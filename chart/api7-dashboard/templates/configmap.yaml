@@ -36,7 +36,7 @@ data:
       prometheus:
         host:
         {{- if .Values.prometheus.builtin }}
-        - "https://{{ .Release.Name }}-prometheus-server.{{ .Release.Name }}.svc.{{ .Values.domainSuffix }}:80"
+        - "https://{{ .Release.Name }}-prometheus-server.{{ .Release.Name }}.svc.{{ .Values.clusterDomain }}:80"
         {{- else -}}
           {{ range .Values.prometheus.clusters }}
         - {{ . }}
@@ -46,10 +46,10 @@ data:
       etcd_clusters:
         user_conf:           # etcd cluster_name, this is for store user info like user,role,workspace
           endpoints:
-          - "{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.domainSuffix }}:{{ .Values.etcd.service.port }}"
+          - "{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.port }}"
         cluster_1:         # etcd cluster_name
           endpoints:
-          - "{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.domainSuffix }}:{{ .Values.etcd.service.port }}"
+          - "{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.port }}"
           prefix: {{ .Values.config.etcdKeyPrefix | quote }}
       log:
         error_log:

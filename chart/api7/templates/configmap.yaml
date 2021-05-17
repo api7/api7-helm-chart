@@ -20,59 +20,6 @@ metadata:
   name: {{ include "api7.fullname" . }}
   namespace: {{ .Release.Namespace }}
 data:
-  dashboard-conf.yaml: |-
-    len: {{ len .Values.dashboard.allowList }}
-    conf:
-      {{- if gt (len .Values.dashboard.allowList) 0 }}
-      allow_list:
-        {{- range .Values.dashboard.allowList }}
-        - {{ . }}
-        {{- end }}
-      {{- end }}
-      listen:
-        host: 0.0.0.0     # `manager api` listening ip or host name
-        port: {{ .Values.dashboard.http.containerPort }} # `manager api` listening port
-      {{- if .Values.dashboard.prometheus.enabled }}
-      prometheus:
-        {{- if gt (len .Values.dashboard.prometheus.external) 0 }}
-        host:
-        - {{ .Values.dashboard.prometheus.external }}
-        {{- else -}}
-        host:
-        - "https://{{ .Release.Name }}-prometheus-server.{{ .Release.Name }}.svc.{{ .Values.gateway.k8s_domain }}:80"
-        {{- end -}}
-      {{- end }}
-      etcd_clusters:
-        user_conf:           # etcd cluster_name, this is for store user info like user,role,workspace
-          endpoints:
-          - "{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }}:{{ .Values.etcd.defaultPort }}"
-        cluster_1:         # etcd cluster_name
-          endpoints:
-          - "{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }}:{{ .Values.etcd.defaultPort }}"
-          prefix: {{ .Values.etcd.prefix | quote }}
-      log:
-        error_log:
-          level: warn       # supports levels, lower to higher: debug, info, warn, error, panic, fatal
-          file_path:
-            logs/error.log  # supports relative path, absolute path, standard output
-                            # such as: logs/error.log, /tmp/logs/error.log, /dev/stdout, /dev/stderr
-        access_log:
-          file_path:
-            logs/access.log  # supports relative path, absolute path, standard output
-                            # such as: logs/access.log, /tmp/logs/access.log, /dev/stdout, /dev/stderr
-                            # log example: 2020-12-09T16:38:09.039+0800	INFO	filter/logging.go:46	/apisix/admin/routes/r1	{"status": 401, "host": "127.0.0.1:9000", "query": "asdfsafd=adf&a=a", "requestId": "3d50ecb8-758c-46d1-af5b-cd9d1c820156", "latency": 0, "remoteIP": "127.0.0.1", "method": "PUT", "errs": []}
-    authentication:
-      secret:
-        qwerty              # secret for jwt token generation.
-                            # NOTE: Highly recommended to modify this value to protect `manager api`.
-                            # if it's default value, when `manager api` start , it will generate a random string to replace it.
-      expire_time: 3600     # jwt token expire time, in second
-      users:                # yamllint enable rule:comments-indentation
-        - username: admin   # username and password for login `manager api`
-          password: admin
-        - username: user
-          password: user
-
   config.yaml: |-
     #
     # Licensed to the Apache Software Foundation (ASF) under one or more
@@ -91,10 +38,10 @@ data:
     # limitations under the License.
     #
     apisix:
-      node_listen: {{ .Values.gateway.http.containerPort }}             # APISIX listening port
+      node_listen: {{ .Values.gateway.http.port }}             # APISIX listening port
       enable_heartbeat: true
-      enable_admin: {{ .Values.admin.enabled }}
-      enable_admin_cors: {{ .Values.admin.cors }}
+      enable_admin: false
+      enable_admin_cors: true
       enable_debug: false
       enable_dev_mode: false          # Sets nginx worker_processes to 1 if set to true
       enable_reuseport: true          # Enable nginx SO_REUSEPORT switch if set to true.
@@ -135,23 +82,7 @@ data:
         - 0.0.0.0/0
       {{- end}}
       #   - "::/64"
-      {{- if .Values.admin.enabled }}
-      port_admin: {{ .Values.admin.port }}
-      {{- end }}
 
-      # Default token when use API to call for Admin API.
-      # *NOTE*: Highly recommended to modify this value to protect APISIX's Admin API.
-      # Disabling this configuration item means that the Admin API does not
-      # require any authentication.
-      admin_key:
-        # admin: can everything for configuration data
-        - name: "admin"
-          key: {{ .Values.admin.credentials.admin }}
-          role: admin
-        # viewer: only can view configuration data
-        - name: "viewer"
-          key: {{ .Values.admin.credentials.viewer }}
-          role: viewer
       router:
         http: 'radixtree_uri'         # radixtree_uri: match route by uri(base on radixtree)
                                       # radixtree_host_uri: match route by host + uri(base on radixtree)
@@ -172,7 +103,7 @@ data:
       ssl:
         enable: {{ .Values.gateway.tls.enabled }}
         enable_http2: {{ .Values.gateway.tls.http2.enabled }}
-        listen_port: {{ .Values.gateway.tls.containerPort }}
+        listen_port: {{ .Values.gateway.tls.port }}
         ssl_protocols: "TLSv1 TLSv1.1 TLSv1.2 TLSv1.3"
         ssl_ciphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA"
 
@@ -197,9 +128,9 @@ data:
         #  ipc_shared_dict: 100m        # custom shared cache, format: `cache-key: cache-size`
 
     etcd:
-    {{- if .Values.etcd.useSvcHost }}
+    {{- if .Values.etcd.builtin }}
       host:                                 # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
-        - "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }}:{{ .Values.etcd.defaultPort }}"
+        - "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.port }}"
     {{- else }}
       host:                                 # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
         {{- range $value := .Values.etcd.host }}

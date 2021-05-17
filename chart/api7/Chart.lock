@@ -2,8 +2,8 @@ dependencies:
 - name: etcd
   repository: https://charts.bitnami.com/bitnami
   version: 5.2.1
-- name: prometheus
-  repository: https://charts.helm.sh/stable
-  version: 11.12.1
-digest: sha256:9e2412c74ea8f889d4f6bcd4062c972676ede60a4ebd4d086ecaacb8b1f670da
-generated: "2021-05-07T15:51:07.173681+08:00"
+- name: api7-dashboard
+  repository: file://../api7-dashboard
+  version: 0.0.1
+digest: sha256:20912f3b8b583d45b79e35d9c6d9358796dca8663466d92402c1af073f8ef4da
+generated: "2021-05-17T15:35:24.870976+08:00"

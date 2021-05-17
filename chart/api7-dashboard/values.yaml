@@ -29,8 +29,8 @@ autoscaling:
 # NOTE: as api7-dashboard doesn't share the login states, DO NOT touch this
 # value.
 replicaCount: 1
-# domainSuffix is the domain suffix for target Kubernetes cluster.
-domainSuffix: cluster.local
+# clusterDomain is the domain suffix for target Kubernetes cluster.
+clusterDomain: cluster.local
 # labels to filter the deployed Kubernetes worker ndoes.
 nodeSelector: {}
 
@@ -68,6 +68,11 @@ etcd:
   # Whether to install an ETCD cluster at the same time.
   # TODO: support referring to an existing ETCD cluster.
   builtin: true
+  service:
+    port: 2379
+  auth:
+    rbac:
+      enabled: false
 
 # api7-dashboard configurations
 config:
