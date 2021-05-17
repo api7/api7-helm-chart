@@ -54,23 +54,28 @@ $ helm install api7 ./chart/api7 -n default \
 	--set etcd.image.registry=docker.io \
 	--set etcd.image.repository=bitnami/etcd \
 	--set etcd.image.tag=3.4.14-debian-10-r0 \
-	--set dashboard.image.registry=docker.io \
-	--set dashboard.image.repository=api7/api7-dashboard \
-	--set dashboard.image.tag=dev
+	--set api7-dashboard.image.registry=docker.io \
+	--set api7-dashboard.image.repository=api7/api7-dashboard \
+	--set api7-dashboard.image.tag=dev
 ```
 
-By default Promethues server will be installed, if you don't need it, just add these options:
+If you don't want to install api7-dashboard, just adding:
 
 ```shell
---set dashboard.prometheus.enabled=false
---set prometheus.server.enabled=false
+--set api7-dashboard.enabled=false
+```
+
+By default, Prometheus server will be installed, if you don't need it, just add these options:
+
+```shell
+--set api7-dashboard.prometheus.builtin=false
 ```
 
 If you want to integrate with external Prometheus server, add the following options:
 
 ```shell
---set dashboard.prometheus.enabled=true
---set dashboard.prometheus.external={your prometheus address}
+--set api7-dashboard.prometheus.builtin=true
+--set api7-dashboard.prometheus.clusters={your prometheus address}
 ```
 ## Uninstall
 
