@@ -17,28 +17,33 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Values.dashboard.name }}
+  name: {{ include "api7-dashboard.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "dashboard.labels" . | nindent 4 }}
+    {{- include "api7-dashboard.labels" . | nindent 4 }}
 spec:
-{{- if not .Values.dashboard.autoscaling.enabled }}
-  replicas: {{ .Values.dashboard.replicaCount }}
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
 {{- end }}
   selector:
     matchLabels:
-      {{- include "dashboard.selectorLabels" . | nindent 6 }}
+      {{- include "api7-dashboard.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "dashboard.selectorLabels" . | nindent 8 }}
+        {{- include "api7-dashboard.selectorLabels" . | nindent 8 }}
     spec:
+      initContainers:
+        - name: wait-etcd
+          image: {{ .Values.busybox.image.registry }}/{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}
+          command: [ 'sh', '-c', "until nc -z {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.domainSuffix }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;" ]
       containers:
-        - name: {{ .Values.dashboard.name }}
-          image: "{{ .Values.dashboard.image.registry }}/{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag }}"
-          imagePullPolicy: {{ .Values.dashboard.image.pullPolicy }}
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.dashboard.http.containerPort }}
+              containerPort: {{ .Values.config.http.port }}
               protocol: TCP
           readinessProbe:
             failureThreshold: 6
@@ -46,23 +51,17 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:
-              port: {{ .Values.dashboard.http.containerPort }}
+              port: {{ .Values.config.http.port }}
             timeoutSeconds: 1
           volumeMounts:
             - mountPath: /usr/local/apisix-dashboard/conf/conf.yaml
-              name: dashboard-config
-              subPath: dashboard-conf.yaml
-      {{- if .Values.etcd.useSvcHost }}
-      initContainers:
-      - name: wait-etcd
-        image: "{{ .Values.busybox.image.registry }}/{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-        command: ['sh', '-c', "until nc -z {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;"]
-      {{- end }}
+              name: api7-dashboard-config
+              subPath: conf.yaml
       volumes:
         - configMap:
-            name: {{ include "api7.fullname" . }}
-          name: dashboard-config
-      {{- with .Values.dashboard.nodeSelector }}
+            name: {{ include "api7-dashboard.fullname" . }}
+          name: api7-dashboard-config
+      {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}

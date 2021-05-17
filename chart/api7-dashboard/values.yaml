@@ -1,0 +1,81 @@
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+nameOverride: ""
+fullnameOverride: ""
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# replicaCount represents the number of desired api7-dashboard replicas.
+# NOTE: as api7-dashboard doesn't share the login states, DO NOT touch this
+# value.
+replicaCount: 1
+# domainSuffix is the domain suffix for target Kubernetes cluster.
+domainSuffix: cluster.local
+# labels to filter the deployed Kubernetes worker ndoes.
+nodeSelector: {}
+
+busybox:
+  image:
+    registry: docker.io
+    repository: busybox
+    tag: 1.28
+image:
+  # Registry for the api7-dashboard image.
+  registry: docker.io
+  # Repository for the api7-dashboard image
+  repository: api7/api7-dashboard
+  # Tag for the api7-dashboard image
+  tag: dev
+  # The image pull policy for api7-dashboard image
+  pullPolicy: IfNotPresent
+
+service:
+  # The api7-dashboard service type.
+  type: ClusterIP
+  # loadBalancerIP: a.b.c.d
+  # loadBalancerSourceRanges:
+  #   - "143.231.0.0/16"
+
+# Note if builtin is false and clusters field are empty, prometheus won't be
+# configured in api7-dashboard.
+prometheus:
+  # Use builtin Prometheus server or reusing existing Kubernetes server.
+  builtin: true
+  # Existing prometheus clusters should be filled here
+  clusters: []
+
+etcd:
+  # Whether to install an ETCD cluster at the same time.
+  # TODO: support referring to an existing ETCD cluster.
+  builtin: true
+
+# api7-dashboard configurations
+config:
+  # Key prefix used by api7-dashboard in ETCD cluster.
+  etcdKeyPrefix: /apisix
+  allowList:
+    - 127.0.0.0/24
+  http:
+    enabled: true
+    servicePort: 9000
+    port: 9000

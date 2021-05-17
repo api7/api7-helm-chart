@@ -87,7 +87,11 @@ spec:
       initContainers:
       - name: wait-etcd
         image: "{{ .Values.busybox.image.registry }}/{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
+        {{- if .Values.etcd.builtin -}}
         command: ['sh', '-c', "until nc -z {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;"]
+        {{ else }}
+        command: ['sh', '-c', "until nc -z {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;"]
+        {{ end }}
       {{- end }}
       volumes:
         - configMap:
@@ -107,7 +111,7 @@ spec:
                 - key: app.kubernetes.io/name
                   operator: In
                   values:
-                  - {{ include "api7.name" . }}
+                  - {{ include "api7-dashboard.name" . }}
               topologyKey: kubernetes.io/hostname
             weight: 100'
       {{- end }}

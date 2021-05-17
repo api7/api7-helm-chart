@@ -14,19 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-apiVersion: v2
-name: api7
-description: Chart for APISEVEN
-home: https://www.apiseven.com
-icon: https://static.apiseven.com/2020/05/Jietu20200312-103300-removebg-preview.png
-type: application
-version: 0.2.0
-appVersion: 2.1-EE
-maintainers:
-  - email: chaozhang@api7.ai
-    name: Chao Zhang
-dependencies:
-  - name: etcd
-    version: 5.2.1
-    repository: https://charts.bitnami.com/bitnami
-    condition: etcd.enabled
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "api7-dashboard.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "api7-dashboard.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.config.http.servicePort }}
+      targetPort: {{ .Values.config.http.port }}
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "api7-dashboard.selectorLabels" . | nindent 4 }}

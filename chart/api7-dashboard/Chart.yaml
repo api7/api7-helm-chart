@@ -15,12 +15,12 @@
 # limitations under the License.
 #
 apiVersion: v2
-name: api7
-description: Chart for APISEVEN
+name: api7-dashboard
+description: Chart for APISEVEN Dashboard
 home: https://www.apiseven.com
 icon: https://static.apiseven.com/2020/05/Jietu20200312-103300-removebg-preview.png
 type: application
-version: 0.2.0
+version: 0.0.1
 appVersion: 2.1-EE
 maintainers:
   - email: chaozhang@api7.ai
@@ -29,4 +29,8 @@ dependencies:
   - name: etcd
     version: 5.2.1
     repository: https://charts.bitnami.com/bitnami
-    condition: etcd.enabled
+    condition: etcd.builtin
+  - name: prometheus
+    version: 11.12.1
+    condition: prometheus.builtin
+    repository: https://charts.helm.sh/stable
