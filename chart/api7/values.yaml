@@ -78,7 +78,7 @@ etcd:
   # in such a case, etcd.host should be configured so that existing ETCD cluster can be
   # used.
   builtin: true
-  host:
+  hosts:
     - http://etcd.host:2379 # host or ip e.g. http://172.20.128.89:2379
   prefix: "/apisix"
   timeout: 30
