@@ -17,17 +17,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "apisix.fullname" . }}
+  name: {{ include "api7.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "apisix.labels" . | nindent 4 }}
+    {{- include "api7.labels" . | nindent 4 }}
 spec:
 {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
 {{- end }}
   selector:
     matchLabels:
-      {{- include "apisix.selectorLabels" . | nindent 6 }}
+      {{- include "api7.selectorLabels" . | nindent 6 }}
   template:
     metadata:
     {{- with .Values.podAnnotations }}
@@ -36,7 +36,7 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
     {{- end }}
       labels:
-        {{- include "apisix.selectorLabels" . | nindent 8 }}
+        {{- include "api7.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -52,23 +52,20 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.gateway.http.containerPort }}
+              containerPort: {{ .Values.gateway.http.port }}
               protocol: TCP
+            {{ if .Values.gateway.tls.enabled }}
             - name: tls
-              containerPort: {{ .Values.gateway.tls.containerPort }}
+              containerPort: {{ .Values.gateway.tls.port }}
               protocol: TCP
-            {{- if .Values.admin.enabled }}
-            - name: admin
-              containerPort: {{ .Values.admin.port }}
-              protocol: TCP
-            {{- end }}
+            {{ end }}
           readinessProbe:
             failureThreshold: 6
             initialDelaySeconds: 10
             periodSeconds: 10
             successThreshold: 1
             tcpSocket:
-              port: {{ .Values.gateway.http.containerPort }}
+              port: {{ .Values.gateway.http.port }}
             timeoutSeconds: 1
           lifecycle:
             preStop:
@@ -83,15 +80,17 @@ spec:
               subPath: config.yaml
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-      {{- if .Values.etcd.useSvcHost }}
+      {{- if .Values.etcd.builtin }}
       initContainers:
       - name: wait-etcd
         image: "{{ .Values.busybox.image.registry }}/{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-        command: ['sh', '-c', "until nc -z {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;"]
+        {{- if .Values.etcd.builtin }}
+        command: ['sh', '-c', "until nc -zw 1 {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.gateway.k8s_domain }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;"]
+        {{ end }}
       {{- end }}
       volumes:
         - configMap:
-            name: {{ include "apisix.fullname" . }}
+            name: {{ include "api7.fullname" . }}
           name: apisix-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
@@ -107,7 +106,7 @@ spec:
                 - key: app.kubernetes.io/name
                   operator: In
                   values:
-                  - {{ include "apisix.name" . }}
+                  - {{ include "api7.name" . }}
               topologyKey: kubernetes.io/hostname
             weight: 100'
       {{- end }}
@@ -115,3 +114,4 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+

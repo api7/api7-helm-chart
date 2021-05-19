@@ -17,14 +17,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "apisix.fullname" . }}-gateway
+  name: {{ include "api7.fullname" . }}-gateway
   namespace: {{ .Release.Namespace }}
   annotations:
     {{- range $key, $value := .Values.gateway.annotations }}
       {{ $key }}: {{ $value | quote }}
     {{- end }}
   labels:
-    {{- include "apisix.labels" . | nindent 4 }}
+    {{- include "api7.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.gateway.type }}
   {{- if eq .Values.gateway.type "LoadBalancer" }}
@@ -38,15 +38,9 @@ spec:
   {{- end }}
   {{- end }}
   {{- end }}
-  {{- if gt (len .Values.admin.externalIPs) 0 }}
-  externalIPs:
-  {{- range $ip := .Values.gateway.externalIPs }}
-  - {{ $ip }}
-  {{- end }}
-  {{- end }}
   ports:
   {{- if .Values.gateway.http.enabled }}
-  - name: apisix-gateway
+  - name: api7-gateway
     port: {{ .Values.gateway.http.servicePort }}
     targetPort: {{ .Values.gateway.http.containerPort }}
   {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.gateway.http.nodePort))) }}
@@ -54,8 +48,8 @@ spec:
   {{- end }}
     protocol: TCP
   {{- end }}
-  {{- if or .Values.gateway.tls.enabled }}
-  - name: apisix-gateway-tls
+  {{- if .Values.gateway.tls.enabled }}
+  - name: api7-gateway-tls
     port: {{ .Values.gateway.tls.servicePort }}
     targetPort: {{ .Values.gateway.tls.containerPort }}
   {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.gateway.tls.nodePort))) }}
@@ -64,4 +58,4 @@ spec:
     protocol: TCP
   {{- end }}
   selector:
-    {{- include "apisix.selectorLabels" . | nindent 4 }}
+    {{- include "api7.selectorLabels" . | nindent 4 }}

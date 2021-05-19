@@ -17,7 +17,7 @@
 #
 -->
 
-# Apache APISIX Helm Charts
+# APISEVEN Helm Charts
 
 ## Dependencies
 
@@ -44,48 +44,66 @@ password: 403754725
 
 ## Install
 
-Please use custome image info, such as:
+Please use custom image info, such as:
 
 ```shell
-$ helm install api7 ./chart/apisix -n default \
+$ helm install api7 ./chart/api7 -n default \
 	--set image.registry=docker.io \
 	--set image.repository=api7/api7 \
 	--set image.tag=dev \
 	--set etcd.image.registry=docker.io \
 	--set etcd.image.repository=bitnami/etcd \
 	--set etcd.image.tag=3.4.14-debian-10-r0 \
-	--set dashboard.image.registry=docker.io \
-	--set dashboard.image.repository=api7/api7-dashboard \
-	--set dashboard.image.tag=dev
+	--set api7-dashboard.image.registry=docker.io \
+	--set api7-dashboard.image.repository=api7/api7-dashboard \
+	--set api7-dashboard.image.tag=dev
 ```
 
+If you don't want to install api7-dashboard, just adding:
+
+```shell
+--set api7-dashboard.enabled=false
+```
+
+By default, Prometheus server will be installed, if you don't need it, just add these options:
+
+```shell
+--set api7-dashboard.prometheus.builtin=false
+```
+
+If you want to integrate with external Prometheus server, add the following options:
+
+```shell
+--set api7-dashboard.prometheus.builtin=true
+--set api7-dashboard.prometheus.clusters={your prometheus address}
+```
 ## Uninstall
 
 ```shell
-helm uninstall api7 ./chart/apisix -n default
+helm uninstall api7 ./chart/api7 -n default
 ```
 
 ## FAQ
 
-1. How to install APISIX only?
+1. How to install APISEVEN only?
 
-The Charts will install etcd 3.4.14 by default. If you want to install Apache APISIX only, please set `etcd.enabled=false` and set `etcd.host={http://your_etcd_address:2379}`.
+The Charts will install etcd 3.4.14 by default. If you want to install APISEVEN only, please set `etcd.enabled=false` and set `etcd.host={http://your_etcd_address:2379}`.
 
 Please use the FQDN address or the IP of the etcd.
 
 ```shell
 # if etcd export by kubernetes service need spell fully qualified name
-$ helm install apisix ./chart/apisix -n default \
+$ helm install api7 ./chart/api7 -n default \
     --set etcd.enabled=false \
     --set etcd.host={http://etcd_node_1:2379\,http://etcd_node_2:2379}
 ```
 
-2. Why get 403 when I access Apache APISIX admin api?
+2. Why get 403 when I access APISEVEN admin api?
 
 We can define `allow.ipList` in CIDR.
 
 ```shell
-$ helm install apisix ./chart/apisix -n default \
+$ helm install api7 ./chart/api7 -n default \
     --set allow.ipList="10.22.100.12/8" \
     --set allow.ipList="172.0.0.0/24"
 ```
@@ -93,7 +111,6 @@ $ helm install apisix ./chart/apisix -n default \
 If you want to allow all IPs for a quick test, just set `allow.ipList=""`
 
 ```shell
-$ helm install apisix ./chart/apisix -n default \
+$ helm install api7 ./chart/api7 -n default \
     --set allow.ipList=""
 ```
-

@@ -1,8 +1,24 @@
-{{/* vim: set filetype=mustache: */}}
+#
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "apisix.name" -}}
+{{- define "api7-dashboard.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -11,7 +27,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "apisix.fullname" -}}
+{{- define "api7-dashboard.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -27,16 +43,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "apisix.chart" -}}
+{{- define "api7-dashboard.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "apisix.labels" -}}
-helm.sh/chart: {{ include "apisix.chart" . }}
-{{ include "apisix.selectorLabels" . }}
+{{- define "api7-dashboard.labels" -}}
+helm.sh/chart: {{ include "api7-dashboard.chart" . }}
+{{ include "api7-dashboard.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -46,33 +62,7 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "apisix.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "apisix.name" . }}
+{{- define "api7-dashboard.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "api7-dashboard.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "apisix.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "apisix.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-{{/*
-Dashboard lables
-*/}}
-{{- define "dashboard.labels" -}}
-{{ include "dashboard.selectorLabels" . }}
-{{- end }}
-
-{{/*
-Dashboard selector labels
-*/}}
-{{- define "dashboard.selectorLabels" -}}
-app: {{ .Values.dashboard.name }}
-version: {{ .Values.dashboard.image.tag }}
 {{- end }}
