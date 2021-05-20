@@ -98,11 +98,6 @@ dns:
   validity: 30
   timeout: 5
 
-allow:
-  # The ip range for allowing access to Apache APISIX
-  ipList:
-    - 127.0.0.1/24
-
 # APISIX plugins to be enabled
 plugins:
   - api-breaker

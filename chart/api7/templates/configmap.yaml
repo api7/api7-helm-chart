@@ -73,16 +73,6 @@ data:
       #    disk_path: "/tmp/disk_cache_two"
       #    cache_levels: "1:2"
 
-      allow_admin:                  # http://nginx.org/en/docs/http/ngx_http_access_module.html#allow
-      {{- if .Values.allow.ipList }}
-      {{- range $ips := .Values.allow.ipList }}
-        - {{ $ips }}
-      {{- end }}
-      {{- else }}
-        - 0.0.0.0/0
-      {{- end}}
-      #   - "::/64"
-
       router:
         http: 'radixtree_uri'         # radixtree_uri: match route by uri(base on radixtree)
                                       # radixtree_host_uri: match route by host + uri(base on radixtree)
