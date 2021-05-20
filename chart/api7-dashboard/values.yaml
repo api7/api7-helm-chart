@@ -34,11 +34,6 @@ clusterDomain: cluster.local
 # labels to filter the deployed Kubernetes worker ndoes.
 nodeSelector: {}
 
-busybox:
-  image:
-    registry: docker.io
-    repository: busybox
-    tag: 1.28
 image:
   # Registry for the api7-dashboard image.
   registry: docker.io
@@ -64,23 +59,32 @@ prometheus:
   # Existing prometheus clusters should be filled here
   clusters: []
 
-etcd:
-  # Whether to install an ETCD cluster at the same time.
-  # TODO: support referring to an existing ETCD cluster.
-  builtin: true
-  service:
-    port: 2379
-  auth:
-    rbac:
-      enabled: false
-
 # api7-dashboard configurations
 config:
   # Key prefix used by api7-dashboard in ETCD cluster.
-  etcdKeyPrefix: /apisix
   allowList:
     - 127.0.0.0/24
   http:
     enabled: true
     servicePort: 9000
     port: 9000
+  # Multiple clusters configuration
+  clusters:
+    - name: cluster_1
+      etcd:
+        hosts: []
+        service:
+          port: 2379
+        auth:
+          rbac:
+            enabled: false
+        prefix: /apisix
+  # selfEtcd configures the etcd cluster used to store
+  # metadata.
+  selfEtcd:
+    hosts: []
+    service:
+      port: 2379
+    auth:
+      rbac:
+        enabled: false

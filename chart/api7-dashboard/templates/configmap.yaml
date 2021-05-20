@@ -44,13 +44,19 @@ data:
         {{- end -}}
       {{- end }}
       etcd_clusters:
-        user_conf:           # etcd cluster_name, this is for store user info like user,role,workspace
+      {{ range .Values.config.clusters }}
+      {{- .name | indent 2 }}:
           endpoints:
-          - "{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.port }}"
-        cluster_1:         # etcd cluster_name
+          {{- range .hosts }}
+          - {{ . -}}
+          {{ end }}
+          prefix: {{ .prefix -}}
+      {{ end }}
+        user_conf:
           endpoints:
-          - "{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.port }}"
-          prefix: {{ .Values.config.etcdKeyPrefix | quote }}
+          {{ range .Values.config.selfEtcd.hosts -}}
+          - {{ . -}}
+          {{ end }}
       log:
         error_log:
           level: warn       # supports levels, lower to higher: debug, info, warn, error, panic, fatal

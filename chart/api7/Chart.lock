@@ -5,5 +5,5 @@ dependencies:
 - name: api7-dashboard
   repository: file://../api7-dashboard
   version: 0.0.1
-digest: sha256:20912f3b8b583d45b79e35d9c6d9358796dca8663466d92402c1af073f8ef4da
-generated: "2021-05-17T15:35:24.870976+08:00"
+digest: sha256:75b3fd9965150f1117b8c57fbb3d3b0d0e8786d9bd598dfafb38e5584a123687
+generated: "2021-05-19T17:22:07.944314+08:00"
