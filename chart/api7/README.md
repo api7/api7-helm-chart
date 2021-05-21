@@ -23,7 +23,7 @@ Firstly we should update the dependency in your local. Now we will try to instal
 kubectl create namespace api7
 ```
 
-Image for api7 is private and never should be uploaded to public image registry like [dockerhub](https://hub.docker.com), so make sure the image for api7 was stashed in a registry that can be accessed from the Kubernetes cluster.
+Images for api7 is private and never should be uploaded to public image registries like [dockerhub](https://hub.docker.com), so make sure the image for api7 was stashed in a registry that can be accessed from the Kubernetes cluster.
 
 ```sh
 helm install api7 . -n api7 \
@@ -38,7 +38,7 @@ Check the running status of api7.
 
 
 ```sh
-kubectl get deploy,service -n api7
+kubectl get deploy,svc,sts -n api7
 NAME                   READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/api7   1/1     1            1           3m47s
 
