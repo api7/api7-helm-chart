@@ -1,0 +1,13 @@
+image:
+  registry: localhost:5000
+  repository: api7/api7-dashboard
+  tag: v2.1ee
+config:
+  clusters:
+    - name: cluster_1
+      etcd:
+        hosts:
+        - https://api7-etcd.api7.svc.cluster.local
+  selfEtcd:
+    hosts:
+    - https://api7-etcd.api7.svc.cluster.local
