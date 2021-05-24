@@ -90,7 +90,6 @@ See [values.yaml](./values.yaml) to learn all the config items. Here the most co
 
 ### How to control the desired replica count for api7 deployment?
 
-
 Use `replicaCount` item.
 
 ```sh
