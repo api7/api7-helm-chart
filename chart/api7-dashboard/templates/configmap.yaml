@@ -47,10 +47,10 @@ data:
       {{ range .Values.config.clusters }}
       {{- .name | indent 2 }}:
           endpoints:
-          {{- range .hosts }}
+          {{- range .etcd.hosts }}
           - {{ . -}}
           {{ end }}
-          prefix: {{ .prefix -}}
+          prefix: {{ .etcd.prefix -}}
       {{ end }}
         user_conf:
           endpoints:
