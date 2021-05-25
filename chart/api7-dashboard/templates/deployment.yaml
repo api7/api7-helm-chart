@@ -53,6 +53,20 @@ spec:
             - mountPath: /usr/local/apisix-dashboard/conf/conf.yaml
               name: api7-dashboard-config
               subPath: conf.yaml
+          {{- if .Values.selfRegister.enabled }}
+            - mountPath: /usr/local/apisix-dashboard/self-register.sh
+              name: api7-dashboard-config
+              subPath: self-register.sh
+          {{- end }}
+          {{- if .Values.selfRegister.enabled }}
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                - "/bin/sh"
+                - "-c"
+                - "apk add curl && sh /usr/local/apisix-dashboard/self-register.sh"
+          {{- end}}
       volumes:
         - configMap:
             name: {{ include "api7-dashboard.fullname" . }}

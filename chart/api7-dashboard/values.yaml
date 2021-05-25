@@ -44,6 +44,13 @@ image:
   # The image pull policy for api7-dashboard image
   pullPolicy: IfNotPresent
 
+# Whether to register Route and Upstream to API7, so that API7-Dashboard can be
+# accessed through API7.
+# Basically it should be executed when you install API7-Dashboard for the first time.
+selfRegister:
+  enabled: false
+  host: api7-dashboard.apiseven.com
+
 service:
   # The api7-dashboard service type.
   type: ClusterIP
