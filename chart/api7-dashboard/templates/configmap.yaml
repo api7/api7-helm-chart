@@ -63,7 +63,7 @@ data:
       prometheus:
         host:
         {{- if .Values.prometheus.builtin }}
-        - "https://{{ .Release.Name }}-prometheus-server.{{ .Release.Name }}.svc.{{ .Values.clusterDomain }}:80"
+        - "http://{{ .Release.Name }}-prometheus-server.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:80"
         {{- else -}}
           {{ range .Values.prometheus.clusters }}
         - {{ . }}
