@@ -42,7 +42,7 @@ spec:
   {{- if .Values.gateway.http.enabled }}
   - name: api7-gateway
     port: {{ .Values.gateway.http.servicePort }}
-    targetPort: {{ .Values.gateway.http.containerPort }}
+    targetPort: {{ .Values.gateway.http.port }}
   {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.gateway.http.nodePort))) }}
     nodePort: {{ .Values.gateway.http.nodePort }}
   {{- end }}
@@ -51,7 +51,7 @@ spec:
   {{- if .Values.gateway.tls.enabled }}
   - name: api7-gateway-tls
     port: {{ .Values.gateway.tls.servicePort }}
-    targetPort: {{ .Values.gateway.tls.containerPort }}
+    targetPort: {{ .Values.gateway.tls.port }}
   {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.gateway.tls.nodePort))) }}
     nodePort: {{ .Values.gateway.tls.nodePort }}
   {{- end }}
