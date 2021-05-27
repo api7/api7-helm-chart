@@ -120,6 +120,7 @@ plugins:
   - limit-req
   - node-status
   - openid-connect
+  - prometheus
   - proxy-cache
   - proxy-mirror
   - proxy-rewrite
