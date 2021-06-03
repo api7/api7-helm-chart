@@ -33,6 +33,10 @@ spec:
       labels:
         {{- include "api7-dashboard.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.config.k8sSupport.enable }}
+      serviceAccountName: {{ .Values.config.k8sSupport.serviceAccount }}
+      {{- end }}
+
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -75,3 +79,4 @@ spec:
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
