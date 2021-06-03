@@ -59,7 +59,7 @@ spec:
               containerPort: {{ .Values.gateway.tls.port }}
               protocol: TCP
             {{ end }}
-            {{ if has "prometheus" .Values.plugins }}
+            {{ if (and (has "prometheus" .Values.plugins) (get .Values.plugin_attr.prometheus "enable_export_server" )) }}
             - name: metric
               containerPort: {{ .Values.plugin_attr.prometheus.export_addr.port }}
               protocol: TCP
