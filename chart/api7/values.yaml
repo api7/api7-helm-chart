@@ -141,6 +141,21 @@ plugins:
   - server-info
 stream_plugins:
   - mqtt-proxy
+plugin_attr:
+  log-rotate:
+    interval: 3600    # rotate interval (unit: second)
+    max_kept: 168     # max number of log files will be kept
+  prometheus:
+    export_uri: /apisix/prometheus/metrics
+    enable_export_server: true
+    export_addr:
+      ip: "0.0.0.0"
+      port: 9091
+  server-info:
+    report_interval: 60  # server info report interval (unit: second)
+    report_ttl: 3600     # live time for server info in etcd (unit: second)
+  dubbo-proxy:
+    upstream_multiplex_count: 32
 
 resources:
   limits:

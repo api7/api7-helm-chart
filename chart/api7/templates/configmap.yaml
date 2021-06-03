@@ -140,3 +140,7 @@ data:
     {{- range $plugin := .Values.stream_plugins }}
       - {{ $plugin }}
     {{- end }}
+    {{- if .Values.plugin_attr }}
+    plugin_attr:                     # plugin attr
+    {{- toYaml .Values.plugin_attr | nindent 6 }}
+    {{- end }}
