@@ -106,3 +106,19 @@ data:
           password: admin
         - username: user
           password: user
+
+{{- if .Values.config.k8sSupport.enable }}
+    kubernetes:
+      enable: true            # enable to connect k8s cluster
+      kubeconfig: ""          # the Kubernetes configuration file path, default is
+                              # "", so the in-cluster configuration will be used.
+      app_namespaces:
+        {{ range .Values.config.k8sSupport.namespaces }}
+        - {{ . | quote }}
+        {{ end  }}
+                              # by default all namespaces (represented by "*") are watched.
+      resync_interval: "6h"   # how long should manager-api
+                              # re-synchronizes with Kubernetes, default is 6h,
+      cluster_domain: {{ .Values.config.k8sSupport.clusterDomain | quote }}  # the local domain in the kubelet, the default is cluster.local
+{{- end }}
+

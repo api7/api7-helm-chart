@@ -95,3 +95,13 @@ config:
     auth:
       rbac:
         enabled: false
+
+   # serviceAccount
+  k8sSupport:
+    enable: true
+    namespaces: ["*"]
+    clusterDomain: "cluster.local"
+    clusterRole: "services-lister"
+    serviceAccount: "api7-account"
+    clusterRoleBinding: "api7-services-account-binding"
+
