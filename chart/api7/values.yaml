@@ -47,6 +47,7 @@ gateway:
   # type: LoadBalancer
   # annotations:
   #   service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  workerProcesses: auto
   http:
     enabled: true
     servicePort: 80
