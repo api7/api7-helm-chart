@@ -23,6 +23,12 @@ metadata:
     {{- include "api7-dashboard.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
+  {{- if gt (len .Values.service.loadBalancerSourceRanges) 0 }}
+  loadBalancerSourceRanges:
+    {{- range .Values.service.loadBalancerSourceRanges }}
+    - {{ . -}}
+    {{- end }}
+  {{- end }}
   ports:
     - port: {{ .Values.config.http.servicePort }}
       targetPort: {{ .Values.config.http.port }}
