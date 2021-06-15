@@ -56,7 +56,6 @@ gateway:
     port: 9080
   tls:
     enabled: true
-    host: 0.0.0.0
     servicePort: 443
     port: 9443
     http2:
