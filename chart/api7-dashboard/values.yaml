@@ -75,6 +75,13 @@ config:
     enabled: true
     servicePort: 9000
     port: 9000
+  tls:
+    enabled: false
+    servicePort: 9443
+    port: 9443
+    secretName: ""
+    mtls_enabled: true
+
   # Multiple clusters configuration
   clusters:
     - name: cluster_1

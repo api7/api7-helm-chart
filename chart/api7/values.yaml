@@ -47,7 +47,7 @@ gateway:
   # type: LoadBalancer
   # annotations:
   #   service.beta.kubernetes.io/aws-load-balancer-type: nlb
-  # warn: should update the value of workerProcesses 
+  # warn: should update the value of workerProcesses
   #       to the number of cpu cores that match the actual allocated resources.
   workerProcesses: auto
   http:
@@ -56,6 +56,7 @@ gateway:
     port: 9080
   tls:
     enabled: true
+    host: 0.0.0.0
     servicePort: 443
     port: 9443
     http2:

@@ -62,6 +62,10 @@ spec:
               name: api7-dashboard-config
               subPath: self-register.sh
           {{- end }}
+          {{- if .Values.config.tls.enabled }}
+            - mountPath: /usr/local/apisix-dashboard/tls
+              name: "ssl"
+          {{- end }}
           {{- if .Values.selfRegister.enabled }}
           lifecycle:
             postStart:
@@ -75,6 +79,11 @@ spec:
         - configMap:
             name: {{ include "api7-dashboard.fullname" . }}
           name: api7-dashboard-config
+        {{- if .Values.config.tls.enabled }}
+        - name: ssl
+          secret:
+            secretName: {{ .Values.config.tls.secretName }}
+        {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

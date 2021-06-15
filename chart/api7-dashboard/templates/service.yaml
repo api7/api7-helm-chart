@@ -24,9 +24,17 @@ metadata:
 spec:
   type: {{ .Values.service.type }}
   ports:
+    {{- if .Values.config.http.enabled }}
     - port: {{ .Values.config.http.servicePort }}
       targetPort: {{ .Values.config.http.port }}
       protocol: TCP
       name: http
+    {{ end }}
+    {{- if .Values.config.tls.enabled }}
+    - port: {{ .Values.config.tls.servicePort }}
+      targetPort: {{ .Values.config.tls.port }}
+      protocol: TCP
+      name: https
+    {{ end }}
   selector:
     {{- include "api7-dashboard.selectorLabels" . | nindent 4 }}
