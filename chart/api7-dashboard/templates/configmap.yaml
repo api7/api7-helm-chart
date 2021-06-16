@@ -59,6 +59,18 @@ data:
       listen:
         host: 0.0.0.0     # `manager api` listening ip or host name
         port: {{ .Values.config.http.port }} # `manager api` listening port
+      {{- if .Values.config.tls.enabled }}
+      ssl:
+        enable: true
+        host: "0.0.0.0"
+        port: {{ .Values.config.tls.port }}
+        cert: "/usr/local/apisix-dashboard/tls/tls.crt"
+        key: "/usr/local/apisix-dashboard/tls/tls.key"
+        {{- if .Values.config.tls.mtls_enabled }}
+        client_cert_auth: true
+        trusted_ca: "/usr/local/apisix-dashboard/tls/ca.crt"
+        {{- end }}
+      {{- end }}
       {{- if or .Values.prometheus.builtin (gt (len .Values.prometheus.clusters) 0) }}
       prometheus:
         host:
