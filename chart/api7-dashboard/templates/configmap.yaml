@@ -94,7 +94,7 @@ data:
         user_conf:
           endpoints:
           {{ range .Values.config.selfEtcd.hosts -}}
-          - {{ . -}}
+          - {{ . }}
           {{ end }}
       log:
         error_log:
