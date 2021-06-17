@@ -33,6 +33,10 @@ spec:
       labels:
         {{- include "api7-dashboard.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.config.k8sSupport.enable }}
       serviceAccountName: {{ .Values.config.k8sSupport.serviceAccount }}
       {{- end }}
