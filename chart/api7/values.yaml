@@ -90,6 +90,16 @@ etcd:
     rbac:
       # No authentication by default
       enabled: false
+      ## Allow to use etcd without configuring RBAC authentication
+      ##
+      allowNoneAuthentication: true
+      ## root user password. The root user is always `root`
+      ##
+      rootPassword: ""
+      ## Name of the existing secret containing credentials for the root user
+      ##
+      existingSecret: ""
+
 dns:
   resolvers:
     - 127.0.0.1
