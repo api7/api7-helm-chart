@@ -96,6 +96,10 @@ data:
           {{ range .Values.config.selfEtcd.hosts -}}
           - {{ . }}
           {{ end }}
+          {{- if .Values.etcd.auth.rbac.enabled }}
+          username: root
+          password: {{ .Values.etcd.auth.rbac.rootPassword | quote }}
+          {{ end }}
       log:
         error_log:
           level: warn       # supports levels, lower to higher: debug, info, warn, error, panic, fatal

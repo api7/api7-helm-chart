@@ -96,9 +96,6 @@ etcd:
       ## root user password. The root user is always `root`
       ##
       rootPassword: ""
-      ## Name of the existing secret containing credentials for the root user
-      ##
-      existingSecret: ""
 
 dns:
   resolvers:
