@@ -134,8 +134,8 @@ data:
       prefix: {{ .Values.etcd.prefix | quote }}     # apisix configurations prefix
       timeout: {{ .Values.etcd.timeout }}   # 30 seconds
       {{- if .Values.etcd.auth.rbac.enabled }}
-      user: root
-      password: {{ .Values.etcd.auth.rbac.rootPassword | quote }}
+      user: {{ .Values.etcd.auth.rbac.user | quote }}
+      password: {{ .Values.etcd.auth.rbac.password | quote }}
       {{- end }}
 
     {{- if .Values.plugins }}

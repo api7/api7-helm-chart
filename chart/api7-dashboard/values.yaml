@@ -102,6 +102,12 @@ config:
     auth:
       rbac:
         enabled: false
+        ## etcd user
+        ##
+        user: ""
+        ## etcd password
+        ##
+        password: ""
 
    # serviceAccount
   k8sSupport:
