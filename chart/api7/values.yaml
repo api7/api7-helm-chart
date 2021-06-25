@@ -90,6 +90,13 @@ etcd:
     rbac:
       # No authentication by default
       enabled: false
+      ## etcd user
+      ##
+      user: ""
+      ## etcd password
+      ##
+      password: ""
+
 dns:
   resolvers:
     - 127.0.0.1
