@@ -90,6 +90,10 @@ data:
           - {{ . -}}
           {{ end }}
           prefix: {{ .etcd.prefix -}}
+          {{- if .etcd.auth.rbac.enabled }}
+          username: {{ .etcd.auth.rbac.user | quote }}
+          password: {{ .etcd.auth.rbac.password | quote }}
+          {{ end }}
       {{ end }}
         user_conf:
           endpoints:
