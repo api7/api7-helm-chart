@@ -83,7 +83,7 @@ etcd:
   builtin: true
   hosts:
     - http://etcd.host:2379 # host or ip e.g. http://172.20.128.89:2379
-  prefix: "/apisix"
+  prefix: "/api7"
   timeout: 30
   defaultPort: 2379
   auth:
