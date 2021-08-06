@@ -1,13 +1,25 @@
+replicaCount: 1
 image:
   registry: localhost:5000
   repository: api7/api7-dashboard
-  tag: v2.1ee
+  tag: 2.3
 config:
+  allowList:
+    - 0.0.0.0/0
   clusters:
     - name: cluster_1
       etcd:
         hosts:
-        - https://api7-etcd.api7.svc.cluster.local
+        - http://api7-etcd.api7.svc.cluster.local:2379
+        prefix: /api7
+        auth:
+          rbac:
+            enabled: false
   selfEtcd:
     hosts:
-    - https://api7-etcd.api7.svc.cluster.local
+    - http://api7-etcd.api7.svc.cluster.local:2379
+    auth:
+      rbac:
+        enabled: false
+service:
+  type: NodePort

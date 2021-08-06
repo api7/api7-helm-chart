@@ -1,0 +1,46 @@
+{{- if .Values.httpbin.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: httpbin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: httpbin-deployment
+  strategy:
+    rollingUpdate:
+      maxSurge: 50%
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: httpbin-deployment
+    spec:
+      terminationGracePeriodSeconds: 0
+      containers:
+        - livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 2
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            successThreshold: 1
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 2
+          image: "{{ .Values.httpbin.image.repository }}:{{ .Values.httpbin.image.tag }}"
+          imagePullPolicy: IfNotPresent
+          name: httpbin-deployment
+          ports:
+            - containerPort: 80
+              name: "http"
+              protocol: "TCP"
+{{- end }}

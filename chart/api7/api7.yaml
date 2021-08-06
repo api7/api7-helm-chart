@@ -1,0 +1,13 @@
+# file name is api7.yaml
+replicaCount: 1
+image:
+  registry: localhost:5000
+  repository: api7/api7-gateway
+  tag: 2.3
+
+gateway:
+  type: NodePort
+
+etcd:
+  builtin: true
+  prefix: "/api7"

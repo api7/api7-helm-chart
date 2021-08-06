@@ -40,7 +40,7 @@ data:
     apisix:
       node_listen: {{ .Values.gateway.http.port }}             # APISIX listening port
       enable_heartbeat: true
-      enable_admin: false
+      enable_admin: true
       enable_admin_cors: true
       enable_debug: false
       enable_dev_mode: false          # Sets nginx worker_processes to 1 if set to true
@@ -72,6 +72,9 @@ data:
       #    disk_size: 1G
       #    disk_path: "/tmp/disk_cache_two"
       #    cache_levels: "1:2"
+      allow_admin:
+        - 127.0.0.0/24
+        - 0.0.0.0/0
 
       router:
         http: 'radixtree_uri'         # radixtree_uri: match route by uri(base on radixtree)

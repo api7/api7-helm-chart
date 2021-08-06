@@ -8,3 +8,4 @@ Detailed instructions are enrolled in the README of each chart.
 
 * [api7](./chart/api7/README.md)
 * [api7-dashboard](./chart/api7-dashboard/README.md)
+* [api7-ingress](./chart/api7-ingress/README.md)
