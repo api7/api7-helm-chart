@@ -1,132 +1,101 @@
-#
-# Licensed to the Apache Software Foundation (ASF) under one or more
-# contributor license agreements.  See the NOTICE file distributed with
-# this work for additional information regarding copyright ownership.
-# The ASF licenses this file to You under the Apache License, Version 2.0
-# (the "License"); you may not use this file except in compliance with
-# the License.  You may obtain a copy of the License at
-#
-#     http://www.apache.org/licenses/LICENSE-2.0
-#
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-#
+replicaCount: 1
 
+image:
+  repository: apache/apisix-dashboard
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "2.7"
+
+imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+config:
+  conf:
+    listen:
+      host: 0.0.0.0
+      port: 9000
+    etcd:
+      # Supports defining multiple etcd host addresses for an etcd cluster
+      endpoints:
+        - apisix-etcd:2379
+      # Etcd basic auth info
+      username: ~
+      password: ~
+    log:
+      errorLog:
+        level: warn
+        filePath: /dev/stderr
+      accessLog:
+        filePath: /dev/stdout
+
+  authentication:
+    secert: secert
+    expireTime: 3600
+    users:
+      - username: admin
+        password: admin
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: apisix-dashboard.local
+      paths: []
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
 
 autoscaling:
   enabled: false
   minReplicas: 1
   maxReplicas: 100
   targetCPUUtilizationPercentage: 80
-  targetMemoryUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
 
-# replicaCount represents the number of desired api7-dashboard replicas.
-# NOTE: as api7-dashboard doesn't share the login states, DO NOT touch this
-# value.
-replicaCount: 1
-# clusterDomain is the domain suffix for target Kubernetes cluster.
-clusterDomain: cluster.local
-# labels to filter the deployed Kubernetes worker ndoes.
 nodeSelector: {}
 
-image:
-  # Registry for the api7-dashboard image.
-  registry: docker.io
-  # Repository for the api7-dashboard image
-  repository: api7/api7-dashboard
-  # Tag for the api7-dashboard image
-  tag: dev
-  # The image pull policy for api7-dashboard image
-  pullPolicy: IfNotPresent
+tolerations: []
 
-imagePullSecrets: []
-
-# Whether to register Route and Upstream to API7, so that API7-Dashboard can be
-# accessed through API7.
-# Basically it should be executed when you install API7-Dashboard for the first time.
-selfRegister:
-  enabled: false
-  host: api7-dashboard.apiseven.com
-
-service:
-  # The api7-dashboard service type.
-  type: ClusterIP
-  # loadBalancerIP: a.b.c.d
-  loadBalancerSourceRanges: []
-# Note if builtin is false and clusters field are empty, prometheus won't be
-# configured in api7-dashboard.
-prometheus:
-  # Use builtin Prometheus server or reusing existing Kubernetes server.
-  builtin: true
-  # Existing prometheus clusters should be filled here
-  clusters: []
-
-# api7-dashboard configurations
-config:
-  # Key prefix used by api7-dashboard in ETCD cluster.
-  allowList:
-    - 127.0.0.0/24
-  http:
-    enabled: true
-    servicePort: 9000
-    port: 9000
-  tls:
-    enabled: false
-    servicePort: 9443
-    port: 9443
-    secretName: ""
-    mtls_enabled: true
-
-  # Multiple clusters configuration
-  clusters:
-    - name: cluster_1
-      etcd:
-        hosts: []
-        service:
-          port: 2379
-        auth:
-          rbac:
-            enabled: false
-            ## etcd user
-            ##
-            user: ""
-            ## etcd password
-            ##
-            password: ""
-        prefix: /api7
-  # selfEtcd configures the etcd cluster used to store
-  # metadata.
-  selfEtcd:
-    hosts: []
-    service:
-      port: 2379
-    auth:
-      rbac:
-        enabled: false
-        ## etcd user
-        ##
-        user: ""
-        ## etcd password
-        ##
-        password: ""
-
-  k8sSupport:
-    enable: true
-    namespaces: ["*"]
-    clusterDomain: "cluster.local"
-    clusterRole: "services-lister"
-    serviceAccount: "api7-account"
-    clusterRoleBinding: "api7-services-account-binding"
-
-  log:
-    error_log:
-      level: warn
-      file_path: "/dev/stderr"
-    access_log:
-      file_path: "/dev/stdout"
-
+affinity: {}

@@ -13,132 +13,50 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+#
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ include "api7-dashboard.fullname" . }}
+  name: {{ include "apisix-dashboard.fullname" . }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "apisix-dashboard.labels" . | nindent 4 }}
 data:
-  {{- if .Values.selfRegister.enabled }}
-  self-register.sh: |-
-    #!/usr/bin/env sh
-    echo 'Checking the running of Manager API...'
-    until nc -zw 1 127.0.0.1 {{ .Values.config.http.port }}; do
-      echo 'Waiting for Manager API'
-      sleep 1
-    done
-    token=`curl -s http://127.0.0.1:{{ .Values.config.http.port }}/apisix/admin/user/login -d '{"username":"admin", "password":"admin"}' | grep -o '"token":"[^\"]*"' | awk -F : '{print $2}' | tr -d '"'`
-    {{- $global := . -}}
-    {{ range $idx, $cluster := .Values.config.clusters }}
-    {{ with $global }}
-    echo '
-    {
-      "name": "dashboard-route-{{ $cluster.name }}",
-      "uris": ["/*"],
-      "hosts": ["{{ .Values.selfRegister.host }}"],
-      "upstream": {
-        "type": "roundrobin",
-        "nodes": {
-          "{{ include "api7-dashboard.fullname" . }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.config.http.port }}": 1
-        }
-      }
-    }' | curl http://127.0.0.1:{{ .Values.config.http.port }}/apisix/admin/routes/E08D6599-EF67-408A-8006-17D2B592C3D4?cluster_id={{ $cluster.name }} -XPUT -H "Authorization: $token" -v -d @-
-    {{ end -}}
-    {{ end -}}
-  {{ end }}
   conf.yaml: |-
-    len: {{ len .Values.config.allowList }}
+    {{- with .Values.config.conf }}
     conf:
-      {{- if gt (len .Values.config.allowList) 0 }}
-      allow_list:
-        {{- range .Values.config.allowList }}
-        - {{ . }}
-        {{- end }}
-      {{- end }}
       listen:
-        host: 0.0.0.0     # `manager api` listening ip or host name
-        port: {{ .Values.config.http.port }} # `manager api` listening port
-      {{- if .Values.config.tls.enabled }}
-      ssl:
-        enable: true
-        host: "0.0.0.0"
-        port: {{ .Values.config.tls.port }}
-        cert: "/usr/local/apisix-dashboard/tls/tls.crt"
-        key: "/usr/local/apisix-dashboard/tls/tls.key"
-        {{- if .Values.config.tls.mtls_enabled }}
-        client_cert_auth: true
-        trusted_ca: "/usr/local/apisix-dashboard/tls/ca.crt"
+        host: {{ .listen.host }}
+        port: {{ .listen.port }}
+      {{- with .etcd }}
+      etcd:
+        endpoints:
+          {{- range .endpoints }}
+          - {{ . }}
+          {{- end }}
+        {{- if .username }}
+        username: {{ .username }}
+        {{- end }}
+        {{- if .password }}
+        password: {{ .password }}
         {{- end }}
       {{- end }}
-      {{- if or .Values.prometheus.builtin (gt (len .Values.prometheus.clusters) 0) }}
-      prometheus:
-        host:
-        {{- if .Values.prometheus.builtin }}
-        - "http://{{ .Release.Name }}-prometheus-server.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:80"
-        {{- else -}}
-          {{ range .Values.prometheus.clusters }}
-        - {{ . }}
-          {{ end }}
-        {{- end -}}
-      {{- end }}
-      etcd_clusters:
-      {{ range .Values.config.clusters }}
-      {{- .name | indent 2 }}:
-          endpoints:
-          {{- range .etcd.hosts }}
-          - {{ . -}}
-          {{ end }}
-          prefix: {{ .etcd.prefix -}}
-          {{- if .etcd.auth.rbac.enabled }}
-          username: {{ .etcd.auth.rbac.user | quote }}
-          password: {{ .etcd.auth.rbac.password | quote }}
-          {{ end }}
-      {{ end }}
-        user_conf:
-          endpoints:
-          {{ range .Values.config.selfEtcd.hosts -}}
-          - {{ . }}
-          {{ end }}
-          {{- if .Values.config.selfEtcd.auth.rbac.enabled }}
-          username: {{ .Values.config.selfEtcd.auth.rbac.user | quote }}
-          password: {{ .Values.config.selfEtcd.auth.rbac.password | quote }}
-          {{ end }}
+      {{- with .log }}
       log:
         error_log:
-          level: {{ .Values.config.log.error_log.level }}       # supports levels, lower to higher: debug, info, warn, error, panic, fatal
-          file_path:
-            {{ .Values.config.log.error_log.file_path }}  # supports relative path, absolute path, standard output
-                            # such as: logs/error.log, /tmp/logs/error.log, /dev/stdout, /dev/stderr
+          level: {{ .errorLog.level }}
+          file_path: {{ .errorLog.filePath }}
         access_log:
-          file_path:
-            {{ .Values.config.log.access_log.file_path }}  # supports relative path, absolute path, standard output
-                            # such as: logs/access.log, /tmp/logs/access.log, /dev/stdout, /dev/stderr
-                            # log example: 2020-12-09T16:38:09.039+0800	INFO	filter/logging.go:46	/apisix/admin/routes/r1	{"status": 401, "host": "127.0.0.1:9000", "query": "asdfsafd=adf&a=a", "requestId": "3d50ecb8-758c-46d1-af5b-cd9d1c820156", "latency": 0, "remoteIP": "127.0.0.1", "method": "PUT", "errs": []}
+          file_path: {{ .accessLog.filePath }}
+      {{- end }}
+    {{- end }}
+    {{- with .Values.config.authentication }}
     authentication:
-      secret:
-        qwerty              # secret for jwt token generation.
-                            # NOTE: Highly recommended to modify this value to protect `manager api`.
-                            # if it's default value, when `manager api` start , it will generate a random string to replace it.
-      expire_time: 3600     # jwt token expire time, in second
-      users:                # yamllint enable rule:comments-indentation
-        - username: admin   # username and password for login `manager api`
-          password: admin
-        - username: user
-          password: user
-
-{{- if .Values.config.k8sSupport.enable }}
-    kubernetes:
-      enable: true            # enable to connect k8s cluster
-      kubeconfig: ""          # the Kubernetes configuration file path, default is
-                              # "", so the in-cluster configuration will be used.
-      app_namespaces:
-        {{ range .Values.config.k8sSupport.namespaces }}
-        - {{ . | quote }}
-        {{ end  }}
-                              # by default all namespaces (represented by "*") are watched.
-      resync_interval: "6h"   # how long should manager-api
-                              # re-synchronizes with Kubernetes, default is 6h,
-      cluster_domain: {{ .Values.config.k8sSupport.clusterDomain | quote }}  # the local domain in the kubelet, the default is cluster.local
-{{- end }}
-
+      secert: {{ .secert }}
+      expire_time: {{ .expireTime }}
+      users:
+        {{- range .users }}
+        - username: {{ .username }}
+          password: {{ .password }}
+        {{- end }}
+    {{- end }}

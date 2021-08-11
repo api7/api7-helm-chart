@@ -13,83 +13,75 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+#
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "api7-dashboard.fullname" . }}
+  name: {{ include "apisix-dashboard.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-    {{- include "api7-dashboard.labels" . | nindent 4 }}
+    {{- include "apisix-dashboard.labels" . | nindent 4 }}
 spec:
-{{- if not .Values.autoscaling.enabled }}
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-{{- end }}
+  {{- end }}
   selector:
     matchLabels:
-      {{- include "api7-dashboard.selectorLabels" . | nindent 6 }}
+      {{- include "apisix-dashboard.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       labels:
-        {{- include "api7-dashboard.selectorLabels" . | nindent 8 }}
+        {{- include "apisix-dashboard.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.config.k8sSupport.enable }}
-      serviceAccountName: {{ .Values.config.k8sSupport.serviceAccount }}
-      {{- end }}
-
+      serviceAccountName: {{ include "apisix-dashboard.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.config.http.port }}
+              containerPort: {{ .Values.config.conf.listen.port }}
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /ping
+              port: http
           readinessProbe:
-            failureThreshold: 6
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            tcpSocket:
-              port: {{ .Values.config.http.port }}
-            timeoutSeconds: 1
+            httpGet:
+              path: /ping
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
           volumeMounts:
             - mountPath: /usr/local/apisix-dashboard/conf/conf.yaml
-              name: api7-dashboard-config
+              name: apisix-dashboard-config
               subPath: conf.yaml
-          {{- if .Values.selfRegister.enabled }}
-            - mountPath: /usr/local/apisix-dashboard/self-register.sh
-              name: api7-dashboard-config
-              subPath: self-register.sh
-          {{- end }}
-          {{- if .Values.config.tls.enabled }}
-            - mountPath: /usr/local/apisix-dashboard/tls
-              name: "ssl"
-          {{- end }}
-          {{- if .Values.selfRegister.enabled }}
-          lifecycle:
-            postStart:
-              exec:
-                command:
-                - "/bin/sh"
-                - "-c"
-                - "apk add curl && sh /usr/local/apisix-dashboard/self-register.sh"
-          {{- end}}
       volumes:
         - configMap:
-            name: {{ include "api7-dashboard.fullname" . }}
-          name: api7-dashboard-config
-        {{- if .Values.config.tls.enabled }}
-        - name: ssl
-          secret:
-            secretName: {{ .Values.config.tls.secretName }}
-        {{- end }}
+            name: {{ include "apisix-dashboard.fullname" . }}
+          name: apisix-dashboard-config
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -3,11 +3,11 @@ replicaCount: 1
 image:
   registry: localhost:5000
   repository: api7/api7-gateway
-  tag: 2.3
+  tag: poc
 
 gateway:
   type: NodePort
 
 etcd:
   builtin: true
-  prefix: "/api7"
+  prefix: "/apisix"

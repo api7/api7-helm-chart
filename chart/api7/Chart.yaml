@@ -30,7 +30,3 @@ dependencies:
     version: 5.2.1
     repository: https://charts.bitnami.com/bitnami
     condition: etcd.builtin
-  - name: api7-dashboard
-    version: 0.0.1
-    repository: file://../api7-dashboard
-    condition: api7-dashboard.enabled
