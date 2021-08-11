@@ -30,6 +30,10 @@ spec:
             items:
               - key: config.yaml
                 path: config.yaml
+      initContainers:
+      - name: wait-api7-gateway
+        image: busybox:1.28
+        command: ['sh', '-c', "until nc -z api7-gateway.api7.svc.cluster.local 80 ; do echo waiting for api7-gateway `date`; sleep 2; done;"]
       containers:
         - name: {{ .Chart.Name }}
           command:
