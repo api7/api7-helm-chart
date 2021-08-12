@@ -1,6 +1,6 @@
 replicaCount: 1
 image:
-  repository: localhost:5000/api7/api7-ingress
+  repository: localhost:5000/api7/api7-ingress-controller
   tag: poc
 config:
   apisix:
