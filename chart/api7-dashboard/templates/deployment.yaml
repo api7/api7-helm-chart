@@ -72,13 +72,13 @@ spec:
           {{- end }}
           {{- range .Values.config.clusters }}
           {{- if .etcd.auth.tls.enabled }}
-          - name: {{ .name }}-etcd-ssl
-            mountPath: "/usr/local/apisix-dashboard/{{ .name }}-etcd-ssl"
+            - name: {{ .name }}-etcd-ssl
+              mountPath: "/usr/local/apisix-dashboard/{{ .name }}-etcd-ssl"
           {{- end }}
           {{- end }}
           {{- if .Values.config.selfEtcd.auth.tls.enabled }}
-          - name: self-etcd-ssl
-            mountPath: "/usr/local/apisix-dashboard/self-etcd-ssl"
+            - name: self-etcd-ssl
+              mountPath: "/usr/local/apisix-dashboard/self-etcd-ssl"
           {{- end }}
           {{- if .Values.selfRegister.enabled }}
           lifecycle:
@@ -108,7 +108,7 @@ spec:
         {{- if .Values.config.selfEtcd.auth.tls.enabled }}
         - name: self-etcd-ssl
           secret:
-            secretName: {{ .Values.config.selfEtcd.auth.tls.enabled }}
+            secretName: {{ .Values.config.selfEtcd.auth.tls.existingSecret }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
