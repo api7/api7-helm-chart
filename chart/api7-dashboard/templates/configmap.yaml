@@ -112,9 +112,9 @@ data:
           {{ end }}
           {{- if .Values.config.selfEtcd.auth.tls.enabled }}
           mtls:
-            key_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .etcd.auth.tls.certKeyFilename }}"
-            cert_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .etcd.auth.tls.certFilename }}"
-            ca_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .etcd.auth.tls.certCAFilename }}"
+            key_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certKeyFilename }}"
+            cert_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certFilename }}"
+            ca_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certCAFilename }}"
           {{- end }}
       log:
         error_log:
