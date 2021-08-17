@@ -45,11 +45,10 @@ securityContext:
 gateway:
   type: NodePort
   # type: LoadBalancer
-  # annotations:
-  #   service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  annotations: {}
+  loadBalancerIP: ""
   # warn: should update the value of workerProcesses
   #       to the number of cpu cores that match the actual allocated resources.
-  loadBalancerIP: ""
   workerProcesses: auto
   http:
     enabled: true
