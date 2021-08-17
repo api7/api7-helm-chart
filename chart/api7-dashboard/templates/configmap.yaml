@@ -94,6 +94,12 @@ data:
           username: {{ .etcd.auth.rbac.user | quote }}
           password: {{ .etcd.auth.rbac.password | quote }}
           {{ end }}
+          {{- if .etcd.auth.tls.enabled }}
+          mtls:
+            key_file: "/usr/local/apisix-dashboard/{{ .name }}-etcd-ssl/{{ .etcd.auth.tls.certKeyFilename }}"
+            cert_file: "/usr/local/apisix-dashboard/{{ .name }}-etcd-ssl/{{ .etcd.auth.tls.certFilename }}"
+            ca_file: "/usr/local/apisix-dashboard/{{ .name }}-etcd-ssl/{{ .etcd.auth.tls.certCAFilename }}"
+          {{- end }}
       {{ end }}
         user_conf:
           endpoints:
@@ -104,6 +110,12 @@ data:
           username: {{ .Values.config.selfEtcd.auth.rbac.user | quote }}
           password: {{ .Values.config.selfEtcd.auth.rbac.password | quote }}
           {{ end }}
+          {{- if .Values.config.selfEtcd.auth.tls.enabled }}
+          mtls:
+            key_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certKeyFilename }}"
+            cert_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certFilename }}"
+            ca_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certCAFilename }}"
+          {{- end }}
       log:
         error_log:
           level: {{ .Values.config.log.error_log.level }}       # supports levels, lower to higher: debug, info, warn, error, panic, fatal
