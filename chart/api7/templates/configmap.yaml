@@ -90,6 +90,7 @@ data:
       #   {{- end }}
       dns_resolver_valid: {{.Values.dns.validity}}
       resolver_timeout: {{.Values.dns.timeout}}
+      enable_resolv_search_opt: true
       ssl:
         enable: {{ .Values.gateway.tls.enabled }}
         enable_http2: {{ .Values.gateway.tls.http2.enabled }}
