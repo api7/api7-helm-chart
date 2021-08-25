@@ -1,0 +1,11 @@
+apiVersion: v2
+name: api7-satellite
+description: Chart for APISEVEN satellite
+home: https://www.apiseven.com
+icon: https://static.apiseven.com/2020/05/Jietu20200312-103300-removebg-preview.png
+type: application
+version: 0.0.1
+appVersion: 0.2.0
+maintainers:
+  - email: jinwei@api7.ai
+    name: Wei Jin
