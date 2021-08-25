@@ -21,6 +21,7 @@ securityContext:
   {}
 
 satellite:
+  jobName: api7
   http:
     port: 12800
   grpc:

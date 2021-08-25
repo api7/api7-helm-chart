@@ -64,7 +64,7 @@ data:
           fetcher:
             plugin_name: "prometheus-metrics-fetcher"
             scrape_configs:
-              - job_name: 'prometheus'
+              - job_name: {{ .Values.satellite.jobName }}
                 metrics_path: '/apisix/prometheus/metrics'
                 scrape_interval: 10s
                 tls_config:
