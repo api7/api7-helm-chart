@@ -45,8 +45,8 @@ securityContext:
 gateway:
   type: NodePort
   # type: LoadBalancer
-  # annotations:
-  #   service.beta.kubernetes.io/aws-load-balancer-type: nlb
+  annotations: {}
+  loadBalancerIP: ""
   # warn: should update the value of workerProcesses
   #       to the number of cpu cores that match the actual allocated resources.
   workerProcesses: auto
@@ -58,6 +58,8 @@ gateway:
     enabled: true
     servicePort: 443
     port: 9443
+    existingCASecret: ""
+    certCAFilename: "ca.crt"
     http2:
       enabled: true
 
@@ -96,6 +98,16 @@ etcd:
       ## etcd password
       ##
       password: ""
+    # Whether to set up secure transport to ETCD cluster.
+    tls:
+      enalbed: false
+      # An existing secret stores the credentials to communicate with ETCD cluster.
+      existingSecret: ""
+      # Certificate filename used to communicate ETCD cluster.
+      certFilename: "tls.crt"
+      # Private key filename used to communicate ETCD cluster.
+      certKeyFilename: "tls.key"
+      verify: true
 
 dns:
   resolvers:
