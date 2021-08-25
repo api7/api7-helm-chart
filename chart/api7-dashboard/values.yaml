@@ -71,6 +71,9 @@ config:
   # Key prefix used by api7-dashboard in ETCD cluster.
   allowList:
     - 127.0.0.0/24
+  allowAdmin: []
+  trustedProxies: []
+
   http:
     enabled: true
     servicePort: 9000
@@ -135,6 +138,17 @@ config:
     clusterRole: "services-lister"
     serviceAccount: "api7-account"
     clusterRoleBinding: "api7-services-account-binding"
+
+  authentication:
+    secret: "qwerty"
+    expire_time: 3600     # jwt token expire time, in second
+    allow_login_failed_times: 0     # the maximum number of login failures allowed, if the number of failed login attempts exceeds the limit within a certain period of time, the account will be locked
+                                    # 0 means no limit
+    login_failed_stat_duration: 1h  # the maximum allowable login failures statistics duration.
+    login_failed_lock_duration: 1h  # the account locked duration.
+    users:                # yamllint enable rule:comments-indentation
+      - username: admin   # username and password for login `manager api`
+        password: admin
 
   log:
     error_log:
