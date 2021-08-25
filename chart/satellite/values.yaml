@@ -3,7 +3,7 @@ fullnameOverride: ""
 
 replicaCount: 1
 image:
-  registry: docker.io
+  registry: localhost:5000
   repository: api7/satellite
   pullPolicy: IfNotPresent
   tag: dev
