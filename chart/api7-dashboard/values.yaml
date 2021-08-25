@@ -71,7 +71,6 @@ config:
   # Key prefix used by api7-dashboard in ETCD cluster.
   allowList:
     - 127.0.0.0/24
-  trustedProxies: []
   http:
     enabled: true
     servicePort: 9000
@@ -106,7 +105,7 @@ config:
             certFilename: "tls.crt"
             certKeyFilename: "tls.key"
             certCAFilename: "ca.crt"
-        prefix: /api7
+        prefix: /api7/cluster1
   # selfEtcd configures the etcd cluster used to store
   # metadata.
   selfEtcd:
@@ -122,7 +121,6 @@ config:
         ## etcd password
         ##
         password: ""
-
       tls:
         enabled: false
         # Specify an existing secret with credentials for the communication with ETCD.
@@ -130,6 +128,7 @@ config:
         certFilename: "tls.crt"
         certKeyFilename: "tls.key"
         certCAFilename: "ca.crt"
+      prefix: /api7
   k8sSupport:
     enable: true
     namespaces: ["*"]
