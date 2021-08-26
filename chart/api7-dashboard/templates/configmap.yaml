@@ -56,6 +56,18 @@ data:
         - {{ . }}
         {{- end }}
       {{- end }}
+      {{- if gt (len .Values.config.allowAdmin) 0 }}
+      allow_admin:
+        {{- range .Values.config.allowAdmin }}
+        - {{ . }}
+        {{- end }}
+      {{- end }}
+      {{- if gt (len .Values.config.trustedProxies) 0 }}
+      trusted_proxies:
+        {{- range .Values.config.trustedProxies }}
+        - {{ . }}
+        {{- end }}
+      {{- end }}
       listen:
         host: 0.0.0.0     # `manager api` listening ip or host name
         port: {{ .Values.config.http.port }} # `manager api` listening port
@@ -129,15 +141,20 @@ data:
                             # log example: 2020-12-09T16:38:09.039+0800	INFO	filter/logging.go:46	/apisix/admin/routes/r1	{"status": 401, "host": "127.0.0.1:9000", "query": "asdfsafd=adf&a=a", "requestId": "3d50ecb8-758c-46d1-af5b-cd9d1c820156", "latency": 0, "remoteIP": "127.0.0.1", "method": "PUT", "errs": []}
     authentication:
       secret:
-        qwerty              # secret for jwt token generation.
+        {{ .Values.config.authentication.secret }}  # secret for jwt token generation.
                             # NOTE: Highly recommended to modify this value to protect `manager api`.
                             # if it's default value, when `manager api` start , it will generate a random string to replace it.
-      expire_time: 3600     # jwt token expire time, in second
-      users:                # yamllint enable rule:comments-indentation
-        - username: admin   # username and password for login `manager api`
-          password: admin
-        - username: user
-          password: user
+      expire_time: {{ .Values.config.authentication.expire_time }}     # jwt token expire time, in second
+      {{- if gt .Values.config.authentication.allow_login_failed_times 0 }}
+      allow_login_failed_times: {{.Values.config.authentication.allow_login_failed_times}}    # the maximum number of login failures allowed, if the number of failed login attempts exceeds the limit within a certain period of time, the account will be locked
+      login_failed_stat_duration: {{.Values.config.authentication.login_failed_stat_duration}}  # the maximum allowable login failures statistics duration.
+      login_failed_lock_duration: {{.Values.config.authentication.login_failed_lock_duration}}  # the account locked duration.
+      {{ end }}
+      users:
+      {{ range .Values.config.authentication.users }}
+        - username: {{ .username }}   # username and password for login `manager api`
+          password: {{ .password }}
+      {{ end }}
 
 {{- if .Values.config.k8sSupport.enable }}
     kubernetes:
