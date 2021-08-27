@@ -118,6 +118,7 @@ data:
           {{ range .Values.config.selfEtcd.hosts -}}
           - {{ . }}
           {{ end }}
+          prefix: {{ .Values.config.selfEtcd.prefix -}}
           {{- if .Values.config.selfEtcd.auth.rbac.enabled }}
           username: {{ .Values.config.selfEtcd.auth.rbac.user | quote }}
           password: {{ .Values.config.selfEtcd.auth.rbac.password | quote }}

@@ -131,6 +131,7 @@ config:
         certFilename: "tls.crt"
         certKeyFilename: "tls.key"
         certCAFilename: "ca.crt"
+      prefix: /api7
   k8sSupport:
     enable: true
     namespaces: ["*"]
