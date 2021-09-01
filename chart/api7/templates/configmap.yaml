@@ -84,10 +84,17 @@ data:
       #   udp:                        # UDP proxy port list
       #     - 9200
       #     - 9211
+
+      {{- if .Values.stream_proxy }}
+      stream_proxy:
+        {{- toYaml .Values.stream_proxy | nindent 8 }}
+      {{- end }}
+
       # dns_resolver:
       #   {{- range $resolver := .Values.dns.resolvers }}
       #   - {{ $resolver }}
       #   {{- end }}
+
       dns_resolver_valid: {{.Values.dns.validity}}
       resolver_timeout: {{.Values.dns.timeout}}
       enable_resolv_search_opt: true
