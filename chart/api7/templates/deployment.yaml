@@ -66,12 +66,14 @@ spec:
             {{ end }}
             {{- if .Values.gateway.stream_proxy }}
             {{- range .Values.gateway.stream_proxy.tcp }}
-            - name: stream_proxy_{{ .addr }}
+            - name: streamproxy{{ .addr }}
               containerPort: {{ .addr }}
+              protocol: TCP
             {{- end }}
             {{- range .Values.gateway.stream_proxy.udp }}
-            - name: stream_proxy_{{ . }}
-              containerPort: {{ . }}
+            - name: streamproxy{{ . }}
+              containerPort: 9092
+              protocol: UDP
             {{- end }}
             {{- end }}
           readinessProbe:

@@ -86,9 +86,9 @@ data:
       #    - 9200
       #    - "127.0.0.1:9201"
 
-      {{- if .Values.stream_proxy }}
+      {{- if .Values.gateway.stream_proxy }}
       stream_proxy:
-        {{- toYaml .Values.stream_proxy | nindent 8 }}
+        {{- toYaml .Values.gateway.stream_proxy | nindent 8 }}
       {{- end }}
 
       # dns_resolver:
