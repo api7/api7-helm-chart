@@ -72,7 +72,7 @@ spec:
             {{- end }}
             {{- range .Values.gateway.stream_proxy.udp }}
             - name: streamproxy{{ . }}
-              containerPort: 9092
+              containerPort: {{ . }}
               protocol: UDP
             {{- end }}
             {{- end }}

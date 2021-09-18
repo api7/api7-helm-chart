@@ -77,14 +77,6 @@ data:
         http: 'radixtree_uri'         # radixtree_uri: match route by uri(base on radixtree)
                                       # radixtree_host_uri: match route by host + uri(base on radixtree)
         ssl: 'radixtree_sni'          # radixtree_sni: match route by SNI(base on radixtree)
-      # stream_proxy:                  # TCP/UDP proxy
-      #  tcp:                         # TCP proxy port list
-      #    - addr: 9100
-      #      tls: true
-      #    - addr: "127.0.0.1:9101"
-      #  udp:                         # UDP proxy port list
-      #    - 9200
-      #    - "127.0.0.1:9201"
 
       {{- if .Values.gateway.stream_proxy }}
       stream_proxy:
@@ -124,7 +116,7 @@ data:
         keepalive_timeout: 60s         # timeout during which a keep-alive client connection will stay open on the server side.
         client_header_timeout: 60s     # timeout for reading client request header, then 408 (Request Time-out) error is returned to the client
         client_body_timeout: 60s       # timeout for reading client request body, then 408 (Request Time-out) error is returned to the client
-        client_max_body_size: 0        # The maximum allowed size of the client request body.
+        client_max_body_size: {{ .Values.gateway.http.clientMaxBodySize }}        # The maximum allowed size of the client request body.
           # If exceeded, the 413 (Request Entity Too Large) error is returned to the client.
         # Note that unlike Nginx, we don't limit the body size by default.
 
