@@ -60,6 +60,7 @@ gateway:
     enabled: true
     servicePort: 80
     port: 9080
+    clientMaxBodySize: 0
   tls:
     enabled: true
     servicePort: 443
