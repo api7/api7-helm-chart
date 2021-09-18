@@ -148,17 +148,23 @@ data:
         verify: {{ .Values.etcd.auth.tls.verify }}
       {{- end }}
 
-    {{- if .Values.plugins }}
+    {{- if or .Values.plugins .Values.cloudProxy.enabled }}
     plugins:                          # plugin list
-    {{- end }}
     {{- range $plugin := .Values.plugins }}
       - {{ $plugin }}
     {{- end }}
+      - cloud-proxy
+    {{- end }}
+    {{- if .Values.stream_plugins }}
     stream_plugins:
     {{- range $plugin := .Values.stream_plugins }}
       - {{ $plugin }}
     {{- end }}
-    {{- if .Values.plugin_attr }}
+    {{- end }}
+    {{- if or .Values.plugin_attr .Values.cloudProxy.enabled }}
     plugin_attr:                     # plugin attr
     {{- toYaml .Values.plugin_attr | nindent 6 }}
+      cloud-proxy:
+        domain_suffix: {{ .Values.cloudProxy.domain_suffix }}
+        org_salt_size: {{ .Values.cloudProxy.organizationSaltSize }}
     {{- end }}
