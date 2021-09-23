@@ -53,6 +53,12 @@ selfRegister:
   enabled: false
   host: api7-dashboard.apiseven.com
 
+# Whether to customize the `schema.json` for the dashboard.
+# If customize it, will mount `conf/schema.json` into the container, You can customize your schema in `conf/schema.json`.
+# Otherwise use the default `schema.json` in the image.
+customSchema:
+  enabled: false
+
 service:
   # The api7-dashboard service type.
   type: ClusterIP

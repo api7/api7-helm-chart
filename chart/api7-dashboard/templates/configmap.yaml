@@ -172,3 +172,7 @@ data:
       cluster_domain: {{ .Values.config.k8sSupport.clusterDomain | quote }}  # the local domain in the kubelet, the default is cluster.local
 {{- end }}
 
+{{- if .Values.customSchema.enabled }}
+  schema.json: |-
+    {{ .Files.Get "conf/schema.json" }}
+{{ end }}
