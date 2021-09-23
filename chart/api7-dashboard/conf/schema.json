@@ -2634,9 +2634,57 @@
 					"disable": {
 						"type": "boolean"
 					},
+					"etcd_auth_header": {
+						"default": "Authorization",
+						"type": "string"
+					},
+					"etcd_password": {
+						"minLength": 1,
+						"type": "string"
+					},
+					"etcd_timeout": {
+						"default": 3,
+						"minimum": 1,
+						"type": "integer"
+					},
+					"etcd_token_exp": {
+						"default": 180,
+						"minimum": 1,
+						"type": "integer"
+					},
+					"etcd_token_type": {
+						"default": "jwt",
+						"enum": ["jwt", "sample"],
+						"type": "string"
+					},
+					"etcd_username": {
+						"minLength": 1,
+						"type": "string"
+					},
+					"etcd_verify_mode": {
+						"default": "none",
+						"enum": ["mutual", "none", "simple"],
+						"type": "string"
+					},
 					"instance_id_header": {
 						"default": "X-APISEVEN-Instance-Id",
 						"type": "string"
+					},
+					"refresh_interval": {
+						"default": 60,
+						"minimum": 1,
+						"type": "integer"
+					},
+					"upstream_id": {
+						"anyOf": [{
+							"maxLength": 64,
+							"minLength": 1,
+							"pattern": "^[a-zA-Z0-9-_.]+$",
+							"type": "string"
+						}, {
+							"minimum": 1,
+							"type": "integer"
+						}]
 					}
 				},
 				"type": "object"
@@ -3590,6 +3638,10 @@
 			"schema": {
 				"$comment": "this is a mark for our injected plugin schema",
 				"properties": {
+					"allow_degradation": {
+						"default": false,
+						"type": "boolean"
+					},
 					"burst": {
 						"minimum": 0,
 						"type": "integer"
@@ -3606,12 +3658,22 @@
 						"type": "boolean"
 					},
 					"key": {
-						"enum": ["remote_addr", "server_addr"],
+						"enum": ["consumer_name", "http_x_forwarded_for", "http_x_real_ip", "remote_addr", "server_addr"],
 						"type": "string"
 					},
 					"only_use_default_delay": {
 						"default": false,
 						"type": "boolean"
+					},
+					"rejected_code": {
+						"default": 503,
+						"maximum": 599,
+						"minimum": 200,
+						"type": "integer"
+					},
+					"rejected_msg": {
+						"minLength": 1,
+						"type": "string"
 					}
 				},
 				"required": ["burst", "conn", "default_conn_delay", "key"],
