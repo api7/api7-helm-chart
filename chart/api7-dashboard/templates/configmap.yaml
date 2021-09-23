@@ -174,5 +174,5 @@ data:
 
 {{- if .Values.customSchema.enabled }}
   schema.json: |-
-    {{ .Files.Get "conf/schema.json" }}
+{{ .Files.Get "conf/schema.json" | indent 4 }}
 {{ end }}

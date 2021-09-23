@@ -56,6 +56,7 @@ selfRegister:
 # Whether to customize the `schema.json` for the dashboard.
 # If customize it, will mount `conf/schema.json` into the container, You can customize your schema in `conf/schema.json`.
 # Otherwise use the default `schema.json` in the image.
+# Basically, you don't need to enable it unless you're the admin of APISEVEN Cloud and want to use it in the APISEVEN Cloud scenario.
 customSchema:
   enabled: false
 
