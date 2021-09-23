@@ -60,12 +60,7 @@ spec:
           env:
           - name: SATELLITE_GRPC_CLIENT
             value: {{ .Values.satellite.oap.domain }}:{{ .Values.satellite.oap.port }}
-      {{- if .Values.etcd.builtin }}
-      initContainers:
-      - name: wait-apisix
-        image: "{{ .Values.busybox.image.registry }}/{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-        command: ['sh', '-c', "until nc -z api7-gateway.api7.svc.cluster.local 80 ; do echo waiting for api7-gateway `date`; sleep 2; done;"]
-      {{- end }}
+
       volumes:
         - configMap:
             name: {{ include "api7-satellite.fullname" . }}
