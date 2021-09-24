@@ -125,6 +125,7 @@ data:
         {{- if .Values.cloudProxy.enabled }}
         lua_shared_dicts:              # add custom shared cache to nginx.conf
           etcd_token_cache: 10m
+          cloud_proxy_lock: 1m
         {{- end }}
         #  ipc_shared_dict: 100m        # custom shared cache, format: `cache-key: cache-size`
 
