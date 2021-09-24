@@ -55,16 +55,34 @@ spec:
             - mountPath: /skywalking/configs/satellite_config.yam
               name: satellite-config
               subPath: satellite
+            {{- range .Values.satellite.secretVolumes }}
+            - name: {{ .name }}
+              readOnly: true
+              mountPath: {{ .mountPath | default "/satellite/certs" }}
+            {{- end }}
+
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-          - name: SATELLITE_GRPC_CLIENT
-            value: {{ .Values.satellite.oap.domain }}:{{ .Values.satellite.oap.port }}
+          {{- range $key, $value :=  .Values.satellite.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+          {{- end }}
 
       volumes:
         - configMap:
             name: {{ include "api7-satellite.fullname" . }}
           name: satellite-config
+        {{- range .Values.satellite.secretVolumes }}
+        - name: {{ .name }}
+          secret:
+            secretName: {{ .secretName }}
+            {{- if .items }}
+            items:
+              {{- toYaml .items | nindent 14 }}
+            {{- end }}
+        {{- end }}
+
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

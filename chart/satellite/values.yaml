@@ -31,6 +31,13 @@ satellite:
     port: 11800
   selector:
     label: "app.kubernetes.io/name=api7"
+  env:
+    - name: SATELLITE_GRPC_CLIENT
+      value: oap:11800
+
+  secretVolumes:
+  # - name: test
+  #   secretName: test-tls
 
 busybox:
   image:
@@ -42,4 +49,3 @@ nodeSelector: {}
 
 affinity:
   enabled: false
-
