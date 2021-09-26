@@ -1,0 +1,45 @@
+nameOverride: ""
+fullnameOverride: ""
+
+replicaCount: 1
+image:
+  registry: localhost:5000
+  repository: api7/satellite
+  pullPolicy: IfNotPresent
+  tag: dev
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+
+imagePullSecrets: []
+podSecurityContext:
+  {}
+
+securityContext:
+  {}
+
+satellite:
+  jobName: api7
+  http:
+    port: 12800
+  grpc:
+    port: 11800
+  oap:
+    domain: oap
+    port: 11800
+  selector:
+    label: "app.kubernetes.io/name=api7"
+
+busybox:
+  image:
+    registry: docker.io
+    repository: busybox
+    tag: 1.28
+
+nodeSelector: {}
+
+affinity:
+  enabled: false
+
