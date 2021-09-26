@@ -39,6 +39,11 @@ satellite:
   # - name: test
   #   secretName: test-tls
 
+  k8sSupport:
+    clusterRole: satellite
+    clusterRoleBinding: satellite
+    serviceAccount: satellite
+
 busybox:
   image:
     registry: docker.io
