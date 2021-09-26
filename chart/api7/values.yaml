@@ -227,3 +227,10 @@ cloudProxy:
   # the cluster is qa and the organization is infra.
   domainSuffix: api7.cloud
   organizationSaltSize: 6
+
+cloud:
+  tlsSecret: "api7-cloud-ssl"
+  certFilename: "tls.crt"
+  certKeyFilename: "tls.key"
+  certCAFilename: "ca.crt"
+  domain: ""

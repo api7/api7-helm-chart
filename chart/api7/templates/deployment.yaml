@@ -91,6 +91,10 @@ spec:
             - mountPath: /usr/local/apisix/conf/ssl
               name: ssl
             {{- end }}
+            {{- if .Values.cloud.domain }}
+            - mountPath: /usr/local/apisix/conf/cloud-ssl
+              name: cloud-ssl
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.etcd.builtin }}
@@ -112,6 +116,11 @@ spec:
         - secret:
             secretName: {{ .Values.gateway.tls.existingCASecret | quote }}
           name: ssl
+        {{- end }}
+        {{- if .Values.cloud.domain }}
+        - secret:
+            secretName: {{ .Values.cloud.tlsSecret }}
+          name: cloud-ssl
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
