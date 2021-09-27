@@ -55,32 +55,39 @@ spec:
             - mountPath: /skywalking/configs/satellite_config.yam
               name: satellite-config
               subPath: satellite
-            {{- range .Values.satellite.secretVolumes }}
-            - name: {{ .name }}
+            {{- if .Values.satellite.tlsSkyWalkingSecret }}
+            - name: skywalking-ssl
+              mountPath: "/usr/local/satellite/skywalking-ssl"
               readOnly: true
-              mountPath: {{ .mountPath | default "/satellite/certs" }}
             {{- end }}
-
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-          {{- range $key, $value :=  .Values.satellite.env }}
+            - name: SATELLITE_GRPC_CLIENT
+              value: { { .Values.satellite.oap.domain } }:{{ .Values.satellite.oap.port }}
+            {{- if .Values.satellite.tlsSkyWalkingSecret }}
+            - name: SATELLITE_GRPC_ENABLE_TLS
+              value: true
+            - name: SATELLITE_GRPC_CLIENT_PEM_PATH
+              value: {{ .Values.satellite.tlsSkyWalkingCertFilename }}
+            - name: SATELLITE_GRPC_CLIENT_KEY_PATH
+              value: {{ .Values.satellite.tlsSkyWalkingCertKeyFilename }}
+            - name: SATELLITE_grpc_CA_PEM_PATH
+              value: {{ .Values.satellite.tlsSkyWalkingCertCAFilename }}
+            {{- end }}
+            {{- range $key, $value :=  .Values.satellite.env }}
             - name: {{ $key }}
               value: {{ $value | quote }}
-          {{- end }}
+            {{- end }}
 
       volumes:
         - configMap:
             name: {{ include "api7-satellite.fullname" . }}
           name: satellite-config
-        {{- range .Values.satellite.secretVolumes }}
-        - name: {{ .name }}
+        {{- if .Values.satellite.tlsSkyWalkingSecret }}
+        - name: skywalking-ssl
           secret:
-            secretName: {{ .secretName }}
-            {{- if .items }}
-            items:
-              {{- toYaml .items | nindent 14 }}
-            {{- end }}
+            secretName: {{ .Values.satellite.tlsSkyWalkingSecret | quote }}
         {{- end }}
 
       {{- with .Values.nodeSelector }}
