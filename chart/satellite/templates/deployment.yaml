@@ -69,11 +69,11 @@ spec:
             - name: SATELLITE_GRPC_ENABLE_TLS
               value: true
             - name: SATELLITE_GRPC_CLIENT_PEM_PATH
-              value: {{ .Values.satellite.tlsSkyWalkingCertFilename }}
+              value: "/usr/local/satellite/skywalking-ssl/{{ .Values.satellite.tlsSkyWalkingCertFilename }}"
             - name: SATELLITE_GRPC_CLIENT_KEY_PATH
-              value: {{ .Values.satellite.tlsSkyWalkingCertKeyFilename }}
+              value: "/usr/local/satellite/skywalking-ssl/{{ .Values.satellite.tlsSkyWalkingCertKeyFilename }}"
             - name: SATELLITE_grpc_CA_PEM_PATH
-              value: {{ .Values.satellite.tlsSkyWalkingCertCAFilename }}
+              value: "/usr/local/satellite/skywalking-ssl/{{ .Values.satellite.tlsSkyWalkingCertCAFilename }}"
             {{- end }}
             {{- range $key, $value :=  .Values.satellite.env }}
             - name: {{ $key }}
