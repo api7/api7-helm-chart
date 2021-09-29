@@ -146,7 +146,7 @@ data:
                             # NOTE: Highly recommended to modify this value to protect `manager api`.
                             # if it's default value, when `manager api` start , it will generate a random string to replace it.
       expire_time: {{ .Values.config.authentication.expire_time }}     # jwt token expire time, in second
-      {{- if gt .Values.config.authentication.allow_login_failed_times 0 }}
+      {{- if gt (int .Values.config.authentication.allow_login_failed_times) 0}}
       allow_login_failed_times: {{.Values.config.authentication.allow_login_failed_times}}    # the maximum number of login failures allowed, if the number of failed login attempts exceeds the limit within a certain period of time, the account will be locked
       login_failed_stat_duration: {{.Values.config.authentication.login_failed_stat_duration}}  # the maximum allowable login failures statistics duration.
       login_failed_lock_duration: {{.Values.config.authentication.login_failed_lock_duration}}  # the account locked duration.
@@ -172,3 +172,7 @@ data:
       cluster_domain: {{ .Values.config.k8sSupport.clusterDomain | quote }}  # the local domain in the kubelet, the default is cluster.local
 {{- end }}
 
+{{- if .Values.customSchema.enabled }}
+  schema.json: |-
+{{ .Files.Get "conf/schema.json" | indent 4 }}
+{{ end }}

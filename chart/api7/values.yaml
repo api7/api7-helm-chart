@@ -225,3 +225,33 @@ busybox:
     registry: docker.io
     repository: busybox
     tag: 1.28
+
+# Whether API7 works in the cloud proxy mode, if so, cloud-proxy plugin will be
+# enabled, this plugin intercepts requests.
+cloudProxy:
+  enabled: false
+  # A valid cluster domain should have such a suffix, e.g. qa.infra0j31xa.cn.api7.cloud,
+  # the cluster is qa and the organization is infra.
+  domainSuffix: api7.cloud
+  organizationSaltSize: 6
+
+cloud:
+  tlsSecret: "api7-cloud-ssl"
+  certFilename: "tls.crt"
+  certKeyFilename: "tls.key"
+  certCAFilename: "ca.crt"
+  domain: ""
+
+# Custom configuration snippet.
+configurationSnippet:
+  main: |
+
+  httpStart: |
+
+  httpEnd: |
+
+  httpSrv: |
+
+  httpAdmin: |
+
+  stream: |

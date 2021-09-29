@@ -66,6 +66,11 @@ spec:
               name: api7-dashboard-config
               subPath: self-register.sh
           {{- end }}
+          {{- if .Values.customSchema.enabled }}
+            - mountPath: /usr/local/apisix-dashboard/conf/schema.json
+              name: api7-dashboard-config
+              subPath: schema.json
+          {{- end }}
           {{- if .Values.config.tls.enabled }}
             - mountPath: /usr/local/apisix-dashboard/tls
               name: "ssl"

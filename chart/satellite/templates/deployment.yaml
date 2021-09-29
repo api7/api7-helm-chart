@@ -1,0 +1,112 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api7-satellite.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "api7-satellite.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "api7-satellite.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "api7-satellite.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ .Values.satellite.k8sSupport.serviceAccount }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.satellite.http.port }}
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: {{ .Values.satellite.http.port }}
+            timeoutSeconds: 1
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - /bin/sh
+                - -c
+                - "sleep 30"
+          volumeMounts:
+            - mountPath: /skywalking/configs/satellite_config.yaml
+              name: satellite-config
+              subPath: satellite
+            {{- if .Values.satellite.tlsSkyWalkingSecret }}
+            - name: skywalking-ssl
+              mountPath: "/usr/local/satellite/skywalking-ssl"
+              readOnly: true
+            {{- end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          env:
+            - name: SATELLITE_GRPC_CLIENT
+              value: { { .Values.satellite.oap.domain } }:{{ .Values.satellite.oap.port }}
+            {{- if .Values.satellite.tlsSkyWalkingSecret }}
+            - name: SATELLITE_GRPC_ENABLE_TLS
+              value: true
+            - name: SATELLITE_GRPC_CLIENT_PEM_PATH
+              value: "/usr/local/satellite/skywalking-ssl/{{ .Values.satellite.tlsSkyWalkingCertFilename }}"
+            - name: SATELLITE_GRPC_CLIENT_KEY_PATH
+              value: "/usr/local/satellite/skywalking-ssl/{{ .Values.satellite.tlsSkyWalkingCertKeyFilename }}"
+            - name: SATELLITE_grpc_CA_PEM_PATH
+              value: "/usr/local/satellite/skywalking-ssl/{{ .Values.satellite.tlsSkyWalkingCertCAFilename }}"
+            {{- end }}
+            {{- range $key, $value :=  .Values.satellite.env }}
+            - name: {{ $key }}
+              value: {{ $value | quote }}
+            {{- end }}
+
+      volumes:
+        - configMap:
+            name: {{ include "api7-satellite.fullname" . }}
+          name: satellite-config
+        {{- if .Values.satellite.tlsSkyWalkingSecret }}
+        - name: skywalking-ssl
+          secret:
+            secretName: {{ .Values.satellite.tlsSkyWalkingSecret | quote }}
+        {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- if .Values.affinity.enable }}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchExpressions:
+                - key: app.kubernetes.io/name
+                  operator: In
+                  values:
+                  - {{ include "api7-satellite.name" . }}
+              topologyKey: kubernetes.io/hostname
+            weight: 100'
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
