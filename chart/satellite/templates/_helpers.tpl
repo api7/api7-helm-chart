@@ -34,7 +34,7 @@ Create chart name and version as used by the chart label.
 Common labels
 */}}
 {{- define "api7-satellite.labels" -}}
-helm.sh/chart: {{ include "api7-dashboard.chart" . }}
+helm.sh/chart: {{ include "api7-satellite.chart" . }}
 {{ include "api7-satellite.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
