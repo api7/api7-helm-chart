@@ -64,6 +64,18 @@ spec:
               containerPort: {{ .Values.plugin_attr.prometheus.export_addr.port }}
               protocol: TCP
             {{ end }}
+            {{- if .Values.gateway.stream_proxy }}
+            {{- range .Values.gateway.stream_proxy.tcp }}
+            - name: streamproxy{{ .addr }}
+              containerPort: {{ .addr }}
+              protocol: TCP
+            {{- end }}
+            {{- range .Values.gateway.stream_proxy.udp }}
+            - name: streamproxy{{ . }}
+              containerPort: {{ . }}
+              protocol: UDP
+            {{- end }}
+            {{- end }}
           readinessProbe:
             failureThreshold: 6
             initialDelaySeconds: 10

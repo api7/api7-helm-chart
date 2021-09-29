@@ -22,6 +22,12 @@ image:
   # Overrides the image tag whose default is the chart appVersion.
   tag: dev
 
+stream_proxy:
+#  tcp:
+#    - addr: 9001
+#  udp:
+#    - 9002
+
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -54,6 +60,7 @@ gateway:
     enabled: true
     servicePort: 80
     port: 9080
+    clientMaxBodySize: 0
   tls:
     enabled: true
     servicePort: 443

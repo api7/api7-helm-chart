@@ -57,5 +57,19 @@ spec:
   {{- end }}
     protocol: TCP
   {{- end }}
+  {{- if .Values.gateway.stream_proxy }}
+  {{- range .Values.gateway.stream_proxy.tcp }}
+  - name: api7-gateway-stream-{{ .addr }}
+    port: {{ .addr }}
+    targetPort: {{ .addr }}
+    protocol: TCP
+  {{- end }}
+  {{- range .Values.gateway.stream_proxy.udp }}
+  - name: api7-gateway-stream-{{ . }}
+    port: {{ . }}
+    targetPort: {{ . }}
+    protocol: UDP
+  {{- end }}
+  {{- end }}
   selector:
     {{- include "api7.selectorLabels" . | nindent 4 }}
