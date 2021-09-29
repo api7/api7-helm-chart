@@ -62,10 +62,10 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             - name: SATELLITE_GRPC_CLIENT
-              value: { { .Values.satellite.oap.domain } }:{{ .Values.satellite.oap.port }}
+              value: {{ .Values.satellite.oap.domain }}:{{ .Values.satellite.oap.port }}
             {{- if .Values.satellite.tlsSkyWalkingSecret }}
             - name: SATELLITE_GRPC_ENABLE_TLS
-              value: true
+              value: "true"
             - name: SATELLITE_GRPC_CLIENT_PEM_PATH
               value: "/usr/local/satellite/skywalking-ssl/{{ .Values.satellite.tlsSkyWalkingCertFilename }}"
             - name: SATELLITE_GRPC_CLIENT_KEY_PATH
