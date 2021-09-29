@@ -234,3 +234,17 @@ cloud:
   certKeyFilename: "tls.key"
   certCAFilename: "ca.crt"
   domain: ""
+
+# Custom configuration snippet.
+configurationSnippet:
+  main: |
+
+  httpStart: |
+
+  httpEnd: |
+
+  httpSrv: |
+
+  httpAdmin: |
+
+  stream: |
