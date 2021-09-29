@@ -23,6 +23,7 @@ spec:
       {{- end }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      serviceAccountName: {{ .Values.satellite.k8sSupport.serviceAccount }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
@@ -32,9 +33,6 @@ spec:
           ports:
             - name: http
               containerPort: {{ .Values.satellite.http.port }}
-              protocol: TCP
-            - name: grpc
-              containerPort: {{ .Values.satellite.grpc.port }}
               protocol: TCP
           readinessProbe:
             failureThreshold: 6
@@ -52,7 +50,7 @@ spec:
                 - -c
                 - "sleep 30"
           volumeMounts:
-            - mountPath: /skywalking/configs/satellite_config.yam
+            - mountPath: /skywalking/configs/satellite_config.yaml
               name: satellite-config
               subPath: satellite
             {{- if .Values.satellite.tlsSkyWalkingSecret }}
