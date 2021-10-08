@@ -233,6 +233,6 @@ data:
         key: "/usr/local/apisix/conf/cloud-ssl/{{ .Values.cloud.certKeyFilename }}"
     {{- toYaml .Values.plugin_attr | nindent 6 }}
       cloud-proxy:
-        domain_suffix: {{ .Values.cloudProxy.domain_suffix }}
+        domain_suffix: {{ .Values.cloudProxy.domainSuffix }}
         org_salt_size: {{ .Values.cloudProxy.organizationSaltSize }}
     {{- end }}
