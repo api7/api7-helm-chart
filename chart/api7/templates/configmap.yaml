@@ -199,6 +199,7 @@ data:
     {{- end }}
     {{- if .Values.cloud.domain }}
       - cloud-prometheus
+      - cloud
     {{- end }}
     {{- if .Values.stream_plugins }}
     stream_plugins:
