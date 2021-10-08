@@ -34,21 +34,6 @@ spec:
             - name: http
               containerPort: {{ .Values.satellite.http.port }}
               protocol: TCP
-          readinessProbe:
-            failureThreshold: 6
-            initialDelaySeconds: 10
-            periodSeconds: 10
-            successThreshold: 1
-            tcpSocket:
-              port: {{ .Values.satellite.http.port }}
-            timeoutSeconds: 1
-          lifecycle:
-            preStop:
-              exec:
-                command:
-                - /bin/sh
-                - -c
-                - "sleep 30"
           volumeMounts:
             - mountPath: /skywalking/configs/satellite_config.yaml
               name: satellite-config
@@ -62,7 +47,7 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
             - name: SATELLITE_GRPC_CLIENT
-              value: {{ .Values.satellite.oap.domain }}:{{ .Values.satellite.oap.port }}
+              value: "{{ .Values.satellite.oap.domain }}:{{ .Values.satellite.oap.port }}"
             {{- if .Values.satellite.tlsSkyWalkingSecret }}
             - name: SATELLITE_GRPC_ENABLE_TLS
               value: "true"
