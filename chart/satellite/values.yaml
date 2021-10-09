@@ -32,6 +32,8 @@ satellite:
   selector:
     label: "app.kubernetes.io/name=api7"
 
+  extraScrapeConfigs: []
+
   tlsSkyWalkingSecret: ""
   tlsSkyWalkingCertFilename: "tls.crt"
   tlsSkyWalkingCertKeyFilename: "tls.key"
