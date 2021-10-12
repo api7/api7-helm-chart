@@ -64,23 +64,10 @@ data:
           fetcher:
             plugin_name: "prometheus-metrics-fetcher"
             scrape_configs:
-            {{- if .Values.satellite.jobName }}
-              - job_name: {{ .Values.satellite.jobName }}
-                metrics_path: {{ .Values.satellite.metricsPath | default "/apisix/prometheus/metrics" }}
-                scrape_interval: {{ .Values.satellite.scrapeInterval | default "60s" }}
-                tls_config:
-                  ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
-                bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
-                kubernetes_sd_configs:
-                - role: pod
-                  selectors:
-                    - role: pod
-                      label: {{ .Values.satellite.selector.label }}
-             {{- end }}
-             {{- range .Values.satellite.extraScrapeConfigs }}
+             {{- range .Values.satellite.scrapeConfigs }}
               - job_name: {{ .jobName }}
-                metrics_path: {{ .metricsPath }}
-                scrape_interval: {{ .scrapeInterval | default "10s" }}
+                metrics_path: {{ .metricsPath | default "/apisix/prometheus/metrics" }}
+                scrape_interval: {{ .scrapeInterval | default "60s" }}
                 tls_config:
                   ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
                 bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token

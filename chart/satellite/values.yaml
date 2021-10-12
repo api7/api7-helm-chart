@@ -21,7 +21,6 @@ securityContext:
   {}
 
 satellite:
-  jobName: api7
   http:
     port: 12800
   grpc:
@@ -29,10 +28,12 @@ satellite:
   oap:
     domain: oap
     port: 11800
-  selector:
-    label: "app.kubernetes.io/name=api7"
 
-  extraScrapeConfigs: []
+  scrapeConfigs:
+    - jobName: api7
+      metricsPath: "/apisix/prometheus/metrics"
+      scrapeInterval: 60s
+      selectorLabel: "app.kubernetes.io/name=api7"
 
   tlsSkyWalkingSecret: ""
   tlsSkyWalkingCertFilename: "tls.crt"
