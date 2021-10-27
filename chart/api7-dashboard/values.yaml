@@ -120,6 +120,7 @@ config:
   # metadata.
   selfEtcd:
     hosts: []
+    name: "default"
     service:
       port: 2379
     auth:
