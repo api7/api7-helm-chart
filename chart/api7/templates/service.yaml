@@ -57,6 +57,11 @@ spec:
   {{- end }}
     protocol: TCP
   {{- end }}
+  {{- if .Values.gateway.metrics.enabled }}
+  - name: api7-gateway-metrics
+    port: {{ .Values.gateway.metrics.servicePort }}
+    targetPort: {{ .Values.gateway.metrics.port }}
+  {{- end }}
   {{- if .Values.gateway.stream_proxy }}
   {{- range .Values.gateway.stream_proxy.tcp }}
   - name: api7-gateway-stream-{{ .addr }}
