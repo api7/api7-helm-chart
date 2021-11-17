@@ -69,6 +69,10 @@ gateway:
     certCAFilename: "ca.crt"
     http2:
       enabled: true
+  metrics:
+    enabled: true
+    servicePort: 9091
+    port: 9091
 
   ingress:
     enabled: false
