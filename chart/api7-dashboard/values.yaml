@@ -73,6 +73,9 @@ prometheus:
   # Existing prometheus clusters should be filled here
   clusters: []
 
+grafana:
+  builtin: true
+
 # api7-dashboard configurations
 config:
   # Key prefix used by api7-dashboard in ETCD cluster.
