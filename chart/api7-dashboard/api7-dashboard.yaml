@@ -8,6 +8,11 @@ config:
       etcd:
         hosts:
         - https://api7-etcd.api7.svc.cluster.local
+        auth:
+              rbac:
+                enabled: false
+              tls:
+                enabled: false
   selfEtcd:
     hosts:
     - https://api7-etcd.api7.svc.cluster.local
