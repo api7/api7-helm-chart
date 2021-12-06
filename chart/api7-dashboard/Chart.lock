@@ -5,5 +5,8 @@ dependencies:
 - name: grafana
   repository: https://grafana.github.io/helm-charts
   version: 6.0.0
-digest: sha256:0b3f674fd91279a390c1752cb2b5d8b609578a8814df9dd536f0cb1c0aa9ee8b
-generated: "2021-11-18T14:27:32.795905+08:00"
+- name: opensearch
+  repository: https://opensearch-project.github.io/helm-charts/
+  version: 1.5.0
+digest: sha256:3fb583bc624d1fa8fecd1b14d4af83a2133fa956a954e576f6056867ecba7b7f
+generated: "2021-12-06T22:05:24.857765+08:00"
