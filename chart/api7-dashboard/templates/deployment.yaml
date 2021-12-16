@@ -81,7 +81,7 @@ spec:
               mountPath: "/usr/local/apisix-dashboard/{{ .name }}-etcd-ssl"
           {{- end }}
           {{- end }}
-          {{- if .Values.config.selfEtcd.auth.tls.enabled }}
+          {{- if .Values.etcd.auth.tls.enabled }}
             - name: self-etcd-ssl
               mountPath: "/usr/local/apisix-dashboard/self-etcd-ssl"
           {{- end }}
@@ -110,10 +110,10 @@ spec:
             secretName: {{ .etcd.auth.tls.existingSecret }}
         {{- end }}
         {{- end }}
-        {{- if .Values.config.selfEtcd.auth.tls.enabled }}
+        {{- if .Values.etcd.auth.tls.enabled }}
         - name: self-etcd-ssl
           secret:
-            secretName: {{ .Values.config.selfEtcd.auth.tls.existingSecret }}
+            secretName: {{ .Values.etcd.auth.tls.existingSecret }}
         {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

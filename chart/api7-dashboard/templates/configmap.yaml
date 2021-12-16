@@ -94,53 +94,27 @@ data:
           {{ end }}
         {{- end -}}
       {{- end }}
-      etcd_clusters:
-      {{ range .Values.config.clusters }}
-      {{- .name | indent 2 }}:
-          endpoints:
-          {{- range .etcd.hosts }}
-          - {{ . -}}
-          {{ end }}
-          prefix: {{ .etcd.prefix -}}
-          {{- if .etcd.auth.rbac.enabled }}
-          username: {{ .etcd.auth.rbac.user | quote }}
-          password: {{ .etcd.auth.rbac.password | quote }}
-          {{ end }}
-          {{- if .etcd.auth.tls.enabled }}
-          mtls:
-            key_file: "/usr/local/apisix-dashboard/{{ .name }}-etcd-ssl/{{ .etcd.auth.tls.certKeyFilename }}"
-            cert_file: "/usr/local/apisix-dashboard/{{ .name }}-etcd-ssl/{{ .etcd.auth.tls.certFilename }}"
-            ca_file: "/usr/local/apisix-dashboard/{{ .name }}-etcd-ssl/{{ .etcd.auth.tls.certCAFilename }}"
-          {{- end }}
-      {{ end }}
-        user_conf:
-          endpoints:
-          {{ range .Values.config.selfEtcd.hosts -}}
-          - {{ . }}
-          {{ end }}
-          prefix: {{ .Values.config.selfEtcd.prefix -}}
-          {{- if .Values.config.selfEtcd.auth.rbac.enabled }}
-          username: {{ .Values.config.selfEtcd.auth.rbac.user | quote }}
-          password: {{ .Values.config.selfEtcd.auth.rbac.password | quote }}
-          {{ end }}
-          {{- if .Values.config.selfEtcd.auth.tls.enabled }}
-          mtls:
-            key_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certKeyFilename }}"
-            cert_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certFilename }}"
-            ca_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certCAFilename }}"
-          {{- end }}
       etcd:
-        name: {{ .Values.config.selfEtcd.name }}
+        name: {{ .Values.etcd.name }}
+        {{- if .Values.etcd.builtin }}
         endpoints:
-        {{ range .Values.config.selfEtcd.hosts -}}
-        - {{ . }}
-        {{ end }}
-        prefix: {{ .Values.config.selfEtcd.prefix -}}
-        {{- if .Values.config.selfEtcd.auth.tls.enabled }}
+          - "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.port }}"
+        {{- else }}
+        endpoints:
+          {{- range $value := .Values.etcd.hosts }}
+          - "{{ $value }}"
+          {{- end }}
+        {{- end }}
+        {{- if .Values.etcd.auth.rbac.enabled }}
+        username: {{ .Values.etcd.auth.rbac.user | quote }}
+        password: {{ .Values.etcd.auth.rbac.password | quote }}
+        {{- end }}
+        prefix: {{ .Values.etcd.prefix -}}
+        {{- if .Values.etcd.auth.tls.enabled }}
         mtls:
-          key_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certKeyFilename }}"
-          cert_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certFilename }}"
-          ca_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.config.selfEtcd.auth.tls.certCAFilename }}"
+          key_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certKeyFilename }}"
+          cert_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certFilename }}"
+          ca_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certCAFilename }}"
         {{- end }}
       log:
         error_log:

@@ -76,6 +76,41 @@ prometheus:
 grafana:
   builtin: true
 
+# etcd configuration
+# use the FQDN address or the IP of the etcd
+etcd:
+  # install etcd(v3) by default, set false if do not want to install etcd(v3) together,
+  # in such a case, etcd.host should be configured so that existing ETCD cluster can be
+  # used.
+  builtin: true
+  name: "default"
+  hosts:
+    - http://etcd.host:2379 # host or ip e.g. http://172.20.128.89:2379
+  prefix: "/api7"
+  timeout: 30
+  defaultPort: 2379
+  auth:
+    rbac:
+      # No authentication by default
+      enabled: false
+      ## etcd user
+      ##
+      user: ""
+      ## etcd password
+      ##
+      password: ""
+    # Whether to set up secure transport to ETCD cluster.
+    tls:
+      enalbed: false
+      # An existing secret stores the credentials to communicate with ETCD cluster.
+      existingSecret: ""
+      # Certificate filename used to communicate ETCD cluster.
+      certFilename: "tls.crt"
+      # Private key filename used to communicate ETCD cluster.
+      certKeyFilename: "tls.key"
+      certCAFilename: "ca.crt"
+      verify: true
+
 # api7-dashboard configurations
 config:
   # Key prefix used by api7-dashboard in ETCD cluster.
@@ -83,7 +118,6 @@ config:
     - 127.0.0.0/24
   allowAdmin: []
   trustedProxies: []
-
   http:
     enabled: true
     servicePort: 9000
@@ -94,55 +128,6 @@ config:
     port: 9443
     secretName: ""
     mtls_enabled: true
-
-  # Multiple clusters configuration
-  clusters:
-    - name: cluster_1
-      etcd:
-        hosts: []
-        service:
-          port: 2379
-        auth:
-          rbac:
-            enabled: false
-            ## etcd user
-            ##
-            user: ""
-            ## etcd password
-            ##
-            password: ""
-          tls:
-            enabled: false
-            # Specify an existing secret with credentials for the communication with ETCD.
-            existingSecret: ""
-            certFilename: "tls.crt"
-            certKeyFilename: "tls.key"
-            certCAFilename: "ca.crt"
-        prefix: /api7
-  # selfEtcd configures the etcd cluster used to store
-  # metadata.
-  selfEtcd:
-    hosts: []
-    name: "default"
-    service:
-      port: 2379
-    auth:
-      rbac:
-        enabled: false
-        ## etcd user
-        ##
-        user: ""
-        ## etcd password
-        ##
-        password: ""
-      tls:
-        enabled: false
-        # Specify an existing secret with credentials for the communication with ETCD.
-        existingSecret: ""
-        certFilename: "tls.crt"
-        certKeyFilename: "tls.key"
-        certCAFilename: "ca.crt"
-      prefix: /api7
   k8sSupport:
     enable: true
     namespaces: ["*"]
@@ -150,7 +135,6 @@ config:
     clusterRole: "services-lister"
     serviceAccount: "api7-account"
     clusterRoleBinding: "api7-services-account-binding"
-
   authentication:
     secret: "qwerty"
     expire_time: 3600     # jwt token expire time, in second
@@ -161,7 +145,6 @@ config:
     users:                # yamllint enable rule:comments-indentation
       - username: admin   # username and password for login `manager api`
         password: admin
-
   log:
     error_log:
       level: warn
