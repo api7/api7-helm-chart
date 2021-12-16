@@ -26,25 +26,12 @@ kubectl create namespace api7
 
 Images for api7-dashboard is private and never should be uploaded to public image registries like [dockerhub](https://hub.docker.com), so make sure the image for api7-dashboard was stashed in a registry that can be accessed from the Kubernetes cluster.
 
-Also, as api7-dashboard is used to operate configurations for api7, so api7 and ETCD cluster should be installed before api7-dashboard, we assume that them were installed already, if not, please refer to [api7-chart](../api7/README.md).
-
 ```sh
-# api7-dashboard.yaml
-image:
-  registry: localhost:5000
-  repository: api7/api7-dashboard
-  tag: v2.1ee
-config:
-  clusters:
-    - name: cluster_1
-      etcd:
-        hosts:
-        - https://api7-etcd.api7.svc.cluster.local
-  selfEtcd:
-    hosts:
-    - https://api7-etcd.api7.svc.cluster.local
-
-helm install api7-dashboard . -n api7 --values api7-dashboard.yaml
+helm install api7-dashboard . -n api7 \
+  --set image.registry=apisixacr.azurecr.cn \
+  --set image.repository=api7-dashboard \
+  --set service.type=NodePort \
+  --set image.tag=2.7.2112
 ```
 
 When you execute the above command, change the registry, repository and tag according to your situation.

@@ -1,9 +1,12 @@
 dependencies:
+- name: etcd
+  repository: https://charts.bitnami.com/bitnami
+  version: 5.2.1
 - name: prometheus
   repository: https://prometheus-community.github.io/helm-charts
   version: 9.7.5
 - name: grafana
   repository: https://grafana.github.io/helm-charts
   version: 6.0.0
-digest: sha256:0b3f674fd91279a390c1752cb2b5d8b609578a8814df9dd536f0cb1c0aa9ee8b
-generated: "2021-11-18T14:27:32.795905+08:00"
+digest: sha256:3a48311c20e4406b0fc709edcc04bf7ae4bd0f24c516068a57870aef0e064db0
+generated: "2021-12-16T10:21:57.083452+08:00"
