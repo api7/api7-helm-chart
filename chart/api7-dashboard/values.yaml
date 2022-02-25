@@ -152,7 +152,7 @@ config:
     access_log:
       file_path: "/dev/stdout"
   security:
-    access_control_allow_origin: "*"  # cors setting, need update it after deploy on k8s
+    access_control_allow_origin: "*"  # cors setting, need update it before deploy on k8s
     access_control_allow_credentials: true
     access_control_allow_headers: "Authorization"
     access_control-allow_methods: "*"
