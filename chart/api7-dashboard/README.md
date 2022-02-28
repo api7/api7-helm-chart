@@ -28,10 +28,10 @@ Images for api7-dashboard is private and never should be uploaded to public imag
 
 ```sh
 helm install api7-dashboard . -n api7 \
-  --set image.registry=apisixacr.azurecr.cn \
+  --set image.registry=localhost:5000 \
   --set image.repository=api7-dashboard \
   --set service.type=NodePort \
-  --set image.tag=2.7.2112
+  --set image.tag=2.8.2202
 ```
 
 When you execute the above command, change the registry, repository and tag according to your situation.
