@@ -35,12 +35,10 @@ clusterDomain: cluster.local
 
 podAnnotations: {}
 
-podSecurityContext:
-  {}
+podSecurityContext: {}
   # fsGroup: 2000
 
-securityContext:
-  {}
+securityContext: {}
   # capabilities:
   #   drop:
   #   - ALL
@@ -48,11 +46,11 @@ securityContext:
   # runAsNonRoot: true
   # runAsUser: 1000
 
-  customLuaSharedDicts: []
-    # - name: foo
-    #   size: 10k
-    # - name: bar
-    #   size: 1m
+customLuaSharedDicts: []
+  # - name: foo
+  #   size: 10k
+  # - name: bar
+  #   size: 1m
 
 gateway:
   type: NodePort
