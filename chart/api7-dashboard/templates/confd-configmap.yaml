@@ -1,0 +1,148 @@
+{{- if .Values.prometheus.server.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "api7-dashboard.fullname" . }}-confd-toml
+  namespace: {{ .Release.Namespace }}
+data:
+  confd.toml: |
+    backend = "etcdv3"
+    confdir = "/etc/confd"
+    nodes = [
+    {{- if .Values.etcd.builtin }}
+        "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.port }}"
+    {{- else }}
+        {{ range .Values.config.selfEtcd.hosts -}}
+        - {{ . }}
+        {{ end }}
+    {{- end }}
+    ]
+    watch = true
+    {{- if .Values.etcd.auth.rbac.enabled }}
+    username = {{ .Values.etcd.auth.rbac.user | quote }}
+    password = {{ .Values.etcd.auth.rbac.password | quote }}
+    basic_auth = true
+    {{ end }}
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "api7-dashboard.fullname" . }}-alertmanager-tmpl
+  namespace: {{ .Release.Namespace }}
+data:
+  api7.alertmanager.yaml.tmpl: |
+    global:
+    route:
+      group_wait: 1s
+      group_interval: 1m
+      repeat_interval: 1m
+      receiver: "api7-dashboard"
+      routes:
+    {{`{{range $alarm := gets "`}}{{ .Values.etcd.prefix }}{{`/alarm/*"}}
+    {{$alarmJson := json $alarm.Value}}
+    {{if eq $alarmJson.status 1.0}}
+    {{if eq $alarmJson.rules_relation "or"}}
+    {{range $alarmJson.rules}}
+      - match:
+          alarm: "{{$alarmJson.id}}"
+          condition: "{{.metric}}{{.operator}}{{.value}}"
+        receiver: "api7-dashboard"
+        repeat_interval: "{{.repeat_interval}}"
+    {{end}}
+    {{else}}
+      - match:
+          alarm: "{{$alarmJson.id}}"
+          condition: "all"
+        receiver: "api7-dashboard"
+        repeat_interval: "{{$alarmJson.repeat_interval}}"
+    {{end}}
+    {{end}}
+    {{end}}`}}
+
+    receivers:
+      - name: "api7-dashboard"
+        webhook_configs:
+          - url: "http://{{ .Release.Name }}-dashboard.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.config.http.servicePort }}/apisix/admin/alarm-webhook?cluster_id=cluster_1"
+            send_resolved: true
+            http_config:
+              bearer_token: {{ .Values.config.authentication.apikey }}
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "api7-dashboard.fullname" . }}-alertmanager-toml
+  namespace: {{ .Release.Namespace }}
+data:
+   api7.alertmanager.yaml.toml: |
+    [template]
+    src = "api7.alertmanager.yaml.tmpl"
+    dest = "/root/alertmanager.yml"
+    mode = "0644"
+    keys = [
+    "{{ .Values.etcd.prefix }}/alarm/",
+    ]
+    reload_cmd = "curl -XPOST 'http://{{ .Release.Name }}-alertmanager.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9093/-/reload'"
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "api7-dashboard.fullname" . }}-rules-tmpl
+  namespace: {{ .Release.Namespace }}
+data:
+  api7.rules.yaml.tmpl: |
+    groups:
+    - name: api7-alarm
+      rules:
+    {{`{{range $alarm := gets "`}}{{ .Values.etcd.prefix }}{{`/alarm/*"}}
+    {{$alarmJson := json $alarm.Value}}
+    {{if eq $alarmJson.status 1.0}}
+    {{if eq $alarmJson.rules_relation "or"}}
+    {{range $alarmJson.rules}}
+      - alert: {{$alarmJson.name}}
+        expr: {{.expr}}
+    {{if not .for}}
+    {{else}}
+        for: {{.for}}
+    {{end}}
+        labels:
+          alarm: "{{$alarmJson.id}}"
+          condition: "{{.metric}}{{.operator}}{{.value}}"
+        annotations:
+          summary: {{$alarmJson.message}}
+          description: {{$alarmJson.message}}
+    {{end}}
+    {{else}}
+      - alert: {{$alarmJson.name}}
+        expr: {{range $index, $expr := $alarmJson.rules}} {{if gt $index 0}}and{{end}} {{.expr}} {{end}}
+        labels:
+          alarm: "{{$alarmJson.id}}"
+          condition: "all"
+        annotations:
+          summary: {{$alarmJson.message}}
+          description: {{$alarmJson.message}}
+    {{end}}
+    {{end}}
+    {{end}}`}}
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "api7-dashboard.fullname" . }}-rules-toml
+  namespace: {{ .Release.Namespace }}
+data:
+  api7.rules.yaml.toml: |
+    [template]
+    src = "api7.rules.yaml.tmpl"
+    dest = "/root/api7.rules.yml"
+    mode = "0644"
+    keys = [
+    "{{ .Values.etcd.prefix }}/alarm/"
+    ]
+    reload_cmd = "curl -XPOST 'http://{{ .Release.Name }}-prometheus.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9090/-/reload'"
+{{- end -}}

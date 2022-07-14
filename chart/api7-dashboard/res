@@ -1,0 +1,3045 @@
+NAME: api7-dashboard
+LAST DEPLOYED: Thu Jul 14 11:04:14 2022
+NAMESPACE: api7
+STATUS: pending-install
+REVISION: 1
+USER-SUPPLIED VALUES:
+image:
+  registry: localhost:5000
+  repository: api7-dashboard
+  tag: 2.8.2202
+service:
+  type: NodePort
+
+COMPUTED VALUES:
+autoscaling:
+  enabled: false
+  maxReplicas: 100
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+clusterDomain: cluster.local
+confd:
+  builtin: true
+config:
+  allowAdmin: []
+  allowList:
+  - 127.0.0.0/24
+  authentication:
+    allow_login_failed_times: 0
+    api_key: adi2c9f034335f136f87ad84b628c8f9
+    expire_time: 3600
+    login_failed_lock_duration: 1h
+    login_failed_stat_duration: 1h
+    secret: qwerty
+    users:
+    - password: admin
+      username: admin
+  http:
+    enabled: true
+    port: 9000
+    servicePort: 9000
+  k8sSupport:
+    clusterDomain: cluster.local
+    clusterRole: services-lister
+    clusterRoleBinding: api7-services-account-binding
+    enable: true
+    namespaces:
+    - '*'
+    serviceAccount: api7-account
+  log:
+    access_log:
+      file_path: /dev/stdout
+    error_log:
+      file_path: /dev/stderr
+      level: warn
+  security:
+    access_control-allow_methods: '*'
+    access_control_allow_credentials: false
+    access_control_allow_headers: ""
+    access_control_allow_origin: ""
+    content_security_policy: default-src 'self'; script-src 'self' 'unsafe-eval';
+      style-src 'self' 'unsafe-inline'
+    x_frame_options: deny
+  tls:
+    enabled: false
+    mtls_enabled: true
+    port: 9443
+    secretName: ""
+    servicePort: 9443
+  trustedProxies: []
+customSchema:
+  enabled: false
+etcd:
+  affinity: {}
+  args: []
+  auth:
+    client:
+      caFilename: ""
+      certFilename: cert.pem
+      certKeyFilename: key.pem
+      enableAuthentication: false
+      existingSecret: ""
+      secureTransport: false
+      useAutoTLS: false
+    peer:
+      caFilename: ""
+      certFilename: cert.pem
+      certKeyFilename: key.pem
+      enableAuthentication: false
+      existingSecret: ""
+      secureTransport: false
+      useAutoTLS: false
+    rbac:
+      allowNoneAuthentication: true
+      create: true
+      enabled: false
+      existingSecret: ""
+      existingSecretPasswordKey: ""
+      password: ""
+      rootPassword: ""
+      user: ""
+    tls:
+      certCAFilename: ca.crt
+      certFilename: tls.crt
+      certKeyFilename: tls.key
+      enalbed: false
+      existingSecret: ""
+      verify: true
+    token:
+      privateKey:
+        existingSecret: ""
+        filename: jwt-token.pem
+      signMethod: RS256
+      ttl: 10m
+      type: jwt
+  autoCompactionMode: ""
+  autoCompactionRetention: ""
+  builtin: true
+  clusterDomain: cluster.local
+  command: []
+  common:
+    exampleValue: common-chart
+    global:
+      imagePullSecrets: []
+      imageRegistry: ""
+      storageClass: ""
+  commonAnnotations: {}
+  commonLabels: {}
+  configuration: ""
+  containerPorts:
+    client: 2379
+    peer: 2380
+  containerSecurityContext:
+    enabled: true
+    runAsNonRoot: true
+    runAsUser: 1001
+  customLivenessProbe: {}
+  customReadinessProbe: {}
+  customStartupProbe: {}
+  defaultPort: 2379
+  diagnosticMode:
+    args:
+    - infinity
+    command:
+    - sleep
+    enabled: false
+  disasterRecovery:
+    cronjob:
+      historyLimit: 1
+      nodeSelector: {}
+      podAnnotations: {}
+      resources:
+        limits: {}
+        requests: {}
+      schedule: '*/30 * * * *'
+      snapshotHistoryLimit: 1
+      tolerations: []
+    enabled: false
+    pvc:
+      existingClaim: ""
+      size: 2Gi
+      storageClassName: nfs
+  existingConfigmap: ""
+  extraDeploy: []
+  extraEnvVars: []
+  extraEnvVarsCM: ""
+  extraEnvVarsSecret: ""
+  extraVolumeMounts: []
+  extraVolumes: []
+  fullnameOverride: ""
+  global:
+    imagePullSecrets: []
+    imageRegistry: ""
+    storageClass: ""
+  hostAliases: []
+  hosts:
+  - http://etcd.host:2379
+  image:
+    debug: false
+    pullPolicy: IfNotPresent
+    pullSecrets: []
+    registry: docker.io
+    repository: bitnami/etcd
+    tag: 3.5.4-debian-11-r9
+  initContainers: []
+  initialClusterState: ""
+  kubeVersion: ""
+  lifecycleHooks: {}
+  livenessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    successThreshold: 1
+    timeoutSeconds: 5
+  maxProcs: ""
+  metrics:
+    enabled: false
+    podAnnotations:
+      prometheus.io/port: '{{ .Values.containerPorts.client }}'
+      prometheus.io/scrape: "true"
+    podMonitor:
+      additionalLabels: {}
+      enabled: false
+      interval: 30s
+      namespace: monitoring
+      relabelings: []
+      scheme: http
+      scrapeTimeout: 30s
+      tlsConfig: {}
+    prometheusRule:
+      additionalLabels: {}
+      enabled: false
+      namespace: ""
+      rules: []
+  name: default
+  nameOverride: ""
+  networkPolicy:
+    allowExternal: true
+    enabled: false
+    extraEgress: []
+    extraIngress: []
+    ingressNSMatchLabels: {}
+    ingressNSPodMatchLabels: {}
+  nodeAffinityPreset:
+    key: ""
+    type: ""
+    values: []
+  nodeSelector: {}
+  pdb:
+    create: true
+    maxUnavailable: ""
+    minAvailable: 51%
+  persistence:
+    accessModes:
+    - ReadWriteOnce
+    annotations: {}
+    enabled: true
+    selector: {}
+    size: 8Gi
+    storageClass: ""
+  persistentVolumeClaimRetentionPolicy:
+    enabled: false
+    whenDeleted: Retain
+    whenScaled: Retain
+  podAffinityPreset: ""
+  podAnnotations: {}
+  podAntiAffinityPreset: soft
+  podLabels: {}
+  podManagementPolicy: Parallel
+  podSecurityContext:
+    enabled: true
+    fsGroup: 1001
+  prefix: /api7
+  priorityClassName: ""
+  readinessProbe:
+    enabled: true
+    failureThreshold: 5
+    initialDelaySeconds: 60
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+  removeMemberOnContainerTermination: true
+  replicaCount: 1
+  resources:
+    limits: {}
+    requests: {}
+  runtimeClassName: ""
+  schedulerName: ""
+  service:
+    annotations: {}
+    clientPortNameOverride: ""
+    clusterIP: ""
+    enabled: true
+    externalIPs: []
+    externalTrafficPolicy: Cluster
+    extraPorts: []
+    loadBalancerIP: ""
+    loadBalancerSourceRanges: []
+    nodePorts:
+      client: ""
+      peer: ""
+    peerPortNameOverride: ""
+    ports:
+      client: 2379
+      peer: 2380
+    sessionAffinity: None
+    sessionAffinityConfig: {}
+    type: ClusterIP
+  serviceAccount:
+    annotations: {}
+    automountServiceAccountToken: true
+    create: false
+    labels: {}
+    name: ""
+  sidecars: []
+  startFromSnapshot:
+    enabled: false
+    existingClaim: ""
+    snapshotFilename: ""
+  startupProbe:
+    enabled: false
+    failureThreshold: 60
+    initialDelaySeconds: 0
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+  terminationGracePeriodSeconds: ""
+  timeout: 30
+  tolerations: []
+  topologySpreadConstraints: []
+  updateStrategy:
+    type: RollingUpdate
+  volumePermissions:
+    enabled: false
+    image:
+      pullPolicy: IfNotPresent
+      pullSecrets: []
+      registry: docker.io
+      repository: bitnami/bitnami-shell
+      tag: 11-debian-11-r9
+    resources:
+      limits: {}
+      requests: {}
+fullnameOverride: ""
+grafana:
+  admin:
+    existingSecret: ""
+    passwordKey: admin-password
+    userKey: admin-user
+  adminUser: admin
+  affinity: {}
+  builtin: true
+  dashboardProviders: {}
+  dashboards: {}
+  dashboardsConfigMaps: {}
+  datasources: {}
+  deploymentStrategy:
+    type: RollingUpdate
+  downloadDashboards:
+    env: {}
+    resources: {}
+  downloadDashboardsImage:
+    pullPolicy: IfNotPresent
+    repository: curlimages/curl
+    sha: ""
+    tag: 7.73.0
+  env: {}
+  envFromSecret: ""
+  envRenderSecret: {}
+  envValueFrom: {}
+  extraConfigmapMounts: []
+  extraContainerVolumes: []
+  extraContainers: ""
+  extraEmptyDirMounts: []
+  extraExposePorts: []
+  extraInitContainers: []
+  extraSecretMounts: []
+  extraVolumeMounts: []
+  global: {}
+  grafana.ini:
+    analytics:
+      check_for_updates: true
+    grafana_net:
+      url: https://grafana.net
+    log:
+      mode: console
+    paths:
+      data: /var/lib/grafana/data
+      logs: /var/log/grafana
+      plugins: /var/lib/grafana/plugins
+      provisioning: /etc/grafana/provisioning
+  hostAliases: []
+  image:
+    pullPolicy: IfNotPresent
+    repository: grafana/grafana
+    sha: ""
+    tag: 7.2.1
+  imageRenderer:
+    enabled: false
+    env: {}
+    hostAliases: []
+    image:
+      pullPolicy: Always
+      repository: grafana/grafana-image-renderer
+      sha: ""
+      tag: latest
+    networkPolicy:
+      limitEgress: false
+      limitIngress: true
+    podPortName: http
+    priorityClassName: ""
+    replicas: 1
+    resources: {}
+    revisionHistoryLimit: 10
+    securityContext: {}
+    service:
+      port: 8081
+      portName: http
+  ingress:
+    annotations: {}
+    enabled: false
+    extraPaths: []
+    hosts:
+    - chart-example.local
+    labels: {}
+    path: /
+    tls: []
+  initChownData:
+    enabled: true
+    image:
+      pullPolicy: IfNotPresent
+      repository: busybox
+      sha: ""
+      tag: 1.31.1
+    resources: {}
+  ldap:
+    config: ""
+    enabled: false
+    existingSecret: ""
+  livenessProbe:
+    failureThreshold: 10
+    httpGet:
+      path: /api/health
+      port: 3000
+    initialDelaySeconds: 60
+    timeoutSeconds: 30
+  namespaceOverride: ""
+  nodeSelector: {}
+  notifiers: {}
+  persistence:
+    accessModes:
+    - ReadWriteOnce
+    enabled: false
+    finalizers:
+    - kubernetes.io/pvc-protection
+    size: 10Gi
+    type: pvc
+  plugins: []
+  podDisruptionBudget: {}
+  podPortName: grafana
+  rbac:
+    create: true
+    extraClusterRoleRules: []
+    extraRoleRules: []
+    namespaced: false
+    pspEnabled: true
+    pspUseAppArmor: true
+  readinessProbe:
+    httpGet:
+      path: /api/health
+      port: 3000
+  replicas: 1
+  resources: {}
+  revisionHistoryLimit: 10
+  securityContext:
+    fsGroup: 472
+    runAsGroup: 472
+    runAsUser: 472
+  service:
+    annotations: {}
+    labels: {}
+    port: 80
+    portName: service
+    targetPort: 3000
+    type: ClusterIP
+  serviceAccount:
+    create: true
+  serviceMonitor:
+    enabled: false
+    interval: 1m
+    labels: {}
+    path: /metrics
+    relabelings: []
+    scrapeTimeout: 30s
+  sidecar:
+    dashboards:
+      SCProvider: true
+      enabled: false
+      folder: /tmp/dashboards
+      label: grafana_dashboard
+      provider:
+        allowUiUpdates: false
+        disableDelete: false
+        folder: ""
+        foldersFromFilesStructure: false
+        name: sidecarProvider
+        orgid: 1
+        type: file
+    datasources:
+      enabled: false
+      label: grafana_datasource
+    enableUniqueFilenames: false
+    image:
+      repository: kiwigrid/k8s-sidecar
+      sha: ""
+      tag: 1.1.0
+    imagePullPolicy: IfNotPresent
+    notifiers:
+      enabled: false
+      label: grafana_notifier
+    resources: {}
+  smtp:
+    existingSecret: ""
+    passwordKey: password
+    userKey: user
+  testFramework:
+    enabled: true
+    image: bats/bats
+    imagePullPolicy: IfNotPresent
+    securityContext: {}
+    tag: v1.1.0
+  tolerations: []
+image:
+  pullPolicy: IfNotPresent
+  registry: localhost:5000
+  repository: api7-dashboard
+  tag: 2.8.2202
+imagePullSecrets: []
+nameOverride: ""
+nodeSelector: {}
+prometheus:
+  alertmanager:
+    affinity: {}
+    baseURL: http://localhost:9093
+    clusterPeers: []
+    configFileName: alertmanager.yml
+    configFromSecret: ""
+    configMapOverrideName: ""
+    containerSecurityContext: {}
+    deploymentAnnotations: {}
+    dnsConfig: {}
+    emptyDir:
+      sizeLimit: ""
+    enabled: true
+    extraArgs: {}
+    extraConfigmapMounts: []
+    extraEnv: {}
+    extraInitContainers: []
+    extraSecretMounts: []
+    image:
+      pullPolicy: IfNotPresent
+      repository: quay.io/prometheus/alertmanager
+      tag: v0.24.0
+    ingress:
+      annotations: {}
+      enabled: false
+      extraLabels: {}
+      extraPaths: []
+      hosts: []
+      path: /
+      pathType: Prefix
+      tls: []
+    name: alertmanager
+    nodeSelector: {}
+    persistentVolume:
+      accessModes:
+      - ReadWriteOnce
+      annotations: {}
+      enabled: true
+      existingClaim: ""
+      mountPath: /data
+      size: 2Gi
+      subPath: ""
+    podAnnotations: {}
+    podDisruptionBudget:
+      enabled: false
+      maxUnavailable: 1
+    podLabels: {}
+    podSecurityPolicy:
+      annotations: {}
+    prefixURL: ""
+    priorityClassName: ""
+    probeHeaders: []
+    replicaCount: 1
+    resources: {}
+    securityContext:
+      fsGroup: 65534
+      runAsGroup: 65534
+      runAsNonRoot: true
+      runAsUser: 65534
+    service:
+      annotations: {}
+      clusterIP: ""
+      externalIPs: []
+      labels: {}
+      loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+      servicePort: 80
+      sessionAffinity: None
+      type: ClusterIP
+    statefulSet:
+      annotations: {}
+      enabled: false
+      headless:
+        annotations: {}
+        enableMeshPeer: false
+        labels: {}
+        servicePort: 80
+      labels: {}
+      podManagementPolicy: OrderedReady
+    tolerations: []
+    useClusterRole: true
+    useExistingRole: false
+  alertmanagerFiles:
+    alertmanager.yml:
+      global: {}
+      receivers:
+      - name: default-receiver
+      route:
+        group_interval: 5m
+        group_wait: 10s
+        receiver: default-receiver
+        repeat_interval: 3h
+  builtin: true
+  clusters: []
+  configmapReload:
+    alertmanager:
+      containerSecurityContext: {}
+      enabled: true
+      extraArgs: {}
+      extraConfigmapMounts: []
+      extraVolumeDirs: []
+      image:
+        pullPolicy: IfNotPresent
+        repository: jimmidyson/configmap-reload
+        tag: v0.5.0
+      name: configmap-reload
+      resources: {}
+    prometheus:
+      containerSecurityContext: {}
+      enabled: true
+      extraArgs: {}
+      extraConfigmapMounts: []
+      extraVolumeDirs: []
+      image:
+        pullPolicy: IfNotPresent
+        repository: jimmidyson/configmap-reload
+        tag: v0.5.0
+      name: configmap-reload
+      resources: {}
+  global: {}
+  kube-state-metrics:
+    affinity: {}
+    annotations: {}
+    autosharding:
+      enabled: false
+    collectors:
+    - certificatesigningrequests
+    - configmaps
+    - cronjobs
+    - daemonsets
+    - deployments
+    - endpoints
+    - horizontalpodautoscalers
+    - ingresses
+    - jobs
+    - limitranges
+    - mutatingwebhookconfigurations
+    - namespaces
+    - networkpolicies
+    - nodes
+    - persistentvolumeclaims
+    - persistentvolumes
+    - poddisruptionbudgets
+    - pods
+    - replicasets
+    - replicationcontrollers
+    - resourcequotas
+    - secrets
+    - services
+    - statefulsets
+    - storageclasses
+    - validatingwebhookconfigurations
+    - volumeattachments
+    containerSecurityContext: {}
+    customLabels: {}
+    extraArgs: []
+    global: {}
+    hostNetwork: false
+    image:
+      pullPolicy: IfNotPresent
+      repository: registry.k8s.io/kube-state-metrics/kube-state-metrics
+      tag: v2.5.0
+    imagePullSecrets: []
+    kubeTargetVersionOverride: ""
+    kubeconfig:
+      enabled: false
+      secret: null
+    metricAllowlist: []
+    metricAnnotationsAllowList: []
+    metricDenylist: []
+    metricLabelsAllowlist: []
+    namespaceOverride: ""
+    namespaces: ""
+    namespacesDenylist: ""
+    nodeSelector: {}
+    podAnnotations: {}
+    podDisruptionBudget: {}
+    podSecurityPolicy:
+      additionalVolumes: []
+      annotations: {}
+      enabled: false
+    prometheus:
+      monitor:
+        additionalLabels: {}
+        enabled: false
+        honorLabels: false
+        interval: ""
+        jobLabel: ""
+        metricRelabelings: []
+        namespace: ""
+        proxyUrl: ""
+        relabelings: []
+        scheme: ""
+        scrapeTimeout: ""
+        selectorOverride: {}
+        tlsConfig: {}
+    prometheusScrape: true
+    rbac:
+      create: true
+      extraRules: []
+      useClusterRole: true
+    releaseLabel: false
+    replicas: 1
+    resources: {}
+    securityContext:
+      enabled: true
+      fsGroup: 65534
+      runAsGroup: 65534
+      runAsUser: 65534
+    selfMonitor:
+      enabled: false
+    service:
+      annotations: {}
+      clusterIP: ""
+      loadBalancerIP: ""
+      nodePort: 0
+      port: 8080
+      type: ClusterIP
+    serviceAccount:
+      annotations: {}
+      create: true
+      imagePullSecrets: []
+      name: null
+    tolerations: []
+    topologySpreadConstraints: []
+  kubeStateMetrics:
+    enabled: false
+  networkPolicy:
+    enabled: false
+  nodeExporter:
+    container:
+      securityContext:
+        allowPrivilegeEscalation: false
+    dnsConfig: {}
+    enabled: false
+    extraArgs: {}
+    extraConfigmapMounts: []
+    extraHostPathMounts: []
+    extraInitContainers: []
+    hostNetwork: true
+    hostPID: true
+    hostRootfs: true
+    image:
+      pullPolicy: IfNotPresent
+      repository: quay.io/prometheus/node-exporter
+      tag: v1.3.1
+    name: node-exporter
+    nodeSelector: {}
+    pod:
+      labels: {}
+    podAnnotations: {}
+    podDisruptionBudget:
+      enabled: false
+      maxUnavailable: 1
+    podSecurityPolicy:
+      annotations: {}
+    priorityClassName: ""
+    resources: {}
+    securityContext:
+      fsGroup: 65534
+      runAsGroup: 65534
+      runAsNonRoot: true
+      runAsUser: 65534
+    service:
+      annotations:
+        prometheus.io/scrape: "true"
+      clusterIP: ""
+      externalIPs: []
+      hostPort: 9100
+      labels: {}
+      loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+      servicePort: 9100
+      type: ClusterIP
+    tolerations: []
+    updateStrategy:
+      type: RollingUpdate
+  podSecurityPolicy:
+    enabled: false
+  pushgateway:
+    containerSecurityContext: {}
+    deploymentAnnotations: {}
+    dnsConfig: {}
+    enabled: false
+    extraArgs: {}
+    extraInitContainers: []
+    image:
+      pullPolicy: IfNotPresent
+      repository: prom/pushgateway
+      tag: v1.4.3
+    ingress:
+      annotations: {}
+      enabled: false
+      extraPaths: []
+      hosts: []
+      path: /
+      pathType: Prefix
+      tls: []
+    name: pushgateway
+    nodeSelector: {}
+    persistentVolume:
+      accessModes:
+      - ReadWriteOnce
+      annotations: {}
+      enabled: false
+      existingClaim: ""
+      mountPath: /data
+      size: 2Gi
+      subPath: ""
+    podAnnotations: {}
+    podDisruptionBudget:
+      enabled: false
+      maxUnavailable: 1
+    podLabels: {}
+    podSecurityPolicy:
+      annotations: {}
+    priorityClassName: ""
+    replicaCount: 1
+    resources: {}
+    securityContext:
+      runAsNonRoot: true
+      runAsUser: 65534
+    service:
+      annotations:
+        prometheus.io/probe: pushgateway
+      clusterIP: ""
+      externalIPs: []
+      labels: {}
+      loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+      servicePort: 9091
+      type: ClusterIP
+    tolerations: []
+    verticalAutoscaler:
+      enabled: false
+  rbac:
+    create: true
+  ruleFiles: {}
+  server:
+    affinity: {}
+    alertmanagers: []
+    baseURL: ""
+    configMapOverrideName: ""
+    configPath: /etc/config/prometheus.yml
+    containerSecurityContext: {}
+    defaultFlagsOverride: []
+    deploymentAnnotations: {}
+    dnsConfig: {}
+    dnsPolicy: ClusterFirst
+    emptyDir:
+      sizeLimit: ""
+    enable: true
+    enableServiceLinks: true
+    enabled: true
+    env: []
+    extraArgs: {}
+    extraConfigmapMounts: []
+    extraFlags:
+    - web.enable-lifecycle
+    extraHostPathMounts: []
+    extraInitContainers: []
+    extraObjects: []
+    extraSecretMounts: []
+    extraTemplates: []
+    extraVolumeMounts: []
+    extraVolumes: []
+    global:
+      evaluation_interval: 1m
+      scrape_interval: 1m
+      scrape_timeout: 10s
+    hostAliases: []
+    hostNetwork: false
+    image:
+      pullPolicy: IfNotPresent
+      repository: quay.io/prometheus/prometheus
+      tag: v2.36.2
+    ingress:
+      annotations: {}
+      enabled: false
+      extraLabels: {}
+      extraPaths: []
+      hosts: []
+      path: /
+      pathType: Prefix
+      tls: []
+    livenessProbeFailureThreshold: 3
+    livenessProbeInitialDelay: 30
+    livenessProbePeriodSeconds: 15
+    livenessProbeSuccessThreshold: 1
+    livenessProbeTimeout: 10
+    name: server
+    nodeSelector: {}
+    persistentVolume:
+      accessModes:
+      - ReadWriteOnce
+      annotations: {}
+      enabled: true
+      existingClaim: ""
+      mountPath: /data
+      size: 8Gi
+      subPath: ""
+    podAnnotations: {}
+    podDisruptionBudget:
+      enabled: false
+      maxUnavailable: 1
+    podLabels: {}
+    podSecurityPolicy:
+      annotations: {}
+    prefixURL: ""
+    priorityClassName: ""
+    probeHeaders: []
+    probeScheme: HTTP
+    readinessProbeFailureThreshold: 3
+    readinessProbeInitialDelay: 30
+    readinessProbePeriodSeconds: 5
+    readinessProbeSuccessThreshold: 1
+    readinessProbeTimeout: 4
+    remoteRead: []
+    remoteWrite: []
+    replicaCount: 1
+    resources: {}
+    retention: 15d
+    securityContext:
+      fsGroup: 65534
+      runAsGroup: 65534
+      runAsNonRoot: true
+      runAsUser: 65534
+    service:
+      annotations: {}
+      clusterIP: ""
+      enabled: true
+      externalIPs: []
+      gRPC:
+        enabled: false
+        servicePort: 10901
+      labels: {}
+      loadBalancerIP: ""
+      loadBalancerSourceRanges: []
+      servicePort: 80
+      sessionAffinity: None
+      statefulsetReplica:
+        enabled: false
+        replica: 0
+      type: ClusterIP
+    sidecarContainers:
+      confd:
+        image: johz/confd:0.16.0
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /etc/confd/confd.toml
+          name: confd-toml
+          subPath: confd.toml
+        - mountPath: /etc/confd/conf.d/api7.alertmanager.yaml.toml
+          name: alertmanager-toml
+          subPath: api7.alertmanager.yaml.toml
+        - mountPath: /etc/confd/templates/api7.alertmanager.yaml.tmpl
+          name: alertmanager-tmpl
+          subPath: api7.alertmanager.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.rules.yaml.toml
+          name: rules-toml
+          subPath: api7.rules.yaml.toml
+        - mountPath: /etc/confd/templates/api7.rules.yaml.tmpl
+          name: rules-tmpl
+          subPath: api7.rules.yaml.tmpl
+        - mountPath: /root/
+          name: storage-volume
+    sidecarTemplateValues: {}
+    startupProbe:
+      enabled: false
+      failureThreshold: 30
+      periodSeconds: 5
+      timeoutSeconds: 10
+    statefulSet:
+      annotations: {}
+      enabled: false
+      headless:
+        annotations: {}
+        gRPC:
+          enabled: false
+          servicePort: 10901
+        labels: {}
+        servicePort: 80
+      labels: {}
+      podManagementPolicy: OrderedReady
+    storagePath: ""
+    tcpSocketProbeEnabled: false
+    terminationGracePeriodSeconds: 300
+    tolerations: []
+    verticalAutoscaler:
+      enabled: false
+  serverFiles:
+    alerting_rules.yml: {}
+    alerts: {}
+    prometheus.yml:
+      rule_files:
+      - /etc/config/recording_rules.yml
+      - /etc/config/alerting_rules.yml
+      - /etc/config/rules
+      - /etc/config/alerts
+      scrape_configs:
+      - job_name: prometheus
+        static_configs:
+        - targets:
+          - localhost:9090
+      - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        job_name: kubernetes-apiservers
+        kubernetes_sd_configs:
+        - role: endpoints
+        relabel_configs:
+        - action: keep
+          regex: default;kubernetes;https
+          source_labels:
+          - __meta_kubernetes_namespace
+          - __meta_kubernetes_service_name
+          - __meta_kubernetes_endpoint_port_name
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+      - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        job_name: kubernetes-nodes
+        kubernetes_sd_configs:
+        - role: node
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - replacement: kubernetes.default.svc:443
+          target_label: __address__
+        - regex: (.+)
+          replacement: /api/v1/nodes/$1/proxy/metrics
+          source_labels:
+          - __meta_kubernetes_node_name
+          target_label: __metrics_path__
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+      - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        job_name: kubernetes-nodes-cadvisor
+        kubernetes_sd_configs:
+        - role: node
+        relabel_configs:
+        - action: labelmap
+          regex: __meta_kubernetes_node_label_(.+)
+        - replacement: kubernetes.default.svc:443
+          target_label: __address__
+        - regex: (.+)
+          replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
+          source_labels:
+          - __meta_kubernetes_node_name
+          target_label: __metrics_path__
+        scheme: https
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+          insecure_skip_verify: true
+      - honor_labels: true
+        job_name: kubernetes-service-endpoints
+        kubernetes_sd_configs:
+        - role: endpoints
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scrape
+        - action: drop
+          regex: true
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
+        - action: replace
+          regex: (https?)
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: (.+?)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          source_labels:
+          - __address__
+          - __meta_kubernetes_service_annotation_prometheus_io_port
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)
+          replacement: __param_$1
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_service_name
+          target_label: service
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_node_name
+          target_label: node
+      - honor_labels: true
+        job_name: kubernetes-service-endpoints-slow
+        kubernetes_sd_configs:
+        - role: endpoints
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
+        - action: replace
+          regex: (https?)
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: (.+?)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          source_labels:
+          - __address__
+          - __meta_kubernetes_service_annotation_prometheus_io_port
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)
+          replacement: __param_$1
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_service_name
+          target_label: service
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_node_name
+          target_label: node
+        scrape_interval: 5m
+        scrape_timeout: 30s
+      - honor_labels: true
+        job_name: prometheus-pushgateway
+        kubernetes_sd_configs:
+        - role: service
+        relabel_configs:
+        - action: keep
+          regex: pushgateway
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_probe
+      - honor_labels: true
+        job_name: kubernetes-services
+        kubernetes_sd_configs:
+        - role: service
+        metrics_path: /probe
+        params:
+          module:
+          - http_2xx
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_service_annotation_prometheus_io_probe
+        - source_labels:
+          - __address__
+          target_label: __param_target
+        - replacement: blackbox
+          target_label: __address__
+        - source_labels:
+          - __param_target
+          target_label: instance
+        - action: labelmap
+          regex: __meta_kubernetes_service_label_(.+)
+        - source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - source_labels:
+          - __meta_kubernetes_service_name
+          target_label: service
+      - honor_labels: true
+        job_name: kubernetes-pods
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+        - action: drop
+          regex: true
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape_slow
+        - action: replace
+          regex: (https?)
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: (.+?)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          source_labels:
+          - __address__
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
+          replacement: __param_$1
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_name
+          target_label: pod
+        - action: drop
+          regex: Pending|Succeeded|Failed|Completed
+          source_labels:
+          - __meta_kubernetes_pod_phase
+      - honor_labels: true
+        job_name: kubernetes-pods-slow
+        kubernetes_sd_configs:
+        - role: pod
+        relabel_configs:
+        - action: keep
+          regex: true
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scrape_slow
+        - action: replace
+          regex: (https?)
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_scheme
+          target_label: __scheme__
+        - action: replace
+          regex: (.+)
+          source_labels:
+          - __meta_kubernetes_pod_annotation_prometheus_io_path
+          target_label: __metrics_path__
+        - action: replace
+          regex: (.+?)(?::\d+)?;(\d+)
+          replacement: $1:$2
+          source_labels:
+          - __address__
+          - __meta_kubernetes_pod_annotation_prometheus_io_port
+          target_label: __address__
+        - action: labelmap
+          regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
+          replacement: __param_$1
+        - action: labelmap
+          regex: __meta_kubernetes_pod_label_(.+)
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_namespace
+          target_label: namespace
+        - action: replace
+          source_labels:
+          - __meta_kubernetes_pod_name
+          target_label: pod
+        - action: drop
+          regex: Pending|Succeeded|Failed|Completed
+          source_labels:
+          - __meta_kubernetes_pod_phase
+        scrape_interval: 5m
+        scrape_timeout: 30s
+    recording_rules.yml: {}
+    rules: {}
+  serviceAccounts:
+    alertmanager:
+      annotations: {}
+      create: true
+    nodeExporter:
+      annotations: {}
+      create: true
+    pushgateway:
+      annotations: {}
+      create: true
+    server:
+      annotations: {}
+      create: true
+replicaCount: 1
+selfRegister:
+  enabled: false
+  host: api7-dashboard.apiseven.com
+service:
+  loadBalancerSourceRanges: []
+  type: NodePort
+
+HOOKS:
+---
+# Source: api7-dashboard/charts/grafana/templates/tests/test.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: api7-dashboard-grafana-test
+  labels:
+    helm.sh/chart: grafana-6.0.0
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/version: "7.2.1"
+    app.kubernetes.io/managed-by: Helm
+  annotations:
+    "helm.sh/hook": test-success
+  namespace: api7
+spec:
+  serviceAccountName: api7-dashboard-grafana-test
+  containers:
+    - name: api7-dashboard-test
+      image: "bats/bats:v1.1.0"
+      imagePullPolicy: "IfNotPresent"
+      command: ["/opt/bats/bin/bats", "-t", "/tests/run.sh"]
+      volumeMounts:
+        - mountPath: /tests
+          name: tests
+          readOnly: true
+  volumes:
+  - name: tests
+    configMap:
+      name: api7-dashboard-grafana-test
+  restartPolicy: Never
+MANIFEST:
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: api7-account
+  namespace: api7
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana
+  namespace: api7
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana-test
+  namespace: api7
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: alertmanager
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-alertmanager
+  namespace: api7
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: server
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-server
+  namespace: api7
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  annotations:
+    apparmor.security.beta.kubernetes.io/allowedProfileNames: runtime/default
+    apparmor.security.beta.kubernetes.io/defaultProfileName: runtime/default
+    seccomp.security.alpha.kubernetes.io/allowedProfileNames: docker/default,runtime/default
+    seccomp.security.alpha.kubernetes.io/defaultProfileName: docker/default
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana
+  namespace: api7
+spec:
+  allowPrivilegeEscalation: false
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  readOnlyRootFilesystem: false
+  requiredDropCapabilities:
+  - FOWNER
+  - FSETID
+  - KILL
+  - SETGID
+  - SETUID
+  - SETPCAP
+  - NET_BIND_SERVICE
+  - NET_RAW
+  - SYS_CHROOT
+  - MKNOD
+  - AUDIT_WRITE
+  - SETFCAP
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - emptyDir
+  - projected
+  - secret
+  - downwardAPI
+  - persistentVolumeClaim
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana-test
+  namespace: api7
+spec:
+  allowPrivilegeEscalation: true
+  fsGroup:
+    rule: RunAsAny
+  hostIPC: false
+  hostNetwork: false
+  hostPID: false
+  privileged: false
+  runAsUser:
+    rule: RunAsAny
+  seLinux:
+    rule: RunAsAny
+  supplementalGroups:
+    rule: RunAsAny
+  volumes:
+  - configMap
+  - downwardAPI
+  - emptyDir
+  - projected
+  - secret
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana-test
+  namespace: api7
+rules:
+- apiGroups:
+  - policy
+  resourceNames:
+  - api7-dashboard-grafana-test
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: Role
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana
+  namespace: api7
+rules:
+- apiGroups:
+  - extensions
+  resourceNames:
+  - api7-dashboard-grafana
+  resources:
+  - podsecuritypolicies
+  verbs:
+  - use
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana-clusterrole
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: alertmanager
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-alertmanager
+rules: []
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: server
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-server
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  - nodes/proxy
+  - nodes/metrics
+  - services
+  - endpoints
+  - pods
+  - ingresses
+  - configmaps
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - extensions
+  - networking.k8s.io
+  resources:
+  - ingresses/status
+  - ingresses
+  verbs:
+  - get
+  - list
+  - watch
+- nonResourceURLs:
+  - /metrics
+  verbs:
+  - get
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: services-lister
+rules:
+- apiGroups:
+  - ""
+  resources:
+  - services
+  verbs:
+  - get
+  - list
+  - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana-test
+  namespace: api7
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: api7-dashboard-grafana-test
+subjects:
+- kind: ServiceAccount
+  name: api7-dashboard-grafana-test
+  namespace: api7
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: RoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana
+  namespace: api7
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: api7-dashboard-grafana
+subjects:
+- kind: ServiceAccount
+  name: api7-dashboard-grafana
+  namespace: api7
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana-clusterrolebinding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: api7-dashboard-grafana-clusterrole
+subjects:
+- kind: ServiceAccount
+  name: api7-dashboard-grafana
+  namespace: api7
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: alertmanager
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-alertmanager
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: api7-dashboard-prometheus-alertmanager
+subjects:
+- kind: ServiceAccount
+  name: api7-dashboard-prometheus-alertmanager
+  namespace: api7
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: server
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-server
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: api7-dashboard-prometheus-server
+subjects:
+- kind: ServiceAccount
+  name: api7-dashboard-prometheus-server
+  namespace: api7
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: api7-services-account-binding
+roleRef:
+  apiGroup: ""
+  kind: ClusterRole
+  name: services-lister
+subjects:
+- apiGroup: ""
+  kind: ServiceAccount
+  name: api7-account
+  namespace: api7
+---
+apiVersion: v1
+data:
+  conf.yaml: "len: 1\nconf:\n  allow_list:\n    - 127.0.0.0/24\n  listen:\n    host:
+    0.0.0.0     # `manager api` listening ip or host name\n    port: 9000 # `manager
+    api` listening port\n  prometheus:\n    host:\n    - \"http://api7-dashboard-prometheus-server.api7.svc.cluster.local:80\"\n
+    \ etcd:\n    name: default\n    endpoints:\n      - \"http://api7-dashboard-etcd.api7.svc.cluster.local:\"\n
+    \   prefix: /api7\n  log:\n    error_log:\n      level: warn       # supports
+    levels, lower to higher: debug, info, warn, error, panic, fatal\n      file_path:\n
+    \       /dev/stderr  # supports relative path, absolute path, standard output\n
+    \                       # such as: logs/error.log, /tmp/logs/error.log, /dev/stdout,
+    /dev/stderr\n    access_log:\n      file_path:\n        /dev/stdout  # supports
+    relative path, absolute path, standard output\n                        # such
+    as: logs/access.log, /tmp/logs/access.log, /dev/stdout, /dev/stderr\n                        #
+    log example: 2020-12-09T16:38:09.039+0800 INFO filter/logging.go:46 /apisix/admin/routes/r1
+    {\"status\": 401, \"host\": \"127.0.0.1:9000\", \"query\": \"asdfsafd=adf&a=a\",
+    \"requestId\": \"3d50ecb8-758c-46d1-af5b-cd9d1c820156\", \"latency\": 0, \"remoteIP\":
+    \"127.0.0.1\", \"method\": \"PUT\", \"errs\": []}\n  security:\n    access_control_allow_origin:
+    \n    access_control_allow_credentials: false\n    access_control_allow_headers:
+    \n    access_control-allow_methods: \n    x_frame_options: deny\n    content_security_policy:
+    default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'\n\nauthentication:\n
+    \ secret:\n    qwerty  # secret for jwt token generation.\n                        #
+    NOTE: Highly recommended to modify this value to protect `manager api`.\n                        #
+    if it's default value, when `manager api` start , it will generate a random string
+    to replace it.\n  expire_time: 3600     # jwt token expire time, in second\n  api_key:
+    adi2c9f034335f136f87ad84b628c8f9     # make simple api key authentication for
+    some API, such as webhook.\n  users:\n  \n    - username: admin   # username and
+    password for login `manager api`\n      password: admin\n  \nkubernetes:\n  enable:
+    true            # enable to connect k8s cluster\n  kubeconfig: \"\"          #
+    the Kubernetes configuration file path, default is\n                          #
+    \"\", so the in-cluster configuration will be used.\n  app_namespaces:\n    \n
+    \   - \"*\"\n    \n                          # by default all namespaces (represented
+    by \"*\") are watched.\n  resync_interval: \"6h\"   # how long should manager-api\n
+    \                         # re-synchronizes with Kubernetes, default is 6h,\n
+    \ cluster_domain: \"cluster.local\"  # the local domain in the kubelet, the default
+    is cluster.local"
+kind: ConfigMap
+metadata:
+  name: api7-dashboard
+  namespace: api7
+---
+apiVersion: v1
+data:
+  api7.alertmanager.yaml.tmpl: |
+    global:
+    route:
+      group_wait: 1s
+      group_interval: 1m
+      repeat_interval: 1m
+      receiver: "api7-dashboard"
+      routes:
+    {{range $alarm := gets "/api7/alarm/*"}}
+    {{$alarmJson := json $alarm.Value}}
+    {{if eq $alarmJson.status 1.0}}
+    {{if eq $alarmJson.rules_relation "or"}}
+    {{range $alarmJson.rules}}
+      - match:
+          alarm: "{{$alarmJson.id}}"
+          condition: "{{.metric}}{{.operator}}{{.value}}"
+        receiver: "api7-dashboard"
+        repeat_interval: "{{.repeat_interval}}"
+    {{end}}
+    {{else}}
+      - match:
+          alarm: "{{$alarmJson.id}}"
+          condition: "all"
+        receiver: "api7-dashboard"
+        repeat_interval: "{{$alarmJson.repeat_interval}}"
+    {{end}}
+    {{end}}
+    {{end}}
+
+    receivers:
+      - name: "api7-dashboard"
+        webhook_configs:
+          - url: "http://api7-dashboard-dashboard.api7.svc.cluster.local:9000/apisix/admin/alarm-webhook?cluster_id=cluster_1"
+            send_resolved: true
+            http_config:
+              bearer_token:
+kind: ConfigMap
+metadata:
+  name: api7-dashboard-alertmanager-tmpl
+  namespace: api7
+---
+apiVersion: v1
+data:
+  api7.alertmanager.yaml.toml: |
+    [template]
+    src = "api7.alertmanager.yaml.tmpl"
+    dest = "/root/alertmanager.yml"
+    mode = "0644"
+    keys = [
+    "/api7/alarm/",
+    ]
+    reload_cmd = "curl -XPOST 'http://api7-dashboard-alertmanager.api7.svc.cluster.local:9093/-/reload'"
+kind: ConfigMap
+metadata:
+  name: api7-dashboard-alertmanager-toml
+  namespace: api7
+---
+apiVersion: v1
+data:
+  confd.toml: |
+    backend = "etcdv3"
+    confdir = "/etc/confd"
+    nodes = [
+        "http://api7-dashboard-etcd.api7.svc.cluster.local:"
+    ]
+    watch = true
+kind: ConfigMap
+metadata:
+  name: api7-dashboard-confd-toml
+  namespace: api7
+---
+apiVersion: v1
+data:
+  grafana.ini: |
+    [analytics]
+    check_for_updates = true
+    [grafana_net]
+    url = https://grafana.net
+    [log]
+    mode = console
+    [paths]
+    data = /var/lib/grafana/data
+    logs = /var/log/grafana
+    plugins = /var/lib/grafana/plugins
+    provisioning = /etc/grafana/provisioning
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana
+  namespace: api7
+---
+apiVersion: v1
+data:
+  run.sh: |-
+    @test "Test Health" {
+      url="http://api7-dashboard-grafana/api/health"
+
+      code=$(wget --server-response --spider --timeout 10 --tries 1 ${url} 2>&1 | awk '/^  HTTP/{print $2}')
+      [ "$code" == "200" ]
+    }
+kind: ConfigMap
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana-test
+  namespace: api7
+---
+apiVersion: v1
+data:
+  alertmanager.yml: |
+    global: {}
+    receivers:
+    - name: default-receiver
+    route:
+      group_interval: 5m
+      group_wait: 10s
+      receiver: default-receiver
+      repeat_interval: 3h
+  allow-snippet-annotations: "false"
+kind: ConfigMap
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: alertmanager
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-alertmanager
+  namespace: api7
+---
+apiVersion: v1
+data:
+  alerting_rules.yml: |
+    {}
+  alerts: |
+    {}
+  allow-snippet-annotations: "false"
+  prometheus.yml: |
+    global:
+      evaluation_interval: 1m
+      scrape_interval: 1m
+      scrape_timeout: 10s
+    rule_files:
+    - /etc/config/recording_rules.yml
+    - /etc/config/alerting_rules.yml
+    - /etc/config/rules
+    - /etc/config/alerts
+    scrape_configs:
+    - job_name: prometheus
+      static_configs:
+      - targets:
+        - localhost:9090
+    - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      job_name: kubernetes-apiservers
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - action: keep
+        regex: default;kubernetes;https
+        source_labels:
+        - __meta_kubernetes_namespace
+        - __meta_kubernetes_service_name
+        - __meta_kubernetes_endpoint_port_name
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+    - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      job_name: kubernetes-nodes
+      kubernetes_sd_configs:
+      - role: node
+      relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - replacement: kubernetes.default.svc:443
+        target_label: __address__
+      - regex: (.+)
+        replacement: /api/v1/nodes/$1/proxy/metrics
+        source_labels:
+        - __meta_kubernetes_node_name
+        target_label: __metrics_path__
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+    - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+      job_name: kubernetes-nodes-cadvisor
+      kubernetes_sd_configs:
+      - role: node
+      relabel_configs:
+      - action: labelmap
+        regex: __meta_kubernetes_node_label_(.+)
+      - replacement: kubernetes.default.svc:443
+        target_label: __address__
+      - regex: (.+)
+        replacement: /api/v1/nodes/$1/proxy/metrics/cadvisor
+        source_labels:
+        - __meta_kubernetes_node_name
+        target_label: __metrics_path__
+      scheme: https
+      tls_config:
+        ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        insecure_skip_verify: true
+    - honor_labels: true
+      job_name: kubernetes-service-endpoints
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - action: keep
+        regex: true
+        source_labels:
+        - __meta_kubernetes_service_annotation_prometheus_io_scrape
+      - action: drop
+        regex: true
+        source_labels:
+        - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
+      - action: replace
+        regex: (https?)
+        source_labels:
+        - __meta_kubernetes_service_annotation_prometheus_io_scheme
+        target_label: __scheme__
+      - action: replace
+        regex: (.+)
+        source_labels:
+        - __meta_kubernetes_service_annotation_prometheus_io_path
+        target_label: __metrics_path__
+      - action: replace
+        regex: (.+?)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        source_labels:
+        - __address__
+        - __meta_kubernetes_service_annotation_prometheus_io_port
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)
+        replacement: __param_$1
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_namespace
+        target_label: namespace
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_service_name
+        target_label: service
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_pod_node_name
+        target_label: node
+    - honor_labels: true
+      job_name: kubernetes-service-endpoints-slow
+      kubernetes_sd_configs:
+      - role: endpoints
+      relabel_configs:
+      - action: keep
+        regex: true
+        source_labels:
+        - __meta_kubernetes_service_annotation_prometheus_io_scrape_slow
+      - action: replace
+        regex: (https?)
+        source_labels:
+        - __meta_kubernetes_service_annotation_prometheus_io_scheme
+        target_label: __scheme__
+      - action: replace
+        regex: (.+)
+        source_labels:
+        - __meta_kubernetes_service_annotation_prometheus_io_path
+        target_label: __metrics_path__
+      - action: replace
+        regex: (.+?)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        source_labels:
+        - __address__
+        - __meta_kubernetes_service_annotation_prometheus_io_port
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)
+        replacement: __param_$1
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_namespace
+        target_label: namespace
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_service_name
+        target_label: service
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_pod_node_name
+        target_label: node
+      scrape_interval: 5m
+      scrape_timeout: 30s
+    - honor_labels: true
+      job_name: prometheus-pushgateway
+      kubernetes_sd_configs:
+      - role: service
+      relabel_configs:
+      - action: keep
+        regex: pushgateway
+        source_labels:
+        - __meta_kubernetes_service_annotation_prometheus_io_probe
+    - honor_labels: true
+      job_name: kubernetes-services
+      kubernetes_sd_configs:
+      - role: service
+      metrics_path: /probe
+      params:
+        module:
+        - http_2xx
+      relabel_configs:
+      - action: keep
+        regex: true
+        source_labels:
+        - __meta_kubernetes_service_annotation_prometheus_io_probe
+      - source_labels:
+        - __address__
+        target_label: __param_target
+      - replacement: blackbox
+        target_label: __address__
+      - source_labels:
+        - __param_target
+        target_label: instance
+      - action: labelmap
+        regex: __meta_kubernetes_service_label_(.+)
+      - source_labels:
+        - __meta_kubernetes_namespace
+        target_label: namespace
+      - source_labels:
+        - __meta_kubernetes_service_name
+        target_label: service
+    - honor_labels: true
+      job_name: kubernetes-pods
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - action: keep
+        regex: true
+        source_labels:
+        - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+      - action: drop
+        regex: true
+        source_labels:
+        - __meta_kubernetes_pod_annotation_prometheus_io_scrape_slow
+      - action: replace
+        regex: (https?)
+        source_labels:
+        - __meta_kubernetes_pod_annotation_prometheus_io_scheme
+        target_label: __scheme__
+      - action: replace
+        regex: (.+)
+        source_labels:
+        - __meta_kubernetes_pod_annotation_prometheus_io_path
+        target_label: __metrics_path__
+      - action: replace
+        regex: (.+?)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        source_labels:
+        - __address__
+        - __meta_kubernetes_pod_annotation_prometheus_io_port
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
+        replacement: __param_$1
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_namespace
+        target_label: namespace
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_pod_name
+        target_label: pod
+      - action: drop
+        regex: Pending|Succeeded|Failed|Completed
+        source_labels:
+        - __meta_kubernetes_pod_phase
+    - honor_labels: true
+      job_name: kubernetes-pods-slow
+      kubernetes_sd_configs:
+      - role: pod
+      relabel_configs:
+      - action: keep
+        regex: true
+        source_labels:
+        - __meta_kubernetes_pod_annotation_prometheus_io_scrape_slow
+      - action: replace
+        regex: (https?)
+        source_labels:
+        - __meta_kubernetes_pod_annotation_prometheus_io_scheme
+        target_label: __scheme__
+      - action: replace
+        regex: (.+)
+        source_labels:
+        - __meta_kubernetes_pod_annotation_prometheus_io_path
+        target_label: __metrics_path__
+      - action: replace
+        regex: (.+?)(?::\d+)?;(\d+)
+        replacement: $1:$2
+        source_labels:
+        - __address__
+        - __meta_kubernetes_pod_annotation_prometheus_io_port
+        target_label: __address__
+      - action: labelmap
+        regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
+        replacement: __param_$1
+      - action: labelmap
+        regex: __meta_kubernetes_pod_label_(.+)
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_namespace
+        target_label: namespace
+      - action: replace
+        source_labels:
+        - __meta_kubernetes_pod_name
+        target_label: pod
+      - action: drop
+        regex: Pending|Succeeded|Failed|Completed
+        source_labels:
+        - __meta_kubernetes_pod_phase
+      scrape_interval: 5m
+      scrape_timeout: 30s
+    alerting:
+      alertmanagers:
+      - kubernetes_sd_configs:
+          - role: pod
+        tls_config:
+          ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+        relabel_configs:
+        - source_labels: [__meta_kubernetes_namespace]
+          regex: api7
+          action: keep
+        - source_labels: [__meta_kubernetes_pod_label_app]
+          regex: prometheus
+          action: keep
+        - source_labels: [__meta_kubernetes_pod_label_component]
+          regex: alertmanager
+          action: keep
+        - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_probe]
+          regex: .*
+          action: keep
+        - source_labels: [__meta_kubernetes_pod_container_port_number]
+          regex: "9093"
+          action: keep
+  recording_rules.yml: |
+    {}
+  rules: |
+    {}
+kind: ConfigMap
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: server
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-server
+  namespace: api7
+---
+apiVersion: v1
+data:
+  api7.rules.yaml.tmpl: |
+    groups:
+    - name: api7-alarm
+      rules:
+    {{range $alarm := gets "/api7/alarm/*"}}
+    {{$alarmJson := json $alarm.Value}}
+    {{if eq $alarmJson.status 1.0}}
+    {{if eq $alarmJson.rules_relation "or"}}
+    {{range $alarmJson.rules}}
+      - alert: {{$alarmJson.name}}
+        expr: {{.expr}}
+    {{if not .for}}
+    {{else}}
+        for: {{.for}}
+    {{end}}
+        labels:
+          alarm: "{{$alarmJson.id}}"
+          condition: "{{.metric}}{{.operator}}{{.value}}"
+        annotations:
+          summary: {{$alarmJson.message}}
+          description: {{$alarmJson.message}}
+    {{end}}
+    {{else}}
+      - alert: {{$alarmJson.name}}
+        expr: {{range $index, $expr := $alarmJson.rules}} {{if gt $index 0}}and{{end}} {{.expr}} {{end}}
+        labels:
+          alarm: "{{$alarmJson.id}}"
+          condition: "all"
+        annotations:
+          summary: {{$alarmJson.message}}
+          description: {{$alarmJson.message}}
+    {{end}}
+    {{end}}
+    {{end}}
+kind: ConfigMap
+metadata:
+  name: api7-dashboard-rules-tmpl
+  namespace: api7
+---
+apiVersion: v1
+data:
+  api7.rules.yaml.toml: |
+    [template]
+    src = "api7.rules.yaml.tmpl"
+    dest = "/root/api7.rules.yml"
+    mode = "0644"
+    keys = [
+    "/api7/alarm/"
+    ]
+    reload_cmd = "curl -XPOST 'http://api7-dashboard-prometheus.api7.svc.cluster.local:9090/-/reload'"
+kind: ConfigMap
+metadata:
+  name: api7-dashboard-rules-toml
+  namespace: api7
+---
+apiVersion: v1
+data:
+  etcd-root-password: ZGs4enJNQWsyVQ==
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.3.3
+  name: api7-dashboard-etcd
+  namespace: api7
+type: Opaque
+---
+apiVersion: v1
+data:
+  jwt-token.pem: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlKS0FJQkFBS0NBZ0VBcjdlTCtWdCs4UklsazlsM09pRzVnTzljcVFRb2xUMU9HMFNiVXFIUUZUUG9HbnFJCmhQVWxtTGswVU41aWJ2aWhsQ1VNR28yWWR1eUNqTXJjZUhmRzAwbXI2Mlg1Z0lSNG1OTzNpRWNjWktlZkNkYksKU1lRbEVNMUFOeGQxWVpuVUlQaGdSaktYaWdxMzR1UmRqNkhld3FLb01tYU5iTmY3M1ZzRkdOYUxOQ1BaMjd4VwpKL0hzdzNzQnJxcWZCbWNPSDAwOWhLS3hsMDZWMndkc2l5L1FaZWdxQ1ZQSTRadllnNUwwcm1Vcm1HbXFmQmlpCkh4SkdEeXMzUHo4VFZJa3ZlbmFoTmJId3ViUjRVNkkrZGZnY21iWEpwRFFhU1J3blJuUTRQbHBvQU54K1E0ckgKVGRzTWFYS1pxWFhFNi9XakVyaVlqbUx3QVhNcmt2eElWZmxsRFY3TXZVUTBETy9CWk9TVHVkcFgyOUtPaFRtSgo1UnVMa1J4VGZuUUpxN2M5TUxSaC8yY052ajFxY1hFNzltMVdjMU5GU3pqVGlVSGFNWlNPZmhIK0RuTmdWTjZvCm9DMFpYMDJ4STFta0NXK3AyZWZwVVV0Ynl2YUxqcGtpZUUvN1lBWTNpYmdxY2lJQUZWZzJTOURFTzQ4N05INlUKOVZiTTBRdE8xNjdpRWtiWHdVeVE0V0d3aDNyRC9ZWXJEYVNOcFJtY2Q1OHE0WWpDL0l3UlFzZndxNVhsUFh3NQpZczdKLzlmK2FBOTVLamJFbHBBUXFwTnZUb3duVTNZMThIL1dEQnV4WmtkN1VocnhzU3dndElyVURCaUZIZkhUCnA5amwyVTFicm14bjBrbFl0TXcweGhjVEw3OVR2ejJ6MlMrY1U1Y2pyQ0tlQTFVcDhwNDZoWHZrRXI4Q0F3RUEKQVFLQ0FnQmFlZ2IvMldYT21VcHlDNHFCaXpYcU50V2VUWDdjQVZvRFhsc2Z2Q1BabHdXUEJNTGd1eDJsdXM4KwpTSk9ra2k4WWljN21xVHYxR0NqTWQvUDNyNnpYeEZwYWRnSjNjejVwYXJKWTRFeTFZejNYb2hvOHFtY3ZkSS81CkRnSXB4RHhlMGFVNDMvbjVZVFY0QmFCTFFjemlxVUF6MjJ3OHZDVjZ2OUFyRHVWVWJwVlJ1SE1nVkVoV0N6TTkKamFzZWI5ZnN0Q2ZWOExQQ3Rmc2hjWHdwV3ZCU1dLMjBhY2pJcWlkYzhFRSt2dWNvcmxmVFdCZTZLZjJhOStTVgprMVBQdG1lVkJocFIvSkozL0gzc2ltRGcrMlUybkV6OFdMdWtJM1B4cWd2L3h5dEFMa2h4WExiczFycFlYV0xUCng4a2l1ak5DZzN4QjdKMnFFWFJCVmRlbE5Tb2JVdFl2N0lDaVcwNFhjVmZ4dTJpenlWdUNwK3AzeURpd0pqdjAKNnNhQ1RPUXVkYUdBZ0hpY2RpS2NGYmZjVDRzYVdxU1I3eWxRZEVzMDRyQ3lEeitEN2tOV284eFhWUVIrUXd3OApORHROUFdMTGVsWTNiTkd6RjhTSzl0L0JDZ3o1WFN0YkpLa3hkWXFVTm1USEU4eG10TjJzMWtKZEdyMVpCVUhuCno3NFk0aUFKRUZiZy9WOU9mTkNGRkJkWXllVEpQbnIrc3E3SVluRzFkTk5wcHhXZkdoNGJlNEVwQnAxc2YrQWMKYTAwOFNzNlc4SFducytLZUUzWHZCTW5vZHl0ek9JWk0rOXBma3pkVkZWbmJrQ1ZiTHNkZU4wODZiZVBVSzIyZgpCMlNTb0xadUZTeTYwSGtFUmFVYjZ4NllxQmp1T0s3NGlKSVN6b09BNkhyQk5LUGZvUUtDQVFFQXp2QzdRdldKCk1xemtCQ2h1OUViV3FpWk9tTVB4aDhNcTMxNFZ4TnBVQ21nMUZSdmkyRTdmV0dQV2JmSGRRQjlESFRDdXREeUcKVU4rM2lLcDdMdjVkT0dSWk5uVWhKdmFLNGREejRnYWl0VkV6L3hSNXkvMHpkNnhob2JXQ3o0dE94MGZCdkVLMAprWFZYZlNyMzhHYkFkWENmRnZjL2c0TkZlMEdvTXJLcHNVbE1KenFhclBkOXo4SmxVdzZSYUlVTG11MUR0WTZtCjE1MHpKVVZCaEwvSkU0QjZFWG1XVWxhb3FBN2lMNUR4cWQyN2dhYi8rMWMwSVBxWUl2RTlFQXBOYWora29PeG0KUDJWQkpSUFI0Q2xMRUtzNmtBY3RhOW5DMDdaazZBQlZXMmVBUU9qcC9JZExXZytXa1NVR1JwNU90SllUVzZMZQpQRERDMzVCMWhlYXZzUUtDQVFFQTJWL2NGVkEyNjRyM0xvd3R1L2Q5b01MNTAvNjh2dXd1WVhhUWoxdHRDdSs4CnRkZnJYa0RIZG1MenRhRDUvbXVLenhMOXV4NVBBeUNnZnFFU1UwV1ZaODlNNThaS1Q4TXp4UVRIcFNMdWtodTEKVXVuQVg4dFppdEM5cmdYTEhsVGVCNUxxTU1kOWZDNFZsWHhHME9hUHgyeUVBSlBJMjgyanllMlNwQTFMdFlLNApXNUpzOEdUN2hyU25yYjJnZ3FwVXdOZkFFSUJxMXk5Rk5yRnZIYlIxMkZScENXR3pwbmU3Y0NRNityNFZBQ2xXCklPMHFqazR0djNzM1QzZmFmWXp0WXhiSkFDWmZBMmhpbkJsWHdQVEpUSGtDMWxuM0FlZGdqNlhFN0hBMlRIdDcKZ212NUEzcFBIV0FnRmFtTldKTW42ZlMxVUJka3VpQ0N2eWowRGpKMWJ3S0NBUUE4Y1dmZ3lPTEg0R1BCS3lZdApSenVQK3h4ZDFtMkhuK08zMWowNWdDT24zb1FTcEZCL3Fabm1zVktDVG5DM04rcGNia200N3l5MEZvUCs4UHlGCjMxblBETkJaN2FBL1J5ZU5pWUNTZGltMEdBRzk4WGNaczkwQ2lXRUM0SWRTbzNmaEVQNXZSSFNGUCtiTDhtNzAKMHE1SUh4cjRsRU1DNEthOHQ1S3ZMQ3dRVWo1aC91WUt1MGNPRmRPT2pPUy95SXg1TmUvZTZjbWxsSTdKeGc2NgovV0YzeHNEZ3RjaklSL04vRXNuUjV0NFBKV3FORmdBU280ZmdVaEY1czBpSWxObkR2TThUQ2JsYnJ2RjJLUEhXCkxYbDFadTMxLzRLdXk2M3lOSVlJbFlCWThFUXZzVmdXb0ZYTCtsMmFDMXhuNS9sSkdjU1JzV0tENWlJbE5vWjkKRThJaEFvSUJBUURYUHJ2UWd3aU8vcUU2LzJXK0RoamhHcENGNG1ZRjdCc1ZPWEYxOHdNcjVDNktKZytUMmpObwp3QjB4U2dDaWROMFRwV3VJWVQrK0NnM0N0ajVPSk1ZSDhGYm4zd3J3cG90WjJSelVJWjM1SWVUUUFGVVV4bWlaCk00L1BoVDhYZnRRSXplcUdlTk9DSnFRS3pPL1dwYWZUd2xtSHRNOGRFQ2pTcUNRZnZHYXVpbzJCWjZIbC9TaXYKdjYyV05nSjl3S3FCOW1IaU5UY1djMkZuQWhYVVpVQ1lBU1d0TzRqSUd5R0lydWVVS0tyazZRbTNPd0Y3dm1CQQpqb003ZHFQczFLS3dEdnpqNEJzUFpjclhaYVRtbGIzS3NyMGpnaHc4VDEvbmZpOWNMTlVuc05LaFY4ZFJNVWlyCi91Wm1iT2xndnY2MEJUT1E1a2xBb1RhMmtaZnhndmVUQW9JQkFHQStUQWhwY1pYMkpBYjB0c005L0djRFNQWXIKWjQ0YUhuQVc1S3pZc2RvWlBEak9mWXY2TkJLeFRCSGZjZXFlUHZzbmNmU1JUMTFDSWJDVHdTN1NXK1FzYjJWWQpvVWxqWFRBcnJKMmZ1YURrWlNJcUJ1ZnYwa3ZhK0k4elNCQkIwaUNZcEl0d2dJZ3RjMTQ5bW1IQ2lVa2xYNnUxCncyb2R0aDhCYm9IUzNZU2dldWJQUVpEOWJZM3hDOXc4SjNLTkJTMGk1clFVRXdhb2NPdzJubUpqUWxRWEZTOWMKWkVJMjFDTUtlZHNyaVVwY2d1T3J5TUIrZkhLOFJLTzBKOHF5a1NWV2M5RmVKNEJwdkFKZ25hRXRGVVhCTE9xZworQzcvVE90bmlZU1poR012WkxUM2hXMURINzdRZnZBcnoxdEdsYzExSFRYWTBjNTIzSkNHSG54ckhEcz0KLS0tLS1FTkQgUlNBIFBSSVZBVEUgS0VZLS0tLS0K
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.3.3
+  name: api7-dashboard-etcd-jwt-token
+  namespace: api7
+type: Opaque
+---
+apiVersion: v1
+data:
+  admin-password: cHN4eVdlY1E3WnByRXA4Y1o5UmNwcWZYeFZXTXVqbmhxaDluTjdSOA==
+  admin-user: YWRtaW4=
+  ldap-toml: ""
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana
+  namespace: api7
+type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: api7-dashboard
+    app.kubernetes.io/version: 2.1-EE
+    helm.sh/chart: api7-dashboard-0.0.1
+  name: api7-dashboard
+  namespace: api7
+spec:
+  ports:
+  - name: http
+    port: 9000
+    protocol: TCP
+    targetPort: 9000
+  selector:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/name: api7-dashboard
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.3.3
+  name: api7-dashboard-etcd
+  namespace: api7
+spec:
+  ports:
+  - name: client
+    nodePort: null
+    port: 2379
+    targetPort: client
+  - name: peer
+    nodePort: null
+    port: 2380
+    targetPort: peer
+  selector:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/name: etcd
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    service.alpha.kubernetes.io/tolerate-unready-endpoints: "true"
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.3.3
+  name: api7-dashboard-etcd-headless
+  namespace: api7
+spec:
+  clusterIP: None
+  ports:
+  - name: client
+    port: 2379
+    targetPort: client
+  - name: peer
+    port: 2380
+    targetPort: peer
+  publishNotReadyAddresses: true
+  selector:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/name: etcd
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana
+  namespace: api7
+spec:
+  ports:
+  - name: service
+    port: 80
+    protocol: TCP
+    targetPort: 3000
+  selector:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/name: grafana
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: alertmanager
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-alertmanager
+  namespace: api7
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 9093
+  selector:
+    app: prometheus
+    component: alertmanager
+    release: api7-dashboard
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: server
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-server
+  namespace: api7
+spec:
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 9090
+  selector:
+    app: prometheus
+    component: server
+    release: api7-dashboard
+  sessionAffinity: None
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: alertmanager
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-alertmanager
+  namespace: api7
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: server
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-server
+  namespace: api7
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: api7-dashboard
+    app.kubernetes.io/version: 2.1-EE
+    helm.sh/chart: api7-dashboard-0.0.1
+  name: api7-dashboard
+  namespace: api7
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: api7-dashboard
+      app.kubernetes.io/name: api7-dashboard
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: api7-dashboard
+        app.kubernetes.io/name: api7-dashboard
+    spec:
+      containers:
+      - image: localhost:5000/api7-dashboard:2.8.2202
+        imagePullPolicy: IfNotPresent
+        name: api7-dashboard
+        ports:
+        - containerPort: 9000
+          name: http
+          protocol: TCP
+        readinessProbe:
+          failureThreshold: 6
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          successThreshold: 1
+          tcpSocket:
+            port: 9000
+          timeoutSeconds: 1
+        volumeMounts:
+        - mountPath: /usr/local/apisix-dashboard/conf/conf.yaml
+          name: api7-dashboard-config
+          subPath: conf.yaml
+      serviceAccountName: api7-account
+      volumes:
+      - configMap:
+          name: api7-dashboard
+        name: api7-dashboard-config
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: grafana
+    app.kubernetes.io/version: 7.2.1
+    helm.sh/chart: grafana-6.0.0
+  name: api7-dashboard-grafana
+  namespace: api7
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: api7-dashboard
+      app.kubernetes.io/name: grafana
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/config: 0cbfe5383b2430bc9152111ee8dcadbc75ef59a11a940aac2979a8be7ce90fd3
+        checksum/dashboards-json-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/sc-dashboard-provider-config: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/secret: 60f542bb321bd6791d0538d937247313776d4921128b1c040e0b779719d2faf3
+      labels:
+        app.kubernetes.io/instance: api7-dashboard
+        app.kubernetes.io/name: grafana
+    spec:
+      containers:
+      - env:
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              key: admin-user
+              name: api7-dashboard-grafana
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: admin-password
+              name: api7-dashboard-grafana
+        image: grafana/grafana:7.2.1
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 10
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 60
+          timeoutSeconds: 30
+        name: grafana
+        ports:
+        - containerPort: 80
+          name: service
+          protocol: TCP
+        - containerPort: 3000
+          name: grafana
+          protocol: TCP
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+        resources: {}
+        volumeMounts:
+        - mountPath: /etc/grafana/grafana.ini
+          name: config
+          subPath: grafana.ini
+        - mountPath: /var/lib/grafana
+          name: storage
+      securityContext:
+        fsGroup: 472
+        runAsGroup: 472
+        runAsUser: 472
+      serviceAccountName: api7-dashboard-grafana
+      volumes:
+      - configMap:
+          name: api7-dashboard-grafana
+        name: config
+      - emptyDir: {}
+        name: storage
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: alertmanager
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-alertmanager
+  namespace: api7
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+      component: alertmanager
+      release: api7-dashboard
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        chart: prometheus-15.10.4
+        component: alertmanager
+        heritage: Helm
+        release: api7-dashboard
+    spec:
+      containers:
+      - image: johz/confd:0.16.0
+        imagePullPolicy: Always
+        name: confd
+        volumeMounts:
+        - mountPath: /etc/confd/confd.toml
+          name: confd-toml
+          subPath: confd.toml
+        - mountPath: /etc/confd/conf.d/api7.alertmanager.yaml.toml
+          name: alertmanager-toml
+          subPath: api7.alertmanager.yaml.toml
+        - mountPath: /etc/confd/templates/api7.alertmanager.yaml.tmpl
+          name: alertmanager-tmpl
+          subPath: api7.alertmanager.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.rules.yaml.toml
+          name: rules-toml
+          subPath: api7.rules.yaml.toml
+        - mountPath: /etc/confd/templates/api7.rules.yaml.tmpl
+          name: rules-tmpl
+          subPath: api7.rules.yaml.tmpl
+        - mountPath: /root/
+          name: storage-volume
+      - args:
+        - --config.file=/etc/config/alertmanager.yml
+        - --storage.path=/data
+        - --cluster.listen-address=
+        - --web.external-url=http://localhost:9093
+        env:
+        - name: POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        image: quay.io/prometheus/alertmanager:v0.24.0
+        imagePullPolicy: IfNotPresent
+        name: prometheus-alertmanager
+        ports:
+        - containerPort: 9093
+        readinessProbe:
+          httpGet:
+            path: /-/ready
+            port: 9093
+          initialDelaySeconds: 30
+          timeoutSeconds: 30
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /etc/config
+          name: config-volume
+        - mountPath: /data
+          name: storage-volume
+          subPath: ""
+      - args:
+        - --volume-dir=/etc/config
+        - --webhook-url=http://127.0.0.1:9093/-/reload
+        image: jimmidyson/configmap-reload:v0.5.0
+        imagePullPolicy: IfNotPresent
+        name: prometheus-alertmanager-configmap-reload
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /etc/config
+          name: config-volume
+          readOnly: true
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: api7-dashboard-prometheus-alertmanager
+      volumes:
+      - configMap:
+          name: api7-dashboard-prometheus-alertmanager
+        name: config-volume
+      - name: storage-volume
+        persistentVolumeClaim:
+          claimName: api7-dashboard-prometheus-alertmanager
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: prometheus
+    chart: prometheus-15.10.4
+    component: server
+    heritage: Helm
+    release: api7-dashboard
+  name: api7-dashboard-prometheus-server
+  namespace: api7
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+      component: server
+      release: api7-dashboard
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        chart: prometheus-15.10.4
+        component: server
+        heritage: Helm
+        release: api7-dashboard
+    spec:
+      containers:
+      - args:
+        - --volume-dir=/etc/config
+        - --webhook-url=http://127.0.0.1:9090/-/reload
+        image: jimmidyson/configmap-reload:v0.5.0
+        imagePullPolicy: IfNotPresent
+        name: prometheus-server-configmap-reload
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /etc/config
+          name: config-volume
+          readOnly: true
+      - args:
+        - --storage.tsdb.retention.time=15d
+        - --config.file=/etc/config/prometheus.yml
+        - --storage.tsdb.path=/data
+        - --web.console.libraries=/etc/prometheus/console_libraries
+        - --web.console.templates=/etc/prometheus/consoles
+        - --web.enable-lifecycle
+        image: quay.io/prometheus/prometheus:v2.36.2
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /-/healthy
+            port: 9090
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 15
+          successThreshold: 1
+          timeoutSeconds: 10
+        name: prometheus-server
+        ports:
+        - containerPort: 9090
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            path: /-/ready
+            port: 9090
+            scheme: HTTP
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          successThreshold: 1
+          timeoutSeconds: 4
+        resources: {}
+        securityContext: {}
+        volumeMounts:
+        - mountPath: /etc/config
+          name: config-volume
+        - mountPath: /data
+          name: storage-volume
+          subPath: ""
+      - image: johz/confd:0.16.0
+        imagePullPolicy: Always
+        name: confd
+        volumeMounts:
+        - mountPath: /etc/confd/confd.toml
+          name: confd-toml
+          subPath: confd.toml
+        - mountPath: /etc/confd/conf.d/api7.alertmanager.yaml.toml
+          name: alertmanager-toml
+          subPath: api7.alertmanager.yaml.toml
+        - mountPath: /etc/confd/templates/api7.alertmanager.yaml.tmpl
+          name: alertmanager-tmpl
+          subPath: api7.alertmanager.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.rules.yaml.toml
+          name: rules-toml
+          subPath: api7.rules.yaml.toml
+        - mountPath: /etc/confd/templates/api7.rules.yaml.tmpl
+          name: rules-tmpl
+          subPath: api7.rules.yaml.tmpl
+        - mountPath: /root/
+          name: storage-volume
+      dnsPolicy: ClusterFirst
+      enableServiceLinks: true
+      hostNetwork: false
+      securityContext:
+        fsGroup: 65534
+        runAsGroup: 65534
+        runAsNonRoot: true
+        runAsUser: 65534
+      serviceAccountName: api7-dashboard-prometheus-server
+      terminationGracePeriodSeconds: 300
+      volumes:
+      - configMap:
+          name: api7-dashboard-prometheus-server
+        name: config-volume
+      - name: storage-volume
+        persistentVolumeClaim:
+          claimName: api7-dashboard-prometheus-server
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.3.3
+  name: api7-dashboard-etcd
+  namespace: api7
+spec:
+  podManagementPolicy: Parallel
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: api7-dashboard
+      app.kubernetes.io/name: etcd
+  serviceName: api7-dashboard-etcd-headless
+  template:
+    metadata:
+      annotations:
+        checksum/token-secret: 9a181c1855032b12ae80213d3e575c5a59b0661a602d5f1816d656544e316ddd
+      labels:
+        app.kubernetes.io/instance: api7-dashboard
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: etcd
+        helm.sh/chart: etcd-8.3.3
+    spec:
+      affinity:
+        nodeAffinity: null
+        podAffinity: null
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - podAffinityTerm:
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: api7-dashboard
+                  app.kubernetes.io/name: etcd
+              namespaces:
+              - api7
+              topologyKey: kubernetes.io/hostname
+            weight: 1
+      containers:
+      - env:
+        - name: BITNAMI_DEBUG
+          value: "false"
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: MY_STS_NAME
+          value: api7-dashboard-etcd
+        - name: ETCDCTL_API
+          value: "3"
+        - name: ETCD_ON_K8S
+          value: "yes"
+        - name: ETCD_START_FROM_SNAPSHOT
+          value: "no"
+        - name: ETCD_DISASTER_RECOVERY
+          value: "no"
+        - name: ETCD_NAME
+          value: $(MY_POD_NAME)
+        - name: ETCD_DATA_DIR
+          value: /bitnami/etcd/data
+        - name: ETCD_LOG_LEVEL
+          value: info
+        - name: ALLOW_NONE_AUTHENTICATION
+          value: "no"
+        - name: ETCD_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: etcd-root-password
+              name: api7-dashboard-etcd
+        - name: ETCD_AUTH_TOKEN
+          value: jwt,priv-key=/opt/bitnami/etcd/certs/token/jwt-token.pem,sign-method=RS256,ttl=10m
+        - name: ETCD_ADVERTISE_CLIENT_URLS
+          value: http://$(MY_POD_NAME).api7-dashboard-etcd-headless.api7.svc.cluster.local:2379,http://api7-dashboard-etcd.api7.svc.cluster.local:2379
+        - name: ETCD_LISTEN_CLIENT_URLS
+          value: http://0.0.0.0:2379
+        - name: ETCD_INITIAL_ADVERTISE_PEER_URLS
+          value: http://$(MY_POD_NAME).api7-dashboard-etcd-headless.api7.svc.cluster.local:2380
+        - name: ETCD_LISTEN_PEER_URLS
+          value: http://0.0.0.0:2380
+        - name: ETCD_CLUSTER_DOMAIN
+          value: api7-dashboard-etcd-headless.api7.svc.cluster.local
+        envFrom: null
+        image: docker.io/bitnami/etcd:3.5.4-debian-11-r9
+        imagePullPolicy: IfNotPresent
+        livenessProbe:
+          exec:
+            command:
+            - /opt/bitnami/scripts/etcd/healthcheck.sh
+          failureThreshold: 5
+          initialDelaySeconds: 60
+          periodSeconds: 30
+          successThreshold: 1
+          timeoutSeconds: 5
+        name: etcd
+        ports:
+        - containerPort: 2379
+          name: client
+          protocol: TCP
+        - containerPort: 2380
+          name: peer
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - /opt/bitnami/scripts/etcd/healthcheck.sh
+          failureThreshold: 5
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 5
+        resources:
+          limits: {}
+          requests: {}
+        securityContext:
+          runAsNonRoot: true
+          runAsUser: 1001
+        volumeMounts:
+        - mountPath: /bitnami/etcd
+          name: data
+        - mountPath: /opt/bitnami/etcd/certs/token/
+          name: etcd-jwt-token
+          readOnly: true
+      securityContext:
+        fsGroup: 1001
+      serviceAccountName: default
+      volumes:
+      - name: etcd-jwt-token
+        secret:
+          defaultMode: 256
+          secretName: api7-dashboard-etcd-jwt-token
+  updateStrategy:
+    type: RollingUpdate
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 8Gi
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  labels:
+    app.kubernetes.io/instance: api7-dashboard
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: etcd
+    helm.sh/chart: etcd-8.3.3
+  name: api7-dashboard-etcd
+  namespace: api7
+spec:
+  minAvailable: 51%
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: api7-dashboard
+      app.kubernetes.io/name: etcd
+

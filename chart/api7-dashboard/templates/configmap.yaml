@@ -131,7 +131,7 @@ data:
         access_control_allow_origin: {{ .Values.config.security.access_control_allow_origin }}
         access_control_allow_credentials: {{ .Values.config.security.access_control_allow_credentials }}
         access_control_allow_headers: {{ .Values.config.security.access_control_allow_headers }}
-        access_control-allow_methods: {{ .Values.config.security.access_control-allow_methods }}
+        access_control-allow_methods: {{ .Values.config.security.access_control_allow_methods }}
         x_frame_options: {{ .Values.config.security.x_frame_options }}
         content_security_policy: {{ .Values.config.security.content_security_policy }}
 
@@ -141,6 +141,7 @@ data:
                             # NOTE: Highly recommended to modify this value to protect `manager api`.
                             # if it's default value, when `manager api` start , it will generate a random string to replace it.
       expire_time: {{ .Values.config.authentication.expire_time }}     # jwt token expire time, in second
+      api_key: {{ .Values.config.authentication.api_key }}     # make simple api key authentication for some API, such as webhook.
       {{- if gt (int .Values.config.authentication.allow_login_failed_times) 0}}
       allow_login_failed_times: {{.Values.config.authentication.allow_login_failed_times}}    # the maximum number of login failures allowed, if the number of failed login attempts exceeds the limit within a certain period of time, the account will be locked
       login_failed_stat_duration: {{.Values.config.authentication.login_failed_stat_duration}}  # the maximum allowable login failures statistics duration.

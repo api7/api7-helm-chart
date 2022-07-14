@@ -27,11 +27,11 @@ maintainers:
     name: Chao Zhang
 dependencies:
   - name: etcd
-    version: 5.2.1
+    version: 8.3.3
     repository: https://charts.bitnami.com/bitnami
     condition: etcd.builtin
   - name: prometheus
-    version: 9.0
+    version: 15.10.4
     condition: prometheus.builtin
     repository: https://prometheus-community.github.io/helm-charts
   - name: grafana

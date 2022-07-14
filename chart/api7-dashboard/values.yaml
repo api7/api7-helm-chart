@@ -65,6 +65,7 @@ service:
   type: ClusterIP
   # loadBalancerIP: a.b.c.d
   loadBalancerSourceRanges: []
+
 # Note if builtin is false and clusters field are empty, prometheus won't be
 # configured in api7-dashboard.
 prometheus:
@@ -73,7 +74,48 @@ prometheus:
   # Existing prometheus clusters should be filled here
   clusters: []
 
+  server:
+    enable: true
+    sidecarContainers:
+      confd:
+        image: johz/confd:0.16.0
+        imagePullPolicy: Always
+        volumeMounts:
+        - mountPath: /etc/confd/confd.toml
+          name: confd-toml
+          subPath: confd.toml
+        - mountPath: /etc/confd/conf.d/api7.alertmanager.yaml.toml
+          name: alertmanager-toml
+          subPath: api7.alertmanager.yaml.toml
+        - mountPath: /etc/confd/templates/api7.alertmanager.yaml.tmpl
+          name: alertmanager-tmpl
+          subPath: api7.alertmanager.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.rules.yaml.toml
+          name: rules-toml
+          subPath: api7.rules.yaml.toml
+        - mountPath: /etc/confd/templates/api7.rules.yaml.tmpl
+          name: rules-tmpl
+          subPath: api7.rules.yaml.tmpl
+        - mountPath: /root/
+          name: storage-volume
+
+  alertmanager:
+    enabled: true
+
+  kubeStateMetrics:
+    enabled: false
+
+  nodeExporter:
+    enabled: false
+
+  pushgateway:
+    enabled: false
+
+
 grafana:
+  builtin: true
+
+confd:
   builtin: true
 
 # etcd configuration
@@ -138,6 +180,7 @@ config:
   authentication:
     secret: "qwerty"
     expire_time: 3600     # jwt token expire time, in second
+    api_key: adi2c9f034335f136f87ad84b628c8f9 # make simple api key authentication for some API, such as webhook.
     allow_login_failed_times: 0     # the maximum number of login failures allowed, if the number of failed login attempts exceeds the limit within a certain period of time, the account will be locked
                                     # 0 means no limit
     login_failed_stat_duration: 1h  # the maximum allowable login failures statistics duration.
