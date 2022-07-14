@@ -76,41 +76,19 @@ prometheus:
 
   server:
     enable: true
-    sidecarContainers:
-      confd:
-        image: johz/confd:0.16.0
-        imagePullPolicy: Always
-        volumeMounts:
-        - mountPath: /etc/confd/confd.toml
-          name: confd-toml
-          subPath: confd.toml
-        - mountPath: /etc/confd/conf.d/api7.alertmanager.yaml.toml
-          name: alertmanager-toml
-          subPath: api7.alertmanager.yaml.toml
-        - mountPath: /etc/confd/templates/api7.alertmanager.yaml.tmpl
-          name: alertmanager-tmpl
-          subPath: api7.alertmanager.yaml.tmpl
-        - mountPath: /etc/confd/conf.d/api7.rules.yaml.toml
-          name: rules-toml
-          subPath: api7.rules.yaml.toml
-        - mountPath: /etc/confd/templates/api7.rules.yaml.tmpl
-          name: rules-tmpl
-          subPath: api7.rules.yaml.tmpl
-        - mountPath: /root/
-          name: storage-volume
-
   alertmanager:
     enabled: true
-
   kubeStateMetrics:
     enabled: false
-
   nodeExporter:
     enabled: false
-
   pushgateway:
     enabled: false
-
+  configmapReload:
+    prometheus:
+      enabled: true
+    alertmanager:
+      enabled: true
 
 grafana:
   builtin: true

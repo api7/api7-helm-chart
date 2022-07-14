@@ -11,19 +11,24 @@ spec:
         name: confd
         volumeMounts:
         - mountPath: /etc/confd/confd.toml
-          name: confd-toml
+          name: confd-config
           subPath: confd.toml
         - mountPath: /etc/confd/conf.d/api7.alertmanager.yaml.toml
-          name: alertmanager-toml
+          name: confd-config
           subPath: api7.alertmanager.yaml.toml
         - mountPath: /etc/confd/templates/api7.alertmanager.yaml.tmpl
-          name: alertmanager-tmpl
+          name: confd-config
           subPath: api7.alertmanager.yaml.tmpl
         - mountPath: /etc/confd/conf.d/api7.rules.yaml.toml
-          name: rules-toml
+          name: confd-config
           subPath: api7.rules.yaml.toml
         - mountPath: /etc/confd/templates/api7.rules.yaml.tmpl
-          name: rules-tmpl
+          name: confd-config
           subPath: api7.rules.yaml.tmpl
         - mountPath: /root/
           name: storage-volume
+
+      volumes:
+      - configMap:
+          name: confd-config
+        name: confd-config
