@@ -76,6 +76,13 @@ prometheus:
 
   server:
     enable: true
+    extraVolumes:
+      - name: pod-shared
+        emptyDir: {}
+    extraVolumeMounts:
+      - mountPath: /etc/config/
+        name: pod-shared
+
   alertmanager:
     enabled: true
   kubeStateMetrics:
@@ -86,14 +93,11 @@ prometheus:
     enabled: false
   configmapReload:
     prometheus:
-      enabled: true
+      enabled: false
     alertmanager:
-      enabled: true
+      enabled: false
 
 grafana:
-  builtin: true
-
-confd:
   builtin: true
 
 # etcd configuration
@@ -108,11 +112,14 @@ etcd:
     - http://etcd.host:2379 # host or ip e.g. http://172.20.128.89:2379
   prefix: "/api7"
   timeout: 30
-  defaultPort: 2379
+  sevice:
+    ports:
+      client: 2379
   auth:
     rbac:
       # No authentication by default
       enabled: false
+      create: false
       ## etcd user
       ##
       user: ""

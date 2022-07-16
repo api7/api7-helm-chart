@@ -1,11 +1,7 @@
 resources:
   - all.yaml
 patches:
-  - path: alertmanager-confd.yaml
+  - path: confd.yaml
     target:
       kind: Deployment
-      name: "api7-dashboard-prometheus-alertmanager"
-  - path: prometheus-confd.yaml
-    target:
-      kind: Deployment
-      name: "api7-dashboard-prometheus-server"
+      name: "api7-dashboard-prometheus-server|api7-dashboard-prometheus-alertmanager"

@@ -10,11 +10,11 @@ data:
     confdir = "/etc/confd"
     nodes = [
     {{- if .Values.etcd.builtin }}
-        "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.port }}"
+        "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.ports.client }}"
     {{- else }}
-        {{ range .Values.config.selfEtcd.hosts -}}
-        - {{ . }}
-        {{ end }}
+        {{- range $value := .Values.etcd.hosts }}
+        - "{{ $value }}"
+        {{- end }}
     {{- end }}
     ]
     watch = true
@@ -23,15 +23,6 @@ data:
     password = {{ .Values.etcd.auth.rbac.password | quote }}
     basic_auth = true
     {{ end }}
-  api7.rules.yaml.toml: |
-    [template]
-    src = "api7.rules.yaml.tmpl"
-    dest = "/root/api7.rules.yml"
-    mode = "0644"
-    keys = [
-    "{{ .Values.etcd.prefix }}/alarm/"
-    ]
-    reload_cmd = "curl -XPOST 'http://{{ .Release.Name }}-prometheus.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9090/-/reload'"
   api7.alertmanager.yaml.tmpl: |
     global:
     route:
@@ -40,7 +31,7 @@ data:
       repeat_interval: 1m
       receiver: "api7-dashboard"
       routes:
-    {{`{{range $alarm := gets "`}}{{ .Values.etcd.prefix }}{{`/alarm/*"}}
+    {{`{{range $alarm := gets "`}}{{ .Values.etcd.prefix }}{{`/alarm/management/*"}}
     {{$alarmJson := json $alarm.Value}}
     {{if eq $alarmJson.status 1.0}}
     {{if eq $alarmJson.rules_relation "or"}}
@@ -74,14 +65,59 @@ data:
     dest = "/root/alertmanager.yml"
     mode = "0644"
     keys = [
-    "{{ .Values.etcd.prefix }}/alarm/",
+    "{{ .Values.etcd.prefix }}/management/alarm/",
     ]
     reload_cmd = "curl -XPOST 'http://{{ .Release.Name }}-alertmanager.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9093/-/reload'"
+  api7.prometheus.yaml.toml: |
+    [template]
+    src = "api7.prometheus.yaml.tmpl"
+    dest = "/root/prometheus.yml"
+    mode = "0644"
+    keys = [
+    "{{ .Values.etcd.prefix }}/management/gateways/"
+    ]
+    reload_cmd = "curl -XPOST 'http://{{ .Release.Name }}-prometheus.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9090/-/reload'"
+  api7.prometheus.yaml.tmpl: |
+    global:
+      scrape_interval: 1s     # By default, scrape targets every 15 seconds.
+      evaluation_interval: 1s
+    # Alertmanager configuration
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+                - {{ .Release.Name }}-alertmanager.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9093
+
+    rule_files:
+      - api7.rules.yml
+
+    # A scrape configuration containing exactly one endpoint to scrape:
+    scrape_configs:
+      - job_name: "apisix"
+        scrape_interval: 1s
+        metrics_path: "/apisix/prometheus/metrics"
+        static_configs:
+            - targets:
+    {{`{{range $gateway := gets "`}}{{ .Values.etcd.prefix }}{{`/gateways/*"}}
+    {{$gatewayJson := json $gateway.Value}}
+                {{if ne $gatewayJson.metrics_host ""}}
+                - {{$gatewayJson.metrics_host}}:{{$gatewayJson.metrics_port}}
+                {{end}}
+    {{end}}`}}
+  api7.rules.yaml.toml: |
+    [template]
+    src = "api7.rules.yaml.tmpl"
+    dest = "/root/api7.rules.yml"
+    mode = "0644"
+    keys = [
+    "{{ .Values.etcd.prefix }}/management/alarm/"
+    ]
+    reload_cmd = "curl -XPOST 'http://{{ .Release.Name }}-prometheus.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9090/-/reload'"
   api7.rules.yaml.tmpl: |
     groups:
     - name: api7-alarm
       rules:
-    {{`{{range $alarm := gets "`}}{{ .Values.etcd.prefix }}{{`/alarm/*"}}
+    {{`{{range $alarm := gets "`}}{{ .Values.etcd.prefix }}{{`/management/alarm/*"}}
     {{$alarmJson := json $alarm.Value}}
     {{if eq $alarmJson.status 1.0}}
     {{if eq $alarmJson.rules_relation "or"}}
