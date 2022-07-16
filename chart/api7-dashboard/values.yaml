@@ -76,13 +76,6 @@ prometheus:
 
   server:
     enable: true
-    extraVolumes:
-      - name: pod-shared
-        emptyDir: {}
-    extraVolumeMounts:
-      - mountPath: /etc/config/
-        name: pod-shared
-
   alertmanager:
     enabled: true
   kubeStateMetrics:
