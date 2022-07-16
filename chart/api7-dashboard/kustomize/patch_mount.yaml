@@ -1,5 +1,5 @@
 - op: add
-  path: /spec/template/spec/containers/0/volumeMounts/-
+  path: /spec/template/spec/containers/1/volumeMounts/-
   value:
     name: pod-shared
     mountPath: /etc/config/
