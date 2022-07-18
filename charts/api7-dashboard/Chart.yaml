@@ -38,3 +38,7 @@ dependencies:
     version: 6.0.0
     condition: grafana.builtin
     repository: https://grafana.github.io/helm-charts
+  - name: opensearch
+    version: 1.13.1
+    repository: https://opensearch-project.github.io/helm-charts
+    condition: opensearch.builtin
