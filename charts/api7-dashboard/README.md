@@ -25,7 +25,7 @@ helm install api7-dashboard . -n api7 \
   --set image.repository=api7-dashboard \
   --set service.type=NodePort \
   --set image.tag=2.8.2206 \
-  --post-renderer /Users/chenjunxu/data/www/api7-helm-chart/charts/api7-dashboard/kustomize/kustomize \
+  --post-renderer /path/to/api7-helm-chart/charts/api7-dashboard/kustomize/kustomize \
   --create-namespace
 ```
 
