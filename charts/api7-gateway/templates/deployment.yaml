@@ -103,6 +103,12 @@ spec:
             - mountPath: /usr/local/apisix/conf/ssl
               name: ssl
             {{- end }}
+          env:
+            - name: POD_IP
+              valueFrom:
+                fieldRef:
+                  apiVersion: v1
+                  fieldPath: status.podIP
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.etcd.builtin }}

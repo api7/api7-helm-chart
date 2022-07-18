@@ -6,7 +6,7 @@ spec:
   template:
     spec:
       containers:
-      - image: johz/confd:0.16.0
+      - image: leslietsang/confd:0.16.0
         imagePullPolicy: Always
         name: confd
         volumeMounts:

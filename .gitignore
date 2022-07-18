@@ -1,5 +1,6 @@
 .DS_Store
 .idea
-chart/api7/charts
-chart/api7-dashboard/charts
+charts/api7-gateway/charts
+charts/api7-dashboard/charts
 images
+res

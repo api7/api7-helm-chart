@@ -31,7 +31,7 @@ data:
       repeat_interval: 1m
       receiver: "api7-dashboard"
       routes:
-    {{`{{range $alarm := gets "`}}{{ .Values.etcd.prefix }}{{`/alarm/management/*"}}
+    {{`{{range $alarm := gets "`}}{{ .Values.etcd.prefix }}{{`/management/alarm/*"}}
     {{$alarmJson := json $alarm.Value}}
     {{if eq $alarmJson.status 1.0}}
     {{if eq $alarmJson.rules_relation "or"}}
@@ -67,7 +67,7 @@ data:
     keys = [
     "{{ .Values.etcd.prefix }}/management/alarm/",
     ]
-    reload_cmd = "curl -XPOST 'http://{{ .Release.Name }}-alertmanager.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9093/-/reload'"
+    reload_cmd = "curl -XPOST 'http://127.0.0.1:9093/-/reload'"
   api7.prometheus.yaml.toml: |
     [template]
     src = "api7.prometheus.yaml.tmpl"
@@ -76,7 +76,7 @@ data:
     keys = [
     "{{ .Values.etcd.prefix }}/management/gateways/"
     ]
-    reload_cmd = "curl -XPOST 'http://{{ .Release.Name }}-prometheus.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9090/-/reload'"
+    reload_cmd = "curl -XPOST 'http://127.0.0.1:9090/-/reload'"
   api7.prometheus.yaml.tmpl: |
     global:
       scrape_interval: 1s     # By default, scrape targets every 15 seconds.
@@ -98,7 +98,7 @@ data:
         metrics_path: "/apisix/prometheus/metrics"
         static_configs:
             - targets:
-    {{`{{range $gateway := gets "`}}{{ .Values.etcd.prefix }}{{`/gateways/*"}}
+    {{`{{range $gateway := gets "`}}{{ .Values.etcd.prefix }}{{`/management/gateways/*"}}
     {{$gatewayJson := json $gateway.Value}}
                 {{if ne $gatewayJson.metrics_host ""}}
                 - {{$gatewayJson.metrics_host}}:{{$gatewayJson.metrics_port}}
@@ -112,7 +112,7 @@ data:
     keys = [
     "{{ .Values.etcd.prefix }}/management/alarm/"
     ]
-    reload_cmd = "curl -XPOST 'http://{{ .Release.Name }}-prometheus.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9090/-/reload'"
+    reload_cmd = "curl -XPOST 'http://127.0.0.1:9090/-/reload'"
   api7.rules.yaml.tmpl: |
     groups:
     - name: api7-alarm

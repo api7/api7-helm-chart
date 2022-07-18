@@ -234,8 +234,8 @@ plugin_attr:
       port: 9091
   server-info:
     report_ttl: 60       # live time for server info in etcd (unit: second)
-    metrics_host: ""
-    metrics_port: ""
+    metrics_host: "${{POD_IP}}"
+    metrics_port: "9091"
   dubbo-proxy:
     upstream_multiplex_count: 32
 
