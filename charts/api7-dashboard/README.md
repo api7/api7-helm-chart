@@ -14,7 +14,7 @@ Quick Start
 -----------
 
 ```sh
-cd /path/to/api7-helm-chart/chart/api7-dashboard
+cd /path/to/api7-helm-chart/charts/api7-dashboard
 helm dependency update .
 ```
 
