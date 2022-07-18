@@ -6,6 +6,8 @@ This is the helm chart for [api7-gateway](https://github.com/api7/api7-gateway) 
 Prerequisites
 -------------
 
+Before installing API7 Gateway, you need to install API7 Dashboard and create at least one cluster on the Dashboard. See [api7-dashboard](../api7-dashboard) to learn how to install API7 Dashboard by helm chart.
+
 Before you go ahead, please make sure you have installed [helm](https://helm.sh) in the environment that you'll operate the Kubernetes cluster.
 
 Next, since we don't have a private online repository for these enterprise-edition projects, you should clone/download this project to that project.
@@ -24,7 +26,7 @@ Images for api7 is private and never should be uploaded to public image registri
 helm install api7-gateway . -n api7 \
   --set image.repository=api7-gateway \
   --set image.tag=2.8.2206 \
-  --set etcd.prefix=/api7/417061816636539665 \
+  --set etcd.prefix=/api7/417074703081931549 \
   --set etcd.hosts={http://api7-dashboard-etcd.api7.svc.cluster.local:2379} \
   --create-namespace
 ```
