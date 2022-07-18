@@ -25,7 +25,7 @@ helm install api7-dashboard . -n api7 \
   --set image.repository=api7-dashboard \
   --set service.type=NodePort \
   --set image.tag=2.8.2206 \
-  --post-renderer /path/to/api7-helm-chart/chart/api7-dashboard/kustomize/kustomize \
+  --post-renderer /Users/chenjunxu/data/www/api7-helm-chart/charts/api7-dashboard/kustomize/kustomize \
   --create-namespace
 ```
 
@@ -91,7 +91,7 @@ helm install api7-dashboard -n api7 \
 ### Command for kind
 Import api7-dashboard image:
 ```shell
-kind load docker-image --nodes kind-worker --name kind api7-dashboard：2.8.2206
+kind load docker-image --nodes kind-control-plane --name kind api7-dashboard:2.8.2206
 ```
 
 Expose service
