@@ -18,20 +18,15 @@ cd /path/to/api7-helm-chart/chart/api7-dashboard
 helm dependency update .
 ```
 
-Firstly we should update the dependency in your local. Now we will try to install api7-dashboard to Kubernetes cluster, we assume the target namespace is `api7`.
-
-```sh
-kubectl create namespace api7
-```
-
 Images for api7-dashboard is private and never should be uploaded to public image registries like [dockerhub](https://hub.docker.com), so make sure the image for api7-dashboard was stashed in a registry that can be accessed from the Kubernetes cluster.
 
 ```sh
 helm install api7-dashboard . -n api7 \
-  --set image.registry=localhost:5000 \
   --set image.repository=api7-dashboard \
   --set service.type=NodePort \
-  --set image.tag=2.8.2202
+  --set image.tag=2.8.2206 \
+  --post-renderer /path/to/api7-helm-chart/chart/api7-dashboard/kustomize/kustomize \
+  --create-namespace
 ```
 
 When you execute the above command, change the registry, repository and tag according to your situation.
@@ -91,4 +86,15 @@ Disable the `promethues.builtin` and specify your existing Prometheus server add
 helm install api7-dashboard -n api7 \
 	--set prometheus.builtin=false \
 	--set prometheus.clusters={https://prometheus-0,https://prometheus-1,https://promtheus-2}
+```
+
+### Command for kind
+Import api7-dashboard image:
+```shell
+kind load docker-image --nodes kind-worker --name kind api7-dashboard：2.8.2206
+```
+
+Expose service
+```shell
+kubectl port-forward service/api7-dashboard 9000:9000 -n api7
 ```

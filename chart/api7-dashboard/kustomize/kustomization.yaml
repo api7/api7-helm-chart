@@ -1,0 +1,12 @@
+resources:
+  - all.yaml
+patches:
+  - target:
+      kind: Deployment
+      name: "api7-dashboard-prometheus-server|api7-dashboard-prometheus-alertmanager"
+    path: confd.yaml
+patchesJson6902:
+  - target:
+      kind: Deployment
+      name: "api7-dashboard-prometheus-server|api7-dashboard-prometheus-alertmanager"
+    path: patch_mount.yaml

@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: doesNotMatter
+spec:
+  template:
+    spec:
+      containers:
+      - image: johz/confd:0.16.0
+        imagePullPolicy: Always
+        name: confd
+        volumeMounts:
+        - mountPath: /etc/confd/confd.toml
+          name: confd-config
+          subPath: confd.toml
+        - mountPath: /etc/confd/conf.d/api7.alertmanager.yaml.toml
+          name: confd-config
+          subPath: api7.alertmanager.yaml.toml
+        - mountPath: /etc/confd/templates/api7.alertmanager.yaml.tmpl
+          name: confd-config
+          subPath: api7.alertmanager.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.rules.yaml.toml
+          name: confd-config
+          subPath: api7.rules.yaml.toml
+        - mountPath: /etc/confd/templates/api7.rules.yaml.tmpl
+          name: confd-config
+          subPath: api7.rules.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.prometheus.yaml.toml
+          name: confd-config
+          subPath: api7.prometheus.yaml.toml
+        - mountPath: /etc/confd/templates/api7.prometheus.yaml.tmpl
+          name: confd-config
+          subPath: api7.prometheus.yaml.tmpl
+        - mountPath: /root/
+          name: pod-shared
+      volumes:
+      - configMap:
+          name: confd-config
+        name: confd-config
+      - name: pod-shared
+        emptyDir: {}
