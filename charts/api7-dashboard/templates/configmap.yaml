@@ -193,7 +193,7 @@ data:
       {{ end }}
     {{- if .Values.config.plugins }}
     plugins:
-    {{- range $plugin := .Values.plugins }}
+    {{- range $plugin := .Values.config.plugins }}
       - {{ $plugin }}
     {{- end }}
     {{- end }}
