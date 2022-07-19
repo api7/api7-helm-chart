@@ -191,11 +191,11 @@ plugins:
   - jwt-auth
   - kafka-logger
   - key-auth
-  - log-rotate
+  # - log-rotate
   - limit-conn
   - limit-count
   - limit-req
-  - node-status
+  # - node-status
   - openid-connect
   - prometheus
   - proxy-cache
@@ -209,7 +209,7 @@ plugins:
   - response-rewrite
   - serverless-post-function
   - serverless-pre-function
-  - skywalking
+  # - skywalking
   - sls-logger
   - syslog
   - tcp-logger
@@ -220,8 +220,8 @@ plugins:
   - zipkin
   - server-info
   - traffic-split
-stream_plugins:
-  - mqtt-proxy
+
+stream_plugins: []
 plugin_attr:
   log-rotate:
     interval: 3600    # rotate interval (unit: second)

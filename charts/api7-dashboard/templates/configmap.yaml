@@ -48,7 +48,6 @@ data:
     {{ end -}}
   {{ end }}
   conf.yaml: |-
-    len: {{ len .Values.config.allowList }}
     conf:
       {{- if gt (len .Values.config.allowList) 0 }}
       allow_list:
@@ -94,6 +93,24 @@ data:
           {{ end }}
         {{- end -}}
       {{- end }}
+      audit:
+        enable: {{ .Values.config.audit.enabled }}
+      {{- if or .Values.opensearch.builtin (gt (len .Values.opensearch.hosts) 0) }}
+      opensearch:
+        hosts:
+        {{- if .Values.opensearch.builtin }}
+          - "https://opensearch-cluster-master.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9200"
+        {{- else -}}
+          {{ range .Values.opensearch.hosts }}
+          - {{ . }}
+          {{ end }}
+        {{- end }}
+        {{- if .Values.opensearch.auth.rbac.username }}
+        username: {{ .Values.opensearch.auth.rbac.username | quote }}
+        password: {{ .Values.opensearch.auth.rbac.password | quote }}
+        {{- end }}
+        insecure_skip_verify: {{ not .Values.opensearch.auth.tls.verify }}
+      {{- end }}
       etcd:
         name: {{ .Values.etcd.name }}
         {{- if .Values.etcd.builtin }}
@@ -105,13 +122,13 @@ data:
           - "{{ $value }}"
           {{- end }}
         {{- end }}
-        {{- if .Values.etcd.auth.rbac.enabled }}
+        enable_auth: {{ .Values.etcd.auth.rbac.enabled }}
         username: {{ .Values.etcd.auth.rbac.user | quote }}
         password: {{ .Values.etcd.auth.rbac.password | quote }}
-        {{- end }}
         prefix: {{ .Values.etcd.prefix -}}
         {{- if .Values.etcd.auth.tls.enabled }}
         mtls:
+          enable: {{ .Values.etcd.auth.tls.enabled }}
           key_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certKeyFilename }}"
           cert_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certFilename }}"
           ca_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certCAFilename }}"
@@ -147,11 +164,39 @@ data:
       login_failed_stat_duration: {{.Values.config.authentication.login_failed_stat_duration}}  # the maximum allowable login failures statistics duration.
       login_failed_lock_duration: {{.Values.config.authentication.login_failed_lock_duration}}  # the account locked duration.
       {{ end }}
+      session_age: {{.Values.config.authentication.session_age }}
+      session_store_prefix: {{.Values.config.authentication.session_store_prefix | quote }}
       users:
       {{ range .Values.config.authentication.users }}
-        - username: {{ .username }}   # username and password for login `manager api`
+        - username: {{ .username }}
           password: {{ .password }}
       {{ end }}
+
+      {{- if .Values.config.authentication.ldap }}
+      ldap:
+        enable: {{ .Values.config.authentication.ldap.enabled }}
+        host: {{ .Values.config.authentication.ldap.host | quote }}
+        port: {{ .Values.config.authentication.ldap.port }}
+        sync_time:
+          {{ range .Values.config.authentication.ldap.sync_time }}
+          - {{ . | quote }}
+          {{ end }}
+        username: {{ .Values.config.authentication.ldap.username | quote }}
+        password: {{ .Values.config.authentication.ldap.password | quote }}
+        base_dn: {{ .Values.config.authentication.ldap.base_dn | quote }}
+        filter: {{ .Values.config.authentication.ldap.filter | quote }}
+        delete_user: {{ .Values.config.authentication.ldap.delete_user }}
+        field_map:
+          {{ range $key, $value := .Values.config.authentication.ldap.field_map }}
+          {{ $key }}: {{ $value }}
+          {{ end }}
+      {{ end }}
+    {{- if .Values.config.plugins }}
+    plugins:
+    {{- range $plugin := .Values.config.plugins }}
+      - {{ $plugin }}
+    {{- end }}
+    {{- end }}
 
 {{- if .Values.config.k8sSupport.enable }}
     kubernetes:
