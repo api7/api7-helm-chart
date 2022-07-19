@@ -209,4 +209,55 @@ config:
     content_security_policy: "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
   audit:
     enabled: true     # Whether to enable audit log
-  plugins: []
+  plugins:
+    - api-breaker
+    - authz-casbin
+    - authz-keycloak
+    - basic-auth
+    # - batch-requests
+    - client-control
+    - consumer-restriction
+    - cors
+    - dubbo-proxy
+    - echo
+    - ext-plugin-pre-req
+    - ext-plugin-post-req
+    - error-log-logger
+    - fault-injection
+    - grpc-transcode
+    - gzip
+    - hmac-auth
+    - http-logger
+    - ip-restriction
+    - jwt-auth
+    - kafka-logger
+    - key-auth
+    # - log-rotate
+    - limit-conn
+    - limit-count
+    - limit-req
+    # - node-status
+    - openid-connect
+    - prometheus
+    - proxy-cache
+    - proxy-mirror
+    - proxy-rewrite
+    - real-ip
+    - redirect
+    - referer-restriction
+    - request-id
+    - request-validation
+    - response-rewrite
+    - serverless-post-function
+    - serverless-pre-function
+    # - skywalking
+    - sls-logger
+    - syslog
+    - tcp-logger
+    - ua-restriction
+    - udp-logger
+    - uri-blocker
+    - wolf-rbac
+    - zipkin
+    - server-info
+    - traffic-split
