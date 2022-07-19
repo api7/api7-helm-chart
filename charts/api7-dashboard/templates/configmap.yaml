@@ -191,6 +191,12 @@ data:
           {{ $key }}: {{ $value }}
           {{ end }}
       {{ end }}
+    {{- if .Values.config.plugins }}
+    plugins:
+    {{- range $plugin := .Values.plugins }}
+      - {{ $plugin }}
+    {{- end }}
+    {{- end }}
 
 {{- if .Values.config.k8sSupport.enable }}
     kubernetes:

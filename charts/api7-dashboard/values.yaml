@@ -209,3 +209,4 @@ config:
     content_security_policy: "default-src 'self'; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
   audit:
     enabled: true     # Whether to enable audit log
+  plugins: []
