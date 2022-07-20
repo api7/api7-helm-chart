@@ -38,14 +38,15 @@ data:
     # limitations under the License.
     #
     apisix:
-      node_listen: {{ .Values.gateway.http.port }}             # APISIX listening port
+      node_listen: {{ .Values.gateway.http.port }}
+      lua_module_hook: "apisix.enterprise.init"
       enable_heartbeat: true
       enable_admin: false
       enable_admin_cors: true
       enable_debug: false
       enable_dev_mode: false          # Sets nginx worker_processes to 1 if set to true
       enable_reuseport: true          # Enable nginx SO_REUSEPORT switch if set to true.
-      enable_ipv6: true
+      enable_ipv6: {{ .Values.gateway.enableIPv6 }} # Enable nginx IPv6 resolver
       config_center: etcd             # etcd: use etcd to store the config value
                                       # yaml: fetch the config value from local yaml file `/your_path/conf/apisix.yaml`
 
@@ -104,10 +105,11 @@ data:
     nginx_config:                     # config for render the template to genarate nginx.conf
       error_log: "{{ .Values.logs.errorLog }}"
       error_log_level: "{{ .Values.logs.errorLogLevel }}"         # warn,error
-      worker_processes: {{ .Values.gateway.workerProcesses }}
-      worker_rlimit_nofile: 20480     # the number of files a worker process can open, should be larger than worker_connections
+      worker_processes: {{ .Values.nginx.workerProcesses }}
+      enable_cpu_affinity: {{ default "true" .Values.nginx.enableCPUAffinity }}
+      worker_rlimit_nofile: {{ default "20480" .Values.nginx.workerRlimitNofile }}     # the number of files a worker process can open, should be larger than worker_connections
       event:
-        worker_connections: 10620
+        worker_connections: {{ default "10620" .Values.nginx.workerConnections  }}
       http:
         enable_access_log: {{ .Values.logs.enableAccessLog }}
         {{- if .Values.logs.enableAccessLog }}
