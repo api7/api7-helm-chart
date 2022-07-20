@@ -20,8 +20,8 @@ description: Chart for APISEVEN Dashboard
 home: https://www.apiseven.com
 icon: https://static.apiseven.com/2020/05/Jietu20200312-103300-removebg-preview.png
 type: application
-version: 0.0.1
-appVersion: 2.1-EE
+version: 0.2.0
+appVersion: 2.8.2206.1
 maintainers:
   - email: chaozhang@api7.ai
     name: Chao Zhang

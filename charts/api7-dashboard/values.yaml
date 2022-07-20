@@ -147,8 +147,7 @@ opensearch:
 # api7-dashboard configurations
 config:
   # Key prefix used by api7-dashboard in ETCD cluster.
-  allowList:
-    - 127.0.0.0/24
+  allowList: []
   allowAdmin: []
   trustedProxies: []
   http:
