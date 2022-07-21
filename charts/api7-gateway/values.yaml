@@ -52,14 +52,21 @@ customLuaSharedDicts: []
   # - name: bar
   #   size: 1m
 
+nginx:
+  # warn: should update the value of workerProcesses
+  #       to the number of cpu cores that match the actual allocated resources.
+  workerProcesses: auto
+  workerRlimitNofile: "20480"
+  workerConnections: "10620"
+  enableCPUAffinity: true
+
 gateway:
+  # Enable nginx IPv6 resolver
+  enableIPv6: true
   type: NodePort
   # type: LoadBalancer
   annotations: {}
   loadBalancerIP: ""
-  # warn: should update the value of workerProcesses
-  #       to the number of cpu cores that match the actual allocated resources.
-  workerProcesses: auto
   http:
     enabled: true
     servicePort: 80
