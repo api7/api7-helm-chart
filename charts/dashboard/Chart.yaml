@@ -1,0 +1,13 @@
+apiVersion: v2
+name: api7-dashboard
+description: Chart for APISEVEN Dashboard
+home: https://www.apiseven.com
+icon: https://static.apiseven.com/2020/05/Jietu20200312-103300-removebg-preview.png
+type: application
+version: 0.1.0
+appVersion: 0.1.2208
+dependencies:
+  - name: etcd
+    version: 8.3.3
+    repository: https://charts.bitnami.com/bitnami
+    condition: etcd.builtin
