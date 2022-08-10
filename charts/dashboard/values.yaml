@@ -99,3 +99,8 @@ log:
     file_path: "stderr"
   access_log:
     file_path: "stdout"
+
+docs:
+  api_docs:
+    enable: true
+    path: "/openapi/"
