@@ -53,7 +53,7 @@ data:
           {{ .Values.log.access_log.file_path }}
 
     auth:
-      secret: {{ .Values.auth.secret }} 
+      secret: {{ .Values.auth.secret }}
       session:
         age: {{.Values.auth.session.age }}
         prefix: {{.Values.auth.session.prefix | quote }}
@@ -62,3 +62,8 @@ data:
         - username: {{ .username }}
           password: {{ .password }}
       {{ end }}
+
+    docs:
+      api_docs:
+        enable: {{ .Values.docs.api_docs.enable }}
+        path: {{ .Values.docs.api_docs.path }}
