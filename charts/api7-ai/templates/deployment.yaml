@@ -33,24 +33,25 @@ spec:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: PORT
+              value: {{ .Values.api7ai.port | quote }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: {{ .Values.api7ai.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 3000
+            initialDelaySeconds: 10
           readinessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 3000
+            initialDelaySeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
-          command: ["sleep"]
-          args: ["100000"]
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
