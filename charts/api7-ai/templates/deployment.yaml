@@ -38,18 +38,16 @@ spec:
               value: {{ .Values.api7ai.port | quote }}
           ports:
             - name: http
-              containerPort: {{ .Values.api7ai.port }}
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 10
           readinessProbe:
             httpGet:
               path: /
               port: http
-            initialDelaySeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- with .Values.nodeSelector }}
