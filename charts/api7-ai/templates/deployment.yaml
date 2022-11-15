@@ -38,7 +38,7 @@ spec:
               value: {{ .Values.api7ai.port | quote }}
           ports:
             - name: http
-              containerPort: {{ .Values.api7ai.port }}
+              containerPort: {{ .Values.service.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
