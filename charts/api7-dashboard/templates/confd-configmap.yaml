@@ -13,7 +13,7 @@ data:
         "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.ports.client }}"
     {{- else }}
         {{- range $value := .Values.etcd.hosts }}
-        - "{{ $value }}"
+        "{{ $value }}",
         {{- end }}
     {{- end }}
     ]
