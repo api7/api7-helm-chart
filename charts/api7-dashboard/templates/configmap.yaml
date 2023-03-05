@@ -128,10 +128,16 @@ data:
         prefix: {{ .Values.etcd.prefix }}
         {{- if .Values.etcd.auth.tls.enabled }}
         mtls:
-          enable: {{ .Values.etcd.auth.tls.enabled }}
+          enable: true
           key_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certKeyFilename }}"
           cert_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certFilename }}"
           ca_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certCAFilename }}"
+        {{- else }}
+        mtls:
+          enable: false
+          key_file: ""
+          cert_file: ""
+          ca_file: ""
         {{- end }}
       log:
         error_log:
