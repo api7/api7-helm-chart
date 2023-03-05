@@ -126,6 +126,7 @@ data:
         username: {{ .Values.etcd.auth.rbac.user | quote }}
         password: {{ .Values.etcd.auth.rbac.password | quote }}
         prefix: {{ .Values.etcd.prefix -}}
+
         mtls:
           enable: {{ .Values.etcd.auth.tls.enabled }}
           key_file: "/usr/local/apisix-dashboard/self-etcd-ssl/{{ .Values.etcd.auth.tls.certKeyFilename }}"
