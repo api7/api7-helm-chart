@@ -1,0 +1,113 @@
+nameOverride: ""
+fullnameOverride: ""
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# replicaCount represents the number of desired devportal replicas.
+# NOTE: as devportal doesn't share the login states, DO NOT touch this
+# value.
+replicaCount: 1
+# clusterDomain is the domain suffix for target Kubernetes cluster.
+clusterDomain: cluster.local
+# labels to filter the deployed Kubernetes worker ndoes.
+nodeSelector: {}
+
+image:
+  # Registry for the devportal image.
+  registry: docker.io
+  # Repository for the devportal image
+  repository: api7/devportal
+  # Tag for the devportal image
+  tag: dev
+  # The image pull policy for devportal image
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+
+service:
+  # The devportal service type.
+  type: ClusterIP
+  # loadBalancerIP: a.b.c.d
+  loadBalancerSourceRanges: []
+
+# etcd configuration
+# use the FQDN address or the IP of the etcd
+etcd:
+  # install etcd by default, set false if do not want to install etcd(v3) together,
+  # in such a case, etcd.host should be configured so that existing ETCD cluster can be
+  # used.
+  builtin: true
+  hosts:
+    - http://etcd.api7.svc.cluster.local:2379 # host or ip e.g. http://172.20.128.89:2379
+  prefix: "/api7"
+  timeout: 30
+  sevice:
+    ports:
+      client: 2379
+  auth:
+    rbac:
+      # No authentication by default
+      enabled: false
+      create: false
+      ## etcd user
+      user: ""
+      ## etcd password
+      password: ""
+    # Whether to set up secure transport to ETCD cluster.
+    tls:
+      enalbed: false
+      # An existing secret stores the credentials to communicate with ETCD cluster.
+      existingSecret: ""
+      # Certificate filename used to communicate ETCD cluster.
+      certFilename: "tls.crt"
+      # Private key filename used to communicate ETCD cluster.
+      certKeyFilename: "tls.key"
+      certCAFilename: "ca.crt"
+      verify: true
+
+# dashboard configurations
+server:
+  http:
+    enabled: true
+    servicePort: 9100
+    port: 9100
+  tls:
+    enabled: false
+    servicePort: 9443
+    port: 9443
+    secretName: ""
+    client_cert_auth: true
+
+auth:
+  secret: "XK3GEQipMUkj9sXQocYb"
+  session:
+    prefix: "/session"         # the key prefix for store the session id in etcd
+    age: 604800                # the age of session
+  users:
+    - username: admin   # default username and password for login the dashboard
+      password: admin
+
+log:
+  error_log:
+    level: warn
+    file_path: "stderr"
+  access_log:
+    file_path: "stdout"
+
+docs:
+  api_docs:
+    enable: true
+    path: "/openapi/"
+
+cors:
+  enabled: false
+  access_control_allow_origin: "*"
+  access_control_allow_credentials: "true"
+  access_control_allow_headers: "*"
+  access_control_allow_methods: "*"
