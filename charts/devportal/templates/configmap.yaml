@@ -70,7 +70,7 @@ data:
 
     cors:
       enabled: {{ .Values.cors.enabled }}
-      access_control_allow_origin: {{ .Values.cors.access_control_allow_origin }}
-      access_control_allow_credentials: {{ .Values.cors.access_control_allow_credentials }}
-      access_control_allow_headers: {{ .Values.cors.access_control_allow_headers }}
-      access_control_allow_methods: {{ .Values.cors.access_control_allow_methods }}
+      access_control_allow_origin: {{ .Values.cors.access_control_allow_origin | quote }}
+      access_control_allow_credentials: {{ .Values.cors.access_control_allow_credentials | quote }}
+      access_control_allow_headers: {{ .Values.cors.access_control_allow_headers | quote }}
+      access_control_allow_methods: {{ .Values.cors.access_control_allow_methods | quote }}
