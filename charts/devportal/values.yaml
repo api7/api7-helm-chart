@@ -42,7 +42,7 @@ etcd:
   # install etcd by default, set false if do not want to install etcd(v3) together,
   # in such a case, etcd.host should be configured so that existing ETCD cluster can be
   # used.
-  builtin: true
+  builtin: false
   hosts:
     - http://etcd.api7.svc.cluster.local:2379 # host or ip e.g. http://172.20.128.89:2379
   prefix: "/api7"
