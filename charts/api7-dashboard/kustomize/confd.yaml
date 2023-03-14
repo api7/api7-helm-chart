@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - image: leslietsang/confd:0.16.0
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         name: confd
         volumeMounts:
         - mountPath: /etc/confd/confd.toml
@@ -33,6 +33,14 @@ spec:
           subPath: api7.prometheus.yaml.tmpl
         - mountPath: /root/
           name: pod-shared
+      initContainers:
+      - name: check-etcd
+        image: busybox:1.35
+        command: ['sh', '-c', "until wget $(sed -n '/nodes/{n;p}' /etcd/confd/confd.yaml| sed 's/\"//g' )/version -O /dev/null; do echo \"waiting for etcd\"; sleep 2; done"]
+        volumeMounts:
+          - mountPath: /etcd/confd/confd.yaml
+            name: confd-config
+            subPath: confd.toml
       volumes:
       - configMap:
           name: confd-config
