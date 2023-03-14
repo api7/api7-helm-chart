@@ -1,0 +1,70 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "devportal.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "devportal.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "devportal.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "devportal.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.registry }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.server.http.port }}
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 6
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            tcpSocket:
+              port: {{ .Values.server.http.port }}
+            timeoutSeconds: 1
+          volumeMounts:
+            - mountPath: /usr/local/devportal/conf/devportal.yaml
+              name: devportal-config
+              subPath: devportal.yaml
+          {{- if .Values.server.tls.enabled }}
+            - mountPath: /usr/local/apisix-dashboard/tls
+              name: "ssl"
+          {{- end }}
+          {{- if .Values.etcd.auth.tls.enabled }}
+            - name: self-etcd-ssl
+              mountPath: "/usr/local/apisix-dashboard/self-etcd-ssl"
+          {{- end }}
+      volumes:
+        - configMap:
+            name: {{ include "devportal.fullname" . }}
+          name: devportal-config
+        {{- if .Values.server.tls.enabled }}
+        - name: ssl
+          secret:
+            secretName: {{ .Values.server.tls.secretName }}
+        {{- end }}
+        {{- if .Values.etcd.auth.tls.enabled }}
+        - name: self-etcd-ssl
+          secret:
+            secretName: {{ .Values.etcd.auth.tls.existingSecret }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
