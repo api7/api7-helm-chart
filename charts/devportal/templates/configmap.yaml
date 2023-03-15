@@ -74,3 +74,7 @@ data:
       access_control_allow_credentials: {{ .Values.cors.access_control_allow_credentials | quote }}
       access_control_allow_headers: {{ .Values.cors.access_control_allow_headers | quote }}
       access_control_allow_methods: {{ .Values.cors.access_control_allow_methods | quote }}
+
+    session_options_config:
+      same_site: {{ .Values.session_options_config.same_site }}
+      secure: {{ .Values.session_options_config.secure }}

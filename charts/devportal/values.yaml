@@ -111,3 +111,7 @@ cors:
   access_control_allow_credentials: "true"
   access_control_allow_headers: "*"
   access_control_allow_methods: "*"
+
+session_options_config:
+  same_site: 4       # means the value SameSiteNoneMode
+  secure: true
