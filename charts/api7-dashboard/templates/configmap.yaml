@@ -156,7 +156,7 @@ data:
         access_control_allow_headers: {{ .Values.config.security.access_control_allow_headers }}
         access_control-allow_methods: {{ .Values.config.security.access_control_allow_methods }}
         x_frame_options: {{ .Values.config.security.x_frame_options }}
-        content_security_policy: {{ .Values.config.security.content_security_policy }}
+        content_security_policy: {{ .Values.config.security.content_security_policy | quote }}
 
     authentication:
       secret:
