@@ -1,9 +1,0 @@
-dependencies:
-- name: etcd
-  repository: https://charts.bitnami.com/bitnami
-  version: 5.2.1
-- name: api7-dashboard
-  repository: file://../api7-dashboard
-  version: 0.0.1
-digest: sha256:75b3fd9965150f1117b8c57fbb3d3b0d0e8786d9bd598dfafb38e5584a123687
-generated: "2021-05-19T17:22:07.944314+08:00"
