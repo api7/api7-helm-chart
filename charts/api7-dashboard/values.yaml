@@ -92,6 +92,10 @@ prometheus:
 
 grafana:
   builtin: true
+  grafana.ini:
+    security:
+      allow_embedding: true
+      cookie_samesite: "disabled"
 
 # etcd configuration
 # use the FQDN address or the IP of the etcd
