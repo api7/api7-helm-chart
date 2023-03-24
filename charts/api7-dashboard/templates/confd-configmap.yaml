@@ -55,10 +55,10 @@ data:
     receivers:
       - name: "api7-dashboard"
         webhook_configs:
-          - url: "http://{{ .Release.Name }}-dashboard.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.config.http.servicePort }}/apisix/admin/alarm-webhook?cluster_id=cluster_1"
+          - url: "http://{{ .Release.Name }}.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.config.http.servicePort }}/apisix/admin/alarm-webhook"
             send_resolved: true
             http_config:
-              bearer_token: {{ .Values.config.authentication.apikey }}
+              bearer_token: {{ .Values.config.authentication.api_key }}
   api7.alertmanager.yaml.toml: |
     [template]
     src = "api7.alertmanager.yaml.tmpl"
@@ -86,7 +86,7 @@ data:
       alertmanagers:
         - static_configs:
             - targets:
-                - {{ .Release.Name }}-alertmanager.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:9093
+                - {{ .Release.Name }}-prometheus-alertmanager.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}
 
     rule_files:
       - api7.rules.yml
