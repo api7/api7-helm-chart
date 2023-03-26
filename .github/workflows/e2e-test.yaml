@@ -27,6 +27,7 @@ jobs:
           sudo cp ~/go/bin/ginkgo /usr/local/bin
           sudo cp ~/go/bin/kind /usr/local/bin
           curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh" | bash
+          ls -l
           sudo cp ./kustomize /usr/local/bin
           # pull docker images
           docker pull api7ee.azurecr.io/api7-dashboard:2.13.2302
