@@ -94,6 +94,14 @@ spec:
                 - "-c"
                 - "apk add curl && sh /usr/local/apisix-dashboard/self-register.sh"
           {{- end}}
+      initContainers:
+      - name: check-etcd
+        image: busybox:1.35
+        command: ["sh", "-c", "until wget $(sed -n '/endpoints/{n;p}'  /usr/local/apisix-dashboard/conf/conf.yaml | sed 's/.*\"\\(.*\\)\".*/\\1/')/version -O /dev/null; do echo \"waiting for etcd\"; sleep 2; done"]
+        volumeMounts:
+          - mountPath: /usr/local/apisix-dashboard/conf/conf.yaml
+            name: api7-dashboard-config
+            subPath: conf.yaml
       volumes:
         - configMap:
             name: {{ include "api7-dashboard.fullname" . }}
