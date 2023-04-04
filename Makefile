@@ -7,6 +7,10 @@ DASHBOARD_IMAGE_TAG ?= "2.13.2302"
 GATEWAY_IMAGE_REPOSITORY ?= "api7-gateway"
 GATEWAY_IMAGE_TAG ?= "2.13.2302"
 
+.PHONY: help
+help:  ## Display this help message.
+	@awk 'BEGIN {FS = ":.*##"; printf "\nUsage:\n  make \033[36m<target>\033[0m\n"} /^[a-zA-Z0-9_-]+:.*?##/ { printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2 } /^##@/ { printf "\n\033[1m%s\033[0m\n", substr($$0, 5) } ' $(MAKEFILE_LIST)
+
 .PHONY: kind-up
 kind-up: ## Create the Kubernetes cluster by kind
 	@KIND_CLUSTER_NAME=$(KIND_CLUSTER_NAME) ./test/scripts/kind.sh

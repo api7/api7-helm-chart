@@ -22,12 +22,21 @@ func (f *Framework) InstallChart(dir, name string, args ...string) error {
 		return err
 	}
 
-	args = append([]string{"install", name, ".", "-n", f.config.Namespace}, args...)
-	cmd := exec.Command("helm", args...)
+	// helm dependency update
+	cmd := exec.Command("helm", "dependency", "update", ".")
 	cmd.Dir = pwd + "/charts/" + dir
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("failed to install %s release: %v, output: %s", name, err, string(output))
+		return fmt.Errorf("failed to update dependency error: %v, output: %s", err, string(output))
+	}
+
+	// install chart
+	args = append([]string{"install", name, ".", "-n", f.config.Namespace}, args...)
+	cmd = exec.Command("helm", args...)
+	cmd.Dir = pwd + "/charts/" + dir
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		return fmt.Errorf("failed to install %s error: %v, output: %s", name, err, string(output))
 	}
 
 	return nil
