@@ -60,6 +60,34 @@ nginx:
   workerConnections: "10620"
   enableCPUAffinity: true
 
+admin:
+  enabled: true
+  ip: 0.0.0.0
+  port: 9180
+  servicePort: 9180
+#  nodePort: 9180
+  type: ClusterIP
+  annotations: {}
+  loadBalancerIP: ""
+#  loadBalancerSourceRanges: []
+  # -- Admin API credentials
+  credentials:
+    # -- Apache APISIX admin API admin role credentials
+    admin: edd1c9f034335f136f87ad84b625c8f1
+    # -- Apache APISIX admin API viewer role credentials
+    viewer: 4054f7cf07e344346cd3f287985e76a2
+    # -- The APISIX Helm chart supports storing user credentials in a secret.
+    # The secret needs to contain two keys, admin and viewer, with their respective values set.
+    secretName: ""
+    # -- Name of the admin role key in the secret, overrides the default key name "admin"
+    secretAdminKey: ""
+    # -- Name of the viewer role key in the secret, overrides the default key name "viewer"
+    secretViewerKey: ""
+  allow:
+    # -- The client IP CIDR allowed to access Apache APISIX Admin API service.
+    ipList:
+      - 127.0.0.1/24
+
 gateway:
   # Enable nginx IPv6 resolver
   enableIPv6: true
@@ -97,6 +125,7 @@ gateway:
   #  - secretName: apisix-tls
   #    hosts:
   #      - chart-example.local
+  luaModuleHook: "apisix.enterprise.init"
 
 # etcd configuration
 # use the FQDN address or the IP of the etcd
@@ -104,31 +133,34 @@ etcd:
   # install etcd(v3) by default, set false if do not want to install etcd(v3) together,
   # in such a case, etcd.host should be configured so that existing ETCD cluster can be
   # used.
-  builtin: false
+  builtin: true
+  replicaCount: 1
   hosts:
-    - http://etcd.host:2379 # host or ip e.g. http://172.20.128.89:2379
+    - http://etcd.api7.svc.cluster.local:2379 # host or ip e.g. http://172.20.128.89:2379
   prefix: "/api7"
   timeout: 30
-  defaultPort: 2379
+  service:
+    ports:
+      client: 2379
   auth:
     rbac:
       # No authentication by default
       enabled: false
+      create: false
       ## etcd user
-      ##
       user: ""
       ## etcd password
-      ##
       password: ""
     # Whether to set up secure transport to ETCD cluster.
     tls:
-      enalbed: false
+      enabled: false
       # An existing secret stores the credentials to communicate with ETCD cluster.
       existingSecret: ""
       # Certificate filename used to communicate ETCD cluster.
       certFilename: "tls.crt"
       # Private key filename used to communicate ETCD cluster.
       certKeyFilename: "tls.key"
+      certCAFilename: "ca.crt"
       verify: true
 
 discovery:
