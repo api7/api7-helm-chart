@@ -39,9 +39,9 @@ data:
     #
     apisix:
       node_listen: {{ .Values.gateway.http.port }}
-      lua_module_hook: "apisix.enterprise.init"
+      lua_module_hook: {{ .Values.gateway.luaModuleHook }}
       enable_heartbeat: true
-      enable_admin: false
+      enable_admin: {{ .Values.admin.enabled }}
       enable_admin_cors: true
       enable_debug: false
       enable_dev_mode: false          # Sets nginx worker_processes to 1 if set to true
@@ -159,28 +159,60 @@ data:
       stream_configuration_snippet: {{ toYaml .Values.configurationSnippet.stream | indent 6 }}
       {{- end }}
 
-    etcd:
-    {{- if .Values.etcd.builtin }}
-      host:                                 # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
-        - "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.port }}"
-    {{- else }}
-      host:                                 # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
-        {{- range $value := .Values.etcd.hosts }}
-        - "{{ $value }}"             # multiple etcd address
+    deployment:
+      {{- if .Values.admin.enabled }}
+      admin:
+        allow_admin:
+        {{- if .Values.admin.allow.ipList }}
+        {{- range $ips := .Values.admin.allow.ipList }}
+          - {{ $ips }}
         {{- end }}
-    {{- end }}
-      prefix: {{ .Values.etcd.prefix | quote }}     # apisix configurations prefix
-      timeout: {{ .Values.etcd.timeout }}   # 30 seconds
-      {{- if .Values.etcd.auth.rbac.enabled }}
-      user: {{ .Values.etcd.auth.rbac.user | quote }}
-      password: {{ .Values.etcd.auth.rbac.password | quote }}
+        {{- else }}
+          - 0.0.0.0/0
+        {{- end}}
+        admin_listen:
+          ip: {{ .Values.admin.ip }}
+          port: {{ .Values.admin.port }}
+        admin_key:
+        # admin: can everything for configuration data
+        - name: "admin"
+        {{- if .Values.admin.credentials.secretName }}
+          key: ${{"{{"}}APISIX_ADMIN_KEY{{"}}"}}
+        {{- else }}
+          key: {{ .Values.admin.credentials.admin }}
+        {{- end }}
+          role: admin
+        # viewer: only can view configuration data
+        - name: "viewer"
+        {{- if .Values.admin.credentials.secretName }}
+          key: ${{"{{"}}APISIX_VIEWER_KEY{{"}}"}}
+        {{- else }}
+          key: {{ .Values.admin.credentials.viewer }}
+        {{- end }}
+          role: viewer
       {{- end }}
-      {{- if .Values.etcd.auth.tls.enabled }}
-      tls:
-        cert: "/etcd-ssl/{{ .Values.etcd.auth.tls.certFilename }}"
-        key: "/etcd-ssl/{{ .Values.etcd.auth.tls.certKeyFilename }}"
-        verify: {{ .Values.etcd.auth.tls.verify }}
+      etcd:
+      {{- if .Values.etcd.builtin }}
+        host:                                 # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
+          - "http://{{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }}:{{ .Values.etcd.service.ports.client }}"
+      {{- else }}
+        host:                                 # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
+          {{- range $value := .Values.etcd.hosts }}
+          - "{{ $value }}"             # multiple etcd address
+          {{- end }}
       {{- end }}
+        prefix: {{ .Values.etcd.prefix | quote }}     # apisix configurations prefix
+        timeout: {{ .Values.etcd.timeout }}   # 30 seconds
+        {{- if .Values.etcd.auth.rbac.enabled }}
+        user: {{ .Values.etcd.auth.rbac.user | quote }}
+        password: {{ .Values.etcd.auth.rbac.password | quote }}
+        {{- end }}
+        {{- if .Values.etcd.auth.tls.enabled }}
+        tls:
+          cert: "/etcd-ssl/{{ .Values.etcd.auth.tls.certFilename }}"
+          key: "/etcd-ssl/{{ .Values.etcd.auth.tls.certKeyFilename }}"
+          verify: {{ .Values.etcd.auth.tls.verify }}
+        {{- end }}
 
     {{- if .Values.discovery.enabled }}
     discovery:

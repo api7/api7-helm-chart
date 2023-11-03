@@ -109,13 +109,33 @@ spec:
                 fieldRef:
                   apiVersion: v1
                   fieldPath: status.podIP
+            {{- if .Values.admin.credentials.secretName }}
+            - name: APISIX_ADMIN_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.admin.credentials.secretName | quote }}
+                  {{- if .Values.admin.credentials.secretAdminKey }}
+                  key: {{- .Values.admin.credentials.secretAdminKey }}
+                  {{- else }}
+                  key: {{- "admin" }}
+                  {{- end }}
+            - name: APISIX_VIEWER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.admin.credentials.secretName | quote }}
+                  {{- if .Values.admin.credentials.secretViewerKey }}
+                  key: {{- .Values.admin.credentials.secretViewerKey }}
+                  {{- else }}
+                  key: {{- "viewer" }}
+                  {{- end }}
+            {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
       {{- if .Values.etcd.builtin }}
       initContainers:
       - name: wait-etcd
         image: "{{ .Values.busybox.image.registry }}/{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-        command: ['sh', '-c', "until nc -zw 1 {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }} {{ .Values.etcd.defaultPort }}; do echo waiting for etcd `date`; sleep 2; done;"]
+        command: ['sh', '-c', "until nc -zw 1 {{ .Release.Name }}-etcd.{{ .Release.Namespace }}.svc.{{ .Values.clusterDomain }} {{ .Values.etcd.service.ports.client }}; do echo waiting for etcd `date`; sleep 2; done;"]
       {{- end }}
       volumes:
         - configMap:
