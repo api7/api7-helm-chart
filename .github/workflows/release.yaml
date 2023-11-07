@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - api7-charts
 
 jobs:
   release:
