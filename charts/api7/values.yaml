@@ -1,0 +1,303 @@
+# Default values for api7ee3.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+dashboard:
+  replicaCount: 1
+  image:
+    repository: hkccr.ccs.tencentyun.com/api7/api7-ee-3-integrated
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "dev"
+
+dp_manager:
+  replicaCount: 1
+  image:
+    repository: hkccr.ccs.tencentyun.com/api7/api7-ee-dp-manager
+    pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+    tag: "dev"
+
+imagePullSecret: ""
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+dashboard_service:
+  type: ClusterIP
+  port: 7080
+
+dp_manager_service:
+  type: ClusterIP
+  port: 7900
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+busybox:
+  image:
+    repository: docker.io/busybox
+    tag: 1.28
+
+etcd:
+  builtin: true
+
+keycloak:
+  builtin: true
+  postgresql:
+    primary:
+      initdb:
+        init_scripts: ""
+
+prometheus:
+  builtin: true
+  alertmanager:
+    enabled: false
+  server:
+    enableRemoteWriteReceiver: true
+    enableAdminAPI: true
+    service:
+      type: ClusterIP
+
+apisix:
+  builtin: true
+  apisix:
+    image:
+      repository: hkccr.ccs.tencentyun.com/api7/api7-ee-3-gateway
+      pullPolicy: IfNotPresent
+      tag: dev
+  deployment:
+    mode: traditional
+    role: traditional
+  admin:
+    enabled: false
+  plugins:
+    - api7-agent
+    - api7-traffic-split
+    - real-ip
+    - ai
+    - client-control
+    - proxy-buffering
+    - proxy-control
+    - request-id
+    - zipkin
+    - ext-plugin-pre-req
+    - fault-injection
+    - mocking
+    - serverless-pre-function
+    - cors
+    - ip-restriction
+    - ua-restriction
+    - referer-restriction
+    - csrf
+    - uri-blocker
+    - request-validation
+    - openid-connect
+    - cas-auth
+    - authz-casbin
+    - authz-casdoor
+    - wolf-rbac
+    - ldap-auth
+    - hmac-auth
+    - basic-auth
+    - jwt-auth
+    - key-auth
+    - consumer-restriction
+    - forward-auth
+    - opa
+    - authz-keycloak
+    - proxy-cache
+    - graphql-proxy-cache
+    - body-transformer
+    - proxy-mirror
+    - proxy-rewrite
+    - workflow
+    - api-breaker
+    - graphql-limit-count
+    - limit-conn
+    - limit-count
+    - limit-req
+    - traffic-label
+    - gzip
+    - traffic-split
+    - redirect
+    - response-rewrite
+    - degraphql
+    - kafka-proxy
+    - grpc-transcode
+    - grpc-web
+    - soap
+    - public-api
+    - prometheus
+    - datadog
+    - elasticsearch-logger
+    - echo
+    - loggly
+    - http-logger
+    - splunk-hec-logging
+    - skywalking-logger
+    - google-cloud-logging
+    - sls-logger
+    - tcp-logger
+    - kafka-logger
+    - rocketmq-logger
+    - syslog
+    - udp-logger
+    - file-logger
+    - clickhouse-logger
+    - tencent-cloud-cls
+    - inspect
+    - example-plugin
+    - aws-lambda
+    - azure-functions
+    - openwhisk
+    - openfunction
+    - serverless-post-function
+    - ext-plugin-post-req
+    - ext-plugin-post-resp
+  etcd:
+    enabled: false
+    host:
+      - http://api7ee3-dp-manager:7900
+    user: "api7ee_readonly"
+    password: "changeme"
+    prefix: "/gateway_groups/default"
+
+dashboard_configuration:
+  server:
+    listen:
+      host: "0.0.0.0"
+      port: 7080
+    cors:
+      enabled: false
+      access_control_allow_origin: "*"
+      access_control_allow_credentials: "false"
+      access_control_allow_headers: "*"
+      access_control_allow_methods: "*"
+  gateway_group:
+    control_plane_endpoints:
+      - http://api7ee3-dp-manager:7900
+    domain_suffix: eu-central-1.api7.cloud
+  keycloak:
+    username: "kc_admin"
+    password: "4a5524de-27e8-42a8-a538-7485c4b86331"
+    realm: "master"
+    url: "http://api7ee3-keycloak:80"
+    client_id: "5778c01f-2236-4261-92e9-a7ca4eb180b7"
+    client_secret: "f840329b-1653-4336-a95a-d0cc5aa54a91"
+  session_options_config:
+    same_site: "none"  # means the value SameSiteNoneMode
+    secure: true
+  authentication_config:
+    session_secret: "123456"
+  user_manager:
+    oidc_provider: "keycloak"
+    logout_url: "https://login.api7.ai/v2/logout"
+  oauth2_config:
+    client_id: "5778c01f-2236-4261-92e9-a7ca4eb180b7"
+    client_secret: "f840329b-1653-4336-a95a-d0cc5aa54a91"
+    callback_url: ""
+    auth0_issuer: ""
+    auth0_connection: ""
+    redirect_url: ""
+    issuer: "http://api7ee3-keycloak/realms/master"
+  log:
+    level: info
+    output: stderr
+  database:
+    type: postgres
+    postgres:
+      addr: api7ee3-postgresql:5432
+      user: api7ee
+      password: "changeme"
+      database: api7ee
+  etcd:
+    auth:
+      username: ""
+      password: ""
+    readonly_auth:
+      username: "api7ee_readonly"
+      password: "changeme"
+    endpoints:
+      - http://api7ee3-etcd:2379
+    # server_ca_path: "/path/to/etcd/ca.crt"
+    # client_cert_path: "/path/to/etcd/tls.crt"
+    # client_key_path: "/path/to/etcd/tls.key"
+  prometheus:
+    addr: "http://api7ee3-prometheus-server:9090"
+    whitelist:
+      - "/api/v1/query_range"
+      - "/api/v1/query"
+      - "/api/v1/format_query"
+      - "/api/v1/series"
+      - "/api/v1/labels"
+  console:
+    addr: "http://127.0.0.1:3000"
+
+dp_manager_configuration:
+  server:
+    listen:
+      host: "0.0.0.0"
+      port: 7900
+    status_listen:
+      host: "0.0.0.0"
+      port: 7901
+  log:
+    level: info
+    output: stderr
+  database:
+    type: postgres
+    postgres:
+      addr: api7ee3-postgresql:5432
+      user: api7ee
+      password: "changeme"
+      database: api7ee
+  etcd:
+    auth:
+      username: ""
+      password: ""
+    endpoints:
+      - http://api7ee3-etcd:2379
+    # server_ca_path: "/path/to/etcd/ca.crt"
+    # client_cert_path: "/path/to/etcd/tls.crt"
+    # client_key_path: "/path/to/etcd/tls.key"
+  prometheus:
+    addr: "http://api7ee3-prometheus-server:9090"
+
+
