@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-dp-manager
+  labels:
+    {{- include "api7ee3.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.dp_manager.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "api7ee3.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: dp-manager
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "api7ee3.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: dp-manager
+    spec:
+      {{- if .Values.imagePullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecret }}
+      {{- end }}
+      serviceAccountName: {{ include "api7ee3.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "api7ee3.fullname" . }}-dp-manager-config
+      initContainers:
+        - name: wait-for-dashboard
+          image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
+          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider {{ include "api7ee3.fullname" . }}-dashboard:{{ .Values.dashboard_service.port }}/healthz;do echo waiting for dashboard `date`; sleep 2; done;" ]
+      containers:
+        - name: dp-manager
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.dp_manager.image.repository }}:{{ .Values.dp_manager.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.dp_manager.image.pullPolicy }}
+          command:
+            - /usr/local/api7/api7-ee-dp-manager
+            - -c
+            - /api7-ee/config.yaml
+          ports:
+            - name: http
+              containerPort: {{ .Values.dp_manager_configuration.server.listen.port }}
+              protocol: TCP
+            - name: status
+              containerPort: {{ .Values.dp_manager_configuration.server.status_listen.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: status
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: status
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            failureThreshold: 30
+          volumeMounts:
+            - name: config
+              mountPath: /api7-ee
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

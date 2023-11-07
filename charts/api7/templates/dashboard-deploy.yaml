@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-dashboard
+  labels:
+    {{- include "api7ee3.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.dashboard.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "api7ee3.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: dashboard
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "api7ee3.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: dashboard
+    spec:
+      {{- if .Values.imagePullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecret }}
+      {{- end }}
+      serviceAccountName: {{ include "api7ee3.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "api7ee3.fullname" . }}-dashboard-config
+      initContainers:
+      {{- if .Values.etcd.builtin }}
+        - name: wait-for-etcd
+          image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
+          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider {{ index .Values.dashboard_configuration.etcd.endpoints 0 }}/version;do echo waiting for etcd `date`; sleep 2; done;" ]
+      {{- end }}
+      {{- if .Values.keycloak.builtin }}
+        - name: wait-for-keycloak
+          image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
+          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider {{ .Values.dashboard_configuration.keycloak.url }}/realms/master;do echo waiting for keycloak `date`; sleep 2; done;" ]
+      {{- end }}
+      {{- if .Values.prometheus.builtin }}
+        - name: wait-for-prometheus
+          image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
+          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider {{ .Values.dashboard_configuration.prometheus.addr }};do echo waiting for prometheus `date`; sleep 2; done;" ]
+      {{- end }}
+      containers:
+        - name: dashboard
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.dashboard.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 7080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            failureThreshold: 30
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            failureThreshold: 30
+          volumeMounts:
+            - name: config
+              mountPath: /app/conf
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

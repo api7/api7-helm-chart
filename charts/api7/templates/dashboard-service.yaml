@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-dashboard
+  labels:
+    {{- include "api7ee3.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.dashboard_service.type }}
+  ports:
+    - port: {{ .Values.dashboard_service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+
+  selector:
+    {{- include "api7ee3.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: dashboard

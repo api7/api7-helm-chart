@@ -1,0 +1,3 @@
+[submodule ".github/actions/chart-releaser-action"]
+	path = .github/actions/chart-releaser-action
+	url = https://github.com/helm/chart-releaser-action.git
