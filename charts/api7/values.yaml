@@ -95,7 +95,7 @@ prometheus:
     service:
       type: ClusterIP
 
-apisix:
+api7:
   builtin: true
   apisix:
     image:
