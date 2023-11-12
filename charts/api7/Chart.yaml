@@ -39,7 +39,7 @@ dependencies:
     version: "0.1.4"
     repository: "https://charts.bitnami.com/bitnami"
 
-  - name: apisix
-    condition: apisix.builtin
-    version: "1.4.0"
-    repository: "https://charts.apiseven.com"
+  - name: api7
+    condition: api7.builtin
+    version: "1.7.4"
+    repository: "https://charts.api7.ai"

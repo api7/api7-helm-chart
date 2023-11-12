@@ -8,8 +8,8 @@ dependencies:
 - name: prometheus
   repository: https://charts.bitnami.com/bitnami
   version: 0.1.4
-- name: apisix
-  repository: https://charts.apiseven.com
-  version: 1.4.0
-digest: sha256:74efeb106fd07da1c49b30f71da13fd9240da40e666da10cf0df3504e887dfea
-generated: "2023-06-13T15:25:38.031574107+08:00"
+- name: api7
+  repository: https://charts.api7.ai
+  version: 1.7.4
+digest: sha256:c3d04a7dc0046e1039172b7a0a0357a323f9553e46c0b3025959a3e4f5b931ec
+generated: "2023-11-09T10:39:16.919833326+08:00"
