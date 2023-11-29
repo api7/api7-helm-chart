@@ -1,0 +1,9 @@
+image:
+  registry: dev-image.nbport.com.cn
+  repository: api7/api7-gateway
+  tag: 2.13.2302
+
+etcd:
+  prefix: /api7/489396319882838838
+  hosts:
+    - http://api7-dashboard-etcd.api7.svc.cluster.local:2379
