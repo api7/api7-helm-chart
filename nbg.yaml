@@ -10,7 +10,6 @@ opensearch:
     tag: 1.3.7
   persistence:
     image: kubesphereio/busybox
-    # image: busybox
     imageTag: latest
 
 etcd:
@@ -26,7 +25,7 @@ prometheus:
       tag: v2.25.0
     sidecarContainers:
       confd:
-        image: docker.io/johz/confd:0.16.0
+        image: dev-image.nbport.com.cn/johz/confd:0.16.0
         imagePullPolicy: Always
         name: confd
         volumeMounts:
@@ -71,7 +70,7 @@ prometheus:
       tag: v0.22.2
     sidecarContainers:
       confd:
-        image: docker.io/johz/confd:0.16.0
+        image: dev-image.nbport.com.cn/johz/confd:0.16.0
         imagePullPolicy: Always
         name: confd
         volumeMounts:
@@ -110,3 +109,9 @@ prometheus:
     extraVolumes:
       - name: pod-shared
         emptyDir: {}
+
+grafana:
+  image:
+    registry: dev-image.nbport.com.cn
+    repository: grafana/grafana
+    tag: 7.3.7
