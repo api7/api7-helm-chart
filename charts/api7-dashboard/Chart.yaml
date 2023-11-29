@@ -35,7 +35,7 @@ dependencies:
     condition: prometheus.builtin
     repository: https://prometheus-community.github.io/helm-charts
   - name: grafana
-    version: 6.32.3
+    version: 6.61.2
     condition: grafana.builtin
     repository: https://grafana.github.io/helm-charts
   - name: opensearch
