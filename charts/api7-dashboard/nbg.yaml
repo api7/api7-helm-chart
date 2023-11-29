@@ -1,0 +1,106 @@
+image:
+  registry: dockerhub.kubekey.local
+  tag: 2.13.2302
+
+opensearch:
+  global:
+    dockerRegistry: docker.io
+  image:
+    repository: opensearchproject/opensearch
+    tag: 1.3.7
+  persistence:
+    # image: kubesphereio/busybox
+    image: busybox
+    imageTag: latest
+
+etcd:
+  image:
+    registry: dockerhub.kubekey.local
+    repository: bitnami/etcd
+    tag: 3.5.4-debian-11-r9
+
+prometheus:
+  server:
+    image:
+      repository: dockerhub.kubekey.local/prom/prometheus
+      tag: v2.25.0
+    sidecarContainers:
+      confd:
+        image: docker.io/johz/confd:0.16.0
+        imagePullPolicy: Always
+        name: confd
+        volumeMounts:
+        - mountPath: /etc/confd/confd.toml
+          name: server-confd-config
+          subPath: confd.toml
+        - mountPath: /etc/confd/conf.d/api7.alertmanager.yaml.toml
+          name: server-confd-config
+          subPath: api7.alertmanager.yaml.toml
+        - mountPath: /etc/confd/templates/api7.alertmanager.yaml.tmpl
+          name: server-confd-config
+          subPath: api7.alertmanager.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.rules.yaml.toml
+          name: server-confd-config
+          subPath: api7.rules.yaml.toml
+        - mountPath: /etc/confd/templates/api7.rules.yaml.tmpl
+          name: server-confd-config
+          subPath: api7.rules.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.prometheus.yaml.toml
+          name: server-confd-config
+          subPath: api7.prometheus.yaml.toml
+        - mountPath: /etc/confd/templates/api7.prometheus.yaml.tmpl
+          name: server-confd-config
+          subPath: api7.prometheus.yaml.tmpl
+        - mountPath: /root/
+          name: pod-shared
+    extraConfigmapMounts:
+      - configMap: confd-config
+        name: confd-config
+        mountPath: /etc/confd/conf.d/api7.prometheus.yaml.toml
+        subPath: api7.prometheus.yaml.toml
+        readOnly: true
+    extraVolumeMounts:
+      - name: pod-shared
+        mountPath: /etc/config/
+    extraVolumes:
+      - name: pod-shared
+        emptyDir: {}
+  alertmanager:
+    image:
+      repository: dockerhub.kubekey.local/prom/alertmanager
+      tag: v0.22.2
+    sidecarContainers:
+      confd:
+        image: docker.io/johz/confd:0.16.0
+        imagePullPolicy: Always
+        name: confd
+        volumeMounts:
+        - mountPath: /etc/confd/confd.toml
+          name: confd-config
+          subPath: confd.toml
+        - mountPath: /etc/confd/conf.d/api7.alertmanager.yaml.toml
+          name: confd-config
+          subPath: api7.alertmanager.yaml.toml
+        - mountPath: /etc/confd/templates/api7.alertmanager.yaml.tmpl
+          name: confd-config
+          subPath: api7.alertmanager.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.rules.yaml.toml
+          name: confd-config
+          subPath: api7.rules.yaml.toml
+        - mountPath: /etc/confd/templates/api7.rules.yaml.tmpl
+          name: confd-config
+          subPath: api7.rules.yaml.tmpl
+        - mountPath: /etc/confd/conf.d/api7.prometheus.yaml.toml
+          name: confd-config
+          subPath: api7.prometheus.yaml.toml
+        - mountPath: /etc/confd/templates/api7.prometheus.yaml.tmpl
+          name: confd-config
+          subPath: api7.prometheus.yaml.tmpl
+        - mountPath: /root/
+          name: pod-shared
+    extraVolumeMounts:
+      - name: pod-shared
+        mountPath: /etc/config/
+    extraVolumes:
+      - name: pod-shared
+        emptyDir: {}

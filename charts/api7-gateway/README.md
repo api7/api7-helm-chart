@@ -24,9 +24,9 @@ Images for api7 is private and never should be uploaded to public image registri
 
 ```sh
 helm install api7-gateway . -n api7 \
-  --set image.repository=api7-gateway \
-  --set image.tag=2.8.2206 \
-  --set etcd.prefix=/api7/417074703081931549 \
+  --set image.repository=api7/api7-gateway \
+  --set image.tag=2.13.2302 \
+  --set etcd.prefix=/api7/489396319882838838 \
   --set etcd.hosts={http://api7-dashboard-etcd.api7.svc.cluster.local:2379} \
   --create-namespace
 ```
