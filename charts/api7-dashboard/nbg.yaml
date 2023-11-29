@@ -98,6 +98,12 @@ prometheus:
           subPath: api7.prometheus.yaml.tmpl
         - mountPath: /root/
           name: pod-shared
+    extraConfigmapMounts:
+      - configMap: confd-config
+        name: confd-config
+        mountPath: /etc/confd/conf.d/api7.prometheus.yaml.toml
+        subPath: api7.prometheus.yaml.toml
+        readOnly: true
     extraVolumeMounts:
       - name: pod-shared
         mountPath: /etc/config/
