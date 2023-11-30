@@ -190,8 +190,6 @@ spec:
           resources:
 {{ toYaml .Values.server.resources | indent 12 }}
           volumeMounts:
-            - name: config-volume
-              mountPath: /etc/config
             - name: storage-volume
               mountPath: {{ .Values.server.persistentVolume.mountPath }}
               subPath: "{{ .Values.server.persistentVolume.subPath }}"

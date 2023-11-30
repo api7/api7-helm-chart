@@ -20,7 +20,7 @@ description: Chart for APISEVEN Dashboard
 home: https://www.apiseven.com
 icon: https://static.apiseven.com/2020/05/Jietu20200312-103300-removebg-preview.png
 type: application
-version: 0.6.0
+version: 0.6.2
 appVersion: 2.13.2302
 maintainers:
   - email: chenjunxu@api7.ai

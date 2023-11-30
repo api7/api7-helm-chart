@@ -93,8 +93,6 @@ spec:
           resources:
 {{ toYaml .Values.alertmanager.resources | indent 12 }}
           volumeMounts:
-            - name: config-volume
-              mountPath: /etc/config
             - name: storage-volume
               mountPath: "{{ .Values.alertmanager.persistentVolume.mountPath }}"
               subPath: "{{ .Values.alertmanager.persistentVolume.subPath }}"
