@@ -32,16 +32,9 @@ spec:
           configMap:
             name: {{ include "api7ee3.fullname" . }}-dashboard-config
       initContainers:
-      {{- if .Values.etcd.builtin }}
-        - name: wait-for-etcd
+        - name: wait-for-postgresql
           image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider {{ index .Values.dashboard_configuration.etcd.endpoints 0 }}/version;do echo waiting for etcd `date`; sleep 2; done;" ]
-      {{- end }}
-      {{- if .Values.keycloak.builtin }}
-        - name: wait-for-keycloak
-          image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider {{ .Values.dashboard_configuration.keycloak.url }}/realms/master;do echo waiting for keycloak `date`; sleep 2; done;" ]
-      {{- end }}
+          command: [ 'sh', '-c', "until nc -z -v -w3 {{ .Values.postgresql.host }} {{ .Values.postgresql.port }}; do echo waiting for postgresql `date`; sleep 2; done;" ]
       {{- if .Values.prometheus.builtin }}
         - name: wait-for-prometheus
           image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
