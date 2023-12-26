@@ -108,8 +108,8 @@ dashboard_configuration:
       access_control_allow_headers: "*"
       access_control_allow_methods: "*"
   session_options_config:
-    same_site: "none"  # means the value SameSiteNoneMode
-    secure: true
+    same_site: "lax"  # means the value SameSiteNoneMode
+    secure: false
   authentication_config:
     session_secret: "changeme"
   user_manager:
