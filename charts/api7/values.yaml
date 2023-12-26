@@ -117,12 +117,6 @@ dashboard_configuration:
     logout_url: "https://login.api7.ai/v2/logout"
   login:
     source: DB
-  oauth2_config:
-    client_id: "5778c01f-2236-4261-92e9-a7ca4eb180b7"
-    client_secret: "f840329b-1653-4336-a95a-d0cc5aa54a91"
-    callback_url: ""
-    redirect_url: ""
-    issuer: "http://api7ee3-keycloak/realms/master"
   log:
     level: info
     output: stderr
