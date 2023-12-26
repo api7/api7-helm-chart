@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -8,9 +8,7 @@ A Helm chart for Kubernetes
 
 | Repository | Name | Version |
 |------------|------|---------|
-| https://charts.apiseven.com | apisix | 1.4.0 |
-| https://charts.bitnami.com/bitnami | etcd | 8.12.0 |
-| https://charts.bitnami.com/bitnami | keycloak | 15.1.3 |
+| https://charts.bitnami.com/bitnami | postgresql | 12.12.10 |
 | https://charts.bitnami.com/bitnami | prometheus | 0.1.4 |
 
 ## Values
@@ -18,101 +16,6 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
-| apisix.admin.enabled | bool | `false` |  |
-| apisix.apisix.image.pullPolicy | string | `"IfNotPresent"` |  |
-| apisix.apisix.image.repository | string | `"hkccr.ccs.tencentyun.com/api7/api7-ee-3-gateway"` |  |
-| apisix.apisix.image.tag | string | `"dev"` |  |
-| apisix.builtin | bool | `true` |  |
-| apisix.deployment.mode | string | `"traditional"` |  |
-| apisix.deployment.role | string | `"traditional"` |  |
-| apisix.etcd.enabled | bool | `false` |  |
-| apisix.etcd.host[0] | string | `"http://api7ee3-dp-manager:7900"` |  |
-| apisix.etcd.password | string | `"changeme"` |  |
-| apisix.etcd.prefix | string | `"/gateway_groups/default"` |  |
-| apisix.etcd.user | string | `"api7ee_readonly"` |  |
-| apisix.plugins[0] | string | `"api7-agent"` |  |
-| apisix.plugins[10] | string | `"fault-injection"` |  |
-| apisix.plugins[11] | string | `"mocking"` |  |
-| apisix.plugins[12] | string | `"serverless-pre-function"` |  |
-| apisix.plugins[13] | string | `"cors"` |  |
-| apisix.plugins[14] | string | `"ip-restriction"` |  |
-| apisix.plugins[15] | string | `"ua-restriction"` |  |
-| apisix.plugins[16] | string | `"referer-restriction"` |  |
-| apisix.plugins[17] | string | `"csrf"` |  |
-| apisix.plugins[18] | string | `"uri-blocker"` |  |
-| apisix.plugins[19] | string | `"request-validation"` |  |
-| apisix.plugins[1] | string | `"api7-traffic-split"` |  |
-| apisix.plugins[20] | string | `"openid-connect"` |  |
-| apisix.plugins[21] | string | `"cas-auth"` |  |
-| apisix.plugins[22] | string | `"authz-casbin"` |  |
-| apisix.plugins[23] | string | `"authz-casdoor"` |  |
-| apisix.plugins[24] | string | `"wolf-rbac"` |  |
-| apisix.plugins[25] | string | `"ldap-auth"` |  |
-| apisix.plugins[26] | string | `"hmac-auth"` |  |
-| apisix.plugins[27] | string | `"basic-auth"` |  |
-| apisix.plugins[28] | string | `"jwt-auth"` |  |
-| apisix.plugins[29] | string | `"key-auth"` |  |
-| apisix.plugins[2] | string | `"real-ip"` |  |
-| apisix.plugins[30] | string | `"consumer-restriction"` |  |
-| apisix.plugins[31] | string | `"forward-auth"` |  |
-| apisix.plugins[32] | string | `"opa"` |  |
-| apisix.plugins[33] | string | `"authz-keycloak"` |  |
-| apisix.plugins[34] | string | `"proxy-cache"` |  |
-| apisix.plugins[35] | string | `"graphql-proxy-cache"` |  |
-| apisix.plugins[36] | string | `"body-transformer"` |  |
-| apisix.plugins[37] | string | `"proxy-mirror"` |  |
-| apisix.plugins[38] | string | `"proxy-rewrite"` |  |
-| apisix.plugins[39] | string | `"workflow"` |  |
-| apisix.plugins[3] | string | `"ai"` |  |
-| apisix.plugins[40] | string | `"api-breaker"` |  |
-| apisix.plugins[41] | string | `"graphql-limit-count"` |  |
-| apisix.plugins[42] | string | `"limit-conn"` |  |
-| apisix.plugins[43] | string | `"limit-count"` |  |
-| apisix.plugins[44] | string | `"limit-req"` |  |
-| apisix.plugins[45] | string | `"traffic-label"` |  |
-| apisix.plugins[46] | string | `"gzip"` |  |
-| apisix.plugins[47] | string | `"traffic-split"` |  |
-| apisix.plugins[48] | string | `"redirect"` |  |
-| apisix.plugins[49] | string | `"response-rewrite"` |  |
-| apisix.plugins[4] | string | `"client-control"` |  |
-| apisix.plugins[50] | string | `"degraphql"` |  |
-| apisix.plugins[51] | string | `"kafka-proxy"` |  |
-| apisix.plugins[52] | string | `"grpc-transcode"` |  |
-| apisix.plugins[53] | string | `"grpc-web"` |  |
-| apisix.plugins[54] | string | `"soap"` |  |
-| apisix.plugins[55] | string | `"public-api"` |  |
-| apisix.plugins[56] | string | `"prometheus"` |  |
-| apisix.plugins[57] | string | `"datadog"` |  |
-| apisix.plugins[58] | string | `"elasticsearch-logger"` |  |
-| apisix.plugins[59] | string | `"echo"` |  |
-| apisix.plugins[5] | string | `"proxy-buffering"` |  |
-| apisix.plugins[60] | string | `"loggly"` |  |
-| apisix.plugins[61] | string | `"http-logger"` |  |
-| apisix.plugins[62] | string | `"splunk-hec-logging"` |  |
-| apisix.plugins[63] | string | `"skywalking-logger"` |  |
-| apisix.plugins[64] | string | `"google-cloud-logging"` |  |
-| apisix.plugins[65] | string | `"sls-logger"` |  |
-| apisix.plugins[66] | string | `"tcp-logger"` |  |
-| apisix.plugins[67] | string | `"kafka-logger"` |  |
-| apisix.plugins[68] | string | `"rocketmq-logger"` |  |
-| apisix.plugins[69] | string | `"syslog"` |  |
-| apisix.plugins[6] | string | `"proxy-control"` |  |
-| apisix.plugins[70] | string | `"udp-logger"` |  |
-| apisix.plugins[71] | string | `"file-logger"` |  |
-| apisix.plugins[72] | string | `"clickhouse-logger"` |  |
-| apisix.plugins[73] | string | `"tencent-cloud-cls"` |  |
-| apisix.plugins[74] | string | `"inspect"` |  |
-| apisix.plugins[75] | string | `"example-plugin"` |  |
-| apisix.plugins[76] | string | `"aws-lambda"` |  |
-| apisix.plugins[77] | string | `"azure-functions"` |  |
-| apisix.plugins[78] | string | `"openwhisk"` |  |
-| apisix.plugins[79] | string | `"openfunction"` |  |
-| apisix.plugins[7] | string | `"request-id"` |  |
-| apisix.plugins[80] | string | `"serverless-post-function"` |  |
-| apisix.plugins[81] | string | `"ext-plugin-post-req"` |  |
-| apisix.plugins[82] | string | `"ext-plugin-post-resp"` |  |
-| apisix.plugins[8] | string | `"zipkin"` |  |
-| apisix.plugins[9] | string | `"ext-plugin-pre-req"` |  |
 | busybox.image.repository | string | `"docker.io/busybox"` |  |
 | busybox.image.tag | float | `1.28` |  |
 | dashboard.image.pullPolicy | string | `"IfNotPresent"` |  |
@@ -126,23 +29,9 @@ A Helm chart for Kubernetes
 | dashboard_configuration.database.postgres.password | string | `"changeme"` |  |
 | dashboard_configuration.database.postgres.user | string | `"api7ee"` |  |
 | dashboard_configuration.database.type | string | `"postgres"` |  |
-| dashboard_configuration.etcd.auth.password | string | `""` |  |
-| dashboard_configuration.etcd.auth.username | string | `""` |  |
-| dashboard_configuration.etcd.endpoints[0] | string | `"http://api7ee3-etcd:2379"` |  |
-| dashboard_configuration.etcd.readonly_auth.password | string | `"changeme"` |  |
-| dashboard_configuration.etcd.readonly_auth.username | string | `"api7ee_readonly"` |  |
-| dashboard_configuration.gateway_group.control_plane_endpoints[0] | string | `"http://api7ee3-dp-manager:7900"` |  |
-| dashboard_configuration.gateway_group.domain_suffix | string | `"eu-central-1.api7.cloud"` |  |
-| dashboard_configuration.keycloak.client_id | string | `"5778c01f-2236-4261-92e9-a7ca4eb180b7"` |  |
-| dashboard_configuration.keycloak.client_secret | string | `"f840329b-1653-4336-a95a-d0cc5aa54a91"` |  |
-| dashboard_configuration.keycloak.password | string | `"4a5524de-27e8-42a8-a538-7485c4b86331"` |  |
-| dashboard_configuration.keycloak.realm | string | `"master"` |  |
-| dashboard_configuration.keycloak.url | string | `"http://api7ee3-keycloak:80"` |  |
-| dashboard_configuration.keycloak.username | string | `"kc_admin"` |  |
 | dashboard_configuration.log.level | string | `"info"` |  |
 | dashboard_configuration.log.output | string | `"stderr"` |  |
-| dashboard_configuration.oauth2_config.auth0_connection | string | `""` |  |
-| dashboard_configuration.oauth2_config.auth0_issuer | string | `""` |  |
+| dashboard_configuration.login.source | string | `"DB"` |  |
 | dashboard_configuration.oauth2_config.callback_url | string | `""` |  |
 | dashboard_configuration.oauth2_config.client_id | string | `"5778c01f-2236-4261-92e9-a7ca4eb180b7"` |  |
 | dashboard_configuration.oauth2_config.client_secret | string | `"f840329b-1653-4336-a95a-d0cc5aa54a91"` |  |
@@ -176,9 +65,6 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.database.postgres.password | string | `"changeme"` |  |
 | dp_manager_configuration.database.postgres.user | string | `"api7ee"` |  |
 | dp_manager_configuration.database.type | string | `"postgres"` |  |
-| dp_manager_configuration.etcd.auth.password | string | `""` |  |
-| dp_manager_configuration.etcd.auth.username | string | `""` |  |
-| dp_manager_configuration.etcd.endpoints[0] | string | `"http://api7ee3-etcd:2379"` |  |
 | dp_manager_configuration.log.level | string | `"info"` |  |
 | dp_manager_configuration.log.output | string | `"stderr"` |  |
 | dp_manager_configuration.prometheus.addr | string | `"http://api7ee3-prometheus-server:9090"` |  |
@@ -188,19 +74,23 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.server.status_listen.port | int | `7901` |  |
 | dp_manager_service.port | int | `7900` |  |
 | dp_manager_service.type | string | `"ClusterIP"` |  |
-| etcd.builtin | bool | `true` |  |
 | fullnameOverride | string | `""` |  |
 | imagePullSecret | string | `""` |  |
-| keycloak.builtin | bool | `true` |  |
-| keycloak.postgresql.primary.initdb.init_scripts | string | `""` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
 | podSecurityContext | object | `{}` |  |
+| postgresql.auth.database | string | `"api7ee"` |  |
+| postgresql.auth.password | string | `"changeme"` |  |
+| postgresql.auth.username | string | `"api7ee"` |  |
+| postgresql.builtin | bool | `true` |  |
+| postgresql.host | string | `"api7ee3-postgresql"` |  |
+| postgresql.port | int | `5432` |  |
 | prometheus.alertmanager.enabled | bool | `false` |  |
 | prometheus.builtin | bool | `true` |  |
 | prometheus.server.enableAdminAPI | bool | `true` |  |
 | prometheus.server.enableRemoteWriteReceiver | bool | `true` |  |
+| prometheus.server.service.ports.http | int | `9090` |  |
 | prometheus.server.service.type | string | `"ClusterIP"` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
