@@ -32,11 +32,6 @@ A Helm chart for Kubernetes
 | dashboard_configuration.log.level | string | `"info"` |  |
 | dashboard_configuration.log.output | string | `"stderr"` |  |
 | dashboard_configuration.login.source | string | `"DB"` |  |
-| dashboard_configuration.oauth2_config.callback_url | string | `""` |  |
-| dashboard_configuration.oauth2_config.client_id | string | `"5778c01f-2236-4261-92e9-a7ca4eb180b7"` |  |
-| dashboard_configuration.oauth2_config.client_secret | string | `"f840329b-1653-4336-a95a-d0cc5aa54a91"` |  |
-| dashboard_configuration.oauth2_config.issuer | string | `"http://api7ee3-keycloak/realms/master"` |  |
-| dashboard_configuration.oauth2_config.redirect_url | string | `""` |  |
 | dashboard_configuration.prometheus.addr | string | `"http://api7ee3-prometheus-server:9090"` |  |
 | dashboard_configuration.prometheus.whitelist[0] | string | `"/api/v1/query_range"` |  |
 | dashboard_configuration.prometheus.whitelist[1] | string | `"/api/v1/query"` |  |
