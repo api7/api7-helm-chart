@@ -5,18 +5,18 @@
 dashboard:
   replicaCount: 1
   image:
-    repository: hkccr.ccs.tencentyun.com/api7/api7-ee-3-integrated
+    repository: api7/api7-ee-3-integrated
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "dev"
+    tag: "v3.2.6.0"
 
 dp_manager:
   replicaCount: 1
   image:
-    repository: hkccr.ccs.tencentyun.com/api7/api7-ee-dp-manager
+    repository: api7/api7-ee-dp-manager
     pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "dev"
+    tag: "v3.2.6.0"
 
 imagePullSecret: ""
 nameOverride: ""
@@ -75,16 +75,6 @@ busybox:
     repository: docker.io/busybox
     tag: 1.28
 
-etcd:
-  builtin: true
-
-keycloak:
-  builtin: true
-  postgresql:
-    primary:
-      initdb:
-        init_scripts: ""
-
 prometheus:
   builtin: true
   alertmanager:
@@ -94,110 +84,17 @@ prometheus:
     enableAdminAPI: true
     service:
       type: ClusterIP
+      ports:
+        http: 9090
 
-apisix:
+postgresql:
+  host: api7ee3-postgresql
+  port: 5432
   builtin: true
-  apisix:
-    image:
-      repository: hkccr.ccs.tencentyun.com/api7/api7-ee-3-gateway
-      pullPolicy: IfNotPresent
-      tag: dev
-  deployment:
-    mode: traditional
-    role: traditional
-  admin:
-    enabled: false
-  plugins:
-    - api7-agent
-    - api7-traffic-split
-    - real-ip
-    - ai
-    - client-control
-    - proxy-buffering
-    - proxy-control
-    - request-id
-    - zipkin
-    - ext-plugin-pre-req
-    - fault-injection
-    - mocking
-    - serverless-pre-function
-    - cors
-    - ip-restriction
-    - ua-restriction
-    - referer-restriction
-    - csrf
-    - uri-blocker
-    - request-validation
-    - openid-connect
-    - cas-auth
-    - authz-casbin
-    - authz-casdoor
-    - wolf-rbac
-    - ldap-auth
-    - hmac-auth
-    - basic-auth
-    - jwt-auth
-    - key-auth
-    - consumer-restriction
-    - forward-auth
-    - opa
-    - authz-keycloak
-    - proxy-cache
-    - graphql-proxy-cache
-    - body-transformer
-    - proxy-mirror
-    - proxy-rewrite
-    - workflow
-    - api-breaker
-    - graphql-limit-count
-    - limit-conn
-    - limit-count
-    - limit-req
-    - traffic-label
-    - gzip
-    - traffic-split
-    - redirect
-    - response-rewrite
-    - degraphql
-    - kafka-proxy
-    - grpc-transcode
-    - grpc-web
-    - soap
-    - public-api
-    - prometheus
-    - datadog
-    - elasticsearch-logger
-    - echo
-    - loggly
-    - http-logger
-    - splunk-hec-logging
-    - skywalking-logger
-    - google-cloud-logging
-    - sls-logger
-    - tcp-logger
-    - kafka-logger
-    - rocketmq-logger
-    - syslog
-    - udp-logger
-    - file-logger
-    - clickhouse-logger
-    - tencent-cloud-cls
-    - inspect
-    - example-plugin
-    - aws-lambda
-    - azure-functions
-    - openwhisk
-    - openfunction
-    - serverless-post-function
-    - ext-plugin-post-req
-    - ext-plugin-post-resp
-  etcd:
-    enabled: false
-    host:
-      - http://api7ee3-dp-manager:7900
-    user: "api7ee_readonly"
-    password: "changeme"
-    prefix: "/gateway_groups/default"
+  auth:
+    username: api7ee
+    password: changeme
+    database: api7ee
 
 dashboard_configuration:
   server:
@@ -210,31 +107,20 @@ dashboard_configuration:
       access_control_allow_credentials: "false"
       access_control_allow_headers: "*"
       access_control_allow_methods: "*"
-  gateway_group:
-    control_plane_endpoints:
-      - http://api7ee3-dp-manager:7900
-    domain_suffix: eu-central-1.api7.cloud
-  keycloak:
-    username: "kc_admin"
-    password: "4a5524de-27e8-42a8-a538-7485c4b86331"
-    realm: "master"
-    url: "http://api7ee3-keycloak:80"
-    client_id: "5778c01f-2236-4261-92e9-a7ca4eb180b7"
-    client_secret: "f840329b-1653-4336-a95a-d0cc5aa54a91"
   session_options_config:
-    same_site: "none"  # means the value SameSiteNoneMode
-    secure: true
+    same_site: "lax"  # means the value SameSiteNoneMode
+    secure: false
   authentication_config:
-    session_secret: "123456"
+    session_secret: "changeme"
   user_manager:
     oidc_provider: "keycloak"
     logout_url: "https://login.api7.ai/v2/logout"
+  login:
+    source: DB
   oauth2_config:
     client_id: "5778c01f-2236-4261-92e9-a7ca4eb180b7"
     client_secret: "f840329b-1653-4336-a95a-d0cc5aa54a91"
     callback_url: ""
-    auth0_issuer: ""
-    auth0_connection: ""
     redirect_url: ""
     issuer: "http://api7ee3-keycloak/realms/master"
   log:
@@ -247,18 +133,8 @@ dashboard_configuration:
       user: api7ee
       password: "changeme"
       database: api7ee
-  etcd:
-    auth:
-      username: ""
-      password: ""
-    readonly_auth:
-      username: "api7ee_readonly"
-      password: "changeme"
-    endpoints:
-      - http://api7ee3-etcd:2379
-    # server_ca_path: "/path/to/etcd/ca.crt"
-    # client_cert_path: "/path/to/etcd/tls.crt"
-    # client_key_path: "/path/to/etcd/tls.key"
+    # max_idle_conns: 10
+    # max_open_conns: 30
   prometheus:
     addr: "http://api7ee3-prometheus-server:9090"
     whitelist:
@@ -288,16 +164,5 @@ dp_manager_configuration:
       user: api7ee
       password: "changeme"
       database: api7ee
-  etcd:
-    auth:
-      username: ""
-      password: ""
-    endpoints:
-      - http://api7ee3-etcd:2379
-    # server_ca_path: "/path/to/etcd/ca.crt"
-    # client_cert_path: "/path/to/etcd/tls.crt"
-    # client_key_path: "/path/to/etcd/tls.key"
   prometheus:
     addr: "http://api7ee3-prometheus-server:9090"
-
-
