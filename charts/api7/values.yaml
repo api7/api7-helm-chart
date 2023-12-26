@@ -5,18 +5,18 @@
 dashboard:
   replicaCount: 1
   image:
-    repository: hkccr.ccs.tencentyun.com/api7/api7-ee-3-integrated
+    repository: api7/api7-ee-3-integrated
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "dev"
+    tag: "v3.2.6.0"
 
 dp_manager:
   replicaCount: 1
   image:
-    repository: hkccr.ccs.tencentyun.com/api7/api7-ee-dp-manager
+    repository: api7/api7-ee-dp-manager
     pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "dev"
+    tag: "v3.2.6.0"
 
 imagePullSecret: ""
 nameOverride: ""
@@ -111,7 +111,7 @@ dashboard_configuration:
     same_site: "none"  # means the value SameSiteNoneMode
     secure: true
   authentication_config:
-    session_secret: "123456"
+    session_secret: "changeme"
   user_manager:
     oidc_provider: "keycloak"
     logout_url: "https://login.api7.ai/v2/logout"
