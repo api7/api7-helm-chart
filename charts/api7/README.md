@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -9,7 +9,7 @@ A Helm chart for Kubernetes
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | postgresql | 12.12.10 |
-| https://charts.bitnami.com/bitnami | prometheus | 0.1.4 |
+| https://charts.bitnami.com/bitnami | prometheus | 0.5.1 |
 
 ## Values
 
@@ -81,12 +81,19 @@ A Helm chart for Kubernetes
 | postgresql.builtin | bool | `true` |  |
 | postgresql.host | string | `"api7ee3-postgresql"` |  |
 | postgresql.port | int | `5432` |  |
+| postgresql.primary.persistence.size | string | `"256Gi"` |  |
+| postgresql.readReplicas.persistence.size | string | `"256Gi"` |  |
 | prometheus.alertmanager.enabled | bool | `false` |  |
 | prometheus.builtin | bool | `true` |  |
+| prometheus.server.configuration | string | `""` |  |
 | prometheus.server.enableAdminAPI | bool | `true` |  |
 | prometheus.server.enableRemoteWriteReceiver | bool | `true` |  |
+| prometheus.server.persistence.enabled | bool | `true` |  |
+| prometheus.server.persistence.size | string | `"120Gi"` |  |
+| prometheus.server.rbac.create | bool | `false` |  |
 | prometheus.server.service.ports.http | int | `9090` |  |
 | prometheus.server.service.type | string | `"ClusterIP"` |  |
+| prometheus.server.serviceAccount.create | bool | `false` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
 | serviceAccount.annotations | object | `{}` |  |
