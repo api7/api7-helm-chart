@@ -82,6 +82,10 @@ prometheus:
   server:
     enableRemoteWriteReceiver: true
     enableAdminAPI: true
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
     serviceAccount:
       create: false
     rbac:
@@ -102,6 +106,10 @@ postgresql:
   primary:
     persistence:
       size: 256Gi
+    podSecurityContext:
+      enabled: false
+    containerSecurityContext:
+      enabled: false
   readReplicas:
     persistence:
       size: 256Gi
