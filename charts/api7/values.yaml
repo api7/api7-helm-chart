@@ -101,10 +101,10 @@ postgresql:
   builtin: true
   primary:
     persistence:
-      size: 512Gi
+      size: 256Gi
   readReplicas:
     persistence:
-      size: 512Gi
+      size: 256Gi
   auth:
     username: api7ee
     password: changeme

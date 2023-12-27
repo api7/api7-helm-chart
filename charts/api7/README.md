@@ -81,8 +81,8 @@ A Helm chart for Kubernetes
 | postgresql.builtin | bool | `true` |  |
 | postgresql.host | string | `"api7ee3-postgresql"` |  |
 | postgresql.port | int | `5432` |  |
-| postgresql.primary.persistence.size | string | `"512Gi"` |  |
-| postgresql.readReplicas.persistence.size | string | `"512Gi"` |  |
+| postgresql.primary.persistence.size | string | `"256Gi"` |  |
+| postgresql.readReplicas.persistence.size | string | `"256Gi"` |  |
 | prometheus.alertmanager.enabled | bool | `false` |  |
 | prometheus.builtin | bool | `true` |  |
 | prometheus.server.configuration | string | `""` |  |
