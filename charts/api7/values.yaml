@@ -82,15 +82,29 @@ prometheus:
   server:
     enableRemoteWriteReceiver: true
     enableAdminAPI: true
+    serviceAccount:
+      create: false
+    rbac:
+      create: false
+    persistence:
+      enabled: true
+      size: 120Gi
     service:
       type: ClusterIP
       ports:
         http: 9090
+    configuration: ""
 
 postgresql:
   host: api7ee3-postgresql
   port: 5432
   builtin: true
+  primary:
+    persistence:
+      size: 256Gi
+  readReplicas:
+    persistence:
+      size: 256Gi
   auth:
     username: api7ee
     password: changeme

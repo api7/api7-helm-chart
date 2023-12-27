@@ -1,9 +1,9 @@
 dependencies:
 - name: prometheus
   repository: https://charts.bitnami.com/bitnami
-  version: 0.1.4
+  version: 0.5.1
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 12.12.10
-digest: sha256:6d0fae161d3148048fda2051df32ae93caf03d6718885c555961f67915629a1d
-generated: "2023-12-20T14:13:44.208746+08:00"
+digest: sha256:d549be7a94677d1d3b70748b8ebb0f8fb2a529c57a5ac9cc8d07a08298f29be0
+generated: "2023-12-27T11:58:16.494435714+08:00"
