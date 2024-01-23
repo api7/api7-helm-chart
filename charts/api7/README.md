@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.7.0](https://img.shields.io/badge/Version-0.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.8.0](https://img.shields.io/badge/Version-0.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -20,11 +20,11 @@ A Helm chart for Kubernetes
 | busybox.image.tag | float | `1.28` |  |
 | dashboard.image.pullPolicy | string | `"IfNotPresent"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.2.6.1"` |  |
+| dashboard.image.tag | string | `"v3.2.7.1"` |  |
 | dashboard.replicaCount | int | `1` |  |
 | dashboard_configuration.authentication_config.session_secret | string | `"changeme"` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
-| dashboard_configuration.database.postgres.addr | string | `"api7ee3-postgresql:5432"` |  |
+| dashboard_configuration.database.postgres.addr | string | `"api7-postgresql:5432"` |  |
 | dashboard_configuration.database.postgres.database | string | `"api7ee"` |  |
 | dashboard_configuration.database.postgres.password | string | `"changeme"` |  |
 | dashboard_configuration.database.postgres.user | string | `"api7ee"` |  |
@@ -32,7 +32,7 @@ A Helm chart for Kubernetes
 | dashboard_configuration.log.level | string | `"info"` |  |
 | dashboard_configuration.log.output | string | `"stderr"` |  |
 | dashboard_configuration.login.source | string | `"DB"` |  |
-| dashboard_configuration.prometheus.addr | string | `"http://api7ee3-prometheus-server:9090"` |  |
+| dashboard_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
 | dashboard_configuration.prometheus.whitelist[0] | string | `"/api/v1/query_range"` |  |
 | dashboard_configuration.prometheus.whitelist[1] | string | `"/api/v1/query"` |  |
 | dashboard_configuration.prometheus.whitelist[2] | string | `"/api/v1/format_query"` |  |
@@ -47,22 +47,20 @@ A Helm chart for Kubernetes
 | dashboard_configuration.server.listen.port | int | `7080` |  |
 | dashboard_configuration.session_options_config.same_site | string | `"lax"` |  |
 | dashboard_configuration.session_options_config.secure | bool | `false` |  |
-| dashboard_configuration.user_manager.logout_url | string | `"https://login.api7.ai/v2/logout"` |  |
-| dashboard_configuration.user_manager.oidc_provider | string | `"keycloak"` |  |
 | dashboard_service.port | int | `7080` |  |
 | dashboard_service.type | string | `"ClusterIP"` |  |
 | dp_manager.image.pullPolicy | string | `"IfNotPresent"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.2.6.1"` |  |
+| dp_manager.image.tag | string | `"v3.2.7.1"` |  |
 | dp_manager.replicaCount | int | `1` |  |
-| dp_manager_configuration.database.postgres.addr | string | `"api7ee3-postgresql:5432"` |  |
+| dp_manager_configuration.database.postgres.addr | string | `"api7-postgresql:5432"` |  |
 | dp_manager_configuration.database.postgres.database | string | `"api7ee"` |  |
 | dp_manager_configuration.database.postgres.password | string | `"changeme"` |  |
 | dp_manager_configuration.database.postgres.user | string | `"api7ee"` |  |
 | dp_manager_configuration.database.type | string | `"postgres"` |  |
 | dp_manager_configuration.log.level | string | `"info"` |  |
 | dp_manager_configuration.log.output | string | `"stderr"` |  |
-| dp_manager_configuration.prometheus.addr | string | `"http://api7ee3-prometheus-server:9090"` |  |
+| dp_manager_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
 | dp_manager_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | dp_manager_configuration.server.listen.port | int | `7900` |  |
 | dp_manager_configuration.server.status_listen.host | string | `"0.0.0.0"` |  |
@@ -79,12 +77,14 @@ A Helm chart for Kubernetes
 | postgresql.auth.password | string | `"changeme"` |  |
 | postgresql.auth.username | string | `"api7ee"` |  |
 | postgresql.builtin | bool | `true` |  |
-| postgresql.host | string | `"api7ee3-postgresql"` |  |
-| postgresql.port | int | `5432` |  |
+| postgresql.fullnameOverride | string | `"api7-postgresql"` |  |
 | postgresql.primary.persistence.size | string | `"256Gi"` |  |
+| postgresql.primary.service.ports.postgresql | int | `5432` |  |
 | postgresql.readReplicas.persistence.size | string | `"256Gi"` |  |
+| postgresql.readReplicas.service.ports.postgresql | int | `5432` |  |
 | prometheus.alertmanager.enabled | bool | `false` |  |
 | prometheus.builtin | bool | `true` |  |
+| prometheus.fullnameOverride | string | `"api7-prometheus"` |  |
 | prometheus.server.configuration | string | `""` |  |
 | prometheus.server.enableAdminAPI | bool | `true` |  |
 | prometheus.server.enableRemoteWriteReceiver | bool | `true` |  |
