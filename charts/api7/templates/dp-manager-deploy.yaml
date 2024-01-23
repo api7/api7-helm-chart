@@ -35,6 +35,8 @@ spec:
         - name: wait-for-dashboard
           image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
           command: [ 'sh', '-c', "until wget --timeout=3 -q --spider {{ include "api7ee3.fullname" . }}-dashboard:{{ .Values.dashboard_service.port }}/healthz;do echo waiting for dashboard `date`; sleep 2; done;" ]
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
       containers:
         - name: dp-manager
           securityContext:
