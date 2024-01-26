@@ -1,0 +1,36 @@
+## API7 Gateway for Kubernetes
+
+API7 Gateway is a dynamic, real-time, high-performance API gateway.
+
+API7 Gateway provides rich traffic management features such as load balancing, dynamic upstream, canary release, circuit breaking, authentication, observability, and more.
+
+You can use API7 Gateway to handle traditional north-south traffic, as well as east-west traffic between services.
+
+This chart bootstraps all the components needed to run API7 Gateway on a Kubernetes Cluster using [Helm](https://helm.sh).
+
+## Prerequisites
+
+* Kubernetes v1.14+
+* Helm v3+
+
+## Install
+
+```sh
+helm repo add api7 https://charts.api7.ai
+helm repo update
+
+helm install [RELEASE_NAME] api7/gateway --namespace api7 --create-namespace
+```
+
+## Uninstall
+
+ ```sh
+helm delete [RELEASE_NAME] --namespace api7
+ ```
+
+The command removes all the Kubernetes components associated with the chart and deletes the release.
+
+
+## Parameters
+
+{{ template "chart.valuesSection" . }}

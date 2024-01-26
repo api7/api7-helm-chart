@@ -1,0 +1,23 @@
+{{- if and (eq .Values.deployment.mode "decoupled") (eq .Values.deployment.role "control_plane") }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "apisix.fullname" . }}-control-plane
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- range $key, $value := .Values.admin.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  labels:
+    {{- include "apisix.labels" . | nindent 4 }}
+    app.kubernetes.io/service: apisix-control-plane
+spec:
+  type: "ClusterIP"
+  ports:
+  - name: apisix-control-plane
+    port: {{ .Values.deployment.controlPlane.confServerPort }}
+    targetPort: {{ .Values.deployment.controlPlane.confServerPort }}
+    protocol: TCP
+  selector:
+    {{- include "apisix.selectorLabels" . | nindent 4 }}
+{{ end }}

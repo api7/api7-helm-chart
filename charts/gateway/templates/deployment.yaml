@@ -1,0 +1,21 @@
+{{- if and (.Values.apisix.enabled) (eq .Values.apisix.kind "Deployment") }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "apisix.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "apisix.labels" . | nindent 4 }}
+spec:
+{{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.apisix.replicaCount }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "apisix.selectorLabels" . | nindent 6 }}
+  {{- if .Values.updateStrategy }}
+  strategy: {{ toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+  {{- include "apisix.podTemplate" . | nindent 4 }}
+{{- end }}
