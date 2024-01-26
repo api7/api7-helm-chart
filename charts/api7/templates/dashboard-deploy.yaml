@@ -43,7 +43,7 @@ spec:
         {{- if .Values.prometheus.builtin }}
         - name: wait-for-prometheus
           image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider http://{{ .Values.prometheus.fullnameOverride }}:{{ .Values.prometheus.server.service.ports.http }}; do echo waiting for builtin prometheus service `date`; sleep 2; done;" ]
+          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider http://{{ .Values.prometheus.fullnameOverride }}-server:{{ .Values.prometheus.server.service.ports.http }}; do echo waiting for builtin prometheus service `date`; sleep 2; done;" ]
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
         {{- end }}
