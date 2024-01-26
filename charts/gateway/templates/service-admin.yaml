@@ -1,0 +1,43 @@
+{{ if (and .Values.apisix.enabled .Values.admin.enabled) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "apisix.fullname" . }}-admin
+  namespace: {{ .Release.Namespace }}
+  annotations:
+    {{- range $key, $value := .Values.admin.annotations }}
+      {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  labels:
+    {{- include "apisix.labels" . | nindent 4 }}
+    app.kubernetes.io/service: apisix-admin
+spec:
+  type: {{ .Values.admin.type }}
+  {{- if eq .Values.admin.type "LoadBalancer" }}
+  {{- if .Values.admin.loadBalancerIP }}
+  loadBalancerIP: {{ .Values.admin.loadBalancerIP }}
+  {{- end }}
+  {{- if .Values.admin.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+  {{- range $cidr := .Values.admin.loadBalancerSourceRanges }}
+  - {{ $cidr }}
+  {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if gt (len .Values.admin.externalIPs) 0 }}
+  externalIPs:
+  {{- range $ip := .Values.admin.externalIPs }}
+  - {{ $ip }}
+  {{- end }}
+  {{- end }}
+  ports:
+  - name: apisix-admin
+    port: {{ .Values.admin.servicePort }}
+    targetPort: {{ .Values.admin.port }}
+  {{- if (and (eq .Values.admin.type "NodePort") (not (empty .Values.admin.nodePort))) }}
+    nodePort: {{ .Values.admin.nodePort }}
+  {{- end }}
+    protocol: TCP
+  selector:
+    {{- include "apisix.selectorLabels" . | nindent 4 }}
+{{ end }}

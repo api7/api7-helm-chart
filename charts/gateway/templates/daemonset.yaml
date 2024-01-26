@@ -1,0 +1,18 @@
+{{- if and (.Values.apisix.enabled) (eq .Values.apisix.kind "DaemonSet") }}
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ include "apisix.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "apisix.labels" . | nindent 4 }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "apisix.selectorLabels" . | nindent 6 }}
+  {{- if .Values.updateStrategy }}
+  updateStrategy: {{ toYaml .Values.updateStrategy | nindent 4 }}
+  {{- end }}
+  template:
+  {{- include "apisix.podTemplate" . | nindent 4 }}
+{{- end }}
