@@ -6,4 +6,5 @@ Detailed instructions are enrolled in the README of each chart.
 
 ## Projects
 
-* [api7-gateway](./charts/api7/README.md)
+* [api7-control-plane](./charts/api7/README.md)
+* [api7-gateway](./charts/gateway/README.md)
