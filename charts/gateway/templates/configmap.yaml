@@ -324,6 +324,12 @@ data:
           key: "/etcd-ssl/{{ .Values.etcd.auth.tls.certKeyFilename }}"
           verify: {{ .Values.etcd.auth.tls.verify }}
           sni: "{{ .Values.etcd.auth.tls.sni }}"
+        {{- else }}
+        tls:
+          verify: {{ .Values.etcd.auth.tls.verify }}
+          {{- if ne .Values.etcd.auth.tls.sni "" }}
+          sni: "{{ .Values.etcd.auth.tls.sni }}"
+          {{- end }}
         {{- end }}
     {{- end }}
     {{- end }}
