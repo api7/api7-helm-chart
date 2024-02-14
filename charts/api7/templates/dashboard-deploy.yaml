@@ -36,14 +36,14 @@ spec:
         {{- if .Values.postgresql.builtin }}
         - name: wait-for-postgresql
           image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-          command: [ 'sh', '-c', "until nc -z -v -w3 api7-postgresql 5432; do echo waiting for postgresql `date`; sleep 2; done;" ]
+          command: [ 'sh', '-c', "until nc -z -v -w3 {{ .Values.postgresql.fullnameOverride }} {{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for builtin postgresql service `date`; sleep 2; done;" ]
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
         {{- end }}
         {{- if .Values.prometheus.builtin }}
         - name: wait-for-prometheus
           image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider http://api7-prometheus-server:9090;do echo waiting for prometheus `date`; sleep 2; done;" ]
+          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider http://{{ .Values.prometheus.fullnameOverride }}-server:{{ .Values.prometheus.server.service.ports.http }}; do echo waiting for builtin prometheus service `date`; sleep 2; done;" ]
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
         {{- end }}
