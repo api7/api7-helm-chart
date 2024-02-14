@@ -8,7 +8,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.7.1"
+    tag: "v3.2.8.1"
 
 dp_manager:
   replicaCount: 1
@@ -16,7 +16,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.7.1"
+    tag: "v3.2.8.1"
 
 imagePullSecret: ""
 nameOverride: ""
@@ -130,20 +130,13 @@ dashboard_configuration:
   session_options_config:
     same_site: "lax"  # means the value SameSiteNoneMode
     secure: false
-  authentication_config:
-    session_secret: "changeme"
   login:
     source: DB
   log:
-    level: info
+    level: warn
     output: stderr
   database:
-    type: postgres
-    postgres:
-      addr: api7-postgresql:5432
-      user: api7ee
-      password: "changeme"
-      database: api7ee
+    dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     # max_idle_conns: 10
     # max_open_conns: 30
   prometheus:
@@ -166,14 +159,11 @@ dp_manager_configuration:
       host: "0.0.0.0"
       port: 7901
   log:
-    level: info
+    level: warn
     output: stderr
   database:
-    type: postgres
-    postgres:
-      addr: api7-postgresql:5432
-      user: api7ee
-      password: "changeme"
-      database: api7ee
+    dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
+    # max_idle_conns: 10
+    # max_open_conns: 30
   prometheus:
     addr: "http://api7-prometheus-server:9090"
