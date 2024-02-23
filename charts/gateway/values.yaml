@@ -541,7 +541,7 @@ etcd:
       # -- etcd client cert key filename using in etcd.auth.tls.existingSecret
       certKeyFilename: ""
       # -- whether to verify the etcd endpoint certificate when setup a TLS connection to etcd
-      verify: true
+      verify: false
       # -- specify the TLS Server Name Indication extension, the ETCD endpoint hostname will be used when this setting is unset.
       sni: ""
 
