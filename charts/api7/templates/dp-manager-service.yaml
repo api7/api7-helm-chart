@@ -11,10 +11,10 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-    - port: {{ .Values.dp_manager_configuration.server.status_listen.port }}
-      targetPort: status
+    - port: {{ .Values.dp_manager_service.tlsPort }}
+      targetPort: https
       protocol: TCP
-      name: status
+      name: https
 
   selector:
     {{- include "api7ee3.selectorLabels" . | nindent 4 }}
