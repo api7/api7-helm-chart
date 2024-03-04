@@ -51,20 +51,20 @@ spec:
             - name: http
               containerPort: {{ .Values.dp_manager_configuration.server.listen.port }}
               protocol: TCP
-            - name: status
-              containerPort: {{ .Values.dp_manager_configuration.server.status_listen.port }}
+            - name: https
+              containerPort: {{ .Values.dp_manager_configuration.server.tls.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
-              port: status
+              port: http
             initialDelaySeconds: 1
             periodSeconds: 2
             failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /healthz
-              port: status
+              port: http
             initialDelaySeconds: 1
             periodSeconds: 2
             failureThreshold: 30

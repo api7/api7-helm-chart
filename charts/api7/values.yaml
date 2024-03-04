@@ -8,7 +8,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.8.1"
+    tag: "v3.2.9.0"
 
 dp_manager:
   replicaCount: 1
@@ -16,7 +16,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.8.1"
+    tag: "v3.2.9.0"
 
 imagePullSecret: ""
 nameOverride: ""
@@ -51,6 +51,7 @@ dashboard_service:
 dp_manager_service:
   type: ClusterIP
   port: 7900
+  tlsPort: 7943
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -121,12 +122,6 @@ dashboard_configuration:
     listen:
       host: "0.0.0.0"
       port: 7080
-    cors:
-      enabled: false
-      access_control_allow_origin: "*"
-      access_control_allow_credentials: "false"
-      access_control_allow_headers: "*"
-      access_control_allow_methods: "*"
   session_options_config:
     same_site: "lax"  # means the value SameSiteNoneMode
     secure: false
@@ -155,9 +150,9 @@ dp_manager_configuration:
     listen:
       host: "0.0.0.0"
       port: 7900
-    status_listen:
+    tls:
       host: "0.0.0.0"
-      port: 7901
+      port: 7943
   log:
     level: warn
     output: stderr
