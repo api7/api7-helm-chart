@@ -2,6 +2,7 @@ kind: ConfigMap
 apiVersion: v1
 metadata:
   name: {{ include "api7ee3.fullname" . }}-dp-manager-config
+  namespace: {{ .Release.Namespace | quote }}
 data:
   config.yaml: |
   {{- toYaml .Values.dp_manager_configuration | nindent 4 }}
