@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ include "api7ee3.fullname" . }}-dp-manager
+  namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "api7ee3.labels" . | nindent 4 }}
 spec:
