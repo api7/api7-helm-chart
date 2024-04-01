@@ -32,6 +32,11 @@ spec:
         - name: config
           configMap:
             name: {{ include "api7ee3.fullname" . }}-dashboard-config
+      {{- if .Values.dashboard.keyCertSecret }}
+        - name: ssl
+          secret:
+            secretName: {{ .Values.dashboard.keyCertSecret | quote }}
+      {{- end }}
       {{- if or .Values.postgresql.builtin .Values.prometheus.builtin }}
       initContainers:
         {{- if .Values.postgresql.builtin }}
@@ -57,25 +62,35 @@ spec:
           imagePullPolicy: {{ .Values.dashboard.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: 7080
+              containerPort: {{ .Values.dashboard_configuration.server.listen.port }}
+              protocol: TCP
+            - name: https
+              containerPort: {{ .Values.dashboard_configuration.server.tls.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
-              port: http
+              port: {{ if not .Values.dashboard_configuration.server.listen.disable }}http{{ else }}https{{ end }}
+              scheme: {{ if not .Values.dashboard_configuration.server.listen.disable }}HTTP{{ else }}HTTPS{{ end }}
             initialDelaySeconds: 1
             periodSeconds: 2
             failureThreshold: 30
           readinessProbe:
             httpGet:
               path: /healthz
-              port: http
+              port: {{ if not .Values.dashboard_configuration.server.listen.disable }}http{{ else }}https{{ end }}
+              scheme: {{ if not .Values.dashboard_configuration.server.listen.disable }}HTTP{{ else }}HTTPS{{ end }}
             initialDelaySeconds: 1
             periodSeconds: 2
             failureThreshold: 30
           volumeMounts:
             - name: config
               mountPath: /app/conf
+          {{- if .Values.dashboard.keyCertSecret }}
+            - mountPath: /app/certs
+              name: ssl
+              readOnly: true
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
 

@@ -4,11 +4,13 @@
 
 dashboard:
   replicaCount: 1
+  # Specifies the name of Secret for dashboard TLS configuration, and files store under /app/certs directory
+  keyCertSecret: ""
   image:
     repository: api7/api7-ee-3-integrated
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.9.1"
+    tag: "v3.2.9.2"
 
 dp_manager:
   replicaCount: 1
@@ -16,7 +18,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.9.1"
+    tag: "v3.2.9.2"
 
 imagePullSecret: ""
 nameOverride: ""
@@ -47,6 +49,7 @@ securityContext: {}
 dashboard_service:
   type: ClusterIP
   port: 7080
+  tlsPort: 7443
 
 dp_manager_service:
   type: ClusterIP
@@ -120,8 +123,15 @@ postgresql:
 dashboard_configuration:
   server:
     listen:
+      disable: false
       host: "0.0.0.0"
       port: 7080
+    tls:
+      disable: false
+      host: "0.0.0.0"
+      port: 7443
+      key_file: ""    # the file path of private key, (e.g. /app/certs/tls.key)
+      cert_file: ""   # the file path of certificate, (e.g. /app/certs/tls.crt)
   session_options_config:
     same_site: "lax"  # means the value SameSiteNoneMode
     secure: false

@@ -12,6 +12,10 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    - port: {{ .Values.dashboard_service.tlsPort }}
+      targetPort: https
+      protocol: TCP
+      name: https
 
   selector:
     {{- include "api7ee3.selectorLabels" . | nindent 4 }}
