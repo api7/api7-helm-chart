@@ -34,7 +34,7 @@ A Helm chart for Kubernetes
 | dashboard_configuration.prometheus.whitelist[2] | string | `"/api/v1/format_query"` |  |
 | dashboard_configuration.prometheus.whitelist[3] | string | `"/api/v1/series"` |  |
 | dashboard_configuration.prometheus.whitelist[4] | string | `"/api/v1/labels"` |  |
-| dashboard_configuration.server.listen.disable | bool | `false` |  |
+| dashboard_configuration.server.listen.disable | bool | `true` |  |
 | dashboard_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | dashboard_configuration.server.listen.port | int | `7080` |  |
 | dashboard_configuration.server.tls.cert_file | string | `""` |  |
