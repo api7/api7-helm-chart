@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.12.1](https://img.shields.io/badge/Version-0.12.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.12.2](https://img.shields.io/badge/Version-0.12.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -20,7 +20,8 @@ A Helm chart for Kubernetes
 | busybox.image.tag | float | `1.28` |  |
 | dashboard.image.pullPolicy | string | `"IfNotPresent"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.2.9.1"` |  |
+| dashboard.image.tag | string | `"v3.2.9.2"` |  |
+| dashboard.keyCertSecret | string | `""` |  |
 | dashboard.replicaCount | int | `1` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
 | dashboard_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
@@ -33,15 +34,22 @@ A Helm chart for Kubernetes
 | dashboard_configuration.prometheus.whitelist[2] | string | `"/api/v1/format_query"` |  |
 | dashboard_configuration.prometheus.whitelist[3] | string | `"/api/v1/series"` |  |
 | dashboard_configuration.prometheus.whitelist[4] | string | `"/api/v1/labels"` |  |
+| dashboard_configuration.server.listen.disable | bool | `true` |  |
 | dashboard_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | dashboard_configuration.server.listen.port | int | `7080` |  |
+| dashboard_configuration.server.tls.cert_file | string | `""` |  |
+| dashboard_configuration.server.tls.disable | bool | `false` |  |
+| dashboard_configuration.server.tls.host | string | `"0.0.0.0"` |  |
+| dashboard_configuration.server.tls.key_file | string | `""` |  |
+| dashboard_configuration.server.tls.port | int | `7443` |  |
 | dashboard_configuration.session_options_config.same_site | string | `"lax"` |  |
 | dashboard_configuration.session_options_config.secure | bool | `false` |  |
 | dashboard_service.port | int | `7080` |  |
+| dashboard_service.tlsPort | int | `7443` |  |
 | dashboard_service.type | string | `"ClusterIP"` |  |
 | dp_manager.image.pullPolicy | string | `"IfNotPresent"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.2.9.1"` |  |
+| dp_manager.image.tag | string | `"v3.2.9.2"` |  |
 | dp_manager.replicaCount | int | `1` |  |
 | dp_manager_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dp_manager_configuration.log.level | string | `"warn"` |  |
