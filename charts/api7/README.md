@@ -20,7 +20,7 @@ A Helm chart for Kubernetes
 | busybox.image.tag | float | `1.28` |  |
 | dashboard.image.pullPolicy | string | `"IfNotPresent"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.2.9.4"` |  |
+| dashboard.image.tag | string | `"v3.2.9.5"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.replicaCount | int | `1` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
@@ -49,7 +49,7 @@ A Helm chart for Kubernetes
 | dashboard_service.type | string | `"ClusterIP"` |  |
 | dp_manager.image.pullPolicy | string | `"IfNotPresent"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.2.9.4"` |  |
+| dp_manager.image.tag | string | `"v3.2.9.5"` |  |
 | dp_manager.replicaCount | int | `1` |  |
 | dp_manager_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dp_manager_configuration.log.level | string | `"warn"` |  |
