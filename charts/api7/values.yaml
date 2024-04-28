@@ -8,7 +8,7 @@ dashboard:
   keyCertSecret: ""
   image:
     repository: api7/api7-ee-3-integrated
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v3.2.10.1"
 
@@ -16,7 +16,7 @@ dp_manager:
   replicaCount: 1
   image:
     repository: api7/api7-ee-dp-manager
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
     tag: "v3.2.10.1"
 

@@ -61,7 +61,7 @@ apisix:
     # -- API7 Gateway image repository
     repository: api7/api7-ee-3-gateway
     # -- API7 Gateway image pull policy
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
     tag: 3.2.7.1
