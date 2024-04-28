@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.12.7](https://img.shields.io/badge/Version-0.12.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.12.8](https://img.shields.io/badge/Version-0.12.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -18,7 +18,7 @@ A Helm chart for Kubernetes
 | affinity | object | `{}` |  |
 | busybox.image.repository | string | `"docker.io/busybox"` |  |
 | busybox.image.tag | float | `1.28` |  |
-| dashboard.image.pullPolicy | string | `"IfNotPresent"` |  |
+| dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
 | dashboard.image.tag | string | `"v3.2.10.1"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
@@ -47,7 +47,7 @@ A Helm chart for Kubernetes
 | dashboard_service.port | int | `7080` |  |
 | dashboard_service.tlsPort | int | `7443` |  |
 | dashboard_service.type | string | `"ClusterIP"` |  |
-| dp_manager.image.pullPolicy | string | `"IfNotPresent"` |  |
+| dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
 | dp_manager.image.tag | string | `"v3.2.10.1"` |  |
 | dp_manager.replicaCount | int | `1` |  |
