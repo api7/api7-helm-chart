@@ -138,7 +138,7 @@ config:
     adminKey: "a7adm-dMx6MQ0NvEbr1V1oC109ovU9r3AZ80966HDx83M48chS1951P0788e4029ef18499999f421c6aea370ae"
     clusterName: "default"
     # -- the APISIX admin API version. can be "v2" or "v3", default is "v2".
-    adminAPIVersion: "v2"
+    adminAPIVersion: "v3"
 
     # -- The APISIX Helm chart supports storing user credentials in a secret.
     # The secret needs to contain a single key for admin token with key adminKey by default.
