@@ -1,6 +1,6 @@
-# Apache APISIX ingress controller
+# Apache API7 ingress controller
 
-[APISIX Ingress controller](https://github.com/apache/apisix-ingress-controller/) for Kubernetes using Apache APISIX as a high performance reverse proxy and load balancer.
+[API7 Ingress controller](https://github.com/api7/api7-ingress-controller/) for Kubernetes using Apache APISIX as a high performance reverse proxy and load balancer.
 
 If you have installed multiple ingress controller, add the `kubernetes.io/ingress.class: apisix` annotation to your Ingress resources.
 
