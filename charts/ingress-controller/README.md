@@ -1,105 +1,12 @@
-# Apache API7 ingress controller
+# api7-ingress-controller
 
-[API7 Ingress controller](https://github.com/api7/api7-ingress-controller/) for Kubernetes using Apache APISIX as a high performance reverse proxy and load balancer.
+![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.0](https://img.shields.io/badge/AppVersion-2.0.0-informational?style=flat-square)
 
-If you have installed multiple ingress controller, add the `kubernetes.io/ingress.class: apisix` annotation to your Ingress resources.
+Ingress Controller for API7
 
-This chart bootstraps an apisix-ingress-controller deployment on a [Kubernetes](http://kubernetes.io) cluster using the [Helm](https://helm.sh) package manager.
+## Source Code
 
-## Prerequisites
-
-Apisix ingress controller requires Kubernetes version 1.16+.
-
-## Get Repo Info
-
-```console
-helm repo add apisix https://charts.apiseven.com
-helm repo update
-```
-
-## Install Chart
-
-**Important:** only helm3 is supported
-
-```console
-helm install [RELEASE_NAME] apisix/apisix-ingress-controller --namespace ingress-apisix --create-namespace
-```
-
-The command deploys apisix-ingress-controller on the Kubernetes cluster in the default configuration.
-
-_See [configuration](#configuration) below._
-
-_See [helm install](https://helm.sh/docs/helm/helm_install/) for command documentation._
-
-## Uninstall Chart
-
-```console
-helm uninstall [RELEASE_NAME] --namespace ingress-apisix
-```
-
-This removes all the Kubernetes components associated with the chart and deletes the release.
-
-_See [helm uninstall](https://helm.sh/docs/helm/helm_uninstall/) for command documentation._
-
-## Upgrading Chart
-
-```console
-helm upgrade [RELEASE_NAME] [CHART] --install
-```
-
-_See [helm upgrade](https://helm.sh/docs/helm/helm_upgrade/) for command documentation._
-
-## Configuration
-
-See [Customizing the Chart Before Installing](https://helm.sh/docs/intro/using_helm/#customizing-the-chart-before-installing). To see all configurable options with detailed comments, visit the chart's [values.yaml](./values.yaml), or run these configuration commands:
-
-```console
-helm show values apisix/apisix-ingress-controller
-```
-
-### Pod priority
-
-`priorityClassName` field referenced a name of a created `PriorityClass` object. Check [here](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption) for more details.
-
-### Security context
-
-A security context provides us with a way to define privilege and access control for a Pod or even at the container level.
-
-Check [here](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.23/#securitycontext-v1-core) to see the SecurityContext resource with more detail.
-
-Check also [here](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) to see a full explanation and some examples to configure the security context.
-
-Right below you have an example of the security context configuration. In this case, we define that all the processes in the container will run with user ID 1000.
-
-```yaml
-...
-
-spec:
-  securityContext:
-    runAsUser: 1000
-    runAsGroup: 3000
-...
-```
-
-The same for the group definition, where we define the primary group of 3000 for all processes.
-
-**It's quite important to know, if the `runAsGroup` is omited, the primary group will be root(0)**, which in some cases goes against some security policies.
-
-To define this configuration at the **pod level**, you need to set:
-
-```yaml
-    --set podSecurityContext.runAsUser=«VALUE»
-    --set podSecurityContext.runAsGroup=«VALUE»
-    ...
-```
-
-The same for container level, you need to set:
-
-```yaml
-    --set securityContext.runAsUser=«VALUE»
-    --set SecurityContext.runAsGroup=«VALUE»
-    ...
-```
+* <https://github.com/api7/api7-helm-chart>
 
 ## Values
 
@@ -113,13 +20,13 @@ The same for container level, you need to set:
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | autoscaling.version | string | `"v2"` | HPA version, the value is "v2" or "v2beta1", default "v2" |
 | clusterDomain | string | `"cluster.local"` |  |
-| config.apisix | object | `{"adminAPIVersion":"v2","adminKey":"edd1c9f034335f136f87ad84b625c8f1","clusterName":"default","existingSecret":"","existingSecretAdminKeyKey":"","serviceName":"apisix-admin","serviceNamespace":"ingress-apisix","servicePort":9180}` | APISIX related configurations. |
-| config.dashboard.adminAPIVersion | string | `"v2"` | the APISIX admin API version. can be "v2" or "v3", default is "v2". |
-| config.dashboard.existingSecret | string | `""` | The APISIX Helm chart supports storing user credentials in a secret. The secret needs to contain a single key for admin token with key adminKey by default. |
-| config.dashboard.existingSecretAdminKeyKey | string | `""` | Name of the admin token key in the secret, overrides the default key name "adminKey" |
-| config.dashboard.serviceName | string | `"apisix-admin"` | Enabling this value, overrides serviceName and serviceNamespace. serviceFullname: "apisix-admin.apisix.svc.local" |
 | config.apisixResourceSyncInterval | string | `"1h"` | Default interval for synchronizing Kubernetes resources to APISIX |
 | config.certFile | string | `"/etc/webhook/certs/cert.pem"` | the TLS certificate file path. |
+| config.dashboard | object | `{"adminAPIVersion":"v3","adminKey":"a7adm-dMx6MQ0NvEbr1V1oC109ovU9r3AZ80966HDx83M48chS1951P0788e4029ef18499999f421c6aea370ae","baseURL":"http://dashboard:7080","clusterName":"default","existingSecret":"","existingSecretAdminKeyKey":""}` | APISIX related configurations. |
+| config.dashboard.adminAPIVersion | string | `"v3"` | the APISIX admin API version. can be "v2" or "v3", default is "v2". |
+| config.dashboard.baseURL | string | `"http://dashboard:7080"` | Enabling this value, overrides serviceName and serviceNamespace. |
+| config.dashboard.existingSecret | string | `""` | The APISIX Helm chart supports storing user credentials in a secret. The secret needs to contain a single key for admin token with key adminKey by default. |
+| config.dashboard.existingSecretAdminKeyKey | string | `""` | Name of the admin token key in the secret, overrides the default key name "adminKey" |
 | config.enableProfiling | bool | `true` | enable profiling via web interfaces host:port/debug/pprof, default is true. |
 | config.httpListen | string | `":8080"` | the HTTP Server listen address, default is ":8080" |
 | config.httpsListen | string | `":8443"` | the HTTPS Server listen address, default is ":8443" |
@@ -135,7 +42,7 @@ The same for container level, you need to set:
 | config.kubernetes.ingressVersion | string | `"networking/v1"` | the supported ingress api group version, can be "networking/v1beta1", "networking/v1" (for Kubernetes version v1.19.0 or higher), and "extensions/v1beta1", default is "networking/v1". |
 | config.kubernetes.kubeconfig | string | `""` | the Kubernetes configuration file path, default is "", so the in-cluster configuration will be used. |
 | config.kubernetes.namespaceSelector | list | `[""]` | namespace_selector represent basis for selecting managed namespaces. the field is support since version 1.4.0 For example, "apisix.ingress=watching", so ingress will watching the namespaces which labels "apisix.ingress=watching" |
-| config.kubernetes.resyncInterval | string | `"6h"` | how long should apisix-ingress-controller re-synchronizes with Kubernetes, default is 6h, |
+| config.kubernetes.resyncInterval | string | `"6h"` | how long should api7-ingress-controller re-synchronizes with Kubernetes, default is 6h, |
 | config.kubernetes.watchEndpointSlices | bool | `false` | whether to watch EndpointSlices rather than Endpoints. |
 | config.logLevel | string | `"info"` | the error log level, default is info, optional values are: debug, info, warn, error, panic, fatal |
 | config.logOutput | string | `"stderr"` | the output file path of error log, default is stderr, when the file path is "stderr" or "stdout", logs are marshalled plainly, which is more readable for human; otherwise logs are marshalled in JSON format, which can be parsed by programs easily. |
@@ -160,14 +67,12 @@ The same for container level, you need to set:
 | gateway.tls.servicePort | int | `443` |  |
 | gateway.tls.sslProtocols | string | `"TLSv1.2 TLSv1.3"` | TLS protocols allowed to use. |
 | gateway.type | string | `"NodePort"` | Apache APISIX service type for user access itself |
-| image.pullPolicy | string | `"IfNotPresent"` |  |
-| image.repository | string | `"apache/apisix-ingress-controller"` |  |
-| image.tag | string | `"1.8.0"` |  |
+| image.pullPolicy | string | `"Always"` |  |
+| image.repository | string | `"api7/api7-ingress-controller"` |  |
+| image.tag | string | `"dev"` |  |
 | imagePullSecrets | list | `[]` |  |
-| initContainer.image | string | `"busybox"` |  |
-| initContainer.tag | float | `1.28` |  |
 | labelsOverride | object | `{}` | Override default labels assigned to Apache APISIX ingress controller resource |
-| nameOverride | string | `""` | Default values for apisix-ingress-controller. This is a YAML-formatted file. Declare variables to be passed into your templates.  |
+| nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
 | podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":1,"minAvailable":"90%"}` | See https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more details |
@@ -191,3 +96,4 @@ The same for container level, you need to set:
 | tolerations | list | `[]` |  |
 | topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment spread across your cluster among failure-domains ref: https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/#spread-constraints-for-pods |
 | updateStrategy | object | `{}` | Update strategy for apisix ingress controller deployment |
+

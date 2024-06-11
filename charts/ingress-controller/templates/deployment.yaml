@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "apisix-ingress-controller.fullname" . }}
+  name: {{ include "api7-ingress-controller.fullname" . }}
   namespace: {{ .Release.Namespace }}
   annotations:
   {{- range $key, $value := .Values.annotations }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
   labels:
-    {{- include "apisix-ingress-controller.labels" . | nindent 4 }}
+    {{- include "api7-ingress-controller.labels" . | nindent 4 }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "apisix-ingress-controller.selectorLabels" . | nindent 6 }}
+      {{- include "api7-ingress-controller.selectorLabels" . | nindent 6 }}
   {{- with .Values.updateStrategy }}
   strategy: {{ toYaml . | nindent 4 }}
   {{- end }}
@@ -29,7 +29,7 @@ spec:
         {{- end }}
         {{- end }}
       labels:
-        {{- include "apisix-ingress-controller.selectorLabels" . | nindent 8 }}
+        {{- include "api7-ingress-controller.selectorLabels" . | nindent 8 }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -38,7 +38,7 @@ spec:
       {{- with .Values.priorityClassName }}
       priorityClassName: {{ . }}
       {{- end }}
-      serviceAccountName: {{ include "apisix-ingress-controller.serviceAccountName" . }}
+      serviceAccountName: {{ include "api7-ingress-controller.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
@@ -48,15 +48,6 @@ spec:
             items:
               - key: config.yaml
                 path: config.yaml
-      initContainers:
-        - name: wait-apisix-admin
-          image: {{ .Values.initContainer.image }}:{{ .Values.initContainer.tag }}
-          {{ if .Values.config.dashboard.baseURL }}
-          command: ['sh', '-c', "until nc -z dashboard 7080 ; do echo waiting for apisix-admin; sleep 2; done;"]
-          {{ end}}
-
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
       containers:
         - name: {{ .Chart.Name }}
           command:
@@ -100,7 +91,7 @@ spec:
             valueFrom:
               secretKeyRef:
                 name: {{ .Values.config.dashboard.existingSecret | quote }}
-                key: {{ include "apisix-ingress-controller.credentials.secretAdminKey" . }}
+                key: {{ include "api7-ingress-controller.credentials.secretAdminKey" . }}
           {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:

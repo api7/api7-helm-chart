@@ -6,7 +6,7 @@ fullnameOverride: ""
 labelsOverride: {}
 # labelsOverride:
 #   app.kubernetes.io/name: "{{ .Release.Name }}"
-#   app.kubernetes.io/instance: '{{ include "apisix-ingress-controller.name" . }}'
+#   app.kubernetes.io/instance: '{{ include "api7-ingress-controller.name" . }}'
 
 # -- Add annotations to Apache APISIX ingress controller resource
 annotations: {}
@@ -28,7 +28,7 @@ serviceAccount:
 replicaCount: 1
 
 image:
-  repository: 127.0.0.1:5000/api7-ingress-controller
+  repository: api7/api7-ingress-controller
   pullPolicy: Always
   tag: "dev"
 
@@ -76,7 +76,7 @@ config:
     # -- the Kubernetes configuration file path, default is "", so the in-cluster
     # configuration will be used.
     kubeconfig: ""
-    # -- how long should apisix-ingress-controller re-synchronizes with Kubernetes,
+    # -- how long should api7-ingress-controller re-synchronizes with Kubernetes,
     # default is 6h,
     resyncInterval: "6h"
     # -- namespace_selector represent basis for selecting managed namespaces.
@@ -126,10 +126,6 @@ config:
     existingSecretAdminKeyKey: ""
 
 resources: {}
-
-initContainer:
-  image: busybox
-  tag: 1.28
 
 autoscaling:
   enabled: false

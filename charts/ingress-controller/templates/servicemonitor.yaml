@@ -2,7 +2,7 @@
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: {{ template "apisix-ingress-controller.fullname" . }}
+  name: {{ template "api7-ingress-controller.fullname" . }}
   {{- if .Values.serviceMonitor.namespace }}
   namespace: {{ .Values.serviceMonitor.namespace }}
   {{- end }}
@@ -24,10 +24,10 @@ spec:
     {{- end }}
   namespaceSelector:
     matchNames:
-    - {{ template "apisix-ingress-controller.namespace" . }}
+    - {{ template "api7-ingress-controller.namespace" . }}
 
   selector:
     matchLabels:
-      {{- include "apisix-ingress-controller.labels" . | nindent 6 }}
+      {{- include "api7-ingress-controller.labels" . | nindent 6 }}
 {{- end }}
 
