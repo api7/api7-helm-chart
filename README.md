@@ -8,3 +8,4 @@ Detailed instructions are enrolled in the README of each chart.
 
 * [api7-control-plane](./charts/api7/README.md)
 * [api7-gateway](./charts/gateway/README.md)
+* [api7-ingress-controller](./charts/ingress-controller/README.md)
