@@ -465,6 +465,29 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-0.2.0/api7ee3-0.2.0.tgz
     version: 0.2.0
+  apisix-ingress-controller:
+  - annotations:
+      artifacthub.io/prerelease: "false"
+    apiVersion: v2
+    appVersion: 1.8.0
+    created: "2024-06-11T06:19:12.239142987Z"
+    description: Apache APISIX Ingress Controller for Kubernetes
+    digest: c5069e074fdf3c785d3d50a870d8dfe507d9366996749b92d2e82da043017efa
+    icon: https://apache.org/logos/res/apisix/apisix.png
+    keywords:
+    - ingress
+    - apisix
+    - nginx
+    - crd
+    maintainers:
+    - name: tao12345666333
+    name: apisix-ingress-controller
+    sources:
+    - https://github.com/apache/apisix-helm-chart
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/apisix-ingress-controller-0.14.0/apisix-ingress-controller-0.14.0.tgz
+    version: 0.14.0
   gateway:
   - apiVersion: v2
     appVersion: 3.2.0
@@ -541,4 +564,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2024-06-06T15:05:46.902909753Z"
+generated: "2024-06-11T06:19:12.239202007Z"
