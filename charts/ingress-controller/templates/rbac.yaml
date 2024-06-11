@@ -126,6 +126,6 @@ roleRef:
   name: {{ .Release.Name }}-clusterrole
 subjects:
   - kind: ServiceAccount
-    name: {{ include "apisix-ingress-controller.serviceAccountName" . }}
+    name: {{ include "api7-ingress-controller.serviceAccountName" . }}
     namespace: {{ .Release.Namespace }}
 {{- end }}

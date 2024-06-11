@@ -1,14 +1,14 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "apisix-ingress-controller.fullname" . }}-apisix-gateway
+  name: {{ include "api7-ingress-controller.fullname" . }}-apisix-gateway
   namespace: {{ .Release.Namespace }}
   annotations:
     {{- range $key, $value := .Values.gateway.annotations }}
       {{ $key }}: {{ $value | quote }}
     {{- end }}
   labels:
-    {{- include "apisix-ingress-controller.labels" . | nindent 4 }}
+    {{- include "api7-ingress-controller.labels" . | nindent 4 }}
 spec:
   ports:
     - name: http
@@ -20,7 +20,7 @@ spec:
       port: {{ .Values.gateway.tls.servicePort }}
       targetPort: {{ .Values.gateway.tls.containerPort }}
   selector:
-    {{- include "apisix-ingress-controller.selectorLabels" . | nindent 4 }}
+    {{- include "api7-ingress-controller.selectorLabels" . | nindent 4 }}
   type: {{ .Values.gateway.type }} # LoadBalancer or NodePort
   {{- if or (eq .Values.gateway.type "LoadBalancer") (eq .Values.gateway.type "NodePort") }}
   externalTrafficPolicy: {{ .Values.gateway.externalTrafficPolicy }}

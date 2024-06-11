@@ -1,0 +1,12 @@
+apiVersion: v2
+name: api7-ingress-controller
+description: Ingress Controller for API7
+keywords:
+  - ingress
+  - api7
+  - crd
+type: application
+version: 0.0.0
+appVersion: 2.0.0
+sources:
+  - https://github.com/api7/api7-helm-chart
