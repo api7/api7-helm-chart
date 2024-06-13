@@ -50,11 +50,41 @@ dashboard_service:
   type: ClusterIP
   port: 7080
   tlsPort: 7443
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: dashboard.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: dashboard-tls
+    #    hosts:
+    #      - dashboard.local
 
 dp_manager_service:
   type: ClusterIP
   port: 7900
   tlsPort: 7943
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: dp-manager.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+    tls: []
+    #  - secretName: dp-manager-tls
+    #    hosts:
+    #      - dp-manager.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
