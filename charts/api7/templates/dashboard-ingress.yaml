@@ -1,5 +1,5 @@
 {{- if .Values.dashboard_service.ingress.enabled -}}
-{{- $fullName := include "api7ee3.fullname" . -}}
+{{- $fullName := include "api7ee3.fullname" . -}}-dashboard
 {{- $svcPort := .Values.dashboard_service.port -}}
 {{- if and .Values.dashboard_service.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.dashboard_service.ingress.annotations "kubernetes.io/ingress.class") }}
