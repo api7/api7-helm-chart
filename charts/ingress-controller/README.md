@@ -69,7 +69,7 @@ Ingress Controller for API7
 | gateway.type | string | `"NodePort"` | Apache APISIX service type for user access itself |
 | image.pullPolicy | string | `"Always"` |  |
 | image.repository | string | `"api7/api7-ingress-controller"` |  |
-| image.tag | string | `"dev"` |  |
+| image.tag | string | `"2.0.0"` |  |
 | imagePullSecrets | list | `[]` |  |
 | labelsOverride | object | `{}` | Override default labels assigned to Apache APISIX ingress controller resource |
 | nameOverride | string | `""` |  |
