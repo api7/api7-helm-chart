@@ -30,7 +30,7 @@ replicaCount: 1
 image:
   repository: api7/api7-ingress-controller
   pullPolicy: Always
-  tag: "dev"
+  tag: "2.0.0"
 
 podAnnotations: {}
 
