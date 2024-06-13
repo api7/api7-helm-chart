@@ -1,5 +1,5 @@
 {{- if .Values.dp_manager_service.ingress.enabled -}}
-{{- $fullName := include "api7ee3.fullname" . -}}
+{{- $fullName := include "api7ee3.fullname" . -}}-dp-manager
 {{- $svcPort := .Values.dp_manager_service.port -}}
 {{- if and .Values.dp_manager_service.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.dp_manager_service.ingress.annotations "kubernetes.io/ingress.class") }}
