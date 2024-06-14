@@ -59,6 +59,31 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.enabled | bool | `true` | Enable or disable API7 Gateway itself |
 | apisix.extraEnvVars | list | `[]` | extraEnvVars An array to add extra env vars e.g: extraEnvVars:   - name: FOO     value: "bar"   - name: FOO2     valueFrom:       secretKeyRef:         name: SECRET_NAME         key: KEY |
 | apisix.hostNetwork | bool | `false` |  |
+| apisix.http.luaSharedDict.access-tokens | string | `"1m"` |  |
+| apisix.http.luaSharedDict.balancer-ewma | string | `"10m"` |  |
+| apisix.http.luaSharedDict.balancer-ewma-last-touched-at | string | `"10m"` |  |
+| apisix.http.luaSharedDict.balancer-ewma-locks | string | `"10m"` |  |
+| apisix.http.luaSharedDict.cas-auth | string | `"10m"` |  |
+| apisix.http.luaSharedDict.discovery | string | `"1m"` |  |
+| apisix.http.luaSharedDict.etcd-cluster-health-check | string | `"10m"` |  |
+| apisix.http.luaSharedDict.ext-plugin | string | `"1m"` |  |
+| apisix.http.luaSharedDict.internal-status | string | `"10m"` |  |
+| apisix.http.luaSharedDict.introspection | string | `"10m"` |  |
+| apisix.http.luaSharedDict.jwks | string | `"1m"` |  |
+| apisix.http.luaSharedDict.lrucache-lock | string | `"10m"` |  |
+| apisix.http.luaSharedDict.plugin-api-breaker | string | `"10m"` |  |
+| apisix.http.luaSharedDict.plugin-graphql-limit-count | string | `"10m"` |  |
+| apisix.http.luaSharedDict.plugin-graphql-limit-count-reset-header | string | `"10m"` |  |
+| apisix.http.luaSharedDict.plugin-limit-conn | string | `"10m"` |  |
+| apisix.http.luaSharedDict.plugin-limit-count | string | `"10m"` |  |
+| apisix.http.luaSharedDict.plugin-limit-count-redis-cluster-slot-lock | string | `"1m"` |  |
+| apisix.http.luaSharedDict.plugin-limit-req | string | `"10m"` |  |
+| apisix.http.luaSharedDict.prometheus-metrics | string | `"10m"` |  |
+| apisix.http.luaSharedDict.saml_sessions | string | `"10m"` |  |
+| apisix.http.luaSharedDict.tars | string | `"1m"` |  |
+| apisix.http.luaSharedDict.tracing_buffer | string | `"10m"` |  |
+| apisix.http.luaSharedDict.upstream-healthcheck | string | `"10m"` |  |
+| apisix.http.luaSharedDict.worker-events | string | `"10m"` |  |
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
@@ -83,6 +108,12 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.resources | object | `{}` | Set pod resource requests & limits |
 | apisix.securityContext | object | `{}` | Set the securityContext for API7 Gateway container |
 | apisix.setIDFromPodUID | bool | `false` | Use Pod metadata.uid as the APISIX id. |
+| apisix.stream.luaSharedDict.config-stream | string | `"5m"` |  |
+| apisix.stream.luaSharedDict.etcd-cluster-health-check-stream | string | `"10m"` |  |
+| apisix.stream.luaSharedDict.lrucache-lock-stream | string | `"10m"` |  |
+| apisix.stream.luaSharedDict.plugin-limit-conn-stream | string | `"10m"` |  |
+| apisix.stream.luaSharedDict.tars-stream | string | `"1m"` |  |
+| apisix.stream.luaSharedDict.worker-events-stream | string | `"10m"` |  |
 | apisix.timezone | string | `""` | timezone is the timezone where apisix uses. For example: "UTC" or "Asia/Shanghai" This value will be set on apisix container's environment variable TZ. You may need to set the timezone to be consistent with your local time zone, otherwise the apisix's logs may used to retrieve event maybe in wrong timezone. |
 | apisix.tolerations | list | `[]` | List of node taints to tolerate |
 | autoscaling.enabled | bool | `false` |  |

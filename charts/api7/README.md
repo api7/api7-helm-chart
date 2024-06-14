@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.12.13](https://img.shields.io/badge/Version-0.12.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.13.2](https://img.shields.io/badge/Version-0.13.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -44,6 +44,13 @@ A Helm chart for Kubernetes
 | dashboard_configuration.server.tls.port | int | `7443` |  |
 | dashboard_configuration.session_options_config.same_site | string | `"lax"` |  |
 | dashboard_configuration.session_options_config.secure | bool | `false` |  |
+| dashboard_service.ingress.annotations | object | `{}` |  |
+| dashboard_service.ingress.className | string | `""` |  |
+| dashboard_service.ingress.enabled | bool | `false` |  |
+| dashboard_service.ingress.hosts[0].host | string | `"dashboard.local"` |  |
+| dashboard_service.ingress.hosts[0].paths[0].path | string | `"/"` |  |
+| dashboard_service.ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
+| dashboard_service.ingress.tls | list | `[]` |  |
 | dashboard_service.port | int | `7080` |  |
 | dashboard_service.tlsPort | int | `7443` |  |
 | dashboard_service.type | string | `"ClusterIP"` |  |
@@ -59,6 +66,13 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.server.listen.port | int | `7900` |  |
 | dp_manager_configuration.server.tls.host | string | `"0.0.0.0"` |  |
 | dp_manager_configuration.server.tls.port | int | `7943` |  |
+| dp_manager_service.ingress.annotations | object | `{}` |  |
+| dp_manager_service.ingress.className | string | `""` |  |
+| dp_manager_service.ingress.enabled | bool | `false` |  |
+| dp_manager_service.ingress.hosts[0].host | string | `"dp-manager.local"` |  |
+| dp_manager_service.ingress.hosts[0].paths[0].path | string | `"/"` |  |
+| dp_manager_service.ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
+| dp_manager_service.ingress.tls | list | `[]` |  |
 | dp_manager_service.port | int | `7900` |  |
 | dp_manager_service.tlsPort | int | `7943` |  |
 | dp_manager_service.type | string | `"ClusterIP"` |  |
