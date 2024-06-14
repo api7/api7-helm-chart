@@ -132,6 +132,11 @@ data:
         - {{ $env }}
       {{- end }}
       {{- end }}
+      stream:
+        {{- if .Values.apisix.stream.luaSharedDict }}
+        lua_shared_dict:
+          {{- toYaml .Values.apisix.stream.luaSharedDict | nindent 10 }}
+        {{- end }}
       http:
         enable_access_log: {{ .Values.logs.enableAccessLog }}
         {{- if .Values.logs.enableAccessLog }}
@@ -153,6 +158,10 @@ data:
         {{- range $dict := .Values.apisix.customLuaSharedDicts }}
           {{ $dict.name }}: {{ $dict.size }}
         {{- end }}
+        {{- end }}
+        {{- if .Values.apisix.http.luaSharedDict }}
+        lua_shared_dict:
+          {{- toYaml .Values.apisix.http.luaSharedDict | nindent 10 }}
         {{- end }}
       {{- if .Values.configurationSnippet.main }}
       main_configuration_snippet: {{- toYaml .Values.configurationSnippet.main | indent 6 }}
