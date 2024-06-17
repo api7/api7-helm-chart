@@ -1,6 +1,9 @@
 {{- if .Values.dashboard_service.ingress.enabled -}}
 {{- $fullName := printf "%s-dashboard" (include "api7ee3.fullname" .) -}}
 {{- $svcPort := .Values.dashboard_service.port -}}
+{{- if .Values.dashboard_configuration.server.listen.disable -}}
+  {{- $svcPort = .Values.dashboard_service.tlsPort -}}
+{{- end }}
 {{- if and .Values.dashboard_service.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
   {{- if not (hasKey .Values.dashboard_service.ingress.annotations "kubernetes.io/ingress.class") }}
   {{- $_ := set .Values.dashboard_service.ingress.annotations "kubernetes.io/ingress.class" .Values.dashboard_service.ingress.className}}
@@ -18,8 +21,11 @@ metadata:
   name: {{ $fullName }}
   labels:
     {{- include "api7ee3.labels" . | nindent 4 }}
-  {{- with .Values.dashboard_service.ingress.annotations }}
   annotations:
+  {{- if .Values.dashboard_configuration.server.listen.disable }}
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+  {{- end }}
+  {{- with .Values.dashboard_service.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
