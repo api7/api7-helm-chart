@@ -13,8 +13,9 @@ spec:
       app.kubernetes.io/component: dashboard
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/dashboard-configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -36,6 +37,11 @@ spec:
         - name: ssl
           secret:
             secretName: {{ .Values.dashboard.keyCertSecret | quote }}
+      {{- end }}
+      {{- if .Values.prometheus.server.existingSecret }}
+        - name: prometheus_ssl
+          secret:
+            secretName: {{ .Values.prometheus.server.existingSecret | quote }}
       {{- end }}
       {{- if or .Values.postgresql.builtin .Values.prometheus.builtin }}
       initContainers:
@@ -91,8 +97,17 @@ spec:
               name: ssl
               readOnly: true
           {{- end }}
+          {{- if .Values.prometheus.server.existingSecret }}
+            - mountPath: /app/prometheus/certs
+              name: prometheus_ssl
+              readOnly: true
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          {{- if .Values.dashboard.extraEnvVars }}
+          {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dashboard.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:

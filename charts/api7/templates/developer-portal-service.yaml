@@ -1,0 +1,20 @@
+{{- if .Values.developer_portal_configuration.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-developer-portal
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "api7ee3.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.developer_portal_service.type }}
+  ports:
+    - port: {{ .Values.developer_portal_service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+
+  selector:
+    {{- include "api7ee3.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: developer-portal
+{{- end }}
