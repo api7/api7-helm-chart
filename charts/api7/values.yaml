@@ -10,7 +10,8 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.11.5"
+    tag: "v3.2.13.0"
+  extraEnvVars: []
 
 dp_manager:
   replicaCount: 1
@@ -18,7 +19,17 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.11.5"
+    tag: "v3.2.13.0"
+  extraEnvVars: []
+
+developer_portal:
+  replicaCount: 1
+  image:
+    repository: api7/api7-developer-portal
+    pullPolicy: IfNotPresent
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "v0.0.3"
+  extraEnvVars: []
 
 imagePullSecret: ""
 nameOverride: ""
@@ -86,6 +97,10 @@ dp_manager_service:
     #    hosts:
     #      - dp-manager.local
 
+developer_portal_service:
+  type: ClusterIP
+  port: 4321
+
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
   # choice for the user. This also increases chances charts run on environments with little
@@ -115,6 +130,7 @@ prometheus:
   alertmanager:
     enabled: false
   server:
+    existingSecret: "" # name of existing secret to mount the path of prometheus client certs.
     enableRemoteWriteReceiver: true
     enableAdminAPI: true
     serviceAccount:
@@ -176,6 +192,16 @@ dashboard_configuration:
     # max_open_conns: 30
   prometheus:
     addr: "http://api7-prometheus-server:9090"
+    basic_auth: # access the prometheus with basic-auth
+      username: "" # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
+      password: ""
+    tls:
+      server_name: ""
+      insecure_skip_verify: false
+      enable_client_cert: false
+      key_file: ""  # the file path of the private key for requesting prometheus, (e.g. /app/prometheus/certs/tls.key)
+      cert_file: "" # the file path of the certificate for requesting prometheus, (e.g. /app/prometheus/certs/tls.crt)
+      ca_file: ""   # the file path of the ca to verify the prometheus tls server. (e.g. /app/prometheus/certs/ca.crt)
     whitelist:
       - "/api/v1/query_range"
       - "/api/v1/query"
@@ -184,6 +210,13 @@ dashboard_configuration:
       - "/api/v1/labels"
   console:
     addr: "http://127.0.0.1:3000"
+#  fallback_cp:
+#    aws_s3:
+#      access_key: "access"
+#      secret_key: "secret"
+#      region: "ap-south-1"
+#      bucket: "to-push-ha-data"
+#    cron_spec: "@every 1m"
 
 dp_manager_configuration:
   server:
@@ -202,3 +235,20 @@ dp_manager_configuration:
     # max_open_conns: 30
   prometheus:
     addr: "http://api7-prometheus-server:9090"
+    basic_auth: # access the prometheus with basic-auth
+      username: "" # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
+      password: ""
+    tls:
+      server_name: ""
+      insecure_skip_verify: false
+      enable_client_cert: false
+      key_file: ""  # the file path of the private key for requesting prometheus, (e.g. /app/prometheus/certs/tls.key)
+      cert_file: "" # the file path of the certificate for requesting prometheus, (e.g. /app/prometheus/certs/tls.crt)
+      ca_file: ""   # the file path of the ca to verify the prometheus tls server. (e.g. /app/prometheus/certs/ca.crt)
+
+developer_portal_configuration:
+  enable: true
+  server:
+    listen:
+      host: "0.0.0.0"
+      port: 4321

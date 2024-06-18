@@ -13,8 +13,9 @@ spec:
       app.kubernetes.io/component: dp-manager
   template:
     metadata:
-      {{- with .Values.podAnnotations }}
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/dp-manager-configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
@@ -32,6 +33,11 @@ spec:
         - name: config
           configMap:
             name: {{ include "api7ee3.fullname" . }}-dp-manager-config
+      {{- if .Values.prometheus.server.existingSecret }}
+        - name: prometheus_ssl
+          secret:
+            secretName: {{ .Values.prometheus.server.existingSecret | quote }}
+      {{- end }}
       initContainers:
         - name: wait-for-dashboard
           image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
@@ -76,8 +82,17 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /api7-ee
+          {{- if .Values.prometheus.server.existingSecret }}
+            - mountPath: /app/prometheus/certs
+              name: prometheus_ssl
+              readOnly: true
+          {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+          env:
+          {{- if .Values.dp_manager.extraEnvVars }}
+          {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dp_manager.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:

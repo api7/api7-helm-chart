@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.13.4](https://img.shields.io/badge/Version-0.13.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.14.0](https://img.shields.io/badge/Version-0.14.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -18,9 +18,10 @@ A Helm chart for Kubernetes
 | affinity | object | `{}` |  |
 | busybox.image.repository | string | `"docker.io/busybox"` |  |
 | busybox.image.tag | float | `1.28` |  |
+| dashboard.extraEnvVars | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.2.11.5"` |  |
+| dashboard.image.tag | string | `"v3.2.13.0"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.replicaCount | int | `1` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
@@ -29,6 +30,14 @@ A Helm chart for Kubernetes
 | dashboard_configuration.log.output | string | `"stderr"` |  |
 | dashboard_configuration.login.source | string | `"DB"` |  |
 | dashboard_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
+| dashboard_configuration.prometheus.basic_auth.password | string | `""` |  |
+| dashboard_configuration.prometheus.basic_auth.username | string | `""` |  |
+| dashboard_configuration.prometheus.tls.ca_file | string | `""` |  |
+| dashboard_configuration.prometheus.tls.cert_file | string | `""` |  |
+| dashboard_configuration.prometheus.tls.enable_client_cert | bool | `false` |  |
+| dashboard_configuration.prometheus.tls.insecure_skip_verify | bool | `false` |  |
+| dashboard_configuration.prometheus.tls.key_file | string | `""` |  |
+| dashboard_configuration.prometheus.tls.server_name | string | `""` |  |
 | dashboard_configuration.prometheus.whitelist[0] | string | `"/api/v1/query_range"` |  |
 | dashboard_configuration.prometheus.whitelist[1] | string | `"/api/v1/query"` |  |
 | dashboard_configuration.prometheus.whitelist[2] | string | `"/api/v1/format_query"` |  |
@@ -54,14 +63,33 @@ A Helm chart for Kubernetes
 | dashboard_service.port | int | `7080` |  |
 | dashboard_service.tlsPort | int | `7443` |  |
 | dashboard_service.type | string | `"ClusterIP"` |  |
+| developer_portal.extraEnvVars | list | `[]` |  |
+| developer_portal.image.pullPolicy | string | `"IfNotPresent"` |  |
+| developer_portal.image.repository | string | `"api7/api7-developer-portal"` |  |
+| developer_portal.image.tag | string | `"v0.0.3"` |  |
+| developer_portal.replicaCount | int | `1` |  |
+| developer_portal_configuration.enable | bool | `true` |  |
+| developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
+| developer_portal_configuration.server.listen.port | int | `4321` |  |
+| developer_portal_service.port | int | `4321` |  |
+| developer_portal_service.type | string | `"ClusterIP"` |  |
+| dp_manager.extraEnvVars | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.2.11.5"` |  |
+| dp_manager.image.tag | string | `"v3.2.13.0"` |  |
 | dp_manager.replicaCount | int | `1` |  |
 | dp_manager_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dp_manager_configuration.log.level | string | `"warn"` |  |
 | dp_manager_configuration.log.output | string | `"stderr"` |  |
 | dp_manager_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
+| dp_manager_configuration.prometheus.basic_auth.password | string | `""` |  |
+| dp_manager_configuration.prometheus.basic_auth.username | string | `""` |  |
+| dp_manager_configuration.prometheus.tls.ca_file | string | `""` |  |
+| dp_manager_configuration.prometheus.tls.cert_file | string | `""` |  |
+| dp_manager_configuration.prometheus.tls.enable_client_cert | bool | `false` |  |
+| dp_manager_configuration.prometheus.tls.insecure_skip_verify | bool | `false` |  |
+| dp_manager_configuration.prometheus.tls.key_file | string | `""` |  |
+| dp_manager_configuration.prometheus.tls.server_name | string | `""` |  |
 | dp_manager_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | dp_manager_configuration.server.listen.port | int | `7900` |  |
 | dp_manager_configuration.server.tls.host | string | `"0.0.0.0"` |  |
@@ -97,6 +125,7 @@ A Helm chart for Kubernetes
 | prometheus.server.configuration | string | `""` |  |
 | prometheus.server.enableAdminAPI | bool | `true` |  |
 | prometheus.server.enableRemoteWriteReceiver | bool | `true` |  |
+| prometheus.server.existingSecret | string | `""` |  |
 | prometheus.server.persistence.enabled | bool | `true` |  |
 | prometheus.server.persistence.size | string | `"120Gi"` |  |
 | prometheus.server.rbac.create | bool | `false` |  |
@@ -109,3 +138,4 @@ A Helm chart for Kubernetes
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
 | tolerations | list | `[]` |  |
+
