@@ -28,7 +28,7 @@ developer_portal:
     repository: api7/api7-developer-portal
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.0.3"
+    tag: "v0.0.4"
   extraEnvVars: []
   port: 4321
   ingress:
