@@ -60,6 +60,10 @@ spec:
             - name: API_URL
               value: 'https://{{ include "api7ee3.fullname" . }}-dashboard:{{ .Values.dashboard_service.tlsPort }}'
           {{- end }}
+          {{- if not .Values.developer_portal_configuration.server.listen.tls.enabled }}
+            - name: DISABLE_HTTPS
+              value: "1"
+          {{- end}}
           {{- if .Values.developer_portal.extraEnvVars }}
           {{- include "api7ee3.tplvalues.render" (dict "value" .Values.developer_portal.extraEnvVars "context" $) | nindent 12 }}
           {{- end }}
