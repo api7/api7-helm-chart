@@ -51,8 +51,15 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+          {{- if not .Values.dashboard_configuration.server.listen.disable }}
             - name: API_URL
               value: 'http://{{ include "api7ee3.fullname" . }}-dashboard.{{ .Release.Namespace }}:{{ .Values.dashboard_service.port }}'
+          {{- else }}
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: "0"
+            - name: API_URL
+              value: 'https://{{ include "api7ee3.fullname" . }}-dashboard:{{ .Values.dashboard_service.tlsPort }}'
+          {{- end }}
           {{- if .Values.developer_portal.extraEnvVars }}
           {{- include "api7ee3.tplvalues.render" (dict "value" .Values.developer_portal.extraEnvVars "context" $) | nindent 12 }}
           {{- end }}
