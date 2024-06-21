@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.14.4](https://img.shields.io/badge/Version-0.14.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.14.5](https://img.shields.io/badge/Version-0.14.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -66,7 +66,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraEnvVars | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"IfNotPresent"` |  |
 | developer_portal.image.repository | string | `"api7/api7-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v0.0.4"` |  |
+| developer_portal.image.tag | string | `"v0.0.5"` |  |
 | developer_portal.ingress.annotations | object | `{}` |  |
 | developer_portal.ingress.className | string | `""` |  |
 | developer_portal.ingress.enabled | bool | `false` |  |
