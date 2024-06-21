@@ -262,7 +262,7 @@ gateway:
       #   enable_http2: true
   # -- API7 Gateway service settings for tls
   tls:
-    enabled: false
+    enabled: true
     servicePort: 443
     containerPort: 9443
     # -- Support multiple https ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L99)
