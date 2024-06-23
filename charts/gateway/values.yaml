@@ -14,7 +14,8 @@ api7ee:
     interval: 15
     # -- max size in bytes(default 32M) of the metrics data sent to the control plane, if the size exceeds, the data will be truncated
     max_metrics_size: 33554432
-  healthcheck_report_interval: 120 # healthcheck data report interval in seconds
+  # -- healthcheck data report interval in seconds
+  healthcheck_report_interval: 120
 
 apisix:
   # -- Enable or disable API7 Gateway itself

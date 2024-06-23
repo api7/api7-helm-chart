@@ -50,7 +50,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | admin.port | int | `9180` | which port to use for API7 Gateway admin API |
 | admin.servicePort | int | `9180` | Service port to use for API7 Gateway admin API |
 | admin.type | string | `"ClusterIP"` | admin service type |
-| api7ee.healthcheck_report_interval | int | `120` |  |
+| api7ee.healthcheck_report_interval | int | `120` | healthcheck data report interval in seconds |
 | api7ee.telemetry.enable | bool | `true` | enable telemetry data report to the control plane |
 | api7ee.telemetry.interval | int | `15` | interval in seconds to send telemetry data to the control plane |
 | api7ee.telemetry.max_metrics_size | int | `33554432` | max size in bytes(default 32M) of the metrics data sent to the control plane, if the size exceeds, the data will be truncated |
