@@ -6,6 +6,17 @@ global:
   # -- Global Docker registry secret names as an array
   imagePullSecrets: []
 
+api7ee:
+  telemetry:
+    # -- enable telemetry data report to the control plane
+    enable: true
+    # -- interval in seconds to send telemetry data to the control plane
+    interval: 15
+    # -- max size in bytes(default 32M) of the metrics data sent to the control plane, if the size exceeds, the data will be truncated
+    max_metrics_size: 33554432
+  # -- healthcheck data report interval in seconds
+  healthcheck_report_interval: 120
+
 apisix:
   # -- Enable or disable API7 Gateway itself
   enabled: true
