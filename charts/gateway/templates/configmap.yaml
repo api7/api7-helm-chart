@@ -12,6 +12,10 @@ data:
       {{- include "apisix.tplvalues.render" (dict "value" $value "context" $) | nindent 6 }}
     {{- end }}
     {{- else }}
+    {{- if .Values.api7ee }}
+    api7ee:
+      {{- toYaml .Values.api7ee | nindent 6 }}
+    {{- end }}
     apisix:    # universal configurations
       {{- if not (eq .Values.deployment.role "control_plane") }}
       node_listen:    # APISIX listening port

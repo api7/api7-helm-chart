@@ -50,6 +50,10 @@ The command removes all the Kubernetes components associated with the chart and 
 | admin.port | int | `9180` | which port to use for API7 Gateway admin API |
 | admin.servicePort | int | `9180` | Service port to use for API7 Gateway admin API |
 | admin.type | string | `"ClusterIP"` | admin service type |
+| api7ee.healthcheck_report_interval | int | `120` |  |
+| api7ee.telemetry.enable | bool | `true` | enable telemetry data report to the control plane |
+| api7ee.telemetry.interval | int | `15` | interval in seconds to send telemetry data to the control plane |
+| api7ee.telemetry.max_metrics_size | int | `33554432` | max size in bytes(default 32M) of the metrics data sent to the control plane, if the size exceeds, the data will be truncated |
 | apisix.affinity | object | `{}` | Set affinity for API7 Gateway deploy |
 | apisix.customLuaSharedDicts | list | `[]` | Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings, click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict |
 | apisix.customizedConfig | object | `{}` | If apisix.enableCustomizedConfig is true, full customized config.yaml. Please note that other settings about APISIX config will be ignored |
