@@ -52,6 +52,9 @@ spec:
             {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
             pathType: {{ .pathType }}
             {{- end }}
+            {{- if .backend }}
+            backend: {{ toYaml .backend | nindent 14 }}
+            {{- else }}
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
@@ -62,6 +65,7 @@ spec:
               serviceName: {{ $fullName }}
               servicePort: {{ $svcPort }}
               {{- end }}
+            {{- end}}
           {{- end }}
     {{- end }}
 {{- end }}

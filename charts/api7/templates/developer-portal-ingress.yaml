@@ -1,9 +1,9 @@
-{{- if .Values.developer_portal.ingress.enabled }}
+{{- if .Values.developer_portal_service.ingress.enabled }}
 {{- $fullName := printf "%s-developer-portal" (include "api7ee3.fullname" .) -}}
-{{- $svcPort := .Values.developer_portal.port -}}
-{{- if and .Values.developer_portal.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .Values.developer_portal.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.developer_portal.ingress.annotations "kubernetes.io/ingress.class" .Values.developer_portal.ingress.className}}
+{{- $svcPort := .Values.developer_portal_service.port -}}
+{{- if and .Values.developer_portal_service.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.developer_portal_service.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.developer_portal_service.ingress.annotations "kubernetes.io/ingress.class" .Values.developer_portal_service.ingress.className}}
   {{- end }}
 {{- end }}
 {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
@@ -18,17 +18,17 @@ metadata:
   name: {{ $fullName }}
   labels:
     {{- include "api7ee3.labels" . | nindent 4 }}
-  {{- with .Values.developer_portal.ingress.annotations }}
+  {{- with .Values.developer_portal_service.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.developer_portal.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.developer_portal.ingress.className }}
+  {{- if and .Values.developer_portal_service.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.developer_portal_service.ingress.className }}
   {{- end }}
-  {{- if .Values.developer_portal.ingress.tls }}
+  {{- if .Values.developer_portal_service.ingress.tls }}
   tls:
-    {{- range .Values.developer_portal.ingress.tls }}
+    {{- range .Values.developer_portal_service.ingress.tls }}
     - hosts:
         {{- range .hosts }}
         - {{ . | quote }}
@@ -37,7 +37,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.developer_portal.ingress.hosts }}
+    {{- range .Values.developer_portal_service.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
@@ -46,6 +46,9 @@ spec:
             {{- if and .pathType (semverCompare ">=1.18-0" $.Capabilities.KubeVersion.GitVersion) }}
             pathType: {{ .pathType }}
             {{- end }}
+            {{- if .backend }}
+            backend: {{ toYaml .backend | nindent 14 }}
+            {{- else }}
             backend:
               {{- if semverCompare ">=1.19-0" $.Capabilities.KubeVersion.GitVersion }}
               service:
@@ -56,6 +59,7 @@ spec:
               serviceName: {{ $fullName }}
               servicePort: {{ $svcPort }}
               {{- end }}
+            {{- end}}
           {{- end }}
     {{- end }}
 {{- end }}
