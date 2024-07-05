@@ -73,6 +73,11 @@ dashboard_service:
         paths:
           - path: /
             pathType: ImplementationSpecific
+            # backend:
+            #   service:
+            #     name: api7ee3-dashboard
+            #     port:
+            #       number: 7943
     tls: []
     #  - secretName: dashboard-tls
     #    hosts:
@@ -93,6 +98,11 @@ dp_manager_service:
         paths:
           - path: /
             pathType: ImplementationSpecific
+            # backend:
+            #   service:
+            #     name: api7ee3-dp-manager
+            #     port:
+            #       number: 7943
     tls: []
     #  - secretName: dp-manager-tls
     #    hosts:
@@ -112,6 +122,11 @@ developer_portal_service:
         paths:
           - path: /
             pathType: ImplementationSpecific
+            # backend:
+            #   service:
+            #     name: api7ee3-developer-portal
+            #     port:
+            #       number: 7943
     tls: []
     #  - secretName: developer-portal-tls
     #    hosts:
