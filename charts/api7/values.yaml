@@ -30,22 +30,6 @@ developer_portal:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v0.0.5"
   extraEnvVars: []
-  port: 4321
-  ingress:
-    enabled: false
-    className: ""
-    annotations: {}
-      # kubernetes.io/ingress.class: nginx
-      # kubernetes.io/tls-acme: "true"
-    hosts:
-      - host: developer-portal.local
-        paths:
-          - path: /
-            pathType: ImplementationSpecific
-    tls: []
-    #  - secretName: developer-portal-tls
-    #    hosts:
-    #      - developer-portal.local
     
 
 imagePullSecret: ""
@@ -89,6 +73,11 @@ dashboard_service:
         paths:
           - path: /
             pathType: ImplementationSpecific
+            # backend:
+            #   service:
+            #     name: api7ee3-dashboard
+            #     port:
+            #       number: 7943
     tls: []
     #  - secretName: dashboard-tls
     #    hosts:
@@ -109,6 +98,11 @@ dp_manager_service:
         paths:
           - path: /
             pathType: ImplementationSpecific
+            # backend:
+            #   service:
+            #     name: api7ee3-dp-manager
+            #     port:
+            #       number: 7943
     tls: []
     #  - secretName: dp-manager-tls
     #    hosts:
@@ -117,6 +111,26 @@ dp_manager_service:
 developer_portal_service:
   type: ClusterIP
   port: 4321
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: developer-portal.local
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            # backend:
+            #   service:
+            #     name: api7ee3-developer-portal
+            #     port:
+            #       number: 7943
+    tls: []
+    #  - secretName: developer-portal-tls
+    #    hosts:
+    #      - developer-portal.local
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious

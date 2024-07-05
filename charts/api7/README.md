@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.14.5](https://img.shields.io/badge/Version-0.14.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
+![Version: 0.15.0](https://img.shields.io/badge/Version-0.15.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.0.0](https://img.shields.io/badge/AppVersion-3.0.0-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -67,19 +67,18 @@ A Helm chart for Kubernetes
 | developer_portal.image.pullPolicy | string | `"IfNotPresent"` |  |
 | developer_portal.image.repository | string | `"api7/api7-developer-portal"` |  |
 | developer_portal.image.tag | string | `"v0.0.5"` |  |
-| developer_portal.ingress.annotations | object | `{}` |  |
-| developer_portal.ingress.className | string | `""` |  |
-| developer_portal.ingress.enabled | bool | `false` |  |
-| developer_portal.ingress.hosts[0].host | string | `"developer-portal.local"` |  |
-| developer_portal.ingress.hosts[0].paths[0].path | string | `"/"` |  |
-| developer_portal.ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
-| developer_portal.ingress.tls | list | `[]` |  |
-| developer_portal.port | int | `4321` |  |
 | developer_portal.replicaCount | int | `1` |  |
 | developer_portal_configuration.enable | bool | `true` |  |
 | developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | developer_portal_configuration.server.listen.port | int | `4321` |  |
 | developer_portal_configuration.server.listen.tls.enabled | bool | `true` |  |
+| developer_portal_service.ingress.annotations | object | `{}` |  |
+| developer_portal_service.ingress.className | string | `""` |  |
+| developer_portal_service.ingress.enabled | bool | `false` |  |
+| developer_portal_service.ingress.hosts[0].host | string | `"developer-portal.local"` |  |
+| developer_portal_service.ingress.hosts[0].paths[0].path | string | `"/"` |  |
+| developer_portal_service.ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
+| developer_portal_service.ingress.tls | list | `[]` |  |
 | developer_portal_service.port | int | `4321` |  |
 | developer_portal_service.type | string | `"ClusterIP"` |  |
 | dp_manager.extraEnvVars | list | `[]` |  |
