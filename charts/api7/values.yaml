@@ -10,7 +10,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.13.0"
+    tag: "v3.2.14.0"
   extraEnvVars: []
 
 dp_manager:
@@ -19,7 +19,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.13.0"
+    tag: "v3.2.14.0"
   extraEnvVars: []
 
 developer_portal:
@@ -30,7 +30,6 @@ developer_portal:
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v0.0.5"
   extraEnvVars: []
-    
 
 imagePullSecret: ""
 nameOverride: ""
@@ -209,18 +208,21 @@ dashboard_configuration:
       port: 7443
       key_file: ""    # the file path of private key, (e.g. /app/certs/tls.key)
       cert_file: ""   # the file path of certificate, (e.g. /app/certs/tls.crt)
+    status:
+      disable: false
+      host: "127.0.0.1"
+      port: 7081
   session_options_config:
     same_site: "lax"  # means the value SameSiteNoneMode
     secure: false
-  login:
-    source: DB
+    max_age: 86400
   log:
     level: warn
     output: stderr
   database:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
-    # max_idle_conns: 10
-    # max_open_conns: 30
+    max_idle_conns: 2
+    max_open_conns: 30
   prometheus:
     addr: "http://api7-prometheus-server:9090"
     basic_auth: # access the prometheus with basic-auth
@@ -249,6 +251,102 @@ dashboard_configuration:
 #      bucket: "to-push-ha-data"
 #    cron_spec: "@every 1m"
 
+  plugins:
+    - real-ip
+    #- ai
+    - error-page
+    - client-control
+    - proxy-control
+    - zipkin
+    #- skywalking
+    - ext-plugin-pre-req
+    - mocking
+    - serverless-pre-function
+    - batch-requests
+    - ua-restriction
+    - referer-restriction
+    - uri-blocker
+    - request-validation
+    - authz-casbin
+    - authz-casdoor
+    - wolf-rbac
+    - multi-auth
+    - ldap-auth
+    - forward-auth
+    - saml-auth
+    - opa
+    - authz-keycloak
+    #- error-log-logger
+    - proxy-mirror
+    - proxy-cache
+    - api-breaker
+    - limit-req
+    #- node-status
+    - gzip
+    - kafka-proxy
+    #- dubbo-proxy
+    - grpc-transcode
+    - grpc-web
+    - public-api
+    - data-mask
+    - opentelemetry
+    - datadog
+    - echo
+    - loggly
+    - splunk-hec-logging
+    - skywalking-logger
+    - google-cloud-logging
+    - sls-logger
+    - tcp-logger
+    - rocketmq-logger
+    - udp-logger
+    - file-logger
+    - clickhouse-logger
+    - ext-plugin-post-resp
+    - serverless-post-function
+    - azure-functions
+    - aws-lambda
+    - openwhisk
+    - consumer-restriction
+    - acl
+    - basic-auth
+    - cors
+    - csrf
+    - fault-injection
+    - hmac-auth
+    - jwt-auth
+    - key-auth
+    - openid-connect
+    - limit-count
+    - redirect
+    - request-id
+    - proxy-rewrite
+    - response-rewrite
+    - workflow
+    - proxy-buffering
+    - tencent-cloud-cls
+    - soap
+    - openfunction
+    - graphql-proxy-cache
+    - ext-plugin-post-req
+    - inspect
+    #- log-rotate
+    - graphql-limit-count
+    - elasticsearch-logger
+    - kafka-logger
+    - body-transformer
+    - traffic-split
+    - degraphql
+    - http-logger
+    - cas-auth
+    - traffic-label
+    - oas-validator
+    - api7-traffic-split
+    - limit-conn
+    - prometheus
+    - syslog
+    - ip-restriction
+
 dp_manager_configuration:
   server:
     listen:
@@ -257,13 +355,17 @@ dp_manager_configuration:
     tls:
       host: "0.0.0.0"
       port: 7943
+    status:
+      disable: false
+      host: "127.0.0.1"
+      port: 7901
   log:
     level: warn
     output: stderr
   database:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
-    # max_idle_conns: 10
-    # max_open_conns: 30
+    max_idle_conns: 2
+    max_open_conns: 30
   prometheus:
     addr: "http://api7-prometheus-server:9090"
     basic_auth: # access the prometheus with basic-auth
@@ -283,5 +385,3 @@ developer_portal_configuration:
     listen:
       host: "0.0.0.0"
       port: 4321
-      tls:
-        enabled: true
