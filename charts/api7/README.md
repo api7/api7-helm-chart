@@ -164,6 +164,7 @@ A Helm chart for Kubernetes
 | developer_portal_configuration.enable | bool | `true` |  |
 | developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | developer_portal_configuration.server.listen.port | int | `4321` |  |
+| developer_portal_configuration.server.listen.tls.enabled | bool | `true` |  |
 | developer_portal_service.ingress.annotations | object | `{}` |  |
 | developer_portal_service.ingress.className | string | `""` |  |
 | developer_portal_service.ingress.enabled | bool | `false` |  |
