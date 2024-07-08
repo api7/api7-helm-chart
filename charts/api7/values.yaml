@@ -253,7 +253,6 @@ dashboard_configuration:
 
   plugins:
     - real-ip
-    #- ai
     - error-page
     - client-control
     - proxy-control
