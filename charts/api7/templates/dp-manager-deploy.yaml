@@ -38,6 +38,9 @@ spec:
           secret:
             secretName: {{ .Values.prometheus.server.existingSecret | quote }}
       {{- end }}
+      {{- if .Values.dashboard.extraVolumes }}
+      {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dashboard.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
       initContainers:
         - name: wait-for-dashboard
           image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
@@ -86,6 +89,9 @@ spec:
             - mountPath: /app/prometheus/certs
               name: prometheus_ssl
               readOnly: true
+          {{- end }}
+          {{- if .Values.dashboard.extraVolumeMounts }}
+          {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dashboard.extraVolumeMounts "context" $) | nindent 12 }}
           {{- end }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

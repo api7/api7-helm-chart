@@ -10,8 +10,10 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.14.0"
+    tag: "v3.2.14.1"
   extraEnvVars: []
+  extraVolumes: []
+  extraVolumeMounts: []
 
 dp_manager:
   replicaCount: 1
@@ -19,8 +21,10 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.14.0"
+    tag: "v3.2.14.1"
   extraEnvVars: []
+  extraVolumes: []
+  extraVolumeMounts: []
 
 developer_portal:
   replicaCount: 1
@@ -28,7 +32,7 @@ developer_portal:
     repository: api7/api7-developer-portal
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.0.5"
+    tag: "v0.0.6"
   extraEnvVars: []
 
 imagePullSecret: ""
@@ -328,7 +332,6 @@ dashboard_configuration:
     - openfunction
     - graphql-proxy-cache
     - ext-plugin-post-req
-    - inspect
     #- log-rotate
     - graphql-limit-count
     - elasticsearch-logger
