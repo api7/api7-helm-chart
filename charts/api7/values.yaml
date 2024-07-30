@@ -10,7 +10,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.14.1"
+    tag: "v3.2.14.2"
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []
@@ -21,7 +21,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.14.1"
+    tag: "v3.2.14.2"
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []
