@@ -11,6 +11,18 @@ dashboard:
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
     tag: "v3.2.14.2"
+  # Resources of the deployment.
+  # It has a higher priority than the common resources configuration:
+  # when this field is configured, it is used first in the deployment,
+  # otherwise the common resources configuration is used.
+  # resources:
+  #   limits:
+  #     cpu: 100m
+  #     memory: 128Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 128Mi
+
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []
@@ -22,6 +34,18 @@ dp_manager:
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
     tag: "v3.2.14.2"
+  # Resources of the deployment.
+  # It has a higher priority than the common resources configuration:
+  # when this field is configured, it is used first in the deployment,
+  # otherwise the common resources configuration is used.
+  # resources:
+  #   limits:
+  #     cpu: 100m
+  #     memory: 128Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 128Mi
+
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []

@@ -109,7 +109,11 @@ spec:
           {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dashboard.extraVolumeMounts "context" $) | nindent 12 }}
           {{- end }}
           resources:
+            {{- if .Values.dashboard.resources }}
+            {{- toYaml .Values.dashboard.resources | nindent 12 }}
+            {{- else }}
             {{- toYaml .Values.resources | nindent 12 }}
+            {{- end }}
           env:
           {{- if .Values.dashboard.extraEnvVars }}
           {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dashboard.extraEnvVars "context" $) | nindent 12 }}
