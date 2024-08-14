@@ -528,6 +528,8 @@ configurationSnippet:
 
   httpSrv: |
 
+  httpSrvLocation: |
+
   httpAdmin: |
 
   stream: |
