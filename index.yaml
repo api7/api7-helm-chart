@@ -52,6 +52,25 @@ entries:
   api7ee3:
   - apiVersion: v2
     appVersion: 3.2.14
+    created: "2024-08-14T09:50:53.120746667Z"
+    dependencies:
+    - condition: prometheus.builtin
+      name: prometheus
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.5.1
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    description: A Helm chart for Kubernetes
+    digest: 17bcffadd0ea0bf414720b94648b850e7a1f7deb8a50d3e56cb6555334f8368b
+    name: api7ee3
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-0.16.5/api7ee3-0.16.5.tgz
+    version: 0.16.5
+  - apiVersion: v2
+    appVersion: 3.2.14
     created: "2024-08-07T04:06:34.148191201Z"
     dependencies:
     - condition: prometheus.builtin
@@ -1011,4 +1030,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2024-08-14T07:41:33.568148247Z"
+generated: "2024-08-14T09:50:53.320251611Z"
