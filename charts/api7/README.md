@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.16.4](https://img.shields.io/badge/Version-0.16.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.14](https://img.shields.io/badge/AppVersion-3.2.14-informational?style=flat-square)
+![Version: 0.16.5](https://img.shields.io/badge/Version-0.16.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.14](https://img.shields.io/badge/AppVersion-3.2.14-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -23,7 +23,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.2.14.3"` |  |
+| dashboard.image.tag | string | `"v3.2.14.4"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.replicaCount | int | `1` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
@@ -96,27 +96,26 @@ A Helm chart for Kubernetes
 | dashboard_configuration.plugins[65] | string | `"workflow"` |  |
 | dashboard_configuration.plugins[66] | string | `"proxy-buffering"` |  |
 | dashboard_configuration.plugins[67] | string | `"tencent-cloud-cls"` |  |
-| dashboard_configuration.plugins[68] | string | `"soap"` |  |
-| dashboard_configuration.plugins[69] | string | `"openfunction"` |  |
+| dashboard_configuration.plugins[68] | string | `"openfunction"` |  |
+| dashboard_configuration.plugins[69] | string | `"graphql-proxy-cache"` |  |
 | dashboard_configuration.plugins[6] | string | `"mocking"` |  |
-| dashboard_configuration.plugins[70] | string | `"graphql-proxy-cache"` |  |
-| dashboard_configuration.plugins[71] | string | `"ext-plugin-post-req"` |  |
-| dashboard_configuration.plugins[72] | string | `"graphql-limit-count"` |  |
-| dashboard_configuration.plugins[73] | string | `"elasticsearch-logger"` |  |
-| dashboard_configuration.plugins[74] | string | `"kafka-logger"` |  |
-| dashboard_configuration.plugins[75] | string | `"body-transformer"` |  |
-| dashboard_configuration.plugins[76] | string | `"traffic-split"` |  |
-| dashboard_configuration.plugins[77] | string | `"degraphql"` |  |
-| dashboard_configuration.plugins[78] | string | `"http-logger"` |  |
-| dashboard_configuration.plugins[79] | string | `"cas-auth"` |  |
+| dashboard_configuration.plugins[70] | string | `"ext-plugin-post-req"` |  |
+| dashboard_configuration.plugins[71] | string | `"graphql-limit-count"` |  |
+| dashboard_configuration.plugins[72] | string | `"elasticsearch-logger"` |  |
+| dashboard_configuration.plugins[73] | string | `"kafka-logger"` |  |
+| dashboard_configuration.plugins[74] | string | `"body-transformer"` |  |
+| dashboard_configuration.plugins[75] | string | `"traffic-split"` |  |
+| dashboard_configuration.plugins[76] | string | `"degraphql"` |  |
+| dashboard_configuration.plugins[77] | string | `"http-logger"` |  |
+| dashboard_configuration.plugins[78] | string | `"cas-auth"` |  |
+| dashboard_configuration.plugins[79] | string | `"traffic-label"` |  |
 | dashboard_configuration.plugins[7] | string | `"serverless-pre-function"` |  |
-| dashboard_configuration.plugins[80] | string | `"traffic-label"` |  |
-| dashboard_configuration.plugins[81] | string | `"oas-validator"` |  |
-| dashboard_configuration.plugins[82] | string | `"api7-traffic-split"` |  |
-| dashboard_configuration.plugins[83] | string | `"limit-conn"` |  |
-| dashboard_configuration.plugins[84] | string | `"prometheus"` |  |
-| dashboard_configuration.plugins[85] | string | `"syslog"` |  |
-| dashboard_configuration.plugins[86] | string | `"ip-restriction"` |  |
+| dashboard_configuration.plugins[80] | string | `"oas-validator"` |  |
+| dashboard_configuration.plugins[81] | string | `"api7-traffic-split"` |  |
+| dashboard_configuration.plugins[82] | string | `"limit-conn"` |  |
+| dashboard_configuration.plugins[83] | string | `"prometheus"` |  |
+| dashboard_configuration.plugins[84] | string | `"syslog"` |  |
+| dashboard_configuration.plugins[85] | string | `"ip-restriction"` |  |
 | dashboard_configuration.plugins[8] | string | `"batch-requests"` |  |
 | dashboard_configuration.plugins[9] | string | `"ua-restriction"` |  |
 | dashboard_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
@@ -160,7 +159,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraEnvVars | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"IfNotPresent"` |  |
 | developer_portal.image.repository | string | `"api7/api7-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v0.0.6"` |  |
+| developer_portal.image.tag | string | `"v0.0.8"` |  |
 | developer_portal.replicaCount | int | `1` |  |
 | developer_portal_configuration.enable | bool | `true` |  |
 | developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
@@ -180,7 +179,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.2.14.3"` |  |
+| dp_manager.image.tag | string | `"v3.2.14.4"` |  |
 | dp_manager.replicaCount | int | `1` |  |
 | dp_manager_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dp_manager_configuration.database.max_idle_conns | int | `2` |  |
