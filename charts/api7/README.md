@@ -23,7 +23,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.2.14.5"` |  |
+| dashboard.image.tag | string | `"v3.2.14.6"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.replicaCount | int | `1` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
@@ -116,6 +116,7 @@ A Helm chart for Kubernetes
 | dashboard_configuration.plugins[83] | string | `"prometheus"` |  |
 | dashboard_configuration.plugins[84] | string | `"syslog"` |  |
 | dashboard_configuration.plugins[85] | string | `"ip-restriction"` |  |
+| dashboard_configuration.plugins[86] | string | `"mqtt-proxy"` |  |
 | dashboard_configuration.plugins[8] | string | `"batch-requests"` |  |
 | dashboard_configuration.plugins[9] | string | `"ua-restriction"` |  |
 | dashboard_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
@@ -159,7 +160,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraEnvVars | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"IfNotPresent"` |  |
 | developer_portal.image.repository | string | `"api7/api7-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v0.0.8"` |  |
+| developer_portal.image.tag | string | `"v0.0.9"` |  |
 | developer_portal.replicaCount | int | `1` |  |
 | developer_portal_configuration.enable | bool | `true` |  |
 | developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
@@ -179,7 +180,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.2.14.5"` |  |
+| dp_manager.image.tag | string | `"v3.2.14.6"` |  |
 | dp_manager.replicaCount | int | `1` |  |
 | dp_manager_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dp_manager_configuration.database.max_idle_conns | int | `2` |  |
