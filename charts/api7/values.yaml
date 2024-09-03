@@ -87,6 +87,7 @@ securityContext: {}
 
 dashboard_service:
   type: ClusterIP
+  annotations: {}
   port: 7080
   tlsPort: 7443
   ingress:
@@ -112,6 +113,7 @@ dashboard_service:
 
 dp_manager_service:
   type: ClusterIP
+  annotations: {}
   port: 7900
   tlsPort: 7943
   ingress:
@@ -137,6 +139,7 @@ dp_manager_service:
 
 developer_portal_service:
   type: ClusterIP
+  annotations: {}
   port: 4321
   ingress:
     enabled: false
