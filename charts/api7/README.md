@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.16.8](https://img.shields.io/badge/Version-0.16.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.14](https://img.shields.io/badge/AppVersion-3.2.14-informational?style=flat-square)
+![Version: 0.16.9](https://img.shields.io/badge/Version-0.16.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.14](https://img.shields.io/badge/AppVersion-3.2.14-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -147,6 +147,7 @@ A Helm chart for Kubernetes
 | dashboard_configuration.session_options_config.max_age | int | `86400` |  |
 | dashboard_configuration.session_options_config.same_site | string | `"lax"` |  |
 | dashboard_configuration.session_options_config.secure | bool | `false` |  |
+| dashboard_service.annotations | object | `{}` |  |
 | dashboard_service.ingress.annotations | object | `{}` |  |
 | dashboard_service.ingress.className | string | `""` |  |
 | dashboard_service.ingress.enabled | bool | `false` |  |
@@ -166,6 +167,7 @@ A Helm chart for Kubernetes
 | developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | developer_portal_configuration.server.listen.port | int | `4321` |  |
 | developer_portal_configuration.server.listen.tls.enabled | bool | `true` |  |
+| developer_portal_service.annotations | object | `{}` |  |
 | developer_portal_service.ingress.annotations | object | `{}` |  |
 | developer_portal_service.ingress.className | string | `""` |  |
 | developer_portal_service.ingress.enabled | bool | `false` |  |
@@ -203,6 +205,7 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.server.status.port | int | `7901` |  |
 | dp_manager_configuration.server.tls.host | string | `"0.0.0.0"` |  |
 | dp_manager_configuration.server.tls.port | int | `7943` |  |
+| dp_manager_service.annotations | object | `{}` |  |
 | dp_manager_service.ingress.annotations | object | `{}` |  |
 | dp_manager_service.ingress.className | string | `""` |  |
 | dp_manager_service.ingress.enabled | bool | `false` |  |

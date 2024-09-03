@@ -6,6 +6,10 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "api7ee3.labels" . | nindent 4 }}
+  {{- with .Values.developer_portal_service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.developer_portal_service.type }}
   ports:

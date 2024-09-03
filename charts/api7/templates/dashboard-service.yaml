@@ -5,6 +5,10 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "api7ee3.labels" . | nindent 4 }}
+  {{- with .Values.dashboard_service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.dashboard_service.type }}
   ports:

@@ -5,6 +5,10 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
   labels:
     {{- include "api7ee3.labels" . | nindent 4 }}
+  {{- with .Values.dp_manager_service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.dp_manager_service.type }}
   ports:
