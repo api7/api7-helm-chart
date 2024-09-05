@@ -56,7 +56,9 @@ developer_portal:
     repository: api7/api7-developer-portal
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.0.9"
+    tag: "v0.0.10"
+  # Specifies the name of Secret for developer portal TLS configuration, and files store under /app/certs directory
+  keyCertSecret: ""
   extraEnvVars: []
 
 imagePullSecret: ""

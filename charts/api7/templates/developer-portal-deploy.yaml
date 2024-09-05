@@ -29,6 +29,12 @@ spec:
       serviceAccountName: {{ include "api7ee3.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+      {{- if .Values.developer_portal.keyCertSecret }}
+        - name: ssl
+          secret:
+            secretName: {{ .Values.developer_portal.keyCertSecret | quote }}
+      {{- end }}
       containers:
         - name: developer-portal
           securityContext:
@@ -67,8 +73,20 @@ spec:
             - name: DISABLE_HTTPS
               value: "1"
           {{- end}}
+          {{- if .Values.developer_portal.keyCertSecret }}
+            - name: SERVER_CERT_PATH
+              value: "/app/certs/tls.crt"
+            - name: SERVER_KEY_PATH
+              value: "/app/certs/tls.key"
+          {{- end}}
           {{- if .Values.developer_portal.extraEnvVars }}
           {{- include "api7ee3.tplvalues.render" (dict "value" .Values.developer_portal.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+          {{- if .Values.developer_portal.keyCertSecret }}
+            - mountPath: /app/certs
+              name: ssl
+              readOnly: true
           {{- end }}
 
       {{- with .Values.nodeSelector }}
