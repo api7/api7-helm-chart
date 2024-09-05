@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.16.9](https://img.shields.io/badge/Version-0.16.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.14](https://img.shields.io/badge/AppVersion-3.2.14-informational?style=flat-square)
+![Version: 0.16.10](https://img.shields.io/badge/Version-0.16.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.14](https://img.shields.io/badge/AppVersion-3.2.14-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -161,7 +161,8 @@ A Helm chart for Kubernetes
 | developer_portal.extraEnvVars | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"IfNotPresent"` |  |
 | developer_portal.image.repository | string | `"api7/api7-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v0.0.9"` |  |
+| developer_portal.image.tag | string | `"v0.0.10"` |  |
+| developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.replicaCount | int | `1` |  |
 | developer_portal_configuration.enable | bool | `true` |  |
 | developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
