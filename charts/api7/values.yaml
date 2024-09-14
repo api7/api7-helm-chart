@@ -10,7 +10,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.14.6"
+    tag: "v3.2.15.0"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -33,7 +33,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.14.6"
+    tag: "v3.2.15.0"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -258,6 +258,7 @@ dashboard_configuration:
     max_open_conns: 30
   prometheus:
     addr: "http://api7-prometheus-server:9090"
+    timeout: "30s"
     basic_auth: # access the prometheus with basic-auth
       username: "" # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
       password: ""
@@ -340,6 +341,7 @@ dashboard_configuration:
     - aws-lambda
     - openwhisk
     - consumer-restriction
+    - attach-consumer-label
     - acl
     - basic-auth
     - cors
@@ -399,6 +401,7 @@ dp_manager_configuration:
     max_open_conns: 30
   prometheus:
     addr: "http://api7-prometheus-server:9090"
+    timeout: "30s"
     basic_auth: # access the prometheus with basic-auth
       username: "" # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
       password: ""
