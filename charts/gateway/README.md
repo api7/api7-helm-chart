@@ -82,7 +82,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.http.luaSharedDict.plugin-limit-count | string | `"10m"` |  |
 | apisix.http.luaSharedDict.plugin-limit-count-redis-cluster-slot-lock | string | `"1m"` |  |
 | apisix.http.luaSharedDict.plugin-limit-req | string | `"10m"` |  |
-| apisix.http.luaSharedDict.prometheus-metrics | string | `"10m"` |  |
 | apisix.http.luaSharedDict.saml_sessions | string | `"10m"` |  |
 | apisix.http.luaSharedDict.tars | string | `"1m"` |  |
 | apisix.http.luaSharedDict.tracing_buffer | string | `"10m"` |  |
@@ -100,6 +99,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.luaModuleHook.configMapRef.name | string | `""` | Name of the ConfigMap where the lua module codes store |
 | apisix.luaModuleHook.hookPoint | string | `""` | the hook module which will be used to inject third party code into APISIX use the lua require style like: "module.say_hello" |
 | apisix.luaModuleHook.luaPath | string | `""` | extend lua_package_path to load third party code |
+| apisix.meta.luaSharedDict.prometheus-metrics | string | `"15m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.podAnnotations | object | `{}` | Annotations to add to each pod |
 | apisix.podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":1,"minAvailable":"90%"}` | See https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more details |
