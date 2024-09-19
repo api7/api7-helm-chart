@@ -137,7 +137,7 @@ data:
       {{- end }}
       {{- end }}
 
-      {{- if .Values.apisix.stream.luaSharedDict }}
+      {{- if .Values.apisix.meta.luaSharedDict }}
       meta:
         lua_shared_dict:
           {{- toYaml .Values.apisix.meta.luaSharedDict | nindent 10 }}
