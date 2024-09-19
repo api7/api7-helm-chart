@@ -136,6 +136,13 @@ data:
         - {{ $env }}
       {{- end }}
       {{- end }}
+
+      {{- if .Values.apisix.stream.luaSharedDict }}
+      meta:
+        lua_shared_dict:
+          {{- toYaml .Values.apisix.meta.luaSharedDict | nindent 10 }}
+      {{- end }}
+
       stream:
         {{- if .Values.apisix.stream.luaSharedDict }}
         lua_shared_dict:
