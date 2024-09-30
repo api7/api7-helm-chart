@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.16.13](https://img.shields.io/badge/Version-0.16.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.15](https://img.shields.io/badge/AppVersion-3.2.15-informational?style=flat-square)
+![Version: 0.16.14](https://img.shields.io/badge/Version-0.16.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.16](https://img.shields.io/badge/AppVersion-3.2.16-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -23,7 +23,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.2.15.2"` |  |
+| dashboard.image.tag | string | `"v3.2.16.0"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.replicaCount | int | `1` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
@@ -118,7 +118,10 @@ A Helm chart for Kubernetes
 | dashboard_configuration.plugins[85] | string | `"syslog"` |  |
 | dashboard_configuration.plugins[86] | string | `"ip-restriction"` |  |
 | dashboard_configuration.plugins[87] | string | `"mqtt-proxy"` |  |
+| dashboard_configuration.plugins[88] | string | `"ai-proxy"` |  |
+| dashboard_configuration.plugins[89] | string | `"ai-prompt-template"` |  |
 | dashboard_configuration.plugins[8] | string | `"batch-requests"` |  |
+| dashboard_configuration.plugins[90] | string | `"ai-prompt-decorator"` |  |
 | dashboard_configuration.plugins[9] | string | `"ua-restriction"` |  |
 | dashboard_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
 | dashboard_configuration.prometheus.basic_auth.password | string | `""` |  |
@@ -163,7 +166,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraEnvVars | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"IfNotPresent"` |  |
 | developer_portal.image.repository | string | `"api7/api7-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v0.0.10"` |  |
+| developer_portal.image.tag | string | `"v0.1.1"` |  |
 | developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.replicaCount | int | `1` |  |
 | developer_portal_configuration.enable | bool | `true` |  |
@@ -185,7 +188,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.2.15.2"` |  |
+| dp_manager.image.tag | string | `"v3.2.16.0"` |  |
 | dp_manager.replicaCount | int | `1` |  |
 | dp_manager_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dp_manager_configuration.database.max_idle_conns | int | `2` |  |
