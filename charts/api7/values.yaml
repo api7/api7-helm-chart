@@ -10,7 +10,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.16.2"
+    tag: "v3.2.16.3"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -33,7 +33,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.16.2"
+    tag: "v3.2.16.3"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -56,7 +56,7 @@ developer_portal:
     repository: api7/api7-developer-portal
     pullPolicy: IfNotPresent
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.1.2"
+    tag: "v0.1.3"
   # Specifies the name of Secret for developer portal TLS configuration, and files store under /app/certs directory
   keyCertSecret: ""
   extraEnvVars: []
@@ -277,111 +277,19 @@ dashboard_configuration:
       - "/api/v1/labels"
   console:
     addr: "http://127.0.0.1:3000"
-#  fallback_cp:
-#    aws_s3:
-#      access_key: "access"
-#      secret_key: "secret"
-#      region: "ap-south-1"
-#      bucket: "to-push-ha-data"
-#    cron_spec: "@every 1m"
-
-  plugins:
-    - real-ip
-    - error-page
-    - client-control
-    - proxy-control
-    - zipkin
-    #- skywalking
-    - ext-plugin-pre-req
-    - mocking
-    - serverless-pre-function
-    - batch-requests
-    - ua-restriction
-    - referer-restriction
-    - uri-blocker
-    - request-validation
-    - authz-casbin
-    - authz-casdoor
-    - wolf-rbac
-    - multi-auth
-    - ldap-auth
-    - forward-auth
-    - saml-auth
-    - opa
-    - authz-keycloak
-    #- error-log-logger
-    - proxy-mirror
-    - proxy-cache
-    - api-breaker
-    - limit-req
-    #- node-status
-    - gzip
-    - kafka-proxy
-    #- dubbo-proxy
-    - grpc-transcode
-    - grpc-web
-    - public-api
-    - data-mask
-    - opentelemetry
-    - datadog
-    - echo
-    - loggly
-    - splunk-hec-logging
-    - skywalking-logger
-    - google-cloud-logging
-    - sls-logger
-    - tcp-logger
-    - rocketmq-logger
-    - udp-logger
-    - file-logger
-    - clickhouse-logger
-    - ext-plugin-post-resp
-    - serverless-post-function
-    - azure-functions
-    - aws-lambda
-    - openwhisk
-    - consumer-restriction
-    - attach-consumer-label
-    - acl
-    - basic-auth
-    - cors
-    - csrf
-    - fault-injection
-    - hmac-auth
-    - jwt-auth
-    - key-auth
-    - openid-connect
-    - limit-count
-    - redirect
-    - request-id
-    - proxy-rewrite
-    - response-rewrite
-    - workflow
-    - proxy-buffering
-    - tencent-cloud-cls
-    - openfunction
-    - graphql-proxy-cache
-    - ext-plugin-post-req
-    #- log-rotate
-    - graphql-limit-count
-    - elasticsearch-logger
-    - kafka-logger
-    - body-transformer
-    - traffic-split
-    - degraphql
-    - http-logger
-    - cas-auth
-    - traffic-label
-    - oas-validator
-    - api7-traffic-split
-    - limit-conn
-    - prometheus
-    - syslog
-    - ip-restriction
-    - mqtt-proxy
-    - ai-proxy
-    - ai-prompt-template
-    - ai-prompt-decorator
+  consumer_proxy:
+    enable: false
+    cache_success_count: 512
+    cache_success_ttl: 60
+    cache_failure_count: 512
+    cache_failure_ttl: 60
+  # fallback_cp:
+  #   aws_s3:
+  #     access_key: "access"
+  #     secret_key: "secret"
+  #     region: "ap-south-1"
+  #     bucket: "to-push-ha-data"
+  #   cron_spec: "@every 1m"
 
 dp_manager_configuration:
   server:
@@ -415,6 +323,10 @@ dp_manager_configuration:
       key_file: ""  # the file path of the private key for requesting prometheus, (e.g. /app/prometheus/certs/tls.key)
       cert_file: "" # the file path of the certificate for requesting prometheus, (e.g. /app/prometheus/certs/tls.crt)
       ca_file: ""   # the file path of the ca to verify the prometheus tls server. (e.g. /app/prometheus/certs/ca.crt)
+  rate_limit:
+    enable: false
+    time_window: 1  # unit: second
+    count: 1000
 
 developer_portal_configuration:
   enable: true
