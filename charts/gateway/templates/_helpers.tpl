@@ -88,13 +88,6 @@ prometheus:
   export_uri: {{ .Values.serviceMonitor.path }}
   metric_prefix: {{ .Values.serviceMonitor.metricPrefix }}
 {{- end }}
-{{- if .Values.customPlugins.enabled }}
-{{- range $plugin := .Values.customPlugins.plugins }}
-{{- if $plugin.attrs }}
-{{ $plugin.name }}: {{- $plugin.attrs | toYaml | nindent 2 }}
-{{- end }}
-{{- end }}
-{{- end }}
 {{- end -}}
 
 {{- define "apisix.pluginAttrs" -}}
