@@ -213,6 +213,13 @@ data:
       prefix: {{ .Values.vault.prefix }}
     {{- end }}
 
+    {{- if or .Values.pluginAttrs .Values.serviceMonitor.enabled}}
+    {{- $pluginAttrs := include "apisix.pluginAttrs" . -}}
+    {{- if gt (len ($pluginAttrs | fromYaml)) 0 }}
+    plugin_attr: {{- $pluginAttrs | nindent 6 }}
+    {{- end }}
+    {{- end }}
+
     deployment:
       role: {{ .Values.deployment.role }}
       {{- if or (eq .Values.deployment.role "traditional") (eq .Values.deployment.role "control_plane") }}
