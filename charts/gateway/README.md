@@ -62,6 +62,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.enableServerTokens | bool | `true` | Whether the APISIX version number should be shown in Server header |
 | apisix.enabled | bool | `true` | Enable or disable API7 Gateway itself |
 | apisix.extraEnvVars | list | `[]` | extraEnvVars An array to add extra env vars e.g: extraEnvVars:   - name: FOO     value: "bar"   - name: FOO2     valueFrom:       secretKeyRef:         name: SECRET_NAME         key: KEY |
+| apisix.extraEnvVarsCM | string | `""` |  |
+| apisix.extraEnvVarsSecret | string | `""` |  |
 | apisix.hostNetwork | bool | `false` |  |
 | apisix.http.luaSharedDict.access-tokens | string | `"1m"` |  |
 | apisix.http.luaSharedDict.balancer-ewma | string | `"10m"` |  |
@@ -90,7 +92,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.2.7.1"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.2.16.3"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.luaModuleHook | object | `{"configMapRef":{"mounts":[{"key":"","path":""}],"name":""},"enabled":false,"hookPoint":"","luaPath":""}` | Whether to add a custom lua module |
 | apisix.luaModuleHook.configMapRef | object | `{"mounts":[{"key":"","path":""}],"name":""}` | configmap that stores the codes |
@@ -127,14 +129,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
 | autoscaling.version | string | `"v2"` | HPA version, the value is "v2" or "v2beta1", default "v2" |
 | configurationSnippet | object | `{"httpAdmin":"","httpEnd":"","httpSrv":"","httpSrvLocation":"","httpStart":"","main":"","stream":""}` | Custom configuration snippet. |
-| customPlugins | object | `{"enabled":false,"luaPath":"/opts/custom_plugins/?.lua","plugins":[{"attrs":{},"configMap":{"mounts":[{"key":"the-file-name","path":"mount-path"}],"name":"configmap-name"},"name":"plugin-name"}]}` | customPlugins allows you to mount your own HTTP plugins. |
-| customPlugins.enabled | bool | `false` | Whether to configure some custom plugins |
-| customPlugins.luaPath | string | `"/opts/custom_plugins/?.lua"` | the lua_path that tells APISIX where it can find plugins, note the last ';' is required. |
-| customPlugins.plugins[0] | object | `{"attrs":{},"configMap":{"mounts":[{"key":"the-file-name","path":"mount-path"}],"name":"configmap-name"},"name":"plugin-name"}` | plugin name. |
-| customPlugins.plugins[0].attrs | object | `{}` | plugin attrs |
-| customPlugins.plugins[0].configMap | object | `{"mounts":[{"key":"the-file-name","path":"mount-path"}],"name":"configmap-name"}` | plugin codes can be saved inside configmap object. |
-| customPlugins.plugins[0].configMap.mounts | list | `[{"key":"the-file-name","path":"mount-path"}]` | since keys in configmap is flat, mountPath allows to define the mount path, so that plugin codes can be mounted hierarchically. |
-| customPlugins.plugins[0].configMap.name | string | `"configmap-name"` | name of configmap. |
 | deployment.certs | object | `{"cert":"","cert_key":"","certsSecret":"","mTLSCACert":"","mTLSCACertSecret":""}` | certs used for certificates in decoupled mode |
 | deployment.certs.cert | string | `""` | cert name in certsSecret |
 | deployment.certs.cert_key | string | `""` | cert key in certsSecret |
@@ -178,8 +172,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | etcd.prefix | string | `"/apisix"` | apisix configurations prefix |
 | etcd.timeout | int | `30` | Set the timeout value in seconds for subsequent socket operations from apisix to etcd cluster |
 | etcd.user | string | `""` | if etcd.enabled is false, username for external etcd. If etcd.enabled is true, use etcd.auth.rbac.rootPassword instead. |
-| extPlugin.cmd | list | `["/path/to/apisix-plugin-runner/runner","run"]` | the command and its arguements to run as a subprocess |
-| extPlugin.enabled | bool | `false` | Enable External Plugins. See [external plugin](https://apisix.apache.org/docs/apisix/next/external-plugin/) |
 | extraInitContainers | list | `[]` | Additional `initContainers`, See [Kubernetes initContainers](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/) for the detail. |
 | extraVolumeMounts | list | `[]` | Additional `volume`, See [Kubernetes Volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the detail. |
 | extraVolumes | list | `[]` | Additional `volume`, See [Kubernetes Volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the detail. |
@@ -214,7 +206,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | nginx.workerProcesses | string | `"auto"` |  |
 | nginx.workerRlimitNofile | string | `"20480"` |  |
 | pluginAttrs | object | `{}` | Set APISIX plugin attributes, see [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L376) for more details |
-| plugins | list | `[]` | Customize the list of APISIX plugins to enable. By default, APISIX's default plugins are automatically used. See [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml) |
 | rbac.create | bool | `false` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `false` |  |
@@ -229,12 +220,17 @@ The command removes all the Kubernetes components associated with the chart and 
 | serviceMonitor.name | string | `""` | name of the serviceMonitor, by default, it is the same as the apisix fullname |
 | serviceMonitor.namespace | string | `""` | namespace where the serviceMonitor is deployed, by default, it is the same as the namespace of the apisix |
 | serviceMonitor.path | string | `"/apisix/prometheus/metrics"` | path of the metrics endpoint |
-| stream_plugins | list | `[]` | Customize the list of APISIX stream_plugins to enable. By default, APISIX's default stream_plugins are automatically used. See [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml) |
 | updateStrategy | object | `{}` |  |
 | vault.enabled | bool | `false` | Enable or disable the vault integration |
 | vault.host | string | `""` | The host address where the vault server is running. |
 | vault.prefix | string | `""` | Prefix allows you to better enforcement of policies. |
 | vault.timeout | int | `10` | HTTP timeout for each request. |
 | vault.token | string | `""` | The generated token from vault instance that can grant access to read data from the vault. |
-| wasmPlugins.enabled | bool | `false` | Enable Wasm Plugins. See [wasm plugin](https://apisix.apache.org/docs/apisix/next/wasm/) |
-| wasmPlugins.plugins | list | `[]` |  |
+
+## Upgrading
+
+### To 0.1.11
+
+Remove configuration items such as `plugins`, `stream_plugins`, and `custom_plugins` that are no longer needed in API7 EE.
+
+**This version of the helm chart needs to be used with API7 EE gateway version 3.2.16.3 or above.**

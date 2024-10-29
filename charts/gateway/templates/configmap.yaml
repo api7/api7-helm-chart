@@ -28,9 +28,6 @@ data:
       enable_admin: {{ .Values.admin.enabled }}
       enable_admin_cors: {{ .Values.admin.cors }}
       enable_debug: false
-      {{- if or .Values.customPlugins.enabled .Values.apisix.luaModuleHook.enabled }}
-      extra_lua_path: {{ .Values.customPlugins.luaPath }};{{ .Values.apisix.luaModuleHook.luaPath }}
-      {{- end }}
 
       {{- if .Values.apisix.luaModuleHook.enabled }}
       lua_module_hook: {{ .Values.apisix.luaModuleHook.hookPoint | quote }}
@@ -216,47 +213,11 @@ data:
       prefix: {{ .Values.vault.prefix }}
     {{- end }}
 
-    {{- if .Values.plugins }}
-    plugins:    # plugin list
-    {{- range $plugin := .Values.plugins }}
-      {{- if ne $plugin "" }}
-      - {{ $plugin }}
-      {{- end }}
-    {{- end }}
-    {{- if .Values.customPlugins.enabled }}
-    {{- range $plugin := .Values.customPlugins.plugins }}
-      - {{ $plugin.name }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
-    {{- if .Values.stream_plugins }}
-    stream_plugins:
-    {{- range $plugin := .Values.stream_plugins }}
-      {{- if ne $plugin "" }}
-      - {{ $plugin }}
-      {{- end }}
-    {{- end }}
-    {{- end }}
-
-    {{- if .Values.extPlugin.enabled }}
-    ext-plugin:
-      cmd:
-      {{- range $arg := .Values.extPlugin.cmd }}
-        - {{ $arg }}
-      {{- end }}
-    {{- end }}
-
-    {{- if or .Values.pluginAttrs .Values.customPlugins.enabled .Values.serviceMonitor.enabled}}
+    {{- if or .Values.pluginAttrs .Values.serviceMonitor.enabled}}
     {{- $pluginAttrs := include "apisix.pluginAttrs" . -}}
     {{- if gt (len ($pluginAttrs | fromYaml)) 0 }}
     plugin_attr: {{- $pluginAttrs | nindent 6 }}
     {{- end }}
-    {{- end }}
-
-    {{- if .Values.wasmPlugins.enabled }}
-    wasm:
-      plugins:
-        {{- toYaml .Values.wasmPlugins.plugins | nindent 8 }}
     {{- end }}
 
     deployment:

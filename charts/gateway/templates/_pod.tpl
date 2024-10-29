@@ -53,6 +53,15 @@ spec:
               name: {{ .Values.admin.credentials.secretName }}
               key: viewer
       {{- end }}
+      envFrom:
+        {{- if .Values.apisix.extraEnvVarsCM }}
+        - configMapRef:
+            name: {{ include "apisix.tplvalues.render" (dict "value" .Values.apisix.extraEnvVarsCM "context" $) }}
+        {{- end }}
+        {{- if .Values.apisix.extraEnvVarsSecret }}
+        - secretRef:
+            name: {{ include "apisix.tplvalues.render" (dict "value" .Values.apisix.extraEnvVarsSecret "context" $) }}
+        {{- end }}
 
       ports:
         - name: http
@@ -155,24 +164,6 @@ spec:
         - mountPath: /etcd-ssl
           name: etcd-ssl
       {{- end }}
-      {{- if .Values.customPlugins.enabled }}
-      {{- range $plugin := .Values.customPlugins.plugins }}
-      {{- range $mount := $plugin.configMap.mounts }}
-      {{- if ne $plugin.configMap.name "" }}
-        - mountPath: {{ $mount.path }}
-          name: plugin-{{ $plugin.configMap.name }}
-          subPath: {{ $mount.key }}
-      {{- end }}
-      {{- end }}
-      {{- end }}
-      {{- end }}
-      {{- if .Values.apisix.luaModuleHook.enabled }}
-      {{- range $mount := .Values.apisix.luaModuleHook.configMapRef.mounts }}
-        - mountPath: {{ $mount.path }}
-          name: lua-module-hook
-          subPath: {{ $mount.key }}
-      {{- end }}
-      {{- end }}
       {{- if .Values.extraVolumeMounts }}
       {{- toYaml .Values.extraVolumeMounts | nindent 8 }}
       {{- end }}
@@ -234,20 +225,6 @@ spec:
             fieldRef:
               fieldPath: metadata.uid
       name: id
-    {{- end }}
-    {{- if .Values.customPlugins.enabled }}
-    {{- range $plugin := .Values.customPlugins.plugins }}
-    {{- if ne $plugin.configMap.name "" }}
-    - name: plugin-{{ $plugin.configMap.name }}
-      configMap:
-        name: {{ $plugin.configMap.name }}
-    {{- end }}
-    {{- end }}
-    {{- end }}
-    {{- if .Values.apisix.luaModuleHook.enabled }}
-    - name: lua-module-hook
-      configMap:
-        name: {{ .Values.apisix.luaModuleHook.configMapRef.name }}
     {{- end }}
     {{- if .Values.extraVolumes }}
     {{- toYaml .Values.extraVolumes | nindent 4 }}

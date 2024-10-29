@@ -115,7 +115,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.2.7.1
+    tag: 3.2.16.3
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
@@ -190,6 +190,12 @@ apisix:
   #         name: SECRET_NAME
   #         key: KEY
   extraEnvVars: []
+  ## @param extraEnvVarsCM Name of existing ConfigMap containing extra env vars
+  ##
+  extraEnvVarsCM: ""
+  ## @param extraEnvVarsSecret Name of existing Secret containing extra env vars
+  ##
+  extraEnvVarsSecret: ""
 
 nameOverride: ""
 fullnameOverride: ""
@@ -374,46 +380,8 @@ nginx:
   enableCPUAffinity: true
   envs: []
 
-# -- Customize the list of APISIX plugins to enable. By default, APISIX's default plugins are automatically used. See [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml)
-plugins: []
-# -- Customize the list of APISIX stream_plugins to enable. By default, APISIX's default stream_plugins are automatically used. See [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml)
-stream_plugins: []
-
 # -- Set APISIX plugin attributes, see [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L376) for more details
 pluginAttrs: {}
-
-extPlugin:
-  # -- Enable External Plugins. See [external plugin](https://apisix.apache.org/docs/apisix/next/external-plugin/)
-  enabled: false
-  # -- the command and its arguements to run as a subprocess
-  cmd: ["/path/to/apisix-plugin-runner/runner", "run"]
-
-wasmPlugins:
-  # -- Enable Wasm Plugins. See [wasm plugin](https://apisix.apache.org/docs/apisix/next/wasm/)
-  enabled: false
-  plugins: []
-
-# -- customPlugins allows you to mount your own HTTP plugins.
-customPlugins:
-  # -- Whether to configure some custom plugins
-  enabled: false
-  # -- the lua_path that tells APISIX where it can find plugins,
-  # note the last ';' is required.
-  luaPath: "/opts/custom_plugins/?.lua"
-  plugins:
-    # -- plugin name.
-    - name: "plugin-name"
-      # -- plugin attrs
-      attrs: {}
-      # -- plugin codes can be saved inside configmap object.
-      configMap:
-        # -- name of configmap.
-        name: "configmap-name"
-        # -- since keys in configmap is flat, mountPath allows to define the mount
-        # path, so that plugin codes can be mounted hierarchically.
-        mounts:
-          - key: "the-file-name"
-            path: "mount-path"
 
 updateStrategy: {}
   # type: RollingUpdate
