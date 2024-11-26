@@ -10,7 +10,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.16.5"
+    tag: "v3.2.16.6"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -33,7 +33,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.2.16.5"
+    tag: "v3.2.16.6"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -52,14 +52,17 @@ dp_manager:
 
 developer_portal:
   replicaCount: 1
-  image:
-    repository: api7/api7-developer-portal
-    pullPolicy: IfNotPresent
-    # Overrides the image tag whose default is the chart appVersion.
-    tag: "v0.1.3"
   # Specifies the name of Secret for developer portal TLS configuration, and files store under /app/certs directory
   keyCertSecret: ""
+  image:
+    repository: api7/api7-ee-developer-portal
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "v3.2.16.6"
+
   extraEnvVars: []
+  extraVolumes: []
+  extraVolumeMounts: []
 
 imagePullSecret: ""
 nameOverride: ""
@@ -283,6 +286,11 @@ dashboard_configuration:
     cache_success_ttl: 60
     cache_failure_count: 512
     cache_failure_ttl: 60
+  developer_proxy:
+    cache_success_count: 256
+    cache_success_ttl: 15
+    cache_failure_count: 256
+    cache_failure_ttl: 15
   # fallback_cp:
   #   aws_s3:
   #     access_key: "access"
@@ -336,3 +344,16 @@ developer_portal_configuration:
       port: 4321
       tls:
         enabled: true
+        key_file: ""    # the file path of private key, (e.g. /app/certs/tls.key)
+        cert_file: ""   # the file path of certificate, (e.g. /app/certs/tls.crt)
+    status:
+      disable: false
+      host: "127.0.0.1"
+      port: 4322
+  log:
+    level: warn
+    output: stderr
+  database:
+    dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
+    max_idle_conns: 2
+    max_open_conns: 30

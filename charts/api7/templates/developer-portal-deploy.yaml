@@ -15,6 +15,7 @@ spec:
   template:
     metadata:
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/developer-portal-configmap.yaml") . | sha256sum }}
       {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
       {{- end }}
@@ -30,11 +31,27 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       volumes:
+        - name: config
+          configMap:
+            name: {{ include "api7ee3.fullname" . }}-developer-portal-config
+      {{- if .Values.developer_portal.extraVolumes }}
+      {{- include "api7ee3.tplvalues.render" (dict "value" .Values.developer_portal.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
       {{- if .Values.developer_portal.keyCertSecret }}
         - name: ssl
           secret:
             secretName: {{ .Values.developer_portal.keyCertSecret | quote }}
       {{- end }}
+      initContainers:
+        - name: wait-for-dashboard
+          image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
+          {{- if not .Values.dashboard_configuration.server.listen.disable }}
+          command: [ 'sh', '-c', "until nc -z -v -w3 {{ include "api7ee3.fullname" . }}-dashboard {{ .Values.dashboard_service.port }};do echo waiting for dashboard `date`; sleep 2; done;" ]
+          {{- else }}
+          command: [ 'sh', '-c', "until nc -z -v -w3 {{ include "api7ee3.fullname" . }}-dashboard {{ .Values.dashboard_service.tlsPort }};do echo waiting for dashboard `date`; sleep 2; done;" ]
+          {{- end }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
       containers:
         - name: developer-portal
           securityContext:
@@ -46,43 +63,30 @@ spec:
               containerPort: {{ .Values.developer_portal_configuration.server.listen.port }}
               protocol: TCP
           livenessProbe:
-            exec:
-              command: ["nc", "-z", "127.0.0.1", "4321"]
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            failureThreshold: 10
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: {{ if not .Values.developer_portal_configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            failureThreshold: 30
           readinessProbe:
-            exec:
-              command: [ "nc", "-z", "127.0.0.1", "4321" ]
-            initialDelaySeconds: 10
-            periodSeconds: 5
-            failureThreshold: 10
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: {{ if not .Values.developer_portal_configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
+            initialDelaySeconds: 1
+            periodSeconds: 2
+            failureThreshold: 30
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
-          {{- if not .Values.dashboard_configuration.server.listen.disable }}
-            - name: API_URL
-              value: 'http://{{ include "api7ee3.fullname" . }}-dashboard.{{ .Release.Namespace }}:{{ .Values.dashboard_service.port }}'
-          {{- else }}
-            - name: NODE_TLS_REJECT_UNAUTHORIZED
-              value: "0"
-            - name: API_URL
-              value: 'https://{{ include "api7ee3.fullname" . }}-dashboard:{{ .Values.dashboard_service.tlsPort }}'
-          {{- end }}
-          {{- if not .Values.developer_portal_configuration.server.listen.tls.enabled }}
-            - name: DISABLE_HTTPS
-              value: "1"
-          {{- end}}
-          {{- if .Values.developer_portal.keyCertSecret }}
-            - name: SERVER_CERT_PATH
-              value: "/app/certs/tls.crt"
-            - name: SERVER_KEY_PATH
-              value: "/app/certs/tls.key"
-          {{- end}}
           {{- if .Values.developer_portal.extraEnvVars }}
           {{- include "api7ee3.tplvalues.render" (dict "value" .Values.developer_portal.extraEnvVars "context" $) | nindent 12 }}
           {{- end }}
           volumeMounts:
+            - name: config
+              mountPath: /app/conf
           {{- if .Values.developer_portal.keyCertSecret }}
             - mountPath: /app/certs
               name: ssl

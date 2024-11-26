@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.16.19](https://img.shields.io/badge/Version-0.16.19-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.16](https://img.shields.io/badge/AppVersion-3.2.16-informational?style=flat-square)
+![Version: 0.16.20](https://img.shields.io/badge/Version-0.16.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.2.16](https://img.shields.io/badge/AppVersion-3.2.16-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -23,7 +23,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.2.16.5"` |  |
+| dashboard.image.tag | string | `"v3.2.16.6"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.replicaCount | int | `1` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
@@ -35,6 +35,10 @@ A Helm chart for Kubernetes
 | dashboard_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dashboard_configuration.database.max_idle_conns | int | `2` |  |
 | dashboard_configuration.database.max_open_conns | int | `30` |  |
+| dashboard_configuration.developer_proxy.cache_failure_count | int | `256` |  |
+| dashboard_configuration.developer_proxy.cache_failure_ttl | int | `15` |  |
+| dashboard_configuration.developer_proxy.cache_success_count | int | `256` |  |
+| dashboard_configuration.developer_proxy.cache_success_ttl | int | `15` |  |
 | dashboard_configuration.log.level | string | `"warn"` |  |
 | dashboard_configuration.log.output | string | `"stderr"` |  |
 | dashboard_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
@@ -78,15 +82,27 @@ A Helm chart for Kubernetes
 | dashboard_service.tlsPort | int | `7443` |  |
 | dashboard_service.type | string | `"ClusterIP"` |  |
 | developer_portal.extraEnvVars | list | `[]` |  |
-| developer_portal.image.pullPolicy | string | `"IfNotPresent"` |  |
-| developer_portal.image.repository | string | `"api7/api7-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v0.1.3"` |  |
+| developer_portal.extraVolumeMounts | list | `[]` |  |
+| developer_portal.extraVolumes | list | `[]` |  |
+| developer_portal.image.pullPolicy | string | `"Always"` |  |
+| developer_portal.image.repository | string | `"api7/api7-ee-developer-portal"` |  |
+| developer_portal.image.tag | string | `"v3.2.16.6"` |  |
 | developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.replicaCount | int | `1` |  |
+| developer_portal_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
+| developer_portal_configuration.database.max_idle_conns | int | `2` |  |
+| developer_portal_configuration.database.max_open_conns | int | `30` |  |
 | developer_portal_configuration.enable | bool | `true` |  |
+| developer_portal_configuration.log.level | string | `"warn"` |  |
+| developer_portal_configuration.log.output | string | `"stderr"` |  |
 | developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | developer_portal_configuration.server.listen.port | int | `4321` |  |
+| developer_portal_configuration.server.listen.tls.cert_file | string | `""` |  |
 | developer_portal_configuration.server.listen.tls.enabled | bool | `true` |  |
+| developer_portal_configuration.server.listen.tls.key_file | string | `""` |  |
+| developer_portal_configuration.server.status.disable | bool | `false` |  |
+| developer_portal_configuration.server.status.host | string | `"127.0.0.1"` |  |
+| developer_portal_configuration.server.status.port | int | `4322` |  |
 | developer_portal_service.annotations | object | `{}` |  |
 | developer_portal_service.ingress.annotations | object | `{}` |  |
 | developer_portal_service.ingress.className | string | `""` |  |
@@ -102,7 +118,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.2.16.5"` |  |
+| dp_manager.image.tag | string | `"v3.2.16.6"` |  |
 | dp_manager.replicaCount | int | `1` |  |
 | dp_manager_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dp_manager_configuration.database.max_idle_conns | int | `2` |  |
