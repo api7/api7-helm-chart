@@ -18,8 +18,11 @@ metadata:
   name: {{ $fullName }}
   labels:
     {{- include "api7ee3.labels" . | nindent 4 }}
-  {{- with .Values.developer_portal_service.ingress.annotations }}
   annotations:
+  {{- if .Values.developer_portal_configuration.server.listen.tls.enabled }}
+    nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+  {{- end }}
+  {{- with .Values.developer_portal_service.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
