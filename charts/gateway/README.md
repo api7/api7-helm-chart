@@ -82,9 +82,12 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.http.luaSharedDict.plugin-graphql-limit-count-reset-header | string | `"10m"` |  |
 | apisix.http.luaSharedDict.plugin-limit-conn | string | `"10m"` |  |
 | apisix.http.luaSharedDict.plugin-limit-count | string | `"10m"` |  |
+| apisix.http.luaSharedDict.plugin-limit-count-advanced | string | `"10m"` |  |
+| apisix.http.luaSharedDict.plugin-limit-count-advanced-redis-cluster-slot-lock | string | `"1m"` |  |
 | apisix.http.luaSharedDict.plugin-limit-count-redis-cluster-slot-lock | string | `"1m"` |  |
 | apisix.http.luaSharedDict.plugin-limit-req | string | `"10m"` |  |
 | apisix.http.luaSharedDict.saml_sessions | string | `"10m"` |  |
+| apisix.http.luaSharedDict.status_report | string | `"1m"` |  |
 | apisix.http.luaSharedDict.tars | string | `"1m"` |  |
 | apisix.http.luaSharedDict.tracing_buffer | string | `"10m"` |  |
 | apisix.http.luaSharedDict.upstream-healthcheck | string | `"10m"` |  |
@@ -92,7 +95,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.2.16.3"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.2.16.7"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.luaModuleHook | object | `{"configMapRef":{"mounts":[{"key":"","path":""}],"name":""},"enabled":false,"hookPoint":"","luaPath":""}` | Whether to add a custom lua module |
 | apisix.luaModuleHook.configMapRef | object | `{"mounts":[{"key":"","path":""}],"name":""}` | configmap that stores the codes |

@@ -58,6 +58,8 @@ apisix:
       balancer-ewma-locks: 10m
       balancer-ewma-last-touched-at: 10m
       plugin-limit-count-redis-cluster-slot-lock: 1m
+      plugin-limit-count-advanced: 10m
+      plugin-limit-count-advanced-redis-cluster-slot-lock: 1m
       tracing_buffer: 10m
       plugin-api-breaker: 10m
       etcd-cluster-health-check: 10m
@@ -69,6 +71,7 @@ apisix:
       tars: 1m
       cas-auth: 10m
       saml_sessions: 10m
+      status_report: 1m
 
   # -- Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings,
   # click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict
@@ -115,7 +118,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.2.16.3
+    tag: 3.2.16.7
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
