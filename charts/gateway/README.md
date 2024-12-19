@@ -95,7 +95,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.3.0"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.3.1"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.luaModuleHook | object | `{"configMapRef":{"mounts":[{"key":"","path":""}],"name":""},"enabled":false,"hookPoint":"","luaPath":""}` | Whether to add a custom lua module |
 | apisix.luaModuleHook.configMapRef | object | `{"mounts":[{"key":"","path":""}],"name":""}` | configmap that stores the codes |
