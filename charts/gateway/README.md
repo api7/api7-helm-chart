@@ -64,6 +64,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.extraEnvVars | list | `[]` | extraEnvVars An array to add extra env vars e.g: extraEnvVars:   - name: FOO     value: "bar"   - name: FOO2     valueFrom:       secretKeyRef:         name: SECRET_NAME         key: KEY |
 | apisix.extraEnvVarsCM | string | `""` |  |
 | apisix.extraEnvVarsSecret | string | `""` |  |
+| apisix.extraLuaCPath | string | `""` |  |
+| apisix.extraLuaPath | string | `""` |  |
 | apisix.hostNetwork | bool | `false` |  |
 | apisix.http.luaSharedDict.access-tokens | string | `"1m"` |  |
 | apisix.http.luaSharedDict.balancer-ewma | string | `"10m"` |  |
@@ -97,13 +99,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
 | apisix.image.tag | string | `"3.3.2"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
-| apisix.luaModuleHook | object | `{"configMapRef":{"mounts":[{"key":"","path":""}],"name":""},"enabled":false,"hookPoint":"","luaPath":""}` | Whether to add a custom lua module |
-| apisix.luaModuleHook.configMapRef | object | `{"mounts":[{"key":"","path":""}],"name":""}` | configmap that stores the codes |
-| apisix.luaModuleHook.configMapRef.mounts[0] | object | `{"key":"","path":""}` | Name of the ConfigMap key, for setting the mapping relationship between ConfigMap key and the lua module code path. |
-| apisix.luaModuleHook.configMapRef.mounts[0].path | string | `""` | Filepath of the plugin code, for setting the mapping relationship between ConfigMap key and the lua module code path. |
-| apisix.luaModuleHook.configMapRef.name | string | `""` | Name of the ConfigMap where the lua module codes store |
-| apisix.luaModuleHook.hookPoint | string | `""` | the hook module which will be used to inject third party code into APISIX use the lua require style like: "module.say_hello" |
-| apisix.luaModuleHook.luaPath | string | `""` | extend lua_package_path to load third party code |
 | apisix.meta.luaSharedDict.prometheus-metrics | string | `"15m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.podAnnotations | object | `{}` | Annotations to add to each pod |
