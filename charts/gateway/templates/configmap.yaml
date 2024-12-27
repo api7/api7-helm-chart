@@ -28,9 +28,11 @@ data:
       enable_admin: {{ .Values.admin.enabled }}
       enable_admin_cors: {{ .Values.admin.cors }}
       enable_debug: false
-
-      {{- if .Values.apisix.luaModuleHook.enabled }}
-      lua_module_hook: {{ .Values.apisix.luaModuleHook.hookPoint | quote }}
+      {{- if .Values.apisix.extraLuaPath }}
+      extra_lua_path: "{{ .Values.apisix.extraLuaPath }};"
+      {{- end }}
+      {{- if .Values.apisix.extraLuaCPath }}
+      extra_lua_cpath: "{{ .Values.apisix.extraLuaCPath }};"
       {{- end }}
 
       enable_dev_mode: false                       # Sets nginx worker_processes to 1 if set to true

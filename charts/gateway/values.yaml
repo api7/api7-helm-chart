@@ -80,24 +80,9 @@ apisix:
     #   size: 10k
     # - name: bar
     #   size: 1m
-  # -- Whether to add a custom lua module
-  luaModuleHook:
-    enabled: false
-    # -- extend lua_package_path to load third party code
-    luaPath: ""
-    # -- the hook module which will be used to inject third party code into APISIX
-    # use the lua require style like: "module.say_hello"
-    hookPoint: ""
-    # -- configmap that stores the codes
-    configMapRef:
-      # -- Name of the ConfigMap where the lua module codes store
-      name: ""
-      # mounts decides how to mount the codes to the container.
-      mounts:
-        # -- Name of the ConfigMap key, for setting the mapping relationship between ConfigMap key and the lua module code path.
-        - key: ""
-        # -- Filepath of the plugin code, for setting the mapping relationship between ConfigMap key and the lua module code path.
-          path: ""
+
+  extraLuaPath: ""
+  extraLuaCPath: ""
 
   # -- Defines how apisix handles routing:
   # - radixtree_uri: match route by uri(base on radixtree)
