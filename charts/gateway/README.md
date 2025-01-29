@@ -102,6 +102,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.meta.luaSharedDict.prometheus-metrics | string | `"15m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.podAnnotations | object | `{}` | Annotations to add to each pod |
+| apisix.podLabels | object | `{}` | Labels to add to each pod |
 | apisix.podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":1,"minAvailable":"90%"}` | See https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more details |
 | apisix.podDisruptionBudget.enabled | bool | `false` | Enable or disable podDisruptionBudget |
 | apisix.podDisruptionBudget.maxUnavailable | int | `1` | Set the maxUnavailable of podDisruptionBudget |
