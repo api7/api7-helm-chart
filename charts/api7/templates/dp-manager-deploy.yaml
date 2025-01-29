@@ -21,6 +21,11 @@ spec:
       labels:
         {{- include "api7ee3.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: dp-manager
+        {{- if .Values.dp_manager.podLabels }}
+        {{- range $key, $value := $.Values.dp_manager.podLabels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
     spec:
       {{- if .Values.imagePullSecret }}
       imagePullSecrets:
