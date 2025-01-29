@@ -26,6 +26,7 @@ dashboard:
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []
+  podLabels: {}
 
 dp_manager:
   replicaCount: 1
@@ -49,6 +50,7 @@ dp_manager:
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []
+  podLabels: {}
 
 developer_portal:
   replicaCount: 1
@@ -63,6 +65,7 @@ developer_portal:
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []
+  podLabels: {}
 
 imagePullSecret: ""
 nameOverride: ""

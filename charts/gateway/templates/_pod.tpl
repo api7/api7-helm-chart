@@ -9,6 +9,11 @@ metadata:
     {{- end }}
   labels:
     {{- include "apisix.selectorLabels" . | nindent 4 }}
+    {{- if .Values.apisix.podLabels }}
+    {{- range $key, $value := $.Values.apisix.podLabels }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+    {{- end }}
 spec:
   {{- with .Values.global.imagePullSecrets }}
   imagePullSecrets:

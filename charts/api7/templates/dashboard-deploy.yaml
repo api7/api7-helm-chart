@@ -21,6 +21,11 @@ spec:
       labels:
         {{- include "api7ee3.selectorLabels" . | nindent 8 }}
         app.kubernetes.io/component: dashboard
+        {{- if .Values.dashboard.podLabels }}
+        {{- range $key, $value := $.Values.dashboard.podLabels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
     spec:
       {{- if .Values.imagePullSecret }}
       imagePullSecrets:
