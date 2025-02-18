@@ -86,17 +86,17 @@ spec:
               path: /healthz
               port: {{ if not .Values.dashboard_configuration.server.listen.disable }}http{{ else }}https{{ end }}
               scheme: {{ if not .Values.dashboard_configuration.server.listen.disable }}HTTP{{ else }}HTTPS{{ end }}
-            initialDelaySeconds: 1
-            periodSeconds: 2
-            failureThreshold: 30
+            initialDelaySeconds: {{ .Values.dashboard.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dashboard.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.dashboard.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
               path: /healthz
               port: {{ if not .Values.dashboard_configuration.server.listen.disable }}http{{ else }}https{{ end }}
               scheme: {{ if not .Values.dashboard_configuration.server.listen.disable }}HTTP{{ else }}HTTPS{{ end }}
-            initialDelaySeconds: 1
-            periodSeconds: 2
-            failureThreshold: 30
+            initialDelaySeconds: {{ .Values.dashboard.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dashboard.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.dashboard.readinessProbe.failureThreshold }}
           volumeMounts:
             - name: config
               mountPath: /app/conf

@@ -77,16 +77,16 @@ spec:
             httpGet:
               path: /healthz
               port: http
-            initialDelaySeconds: 1
-            periodSeconds: 2
-            failureThreshold: 30
+            initialDelaySeconds: {{ .Values.dp_manager.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dp_manager.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.dp_manager.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
               path: /healthz
               port: http
-            initialDelaySeconds: 1
-            periodSeconds: 2
-            failureThreshold: 30
+            initialDelaySeconds: {{ .Values.dp_manager.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.dp_manager.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.dp_manager.readinessProbe.failureThreshold }}
           volumeMounts:
             - name: config
               mountPath: /api7-ee
