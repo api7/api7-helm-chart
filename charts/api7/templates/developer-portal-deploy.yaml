@@ -72,17 +72,17 @@ spec:
               path: /healthz
               port: http
               scheme: {{ if not .Values.developer_portal_configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
-            initialDelaySeconds: 1
-            periodSeconds: 2
-            failureThreshold: 30
+            initialDelaySeconds: {{ .Values.developer_portal.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.developer_portal.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.developer_portal.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
               path: /healthz
               port: http
               scheme: {{ if not .Values.developer_portal_configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
-            initialDelaySeconds: 1
-            periodSeconds: 2
-            failureThreshold: 30
+            initialDelaySeconds: {{ .Values.developer_portal.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.developer_portal.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.developer_portal.readinessProbe.failureThreshold }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
