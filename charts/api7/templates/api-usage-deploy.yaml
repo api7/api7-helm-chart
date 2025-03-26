@@ -1,0 +1,103 @@
+{{- if (.Values.api_usage | default dict).enable }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-api-usage
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "api7ee3.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.api_usage.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "api7ee3.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: api-usage
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/api-usage-configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "api7ee3.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: api-usage
+        {{- if .Values.api_usage.podLabels }}
+        {{- range $key, $value := $.Values.api_usage.podLabels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+    spec:
+      {{- if .Values.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecret }}
+      {{- end }}
+      serviceAccountName: {{ include "api7ee3.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "api7ee3.fullname" . }}-api-usage-config
+      {{- if .Values.api_usage.extraVolumes }}
+      {{- include "api7ee3.tplvalues.render" (dict "value" .Values.api_usage.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
+      {{- if .Values.api_usage.keyCertSecret }}
+        - name: ssl
+          secret:
+            secretName: {{ .Values.api_usage.keyCertSecret | quote }}
+      {{- end }}
+      containers:
+        - name: api-usage
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.api_usage.image.repository }}:{{ .Values.api_usage.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.api_usage.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.api_usage.configuration.server.listen.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: {{ if not .Values.api_usage.configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
+            initialDelaySeconds: {{ (.Values.api_usage.livenessProbe | default dict).initialDelaySeconds | default 180 }}
+            periodSeconds: {{ (.Values.api_usage.livenessProbe | default dict).periodSeconds | default 10 }}
+            failureThreshold: {{ (.Values.api_usage.livenessProbe | default dict).failureThreshold | default 30 }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+              scheme: {{ if not .Values.api_usage.configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
+            initialDelaySeconds: {{ (.Values.api_usage.readinessProbe | default dict).initialDelaySeconds | default 10  }}
+            periodSeconds: {{ (.Values.api_usage.readinessProbe | default dict).periodSeconds | default 3 }}
+            failureThreshold: {{ (.Values.api_usage.readinessProbe | default dict).failureThreshold | default 3 }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- if .Values.api_usage.extraEnvVars }}
+          env:
+          {{- include "api7ee3.tplvalues.render" (dict "value" .Values.api_usage.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/conf
+          {{- if .Values.api_usage.keyCertSecret }}
+            - mountPath: /app/certs
+              name: ssl
+              readOnly: true
+          {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
