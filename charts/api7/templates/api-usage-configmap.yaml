@@ -1,0 +1,10 @@
+{{- if (.Values.api_usage_configuration | default dict).enable }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-api-usage-config
+  namespace: {{ .Release.Namespace | quote }}
+data:
+  config.yaml: |
+  {{- toYaml .Values.api_usage_configuration | nindent 4 }}
+{{- end }}
