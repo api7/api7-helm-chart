@@ -1,4 +1,4 @@
-{{- if (.Values.api_usage_configuration | default dict).enable }}
+{{- if (.Values.api_usage | default dict).enable }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
@@ -6,5 +6,5 @@ metadata:
   namespace: {{ .Release.Namespace | quote }}
 data:
   config.yaml: |
-  {{- toYaml .Values.api_usage_configuration | nindent 4 }}
+  {{- toYaml .Values.api_usage.configuration | nindent 4 }}
 {{- end }}

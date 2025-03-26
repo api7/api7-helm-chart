@@ -1,9 +1,9 @@
-{{- if ((.Values.api_usage_service | default dict).ingress | default dict).enabled }}
+{{- if ((.Values.api_usage.service | default dict).ingress | default dict).enabled }}
 {{- $fullName := printf "%s-api-usage" (include "api7ee3.fullname" .) -}}
-{{- $svcPort := .Values.api_usage_service.port -}}
-{{- if and .Values.api_usage_service.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
-  {{- if not (hasKey .Values.api_usage_service.ingress.annotations "kubernetes.io/ingress.class") }}
-  {{- $_ := set .Values.api_usage_service.ingress.annotations "kubernetes.io/ingress.class" .Values.api_usage_service.ingress.className}}
+{{- $svcPort := .Values.api_usage.service.port -}}
+{{- if and .Values.api_usage.service.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.api_usage.service.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.api_usage.service.ingress.annotations "kubernetes.io/ingress.class" .Values.api_usage.service.ingress.className}}
   {{- end }}
 {{- end }}
 {{- if semverCompare ">=1.19-0" .Capabilities.KubeVersion.GitVersion -}}
@@ -19,19 +19,19 @@ metadata:
   labels:
     {{- include "api7ee3.labels" . | nindent 4 }}
   annotations:
-  {{- if .Values.api_usage_configuration.server.listen.tls.enabled }}
+  {{- if .Values.api_usage.configuration.server.listen.tls.enabled }}
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
   {{- end }}
-  {{- with .Values.api_usage_service.ingress.annotations }}
+  {{- with .Values.api_usage.service.ingress.annotations }}
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if and .Values.api_usage_service.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
-  ingressClassName: {{ .Values.api_usage_service.ingress.className }}
+  {{- if and .Values.api_usage.service.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.api_usage.service.ingress.className }}
   {{- end }}
-  {{- if .Values.api_usage_service.ingress.tls }}
+  {{- if .Values.api_usage.service.ingress.tls }}
   tls:
-    {{- range .Values.api_usage_service.ingress.tls }}
+    {{- range .Values.api_usage.service.ingress.tls }}
     - hosts:
         {{- range .hosts }}
         - {{ . | quote }}
@@ -40,7 +40,7 @@ spec:
     {{- end }}
   {{- end }}
   rules:
-    {{- range .Values.api_usage_service.ingress.hosts }}
+    {{- range .Values.api_usage.service.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:

@@ -1,4 +1,4 @@
-{{- if (.Values.api_usage_configuration | default dict).enable }}
+{{- if (.Values.api_usage | default dict).enable }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -55,13 +55,13 @@ spec:
           imagePullPolicy: {{ .Values.api_usage.image.pullPolicy }}
           ports:
             - name: http
-              containerPort: {{ .Values.api_usage_configuration.server.listen.port }}
+              containerPort: {{ .Values.api_usage.configuration.server.listen.port }}
               protocol: TCP
           livenessProbe:
             httpGet:
               path: /healthz
               port: http
-              scheme: {{ if not .Values.api_usage_configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
+              scheme: {{ if not .Values.api_usage.configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
             initialDelaySeconds: {{ (.Values.api_usage.livenessProbe | default dict).initialDelaySeconds | default 180 }}
             periodSeconds: {{ (.Values.api_usage.livenessProbe | default dict).periodSeconds | default 10 }}
             failureThreshold: {{ (.Values.api_usage.livenessProbe | default dict).failureThreshold | default 30 }}
@@ -69,7 +69,7 @@ spec:
             httpGet:
               path: /healthz
               port: http
-              scheme: {{ if not .Values.api_usage_configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
+              scheme: {{ if not .Values.api_usage.configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
             initialDelaySeconds: {{ (.Values.api_usage.readinessProbe | default dict).initialDelaySeconds | default 10  }}
             periodSeconds: {{ (.Values.api_usage.readinessProbe | default dict).periodSeconds | default 3 }}
             failureThreshold: {{ (.Values.api_usage.readinessProbe | default dict).failureThreshold | default 3 }}
