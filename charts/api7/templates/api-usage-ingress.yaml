@@ -1,4 +1,5 @@
-{{- if ((.Values.api_usage.service | default dict).ingress | default dict).enabled }}
+{{- if and (.Values.api_usage | default dict).enable .Values.api_usage.service }}
+{{- if ((.Values.api_usage.service.ingress | default dict).enabled | default false) }}
 {{- $fullName := printf "%s-api-usage" (include "api7ee3.fullname" .) -}}
 {{- $svcPort := .Values.api_usage.service.port -}}
 {{- if and .Values.api_usage.service.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
@@ -65,4 +66,5 @@ spec:
             {{- end}}
           {{- end }}
     {{- end }}
+{{- end }}
 {{- end }}
