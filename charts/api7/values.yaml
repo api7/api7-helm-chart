@@ -10,7 +10,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.7.2"
+    tag: "v3.7.3"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -42,7 +42,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.7.2"
+    tag: "v3.7.3"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -76,7 +76,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.7.2"
+    tag: "v3.7.3"
 
   extraEnvVars: []
   extraVolumes: []
@@ -284,8 +284,8 @@ dashboard_configuration:
     output: stderr
   database:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
-    max_idle_conns: 2
     max_open_conns: 30
+    max_idle_time: 30s
   prometheus:
     addr: "http://api7-prometheus-server:9090"
     timeout: "30s"
@@ -343,8 +343,8 @@ dp_manager_configuration:
     output: stderr
   database:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
-    max_idle_conns: 2
     max_open_conns: 30
+    max_idle_time: 30s
   prometheus:
     addr: "http://api7-prometheus-server:9090"
     timeout: "30s"
@@ -358,6 +358,10 @@ dp_manager_configuration:
       key_file: ""  # the file path of the private key for requesting prometheus, (e.g. /app/prometheus/certs/tls.key)
       cert_file: "" # the file path of the certificate for requesting prometheus, (e.g. /app/prometheus/certs/tls.crt)
       ca_file: ""   # the file path of the ca to verify the prometheus tls server. (e.g. /app/prometheus/certs/ca.crt)
+  consumer_cache:
+    size: 50000
+    max_ttl: 2h
+    evict_interval: 5s
   rate_limit:
     enable: false
     time_window: 1  # unit: second
@@ -382,5 +386,5 @@ developer_portal_configuration:
     output: stderr
   database:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
-    max_idle_conns: 2
     max_open_conns: 30
+    max_idle_time: 30s
