@@ -181,6 +181,7 @@ A Helm chart for Kubernetes
 | dp_manager_service.tlsPort | int | `7943` |  |
 | dp_manager_service.type | string | `"ClusterIP"` |  |
 | fullnameOverride | string | `""` |  |
+| global.storageClass | string | `""` |  |
 | imagePullSecret | string | `""` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
@@ -191,6 +192,9 @@ A Helm chart for Kubernetes
 | postgresql.auth.username | string | `"api7ee"` |  |
 | postgresql.builtin | bool | `true` |  |
 | postgresql.fullnameOverride | string | `"api7-postgresql"` |  |
+| postgresql.image.registry | string | `"docker.io"` |  |
+| postgresql.image.repository | string | `"bitnami/postgresql"` |  |
+| postgresql.image.tag | string | `"15.4.0-debian-11-r45"` |  |
 | postgresql.primary.persistence.size | string | `"256Gi"` |  |
 | postgresql.primary.service.ports.postgresql | int | `5432` |  |
 | postgresql.readReplicas.persistence.size | string | `"256Gi"` |  |
@@ -202,12 +206,15 @@ A Helm chart for Kubernetes
 | prometheus.server.enableAdminAPI | bool | `true` |  |
 | prometheus.server.enableRemoteWriteReceiver | bool | `true` |  |
 | prometheus.server.existingSecret | string | `""` |  |
+| prometheus.server.image.registry | string | `"docker.io"` |  |
+| prometheus.server.image.repository | string | `"bitnami/prometheus"` |  |
 | prometheus.server.persistence.enabled | bool | `true` |  |
 | prometheus.server.persistence.size | string | `"120Gi"` |  |
 | prometheus.server.rbac.create | bool | `false` |  |
 | prometheus.server.service.ports.http | int | `9090` |  |
 | prometheus.server.service.type | string | `"ClusterIP"` |  |
 | prometheus.server.serviceAccount.create | bool | `false` |  |
+| prometheus.server.tag | string | `"2.48.1-debian-11-r0"` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
 | serviceAccount.annotations | object | `{}` |  |
