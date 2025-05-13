@@ -339,7 +339,8 @@ dashboard_configuration:
   #     access_key: "access"
   #     secret_key: "secret"
   #     region: "ap-south-1"
-  #     bucket: "to-push-ha-data"
+  #     resource_bucket: "to-push-resource-data"
+  #     config_bucket: "to-push-config-data"
   #   cron_spec: "@every 1m"
 
 dp_manager_configuration:
