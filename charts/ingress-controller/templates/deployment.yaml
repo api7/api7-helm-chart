@@ -1,111 +1,88 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "api7-ingress-controller.fullname" . }}
+  labels:
+    {{- include "apisix-ingress-controller-manager.labels" . | nindent 4 }}
+  name: {{ .Release.Name }}
   namespace: {{ .Release.Namespace }}
   annotations:
-  {{- range $key, $value := .Values.annotations }}
+  {{- range $key, $value := .Values.deployment.annotations }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
-  labels:
-    {{- include "api7-ingress-controller.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
-      {{- include "api7-ingress-controller.selectorLabels" . | nindent 6 }}
-  {{- with .Values.updateStrategy }}
-  strategy: {{ toYaml . | nindent 4 }}
-  {{- end }}
+      {{- include "apisix-ingress-controller-manager.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- if .Values.podAnnotations }}
-        {{- range $key, $value := $.Values.podAnnotations }}
+        {{- if .Values.deployment.podAnnotations }}
+        {{- range $key, $value := $.Values.deployment.podAnnotations }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
         {{- end }}
       labels:
-        {{- include "api7-ingress-controller.selectorLabels" . | nindent 8 }}
+        {{- include "apisix-ingress-controller-manager.selectorLabels" . | nindent 8 }}
     spec:
-      {{- with .Values.imagePullSecrets }}
-      imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- with .Values.priorityClassName }}
-      priorityClassName: {{ . }}
-      {{- end }}
-      serviceAccountName: {{ include "api7-ingress-controller.serviceAccountName" . }}
-      securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      volumes:
-        - name: configuration
-          configMap:
-            name: {{ .Release.Name }}-configmap
-            items:
-              - key: config.yaml
-                path: config.yaml
       containers:
-        - name: {{ .Chart.Name }}
-          command:
-            - /ingress-apisix/api7-ingress-controller
-            - ingress
-            - --config-path
-            - /ingress-apisix/conf/config.yaml
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: http
-              containerPort: {{ (.Values.config.httpListen | split ":")._1 }}
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /healthz
-              port: {{ (.Values.config.httpListen | split ":")._1 }}
-          readinessProbe:
-            httpGet:
-              path: /healthz
-              port: {{ (.Values.config.httpListen | split ":")._1 }}
-          resources:
-            {{- toYaml .Values.resources | nindent 12 }}
-          volumeMounts:
-            - mountPath: /ingress-apisix/conf/config.yaml
-              name: configuration
-              subPath: config.yaml
-          env:
-          - name: POD_NAMESPACE
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.namespace
-          - name: POD_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          {{- if .Values.config.dashboard.existingSecret }}
-          - name: DEFAULT_CLUSTER_ADMIN_KEY
-            valueFrom:
-              secretKeyRef:
-                name: {{ .Values.config.dashboard.existingSecret | quote }}
-                key: {{ include "api7-ingress-controller.credentials.secretAdminKey" . }}
-          {{- end }}
-      {{- with .Values.nodeSelector }}
+      - env:
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        image: "{{ .Values.deployment.image.repository }}:{{ .Values.deployment.image.tag }}"
+        volumeMounts:
+        - name: {{ .Release.Name }}-ingress-config
+          mountPath: /app/conf/config.yaml
+          subPath: config.yaml
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8081
+          initialDelaySeconds: 15
+          periodSeconds: 20
+        name: manager
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8081
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        resources:
+          limits:
+            cpu: 500m
+            memory: 128Mi
+          requests:
+            cpu: 10m
+            memory: 64Mi
+        securityContext:
+          {{- toYaml .Values.deployment.podSecurityContext | nindent 10 }}
+      {{- with .Values.deployment.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.tolerations }}
+      {{- with .Values.deployment.tolerations }}
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.affinity }}
+      {{- with .Values.deployment.affinity }}
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.topologySpreadConstraints }}
+      {{- with .Values.deployment.topologySpreadConstraints }}
       topologySpreadConstraints:
         {{- tpl (. | toYaml) $ | nindent 8 }}
       {{- end }}
+      volumes:
+      - name: {{ .Release.Name }}-ingress-config
+        configMap:
+          name: {{ .Release.Name }}-ingress-config
+      securityContext:
+        runAsNonRoot: true
+      serviceAccountName: {{ .Release.Name }}
+      terminationGracePeriodSeconds: 10

@@ -1,12 +1,21 @@
 apiVersion: v2
-name: api7-ingress-controller
-description: Ingress Controller for API7
+name: apisix-ingress-controller-manager
+description: APISIX Ingress Controller for Kubernetes
+icon: https://apache.org/logos/res/apisix/apisix.png
 keywords:
   - ingress
-  - api7
+  - apisix
+  - nginx
   - crd
 type: application
-version: 0.0.3
+version: 0.1.0
 appVersion: 2.0.0
 sources:
-  - https://github.com/api7/api7-helm-chart
+  - https://github.com/apache/apisix-ingress-controller
+maintainers:
+  - name: AlinsRan
+  - name: Revolyssup
+
+# ref: https://artifacthub.io/docs/topics/annotations/helm/
+annotations:
+  artifacthub.io/prerelease: "true"

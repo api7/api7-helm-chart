@@ -1,16 +1,15 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "api7-ingress-controller.name" -}}
+{{- define "apisix-ingress-controller-manager.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
-
 {{/*
 Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "api7-ingress-controller.fullname" -}}
+{{- define "apisix-ingress-controller-manager.name.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -22,20 +21,18 @@ If release name contains chart name it will be used as a full name.
 {{- end }}
 {{- end }}
 {{- end }}
-
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "api7-ingress-controller.chart" -}}
+{{- define "apisix-ingress-controller-manager.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
-
 {{/*
 Common labels
 */}}
-{{- define "api7-ingress-controller.labels" -}}
-helm.sh/chart: {{ include "api7-ingress-controller.chart" . }}
-{{ include "api7-ingress-controller.selectorLabels" . }}
+{{- define "apisix-ingress-controller-manager.labels" -}}
+helm.sh/chart: {{ include "apisix-ingress-controller-manager.chart" . }}
+{{ include "apisix-ingress-controller-manager.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,37 +42,11 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "api7-ingress-controller.selectorLabels" -}}
+{{- define "apisix-ingress-controller-manager.selectorLabels" -}}
 {{- if .Values.labelsOverride }}
 {{- tpl (.Values.labelsOverride | toYaml) . }}
 {{- else }}
-app.kubernetes.io/name: {{ include "api7-ingress-controller.name" . }}
+app.kubernetes.io/name: {{ include "apisix-ingress-controller-manager.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{- end }}
-{{- end }}
-
-{{/*
-Create the name of the service account to use
-*/}}
-{{- define "api7-ingress-controller.serviceAccountName" -}}
-{{- if .Values.serviceAccount.create }}
-{{- default (include "api7-ingress-controller.fullname" .) .Values.serviceAccount.name }}
-{{- else }}
-{{- default "default" .Values.serviceAccount.name }}
-{{- end }}
-{{- end }}
-
-{{- define "api7-ingress-controller.namespace" -}}
-{{- default .Release.Namespace .Values.namespace -}}
-{{- end -}}
-
-{{/*
-Key to use to fetch admin token from secret
-*/}}
-{{- define "api7-ingress-controller.credentials.secretAdminKey" -}}
-{{- if .Values.config.dashboard.existingSecretAdminKeyKey }}
-{{- .Values.config.dashboard.existingSecretAdminKeyKey }}
-{{- else }}
-{{- "adminKey" }}
 {{- end }}
 {{- end }}
