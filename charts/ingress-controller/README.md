@@ -21,11 +21,9 @@ APISIX Ingress Controller for Kubernetes
 |-----|------|---------|-------------|
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.minReplicas | int | `1` |  |
-| config.certFile | string | `""` |  |
 | config.controllerName | string | `"apisix.apache.org/apisix-ingress-controller"` |  |
 | config.enableHTTP2 | bool | `false` |  |
 | config.execADCTimeout | string | `"15s"` |  |
-| config.keyFile | string | `""` |  |
 | config.leaderElection.disable | bool | `false` |  |
 | config.leaderElection.id | string | `"apisix-ingress-controller-leader"` |  |
 | config.leaderElection.leaseDuration | string | `"15s"` |  |
@@ -34,6 +32,8 @@ APISIX Ingress Controller for Kubernetes
 | config.logLevel | string | `"info"` |  |
 | config.metricsAddr | string | `":8080"` |  |
 | config.probeAddr | string | `":8081"` |  |
+| config.provider.initSyncDelay | string | `"20m"` |  |
+| config.provider.syncPeriod | string | `"0s"` |  |
 | config.secureMetrics | string | `""` |  |
 | deployment.affinity | object | `{}` |  |
 | deployment.annotations | object | `{}` |  |
