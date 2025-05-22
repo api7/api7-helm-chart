@@ -1,19 +1,12 @@
-# apisix-ingress-controller-manager
+# api7-ingress-controller
 
 ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.0](https://img.shields.io/badge/AppVersion-2.0.0-informational?style=flat-square)
 
-APISIX Ingress Controller for Kubernetes
-
-## Maintainers
-
-| Name | Email | Url |
-| ---- | ------ | --- |
-| AlinsRan |  |  |
-| Revolyssup |  |  |
+Ingress Controller for API7
 
 ## Source Code
 
-* <https://github.com/apache/apisix-ingress-controller>
+* <https://github.com/api7/api7-helm-chart>
 
 ## Values
 
