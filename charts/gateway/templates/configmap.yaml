@@ -121,6 +121,8 @@ data:
         ssl_trusted_certificate: "system,/usr/local/apisix/conf/ssl/{{ .Values.gateway.tls.certCAFilename }}"
         {{- end }}
 
+      disable_upstream_healthcheck: {{ .Values.api7ee.disable_upstream_healthcheck }}
+
     nginx_config:    # config for render the template to genarate nginx.conf
       error_log: "{{ .Values.logs.errorLog }}"
       error_log_level: "{{ .Values.logs.errorLogLevel }}"    # warn,error
