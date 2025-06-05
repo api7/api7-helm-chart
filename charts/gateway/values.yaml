@@ -17,8 +17,7 @@ api7ee:
   # -- healthcheck data report interval in seconds
   healthcheck_report_interval: 120
 
-  # A global switch for healthcheck. Defaults to false.
-  # When set to true, it overrides all upstream healthcheck configurations and globally disabling healthchecks.
+  # -- A global switch for healthcheck. Defaults to false. When set to true, it overrides all upstream healthcheck configurations and globally disabling healthchecks.
   disable_upstream_healthcheck: false
 
 apisix:

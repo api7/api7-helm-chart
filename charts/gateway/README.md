@@ -50,7 +50,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | admin.port | int | `9180` | which port to use for API7 Gateway admin API |
 | admin.servicePort | int | `9180` | Service port to use for API7 Gateway admin API |
 | admin.type | string | `"ClusterIP"` | admin service type |
-| api7ee.disable_upstream_healthcheck | bool | `false` |  |
+| api7ee.disable_upstream_healthcheck | bool | `false` | A global switch for healthcheck. Defaults to false. When set to true, it overrides all upstream healthcheck configurations and globally disabling healthchecks. |
 | api7ee.healthcheck_report_interval | int | `120` | healthcheck data report interval in seconds |
 | api7ee.telemetry.enable | bool | `true` | enable telemetry data report to the control plane |
 | api7ee.telemetry.interval | int | `15` | interval in seconds to send telemetry data to the control plane |
