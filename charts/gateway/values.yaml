@@ -17,6 +17,10 @@ api7ee:
   # -- healthcheck data report interval in seconds
   healthcheck_report_interval: 120
 
+  # A global switch for healthcheck. Defaults to false.
+  # When set to true, it overrides all upstream healthcheck configurations and globally disabling healthchecks.
+  disable_upstream_healthcheck: false
+
 apisix:
   # -- Enable or disable API7 Gateway itself
   enabled: true
@@ -103,7 +107,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.7.3
+    tag: 3.8.3
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
