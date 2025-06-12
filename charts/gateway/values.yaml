@@ -79,6 +79,10 @@ apisix:
   # -- Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings,
   # click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict
   customLuaSharedDicts: []
+    # - name: kubernetes
+    #   size: 20m
+    # - name: nacos
+    #   size: 20m
     # - name: foo
     #   size: 10k
     # - name: bar
@@ -407,8 +411,6 @@ discovery:
     # https://apisix.apache.org/docs/apisix/discovery/#configuration-for-eureka
     # https://apisix.apache.org/docs/apisix/discovery/dns/#service-discovery-via-dns
     # https://apisix.apache.org/docs/apisix/discovery/consul_kv/#configuration-for-consul-kv
-    # https://apisix.apache.org/docs/apisix/discovery/nacos/#configuration-for-nacos
-    # https://apisix.apache.org/docs/apisix/discovery/kubernetes/#configuration
     #
     # an eureka example:
     # ```
@@ -424,22 +426,6 @@ discovery:
     #     send: 2000
     #     read: 5000
     # ```
-    #
-    # the minimal Kubernetes example:
-    # ```
-    # kubernetes: {}
-    # ```
-    #
-    # The prerequisites for the above minimal Kubernetes example:
-    #  1. [Optional] Set `.serviceAccount.create` to `true` to create a dedicated ServiceAccount.
-    #     It is recommended to do so, otherwise the default ServiceAccount "default" will be used.
-    #  2. [Required] Set `.rbac.create` to `true` to create and bind the necessary RBAC resources.
-    #     This grants the ServiceAccount in use to List-Watch Kubernetes Endpoints resources.
-    #  3. [Required] Include the following environment variables in `.nginx.envs` to pass them into
-    #     nginx worker processes (https://nginx.org/en/docs/ngx_core_module.html#env):
-    #      - KUBERNETES_SERVICE_HOST
-    #      - KUBERNETES_SERVICE_PORT
-    #     This is for allowing the default `host` and `port` of `.discovery.registry.kubernetes.service`.
 
 # access log and error log configuration
 logs:
