@@ -17,6 +17,14 @@ api7ee:
   # -- healthcheck data report interval in seconds
   healthcheck_report_interval: 120
 
+  status_endpoint:
+    # -- When enabled, APISIX will provide `/status` and `/status/ready` endpoints, /status endpoint will return 200 status code if APISIX has successfully started and running correctly, /status/ready endpoint will return 503 status code if none of the configured etcd (dp_manager) are available.
+    enabled: false
+    # -- The IP address and port on which the status endpoint will listen.
+    ip: 127.0.0.1
+    # -- The port on which the status endpoint will listen.
+    port: 7085
+
   # -- A global switch for healthcheck. Defaults to false. When set to true, it overrides all upstream healthcheck configurations and globally disabling healthchecks.
   disable_upstream_healthcheck: false
 
@@ -110,7 +118,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.8.4
+    tag: 3.8.5
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment

@@ -52,6 +52,9 @@ The command removes all the Kubernetes components associated with the chart and 
 | admin.type | string | `"ClusterIP"` | admin service type |
 | api7ee.disable_upstream_healthcheck | bool | `false` | A global switch for healthcheck. Defaults to false. When set to true, it overrides all upstream healthcheck configurations and globally disabling healthchecks. |
 | api7ee.healthcheck_report_interval | int | `120` | healthcheck data report interval in seconds |
+| api7ee.status_endpoint.enabled | bool | `false` | When enabled, APISIX will provide `/status` and `/status/ready` endpoints, /status endpoint will return 200 status code if APISIX has successfully started and running correctly, /status/ready endpoint will return 503 status code if none of the configured etcd (dp_manager) are available. |
+| api7ee.status_endpoint.ip | string | `"127.0.0.1"` | The IP address and port on which the status endpoint will listen. |
+| api7ee.status_endpoint.port | int | `7085` | The port on which the status endpoint will listen. |
 | api7ee.telemetry.enable | bool | `true` | enable telemetry data report to the control plane |
 | api7ee.telemetry.interval | int | `15` | interval in seconds to send telemetry data to the control plane |
 | api7ee.telemetry.max_metrics_size | int | `33554432` | max size in bytes(default 32M) of the metrics data sent to the control plane, if the size exceeds, the data will be truncated |
@@ -98,7 +101,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.8.4"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.8.5"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.meta.luaSharedDict.prometheus-metrics | string | `"15m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
