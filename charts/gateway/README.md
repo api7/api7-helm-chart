@@ -52,7 +52,9 @@ The command removes all the Kubernetes components associated with the chart and 
 | admin.type | string | `"ClusterIP"` | admin service type |
 | api7ee.disable_upstream_healthcheck | bool | `false` | A global switch for healthcheck. Defaults to false. When set to true, it overrides all upstream healthcheck configurations and globally disabling healthchecks. |
 | api7ee.healthcheck_report_interval | int | `120` | healthcheck data report interval in seconds |
-| api7ee.status_endpoint | object | `{"enabled":false,"ip":"127.0.0.1","port":7085}` | When enabled, APISIX will provide `/status` and `/status/ready` endpoints, /status endpoint will return 200 status code if APISIX has successfully started and running correctly, /status/ready endpoint will return 503 status code if none of the configured etcd (dp_manager) are available. |
+| api7ee.status_endpoint.enabled | bool | `false` | When enabled, APISIX will provide `/status` and `/status/ready` endpoints, /status endpoint will return 200 status code if APISIX has successfully started and running correctly, /status/ready endpoint will return 503 status code if none of the configured etcd (dp_manager) are available. |
+| api7ee.status_endpoint.ip | string | `"127.0.0.1"` |  |
+| api7ee.status_endpoint.port | int | `7085` |  |
 | api7ee.telemetry.enable | bool | `true` | enable telemetry data report to the control plane |
 | api7ee.telemetry.interval | int | `15` | interval in seconds to send telemetry data to the control plane |
 | api7ee.telemetry.max_metrics_size | int | `33554432` | max size in bytes(default 32M) of the metrics data sent to the control plane, if the size exceeds, the data will be truncated |
