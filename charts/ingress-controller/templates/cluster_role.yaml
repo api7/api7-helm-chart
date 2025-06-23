@@ -90,6 +90,7 @@ rules:
   - gatewayclasses/status
   - gateways/status
   - httproutes/status
+  - referencegrants/status
   verbs:
   - get
   - update
