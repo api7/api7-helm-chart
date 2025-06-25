@@ -26,11 +26,8 @@ deployment:
   nodeSelector: {}
   tolerations: []
   affinity: {}
-  podSecurityContext:
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - ALL
+  podSecurityContext: {}
+  securityContext: {}
   topologySpreadConstraints: []
   image:
     repository: api7/api7-ingress-controller

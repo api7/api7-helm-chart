@@ -83,6 +83,6 @@ spec:
         configMap:
           name: {{ .Release.Name }}-ingress-config
       securityContext:
-        runAsNonRoot: true
+        {{- toYaml .Values.deployment.securityContext | nindent 8 }}
       serviceAccountName: {{ .Release.Name }}
       terminationGracePeriodSeconds: 10
