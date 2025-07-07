@@ -1554,6 +1554,21 @@ entries:
   gateway:
   - apiVersion: v2
     appVersion: 3.8.5
+    created: "2025-07-07T09:04:02.230010676Z"
+    dependencies:
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.7.7
+    description: A Helm chart for API7 Gateway
+    digest: e10dae4f6dfc5a2b5c915a540224593f8c7804467f5a3b1492a4b1034322b99d
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.2.18/gateway-0.2.18.tgz
+    version: 0.2.18
+  - apiVersion: v2
+    appVersion: 3.8.5
     created: "2025-06-18T06:26:21.860033556Z"
     dependencies:
     - condition: etcd.enabled
@@ -2017,4 +2032,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2025-06-24T00:53:54.528225689Z"
+generated: "2025-07-07T09:04:02.230377128Z"
