@@ -117,6 +117,23 @@ spec:
         {{- end }}
         {{- end }}
         {{- end }}
+      {{- if .Values.gateway.readinessProbe }}
+      readinessProbe:
+      {{- toYaml Values.gateway.readinessProbe | nindent 8 }}
+      {{- else }}
+      readinessProbe:
+        failureThreshold: 6
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        tcpSocket:
+          port: {{ .Values.gateway.http.containerPort }}
+        timeoutSeconds: 1
+      {{- end }}
+      {{- if .Values.gateway.livenessProbe }}
+      livenessProbe:
+      {{- toYaml Values.gateway.livenessProbe | nindent 8 }}
+      {{- end }}
       readinessProbe:
         failureThreshold: 6
         initialDelaySeconds: 10
