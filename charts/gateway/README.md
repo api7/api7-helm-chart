@@ -138,17 +138,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | deployment.certs.certsSecret | string | `""` | secret name used for decoupled mode |
 | deployment.certs.mTLSCACert | string | `""` | mTLS CA cert filename in mTLSCACertSecret |
 | deployment.certs.mTLSCACertSecret | string | `""` | trusted_ca_cert name in certsSecret |
-| deployment.controlPlane | object | `{"cert":"","certKey":"","certsSecret":"","confServerPort":"9280"}` | used for control_plane deployment mode |
-| deployment.controlPlane.cert | string | `""` | conf Server CA cert name in certsSecret |
-| deployment.controlPlane.certKey | string | `""` | conf Server cert key name in certsSecret |
-| deployment.controlPlane.certsSecret | string | `""` | secret name used by conf Server |
-| deployment.controlPlane.confServerPort | string | `"9280"` | conf Server address |
-| deployment.dataPlane | object | `{"controlPlane":{"host":[],"prefix":"/apisix","timeout":30}}` | used for data_plane deployment mode |
-| deployment.dataPlane.controlPlane.host | list | `[]` | The hosts of the control_plane used by the data_plane |
-| deployment.dataPlane.controlPlane.prefix | string | `"/apisix"` | The prefix of the control_plane used by the data_plane |
-| deployment.dataPlane.controlPlane.timeout | int | `30` | Timeout when the data plane connects to the control plane |
-| deployment.mode | string | `"traditional"` | API7 Gateway deployment mode Optional: traditional, decoupled  ref: https://apisix.apache.org/docs/apisix/deployment-modes/ |
-| deployment.role | string | `"traditional"` | Deployment role Optional: traditional, data_plane, control_plane  ref: https://apisix.apache.org/docs/apisix/deployment-modes/ |
 | discovery.enabled | bool | `false` | Enable or disable API7 Gateway integration service discovery |
 | discovery.registry | object | `{}` | Registry is the same to the one in APISIX [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L281), and refer to such file for more setting details. also refer to [this documentation for integration service discovery](https://apisix.apache.org/docs/apisix/discovery) |
 | dns.resolvers[0] | string | `"127.0.0.1"` |  |
