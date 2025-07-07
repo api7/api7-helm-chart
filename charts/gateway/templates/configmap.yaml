@@ -17,13 +17,11 @@ data:
       {{- toYaml .Values.api7ee | nindent 6 }}
     {{- end }}
     apisix:    # universal configurations
-      {{- if not (eq .Values.deployment.role "control_plane") }}
       node_listen:    # APISIX listening port
         - {{ .Values.gateway.http.containerPort }}
         {{- with .Values.gateway.http.additionalContainerPorts }}
         {{- toYaml . | nindent 8}}
         {{- end }}
-      {{- end }}
       enable_heartbeat: true
       enable_admin: {{ .Values.admin.enabled }}
       enable_admin_cors: {{ .Values.admin.cors }}
@@ -232,25 +230,9 @@ data:
     {{- end }}
 
     deployment:
-      role: {{ .Values.deployment.role }}
-      {{- if or (eq .Values.deployment.role "traditional") (eq .Values.deployment.role "control_plane") }}
-
-      {{- if eq .Values.deployment.role "traditional" }}
+      role: traditional
       role_traditional:
         config_provider: etcd
-      {{- end }}
-
-      {{- if eq .Values.deployment.role "control_plane" }}
-      role_control_plane:
-        config_provider: etcd
-        conf_server:
-          listen: 0.0.0.0:{{ .Values.deployment.controlPlane.confServerPort }}
-          cert: "/conf-server-ssl/{{ .Values.deployment.controlPlane.cert }}"
-          cert_key: "/conf-server-ssl/{{ .Values.deployment.controlPlane.certKey }}"
-          {{- if .Values.deployment.certs.mTLSCACertSecret }}
-          client_ca_cert: "/conf-ca-ssl/{{ .Values.deployment.certs.mTLSCACert }}"
-          {{- end }}
-      {{- end }}
 
       admin:
         allow_admin:    # http://nginx.org/en/docs/http/ngx_http_access_module.html#allow
@@ -288,8 +270,6 @@ data:
             key: {{ .Values.admin.credentials.viewer }}
             {{- end }}
             role: viewer
-
-      {{- if not (eq .Values.deployment.role "data_plane") }}
       etcd:
       {{- if .Values.etcd.enabled }}
         host:                          # it's possible to define multiple etcd hosts addresses of the same etcd cluster.
@@ -329,30 +309,4 @@ data:
           {{- end }}
         {{- end }}
     {{- end }}
-    {{- end }}
-      {{- end }}
-
-      {{- if eq .Values.deployment.role "data_plane" }}
-      role_data_plane:
-        config_provider: control_plane
-        control_plane:
-          host:
-            {{- range $.Values.deployment.dataPlane.controlPlane.host }}
-            - {{ . | quote }}
-            {{- end }}
-          prefix: {{ .Values.deployment.dataPlane.controlPlane.prefix }}
-          timeout: {{ .Values.deployment.dataPlane.controlPlane.timeout }}
-      {{- end }}
-
-      {{- if eq .Values.deployment.mode "decoupled"}}
-      {{- if .Values.deployment.certs.certsSecret }}
-      certs:
-        cert: "/conf-client-ssl/{{ .Values.deployment.certs.cert }}"
-        cert_key: "/conf-client-ssl/{{ .Values.deployment.certs.cert_key }}"
-        {{- if .Values.deployment.certs.mTLSCACertSecret }}
-        trusted_ca_cert: "/conf-ca-ssl/{{ .Values.deployment.certs.mTLSCACert }}"
-        {{- end }}
-      {{- end }}
-      {{- end }}
-
 {{- end }}
