@@ -240,7 +240,7 @@ gateway:
   # annotations:
   #   service.beta.kubernetes.io/aws-load-balancer-type: nlb
   externalIPs: []
-  # -- kubernetes readiness probe, we will provide a default probe based on tcpSocket to your HTTP port.
+  # -- kubernetes readiness probe, we will provide a probe based on tcpSocket to gateway's HTTP port by default.
   readinessProbe: {}
   # -- kubernetes liveness probe.
   livenessProbe: {}
