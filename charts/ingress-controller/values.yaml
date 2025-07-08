@@ -27,7 +27,6 @@ deployment:
   tolerations: []
   affinity: {}
   podSecurityContext: {}
-  securityContext: {}
   topologySpreadConstraints: []
   image:
     repository: api7/api7-ingress-controller
@@ -46,7 +45,7 @@ config:
   metricsAddr: ":8080"
   enableHTTP2: false
   probeAddr: ":8081"
-  secureMetrics: ""
+  secureMetrics: false
   execADCTimeout: "15s"
   provider:
     type: "api7ee"
