@@ -14,11 +14,11 @@ Ingress Controller for API7
 |-----|------|---------|-------------|
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.minReplicas | int | `1` |  |
-| config.controllerName | string | `"apisix.apache.org/api7-ingress-controller"` |  |
+| config.controllerName | string | `"apisix.apache.org/apisix-ingress-controller"` |  |
 | config.enableHTTP2 | bool | `false` |  |
 | config.execADCTimeout | string | `"15s"` |  |
 | config.leaderElection.disable | bool | `false` |  |
-| config.leaderElection.id | string | `"api7-ingress-controller-leader"` |  |
+| config.leaderElection.id | string | `"apisix-ingress-controller-leader"` |  |
 | config.leaderElection.leaseDuration | string | `"15s"` |  |
 | config.leaderElection.renewDeadline | string | `"10s"` |  |
 | config.leaderElection.retryPeriod | string | `"2s"` |  |
