@@ -27,7 +27,6 @@ deployment:
   tolerations: []
   affinity: {}
   podSecurityContext: {}
-  securityContext: {}
   topologySpreadConstraints: []
   image:
     repository: api7/api7-ingress-controller

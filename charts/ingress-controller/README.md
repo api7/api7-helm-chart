@@ -38,7 +38,6 @@ Ingress Controller for API7
 | deployment.podAnnotations | object | `{}` |  |
 | deployment.podSecurityContext | object | `{}` |  |
 | deployment.replicas | int | `1` |  |
-| deployment.securityContext | object | `{}` |  |
 | deployment.tolerations | list | `[]` |  |
 | deployment.topologySpreadConstraints | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
