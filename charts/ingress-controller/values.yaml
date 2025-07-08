@@ -36,9 +36,9 @@ deployment:
 
 config:
   logLevel: "info"
-  controllerName: apisix.apache.org/apisix-ingress-controller
+  controllerName: apisix.apache.org/api7-ingress-controller
   leaderElection:
-    id: "apisix-ingress-controller-leader"
+    id: "api7-ingress-controller-leader"
     leaseDuration: "15s"
     renewDeadline: "10s"
     retryPeriod: "2s"
@@ -46,7 +46,7 @@ config:
   metricsAddr: ":8080"
   enableHTTP2: false
   probeAddr: ":8081"
-  secureMetrics: ""
+  secureMetrics: false
   execADCTimeout: "15s"
   provider:
     type: "api7ee"

@@ -1,29 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  labels:
-    {{- include "apisix-ingress-controller-manager.labels" . | nindent 4 }}
-  name: {{ .Release.Name }}
+  name: {{ include "api7-ingress-controller-manager.name.fullname" . }}
   namespace: {{ .Release.Namespace }}
   annotations:
   {{- range $key, $value := .Values.deployment.annotations }}
     {{ $key }}: {{ $value | quote }}
   {{- end }}
+  labels:
+    {{- include "api7-ingress-controller-manager.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.deployment.replicas }}
   selector:
     matchLabels:
-      {{- include "apisix-ingress-controller-manager.selectorLabels" . | nindent 6 }}
+      {{- include "api7-ingress-controller-manager.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         {{- if .Values.deployment.podAnnotations }}
         {{- range $key, $value := $.Values.deployment.podAnnotations }}
         {{ $key }}: {{ $value | quote }}
         {{- end }}
         {{- end }}
       labels:
-        {{- include "apisix-ingress-controller-manager.selectorLabels" . | nindent 8 }}
+        {{- include "api7-ingress-controller-manager.selectorLabels" . | nindent 8 }}
     spec:
       containers:
       - env:
@@ -83,6 +84,6 @@ spec:
         configMap:
           name: {{ .Release.Name }}-ingress-config
       securityContext:
-        {{- toYaml .Values.deployment.securityContext | nindent 8 }}
+        runAsNonRoot: false
       serviceAccountName: {{ .Release.Name }}
       terminationGracePeriodSeconds: 10
