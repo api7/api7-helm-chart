@@ -2,6 +2,22 @@ apiVersion: v1
 entries:
   api7-ingress-controller:
   - apiVersion: v2
+    appVersion: 2.0.3
+    created: "2025-07-28T11:21:58.880310469Z"
+    description: Ingress Controller for API7
+    digest: 53c7e3e2ac8d974ed71ec4a136dbac4ee27f705b8f9eb43b724ab07b702b8048
+    keywords:
+    - ingress
+    - api7
+    - crd
+    name: api7-ingress-controller
+    sources:
+    - https://github.com/api7/api7-helm-chart
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7-ingress-controller-0.1.6/api7-ingress-controller-0.1.6.tgz
+    version: 0.1.6
+  - apiVersion: v2
     appVersion: 2.0.2
     created: "2025-07-08T14:59:39.19840082Z"
     description: Ingress Controller for API7
@@ -146,6 +162,25 @@ entries:
     - https://github.com/api7/api7-helm-chart/releases/download/api7-ingress-controller-0.0.1/api7-ingress-controller-0.0.1.tgz
     version: 0.0.1
   api7ee3:
+  - apiVersion: v2
+    appVersion: 3.8.8
+    created: "2025-07-28T11:21:59.046802786Z"
+    dependencies:
+    - condition: prometheus.builtin
+      name: prometheus
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.5.1
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    description: A Helm chart for Kubernetes
+    digest: 8834960be68378a83acd98618f4cb5bb649a0933ba0bcc18649ba78f13d029f2
+    name: api7ee3
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-0.17.18/api7ee3-0.17.18.tgz
+    version: 0.17.18
   - apiVersion: v2
     appVersion: 3.8.7
     created: "2025-07-16T10:50:56.952927963Z"
@@ -1604,6 +1639,21 @@ entries:
     version: 0.14.0
   gateway:
   - apiVersion: v2
+    appVersion: 3.8.8
+    created: "2025-07-28T11:21:59.18544817Z"
+    dependencies:
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.7.7
+    description: A Helm chart for API7 Gateway
+    digest: 6ea3a93f69fda5cd206fe8cdfc99285b00007eb0b445a0a675fdb1dd19c0ff68
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.2.20/gateway-0.2.20.tgz
+    version: 0.2.20
+  - apiVersion: v2
     appVersion: 3.8.7
     created: "2025-07-16T10:50:57.094692318Z"
     dependencies:
@@ -2098,4 +2148,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2025-07-16T10:50:57.095143521Z"
+generated: "2025-07-28T11:21:59.186239915Z"
