@@ -32,6 +32,8 @@ deployment:
     repository: api7/api7-ingress-controller
     pullPolicy: IfNotPresent
     tag: "2.0.3"
+  # -- Set pod resource requests & limits
+  resources: {}
 
 config:
   logLevel: "info"
