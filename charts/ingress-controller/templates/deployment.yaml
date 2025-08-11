@@ -72,9 +72,6 @@ spec:
         - name: ADC_EXPERIMENTAL_FEATURE_FLAGS
           value: "remote-state-file,parallel-backend-request"
         ports:
-        - name: http
-          containerPort: 3000
-          protocol: TCP
         - name: http-status
           containerPort: 3001
           protocol: TCP
