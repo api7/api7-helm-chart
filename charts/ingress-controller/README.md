@@ -12,6 +12,7 @@ Ingress Controller for API7
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| adc | object | `{"image":{"pullPolicy":"IfNotPresent","repository":"ghcr.io/api7/adc","tag":"dev"},"resources":{},"securityContext":{}}` | ADC (API Data Collector) container configuration |
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | config.controllerName | string | `"apisix.apache.org/apisix-ingress-controller"` |  |
