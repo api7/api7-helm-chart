@@ -35,7 +35,6 @@ deployment:
   # -- Set pod resource requests & limits
   resources: {}
 
-# -- ADC (API Data Collector) container configuration
 adc:
   image:
     repository: ghcr.io/api7/adc
