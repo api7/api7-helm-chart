@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.18](https://img.shields.io/badge/Version-0.17.18-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.8](https://img.shields.io/badge/AppVersion-3.8.8-informational?style=flat-square)
+![Version: 0.17.19](https://img.shields.io/badge/Version-0.17.19-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.9](https://img.shields.io/badge/AppVersion-3.8.9-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -23,7 +23,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.8.8"` |  |
+| dashboard.image.tag | string | `"v3.8.9"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.livenessProbe.failureThreshold | int | `30` |  |
 | dashboard.livenessProbe.initialDelaySeconds | int | `180` |  |
@@ -33,6 +33,7 @@ A Helm chart for Kubernetes
 | dashboard.readinessProbe.initialDelaySeconds | int | `10` |  |
 | dashboard.readinessProbe.periodSeconds | int | `3` |  |
 | dashboard.replicaCount | int | `1` |  |
+| dashboard_configuration.audit.retention_days | int | `60` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
 | dashboard_configuration.consumer_proxy.cache_failure_count | int | `512` |  |
 | dashboard_configuration.consumer_proxy.cache_failure_ttl | int | `60` |  |
@@ -93,7 +94,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraVolumes | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"Always"` |  |
 | developer_portal.image.repository | string | `"api7/api7-ee-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v3.8.8"` |  |
+| developer_portal.image.tag | string | `"v3.8.9"` |  |
 | developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.livenessProbe.failureThreshold | int | `10` |  |
 | developer_portal.livenessProbe.initialDelaySeconds | int | `60` |  |
@@ -132,7 +133,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.8.8"` |  |
+| dp_manager.image.tag | string | `"v3.8.9"` |  |
 | dp_manager.livenessProbe.failureThreshold | int | `10` |  |
 | dp_manager.livenessProbe.initialDelaySeconds | int | `60` |  |
 | dp_manager.livenessProbe.periodSeconds | int | `3` |  |
