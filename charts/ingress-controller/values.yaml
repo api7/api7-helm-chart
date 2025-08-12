@@ -35,6 +35,14 @@ deployment:
   # -- Set pod resource requests & limits
   resources: {}
 
+adc:
+  image:
+    repository: ghcr.io/api7/adc
+    tag: dev
+    pullPolicy: IfNotPresent
+  resources: {}
+  securityContext: {}
+
 config:
   logLevel: "info"
   controllerName: apisix.apache.org/apisix-ingress-controller
