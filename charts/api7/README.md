@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.19](https://img.shields.io/badge/Version-0.17.19-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.9](https://img.shields.io/badge/AppVersion-3.8.9-informational?style=flat-square)
+![Version: 0.17.20](https://img.shields.io/badge/Version-0.17.20-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.10](https://img.shields.io/badge/AppVersion-3.8.10-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -23,7 +23,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.8.9"` |  |
+| dashboard.image.tag | string | `"v3.8.10"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.livenessProbe.failureThreshold | int | `30` |  |
 | dashboard.livenessProbe.initialDelaySeconds | int | `180` |  |
@@ -94,7 +94,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraVolumes | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"Always"` |  |
 | developer_portal.image.repository | string | `"api7/api7-ee-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v3.8.9"` |  |
+| developer_portal.image.tag | string | `"v3.8.10"` |  |
 | developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.livenessProbe.failureThreshold | int | `10` |  |
 | developer_portal.livenessProbe.initialDelaySeconds | int | `60` |  |
@@ -133,7 +133,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.8.9"` |  |
+| dp_manager.image.tag | string | `"v3.8.10"` |  |
 | dp_manager.livenessProbe.failureThreshold | int | `10` |  |
 | dp_manager.livenessProbe.initialDelaySeconds | int | `60` |  |
 | dp_manager.livenessProbe.periodSeconds | int | `3` |  |
@@ -194,7 +194,7 @@ A Helm chart for Kubernetes
 | postgresql.builtin | bool | `true` |  |
 | postgresql.fullnameOverride | string | `"api7-postgresql"` |  |
 | postgresql.image.registry | string | `"docker.io"` |  |
-| postgresql.image.repository | string | `"bitnami/postgresql"` |  |
+| postgresql.image.repository | string | `"api7/postgresql"` |  |
 | postgresql.image.tag | string | `"15.4.0-debian-11-r45"` |  |
 | postgresql.primary.persistence.size | string | `"256Gi"` |  |
 | postgresql.primary.service.ports.postgresql | int | `5432` |  |
@@ -208,7 +208,7 @@ A Helm chart for Kubernetes
 | prometheus.server.enableRemoteWriteReceiver | bool | `true` |  |
 | prometheus.server.existingSecret | string | `""` |  |
 | prometheus.server.image.registry | string | `"docker.io"` |  |
-| prometheus.server.image.repository | string | `"bitnami/prometheus"` |  |
+| prometheus.server.image.repository | string | `"api7/prometheus"` |  |
 | prometheus.server.persistence.enabled | bool | `true` |  |
 | prometheus.server.persistence.size | string | `"120Gi"` |  |
 | prometheus.server.rbac.create | bool | `false` |  |
