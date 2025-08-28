@@ -4,6 +4,12 @@
 
 Ingress Controller for API7
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| API7 | <support@api7.ai> | <https://api7.ai> |
+
 ## Source Code
 
 * <https://github.com/api7/api7-helm-chart>

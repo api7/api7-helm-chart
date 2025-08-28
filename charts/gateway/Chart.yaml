@@ -21,6 +21,11 @@ version: 0.2.22
 # follow Semantic Versioning. They should reflect the version the application is using.
 appVersion: "3.8.10"
 
+maintainers:
+  - name: API7
+    email: support@api7.ai
+    url: https://api7.ai
+
 dependencies:
   - name: etcd
     version: 8.7.7

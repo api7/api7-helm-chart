@@ -4,6 +4,12 @@
 
 A Helm chart for Kubernetes
 
+## Maintainers
+
+| Name | Email | Url |
+| ---- | ------ | --- |
+| API7 | <support@api7.ai> | <https://api7.ai> |
+
 ## Requirements
 
 | Repository | Name | Version |

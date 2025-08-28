@@ -23,6 +23,11 @@ version: 0.17.20
 # It is recommended to use it with quotes.
 appVersion: "3.8.10"
 
+maintainers:
+  - name: API7
+    email: support@api7.ai
+    url: https://api7.ai
+
 dependencies:
   - name: prometheus
     condition: prometheus.builtin

@@ -1,0 +1,87 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - "main"
+  push:
+    branches:
+      - "main"
+
+jobs:
+
+  helm:
+    name: Helm chart
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Lint
+        run: |
+          docker run --rm --interactive --network host \
+              --name ct-lint \
+              --volume $PWD:/workdir \
+              --workdir /workdir \
+              quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
+               && helm repo add bitnami https://charts.bitnami.com/bitnami \
+               && helm repo add apisix https://charts.apiseven.com \
+               && ct lint \
+                  --charts charts/api7 \
+                  --charts charts/gateway \
+                  --charts charts/ingress-controller'
+
+      - name: Setup Kubernetes
+        uses: engineerd/setup-kind@v0.5.0
+        with:
+          version: v0.22.0
+          image: kindest/node:v1.31.0
+
+      - name: Test install charts
+        run: |
+          kubectl cluster-info
+          docker run --rm --interactive --network host \
+              --name ct \
+              --volume $HOME/.kube/config:/root/.kube/config \
+              --volume $PWD:/workdir \
+              --workdir /workdir \
+              quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
+               && helm repo add bitnami https://charts.bitnami.com/bitnami \
+               && helm repo add apisix https://charts.apiseven.com \
+               && ct install \
+                  --charts charts/api7 \
+                  --charts charts/ingress-controller'
+
+      - name: Test gateway charts
+        run: |
+          kubectl cluster-info
+          docker run --rm --interactive --network host \
+              --name ct \
+              --volume $HOME/.kube/config:/root/.kube/config \
+              --volume $PWD:/workdir \
+              --workdir /workdir \
+              quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
+               && helm repo add bitnami https://charts.bitnami.com/bitnami \
+               && helm repo add apisix https://charts.apiseven.com \
+               && ct install \
+                  --charts charts/gateway --helm-extra-set-args "--set etcd.enabled=true"'
+
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23'
+
+      - name: Run helm-docs
+        run: |
+          go install github.com/norwoodj/helm-docs/cmd/helm-docs@v1.13.1
+          helm-docs --chart-search-root=${GITHUB_WORKSPACE}/charts
+          DIFF=$(git diff ${GITHUB_WORKSPACE}/charts/*/README.md)
+          if [ ! -z "$DIFF" ]; then
+            echo "Please use helm-docs in your clone, of your fork, of the project, and commit an updated README.md for the chart."
+            echo "$DIFF"
+            exit 1
+          fi
