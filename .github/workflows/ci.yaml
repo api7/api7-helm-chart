@@ -29,7 +29,7 @@ jobs:
               --workdir /workdir \
               quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
                && helm repo add bitnami https://charts.bitnami.com/bitnami \
-               && helm repo add prometheus-community https://prometheus-community.github.io/helm-charts \
+               && helm repo add apisix https://charts.apiseven.com \
                && ct lint \
                   --charts charts/api7 \
                   --charts charts/gateway \
