@@ -235,7 +235,7 @@ prometheus:
       registry: docker.io
       repository: api7/prometheus
     tag: 2.48.1-debian-11-r0
-    existingSecret: "" # name of existing secret to mount the path of prometheus client certs.
+    existingSecret: ""  # name of existing secret to mount the path of prometheus client certs.
     enableRemoteWriteReceiver: true
     enableAdminAPI: true
     serviceAccount:
@@ -305,15 +305,15 @@ dashboard_configuration:
   prometheus:
     addr: "http://api7-prometheus-server:9090"
     timeout: "30s"
-    basic_auth: # access the prometheus with basic-auth
-      username: "" # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
+    basic_auth:  # access the prometheus with basic-auth
+      username: ""  # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
       password: ""
     tls:
       server_name: ""
       insecure_skip_verify: false
       enable_client_cert: false
       key_file: ""  # the file path of the private key for requesting prometheus, (e.g. /app/prometheus/certs/tls.key)
-      cert_file: "" # the file path of the certificate for requesting prometheus, (e.g. /app/prometheus/certs/tls.crt)
+      cert_file: ""  # the file path of the certificate for requesting prometheus, (e.g. /app/prometheus/certs/tls.crt)
       ca_file: ""   # the file path of the ca to verify the prometheus tls server. (e.g. /app/prometheus/certs/ca.crt)
     whitelist:
       - "/api/v1/query_range"
@@ -370,15 +370,15 @@ dp_manager_configuration:
   prometheus:
     addr: "http://api7-prometheus-server:9090"
     timeout: "30s"
-    basic_auth: # access the prometheus with basic-auth
-      username: "" # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
+    basic_auth:  #  access the prometheus with basic-auth
+      username: ""  # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
       password: ""
     tls:
       server_name: ""
       insecure_skip_verify: false
       enable_client_cert: false
       key_file: ""  # the file path of the private key for requesting prometheus, (e.g. /app/prometheus/certs/tls.key)
-      cert_file: "" # the file path of the certificate for requesting prometheus, (e.g. /app/prometheus/certs/tls.crt)
+      cert_file: ""  # the file path of the certificate for requesting prometheus, (e.g. /app/prometheus/certs/tls.crt)
       ca_file: ""   # the file path of the ca to verify the prometheus tls server. (e.g. /app/prometheus/certs/ca.crt)
   consumer_cache:
     size: 50000
