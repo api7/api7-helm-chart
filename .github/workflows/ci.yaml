@@ -27,7 +27,8 @@ jobs:
               --name ct-lint \
               --volume $PWD:/workdir \
               --workdir /workdir \
-              quay.io/helmpack/chart-testing:v3.10.1 sh -c 'helm repo add bitnami https://charts.bitnami.com/bitnami \
+              quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
+               && helm repo add bitnami https://charts.bitnami.com/bitnami \
                && helm repo add prometheus-community https://prometheus-community.github.io/helm-charts \
                && helm repo add etcd https://charts.bitnami.com/bitnami \
                && ct lint \
@@ -49,7 +50,8 @@ jobs:
               --volume $HOME/.kube/config:/root/.kube/config \
               --volume $PWD:/workdir \
               --workdir /workdir \
-              quay.io/helmpack/chart-testing:v3.10.1 sh -c 'helm repo add bitnami https://charts.bitnami.com/bitnami \
+              quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
+               && helm repo add bitnami https://charts.bitnami.com/bitnami \
                && helm repo add prometheus-community https://prometheus-community.github.io/helm-charts \
                && helm repo add etcd https://charts.bitnami.com/bitnami \
                && ct install \
