@@ -99,6 +99,13 @@ apisix:
   extraLuaPath: ""
   extraLuaCPath: ""
 
+  # -- Delete the '/' at the end of the URI
+  deleteURITailSlash: false
+  # -- The URI normalization in servlet is a little different from the RFC's.
+  # See https://github.com/jakartaee/servlet/blob/master/spec/src/main/asciidoc/servlet-spec-body.adoc#352-uri-path-canonicalization,
+  # which is used under Tomcat.
+  # Turn this option on if you want to be compatible with servlet when matching URI path.
+  normalizeURILikeServlet: false
   # -- Defines how apisix handles routing:
   # - radixtree_uri: match route by uri(base on radixtree)
   # - radixtree_host_uri: match route by host + uri(base on radixtree)

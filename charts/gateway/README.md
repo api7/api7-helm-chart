@@ -61,6 +61,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.affinity | object | `{}` | Set affinity for API7 Gateway deploy |
 | apisix.customLuaSharedDicts | list | `[]` | Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings, click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict |
 | apisix.customizedConfig | object | `{}` | If apisix.enableCustomizedConfig is true, full customized config.yaml. Please note that other settings about APISIX config will be ignored |
+| apisix.deleteURITailSlash | bool | `false` | Delete the '/' at the end of the URI |
 | apisix.enableCustomizedConfig | bool | `false` | Enable full customized config.yaml |
 | apisix.enableIPv6 | bool | `true` | Enable nginx IPv6 resolver |
 | apisix.enableServerTokens | bool | `true` | Whether the APISIX version number should be shown in Server header |
@@ -105,6 +106,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.meta.luaSharedDict.prometheus-metrics | string | `"15m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
+| apisix.normalizeURILikeServlet | bool | `false` | The URI normalization in servlet is a little different from the RFC's. See https://github.com/jakartaee/servlet/blob/master/spec/src/main/asciidoc/servlet-spec-body.adoc#352-uri-path-canonicalization, which is used under Tomcat. Turn this option on if you want to be compatible with servlet when matching URI path. |
 | apisix.podAnnotations | object | `{}` | Annotations to add to each pod |
 | apisix.podDisruptionBudget | object | `{"enabled":false,"maxUnavailable":1,"minAvailable":"90%"}` | See https://kubernetes.io/docs/tasks/run-application/configure-pdb/ for more details |
 | apisix.podDisruptionBudget.enabled | bool | `false` | Enable or disable podDisruptionBudget |
