@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.10"
+    tag: "v3.8.11"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -50,7 +50,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.10"
+    tag: "v3.8.11"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -84,7 +84,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.10"
+    tag: "v3.8.11"
 
   extraEnvVars: []
   extraVolumes: []
@@ -291,6 +291,10 @@ dashboard_configuration:
       disable: false
       host: "127.0.0.1"
       port: 7081
+    pprof:
+      enable: false
+      host: "127.0.0.1"
+      port: 7082
   session_options_config:
     same_site: "lax"  # means the value SameSiteNoneMode
     secure: false
@@ -360,6 +364,10 @@ dp_manager_configuration:
       disable: false
       host: "127.0.0.1"
       port: 7901
+    pprof:
+      enable: false
+      host: "127.0.0.1"
+      port: 7902
   log:
     level: warn
     output: stderr
