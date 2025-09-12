@@ -311,6 +311,7 @@ admin:
   enabled: false
   # -- admin service type
   type: ClusterIP
+  # loadBalancerClass: "my-loadbalancer-class"
   # loadBalancerIP: a.b.c.d
   # loadBalancerSourceRanges:
   #   - "143.231.0.0/16"
