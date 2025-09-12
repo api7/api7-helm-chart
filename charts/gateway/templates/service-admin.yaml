@@ -14,6 +14,9 @@ metadata:
 spec:
   type: {{ .Values.admin.type }}
   {{- if eq .Values.admin.type "LoadBalancer" }}
+  {{- if .Values.admin.loadBalancerClass }}
+  loadBalancerClass: {{ .Values.admin.loadBalancerClass }}
+  {{- end }}
   {{- if .Values.admin.loadBalancerIP }}
   loadBalancerIP: {{ .Values.admin.loadBalancerIP }}
   {{- end }}
