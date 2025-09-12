@@ -170,7 +170,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | extraVolumeMounts | list | `[]` | Additional `volume`, See [Kubernetes Volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the detail. |
 | extraVolumes | list | `[]` | Additional `volume`, See [Kubernetes Volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the detail. |
 | fullnameOverride | string | `""` |  |
-| gateway.externalIPs | list | `[]` |  |
+| gateway.externalIPs | list | `[]` | IPs for which nodes in the cluster will also accept traffic for the servic annotations:   service.beta.kubernetes.io/aws-load-balancer-type: nlb |
 | gateway.externalTrafficPolicy | string | `"Cluster"` |  |
 | gateway.http | object | `{"additionalContainerPorts":[],"containerPort":9080,"enabled":true,"servicePort":80}` | API7 Gateway service settings for http |
 | gateway.http.additionalContainerPorts | list | `[]` | Support multiple http ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L24) |
