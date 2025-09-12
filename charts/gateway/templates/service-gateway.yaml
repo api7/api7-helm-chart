@@ -17,6 +17,9 @@ spec:
   externalTrafficPolicy: {{ .Values.gateway.externalTrafficPolicy }}
   {{- end }}
   {{- if eq .Values.gateway.type "LoadBalancer" }}
+  {{- if .Values.gateway.loadBalancerClass }}
+  loadBalancerClass: {{ .Values.gateway.loadBalancerClass }}
+  {{- end }}
   {{- if .Values.gateway.loadBalancerIP }}
   loadBalancerIP: {{ .Values.gateway.loadBalancerIP }}
   {{- end }}
