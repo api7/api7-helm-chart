@@ -18,7 +18,8 @@ data:
     {{- end }}
     apisix:    # universal configurations
       node_listen:    # APISIX listening port
-        - {{ .Values.gateway.http.containerPort }}
+        - ip: {{ .Values.gateway.http.ip }}
+          port: {{ .Values.gateway.http.containerPort }}
         {{- with .Values.gateway.http.additionalContainerPorts }}
         {{- toYaml . | nindent 8}}
         {{- end }}
@@ -114,7 +115,8 @@ data:
       ssl:
         enable: {{ .Values.gateway.tls.enabled }}
         listen:
-          - port: {{ .Values.gateway.tls.containerPort }}
+          - ip: {{ .Values.gateway.tls.ip }}
+            port: {{ .Values.gateway.tls.containerPort }}
             enable_http2: {{ .Values.gateway.tls.http2.enabled }}
           {{- with .Values.gateway.tls.additionalContainerPorts }}
           {{- toYaml . | nindent 10}}
