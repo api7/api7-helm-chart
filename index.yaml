@@ -3,6 +3,26 @@ entries:
   api7-ingress-controller:
   - apiVersion: v2
     appVersion: 2.0.6
+    created: "2025-09-23T08:14:14.970163384Z"
+    description: Ingress Controller for API7
+    digest: 04f10a79cb3fa5ef8e1e996f3b18691abe35d63cf66a80611ff2df7f50c01f35
+    keywords:
+    - ingress
+    - api7
+    - crd
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: api7-ingress-controller
+    sources:
+    - https://github.com/api7/api7-helm-chart
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7-ingress-controller-0.1.12/api7-ingress-controller-0.1.12.tgz
+    version: 0.1.12
+  - apiVersion: v2
+    appVersion: 2.0.6
     created: "2025-09-23T01:50:17.883503088Z"
     description: Ingress Controller for API7
     digest: 77afc6f021cf4b9beecdf085b6013eb9654cbdbce49946682d330308534452ac
@@ -2433,4 +2453,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2025-09-23T03:44:25.284990479Z"
+generated: "2025-09-23T08:14:14.970385728Z"
