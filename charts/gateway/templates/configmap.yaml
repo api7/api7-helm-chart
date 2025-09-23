@@ -135,6 +135,12 @@ data:
 
       disable_upstream_healthcheck: {{ .Values.api7ee.disable_upstream_healthcheck }}
 
+      # fine tune the parameters of LRU cache for some features like secret
+      lru:
+        secret:
+          ttl: {{ .Values.apisix.lru.secret.ttl }} # seconds
+          count: {{ .Values.apisix.lru.secret.count }}
+
     nginx_config:    # config for render the template to genarate nginx.conf
       error_log: "{{ .Values.logs.errorLog }}"
       error_log_level: "{{ .Values.logs.errorLogLevel }}"    # warn,error

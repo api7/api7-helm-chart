@@ -104,6 +104,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
 | apisix.image.tag | string | `"3.8.13"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
+| apisix.lru | object | `{"secret":{"count":512,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
+| apisix.lru.secret.ttl | int | `300` | in seconds |
 | apisix.meta.luaSharedDict.prometheus-metrics | string | `"15m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.normalizeURILikeServlet | bool | `false` | The URI normalization in servlet is a little different from the RFC's. See https://github.com/jakartaee/servlet/blob/master/spec/src/main/asciidoc/servlet-spec-body.adoc#352-uri-path-canonicalization, which is used under Tomcat. Turn this option on if you want to be compatible with servlet when matching URI path. |
