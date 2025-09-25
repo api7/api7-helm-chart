@@ -31,14 +31,14 @@ deployment:
   image:
     repository: api7/api7-ingress-controller
     pullPolicy: IfNotPresent
-    tag: "2.0.6"
+    tag: "2.0.7"
   # -- Set pod resource requests & limits
   resources: {}
 
 adc:
   image:
     repository: ghcr.io/api7/adc
-    tag: "0.21.0"
+    tag: "0.21.1"
     pullPolicy: IfNotPresent
   resources: {}
   securityContext: {}

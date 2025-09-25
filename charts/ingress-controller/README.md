@@ -20,7 +20,7 @@ Ingress Controller for API7
 |-----|------|---------|-------------|
 | adc.image.pullPolicy | string | `"IfNotPresent"` |  |
 | adc.image.repository | string | `"ghcr.io/api7/adc"` |  |
-| adc.image.tag | string | `"0.21.0"` |  |
+| adc.image.tag | string | `"0.21.1"` |  |
 | adc.resources | object | `{}` |  |
 | adc.securityContext | object | `{}` |  |
 | autoscaling.enabled | bool | `false` |  |
@@ -44,7 +44,7 @@ Ingress Controller for API7
 | deployment.annotations | object | `{}` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"api7/api7-ingress-controller"` |  |
-| deployment.image.tag | string | `"2.0.6"` |  |
+| deployment.image.tag | string | `"2.0.7"` |  |
 | deployment.nodeSelector | object | `{}` |  |
 | deployment.podAnnotations | object | `{}` |  |
 | deployment.podSecurityContext | object | `{}` |  |
