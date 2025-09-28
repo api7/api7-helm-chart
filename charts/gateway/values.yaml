@@ -564,3 +564,15 @@ vault:
   token: ""
   # -- Prefix allows you to better enforcement of policies.
   prefix: ""
+
+soapProxy:
+  # -- Enable or disable the SOAP proxy feature, this feature is disabled by default,
+  # when use soap-proxy plugin in API7, you need to enable this feature.
+  enabled: false
+  image:
+    # -- SOAP proxy image repository
+    repository: api7/soap-proxy
+    # -- SOAP proxy image tag
+    tag: 1.0.0
+    # -- SOAP proxy image pull policy
+    pullPolicy: IfNotPresent
