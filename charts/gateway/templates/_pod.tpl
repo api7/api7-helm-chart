@@ -76,7 +76,7 @@ spec:
         - name: http-{{ .port | toString }}
           containerPort: {{ .port }}
           protocol: TCP
-        {{- end }}     
+        {{- end }}
         - name: tls
           containerPort: {{ .Values.gateway.tls.containerPort }}
           protocol: TCP
@@ -84,7 +84,7 @@ spec:
         - name: tls-{{ .port | toString }}
           containerPort: {{ .port }}
           protocol: TCP
-        {{- end }}     
+        {{- end }}
         {{- if .Values.admin.enabled }}
         - name: admin
           containerPort: {{ .Values.admin.port }}
@@ -165,6 +165,35 @@ spec:
       {{- end }}
       resources:
       {{- toYaml .Values.apisix.resources | nindent 8 }}
+    {{- if .Values.soapProxy.enabled }}
+    - name: soap-proxy
+      image: {{ .Values.soapProxy.image.repository }}:{{ .Values.soapProxy.image.tag }}
+      imagePullPolicy: {{ .Values.soapProxy.image.pullPolicy }}
+      ports:
+      - containerPort: 5000
+        name: http
+        protocol: TCP
+      readinessProbe:
+        failureThreshold: 6
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+        httpGet:
+          path: /_healthz
+          port: http
+          scheme: HTTP
+      livenessProbe:
+        failureThreshold: 6
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 1
+        httpGet:
+          path: /_healthz
+          port: http
+          scheme: HTTP
+    {{- end }}
   {{- if .Values.apisix.hostNetwork }}
   hostNetwork: true
   dnsPolicy: ClusterFirstWithHostNet
