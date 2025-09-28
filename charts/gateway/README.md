@@ -220,7 +220,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | serviceMonitor.name | string | `""` | name of the serviceMonitor, by default, it is the same as the apisix fullname |
 | serviceMonitor.namespace | string | `""` | namespace where the serviceMonitor is deployed, by default, it is the same as the namespace of the apisix |
 | serviceMonitor.path | string | `"/apisix/prometheus/metrics"` | path of the metrics endpoint |
-| soapProxy.enabled | bool | `false` | Enable or disable the SOAP proxy feature, this feature is disabled by default, when use soap-proxy plugin in API7, you need to enable this feature. |
+| soapProxy.enabled | bool | `false` | Enable or disable the SOAP proxy, this component is disabled by default, when use soap-proxy plugin in API7, you need to enable this component. |
 | soapProxy.image.pullPolicy | string | `"IfNotPresent"` | SOAP proxy image pull policy |
 | soapProxy.image.repository | string | `"api7/soap-proxy"` | SOAP proxy image repository |
 | soapProxy.image.tag | string | `"1.0.0"` | SOAP proxy image tag |
