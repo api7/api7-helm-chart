@@ -11,6 +11,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.dp_manager_service.type }}
+  {{- if .Values.dp_manager_service.loadBalancerClass }}
+  loadBalancerClass: {{ .Values.dp_manager_service.loadBalancerClass }}
+  {{- end }}
   ports:
     - port: {{ .Values.dp_manager_service.port }}
       targetPort: http

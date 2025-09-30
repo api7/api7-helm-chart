@@ -153,6 +153,7 @@ dashboard_service:
 
 dp_manager_service:
   type: ClusterIP
+  # loadBalancerClass: "my-loadbalancer-class"
   annotations: {}
   port: 7900
   tlsPort: 7943
