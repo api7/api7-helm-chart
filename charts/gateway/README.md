@@ -152,7 +152,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | dns.resolvers[5] | string | `"8.8.8.8"` |  |
 | dns.timeout | int | `5` |  |
 | dns.validity | int | `30` |  |
-| etcd | object | `{"auth":{"rbac":{"create":false,"rootPassword":""},"tls":{"certFilename":"","certKeyFilename":"","enabled":false,"existingSecret":"","sni":"","verify":false}},"enabled":false,"host":["http://etcd.host:2379"],"password":"","prefix":"/apisix","replicaCount":3,"service":{"port":2379},"timeout":30,"user":""}` | etcd configuration use the FQDN address or the IP of the etcd |
+| etcd | object | `{"auth":{"rbac":{"create":false,"rootPassword":""},"tls":{"certFilename":"","certKeyFilename":"","enabled":false,"existingSecret":"","sni":"","verify":false}},"enabled":false,"host":["http://etcd.host:2379"],"image":{"repository":"api7/etcd"},"password":"","prefix":"/apisix","replicaCount":3,"service":{"port":2379},"timeout":30,"user":""}` | etcd configuration use the FQDN address or the IP of the etcd |
 | etcd.auth | object | `{"rbac":{"create":false,"rootPassword":""},"tls":{"certFilename":"","certKeyFilename":"","enabled":false,"existingSecret":"","sni":"","verify":false}}` | if etcd.enabled is true, set more values of bitnami/etcd helm chart |
 | etcd.auth.rbac.create | bool | `false` | No authentication by default. Switch to enable RBAC authentication |
 | etcd.auth.rbac.rootPassword | string | `""` | root password for etcd. Requires etcd.auth.rbac.create to be true. |

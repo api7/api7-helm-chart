@@ -516,6 +516,8 @@ serviceMonitor:
 etcd:
   # -- install etcd(v3) by default, set false if do not want to install etcd(v3) together
   enabled: false
+  image:
+    repository: api7/etcd
   # -- if etcd.enabled is false, use external etcd, support multiple address, if your etcd cluster enables TLS, please use https scheme, e.g. https://127.0.0.1:2379.
   host:
     # host or ip e.g. http://172.20.128.89:2379
