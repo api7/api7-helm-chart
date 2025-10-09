@@ -297,6 +297,8 @@ gateway:
       enabled: true
     # -- TLS protocols allowed to use.
     sslProtocols: "TLSv1.2 TLSv1.3"
+    # -- If set this, when the client doesn't send SNI during handshake, the fallback SNI will be used instead
+    fallbackSNI: ""
   # -- API7 Gateway service settings for stream. L4 proxy (TCP/UDP)
   stream:
     enabled: false
@@ -514,6 +516,8 @@ serviceMonitor:
 etcd:
   # -- install etcd(v3) by default, set false if do not want to install etcd(v3) together
   enabled: false
+  image:
+    repository: api7/etcd
   # -- if etcd.enabled is false, use external etcd, support multiple address, if your etcd cluster enables TLS, please use https scheme, e.g. https://127.0.0.1:2379.
   host:
     # host or ip e.g. http://172.20.128.89:2379

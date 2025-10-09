@@ -126,6 +126,9 @@ data:
         {{- if and .Values.gateway.tls.enabled .Values.gateway.tls.existingCASecret }}
         ssl_trusted_certificate: "system,/usr/local/apisix/conf/ssl/{{ .Values.gateway.tls.certCAFilename }}"
         {{- end }}
+      {{- if .Values.gateway.tls.fallbackSNI }}
+        fallback_sni: {{ .Values.gateway.tls.fallbackSNI }}
+      {{- end }}
 
       {{- if .Values.api7ee.status_endpoint.enabled }}
       status:
