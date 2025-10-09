@@ -297,6 +297,8 @@ gateway:
       enabled: true
     # -- TLS protocols allowed to use.
     sslProtocols: "TLSv1.2 TLSv1.3"
+    # -- If set this, when the client doesn't send SNI during handshake, the fallback SNI will be used instead
+    fallbackSNI: ""
   # -- API7 Gateway service settings for stream. L4 proxy (TCP/UDP)
   stream:
     enabled: false
