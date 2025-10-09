@@ -21,7 +21,7 @@ api7ee:
     # -- When enabled, APISIX will provide `/status` and `/status/ready` endpoints, /status endpoint will return 200 status code if APISIX has successfully started and running correctly, /status/ready endpoint will return 503 status code if none of the configured etcd (dp_manager) are available.
     enabled: false
     # -- The IP address and port on which the status endpoint will listen.
-    ip: 127.0.0.1
+    ip: 0.0.0.0
     # -- The port on which the status endpoint will listen.
     port: 7085
 

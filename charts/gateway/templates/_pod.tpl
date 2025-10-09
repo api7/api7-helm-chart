@@ -95,6 +95,11 @@ spec:
           containerPort: {{ .Values.serviceMonitor.containerPort }}
           protocol: TCP
         {{- end }}
+        {{- if .Values.api7ee.status_endpoint.enabled }}
+        - name: status
+          containerPort: {{ .Values.api7ee.status_endpoint.port }}
+          protocol: TCP
+        {{- end }}
         {{- if and .Values.gateway.stream.enabled (or (gt (len .Values.gateway.stream.tcp) 0) (gt (len .Values.gateway.stream.udp) 0)) }}
         {{- with .Values.gateway.stream }}
         {{- if (gt (len .tcp) 0) }}
