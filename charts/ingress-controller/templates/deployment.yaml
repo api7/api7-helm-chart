@@ -41,6 +41,17 @@ spec:
         - name: {{ .Release.Name }}-ingress-config
           mountPath: /app/conf/config.yaml
           subPath: config.yaml
+        {{- if .Values.webhook.enabled }}
+        - name: webhook-certs
+          mountPath: /certs
+          readOnly: true
+        {{- end }}
+        {{- if .Values.webhook.enabled }}
+        ports:
+        - name: webhook
+          containerPort: {{ .Values.webhook.port }}
+          protocol: TCP
+        {{- end }}
         livenessProbe:
           httpGet:
             path: /healthz
@@ -112,6 +123,11 @@ spec:
       - name: {{ .Release.Name }}-ingress-config
         configMap:
           name: {{ .Release.Name }}-ingress-config
+      {{- if .Values.webhook.enabled }}
+      - name: webhook-certs
+        secret:
+          secretName: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-certs
+      {{- end }}
       securityContext:
         runAsNonRoot: false
       serviceAccountName: {{ .Release.Name }}
