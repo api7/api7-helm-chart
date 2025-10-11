@@ -235,7 +235,7 @@ prometheus:
     image:
       registry: docker.io
       repository: api7/prometheus
-    tag: 2.48.1-debian-11-r0
+      tag: 2.48.1-debian-11-r0
     existingSecret: ""  # name of existing secret to mount the path of prometheus client certs.
     enableRemoteWriteReceiver: true
     enableAdminAPI: true
