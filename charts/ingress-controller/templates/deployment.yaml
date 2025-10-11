@@ -45,8 +45,6 @@ spec:
         - name: webhook-certs
           mountPath: /certs
           readOnly: true
-        {{- end }}
-        {{- if .Values.webhook.enabled }}
         ports:
         - name: webhook
           containerPort: {{ .Values.webhook.port }}
