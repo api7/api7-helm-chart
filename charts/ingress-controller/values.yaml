@@ -65,7 +65,7 @@ config:
 # Admission webhook configuration
 webhook:
   # -- Enable or disable admission webhook
-  enabled: false
+  enabled: true
   # -- The port for the webhook server to listen on
   port: 9443
   # -- Failure policy for the webhook (Fail or Ignore)
