@@ -3,14 +3,14 @@
 {{- $certKey := "" -}}
 {{- $caCert := "" -}}
 {{- if not .Values.webhook.certificate.provided }}
-{{- $cn := printf "%s-webhook-service.%s.svc" (include "api7-ingress-controller-manager.name.fullname" .) .Release.Namespace -}}
+{{- $cn := printf "%s.%s.svc" (include "api7-ingress-controller-manager.webhook.serviceName" .) .Release.Namespace -}}
 {{- $ca := genCA "api7-ingress-webhook-ca" 3650 -}}
 {{- $cert := genSignedCert $cn nil (list $cn) 3650 $ca -}}
 {{- $certCert = $cert.Cert -}}
 {{- $certKey = $cert.Key -}}
 {{- $caCert = $ca.Cert -}}
 
-{{- $certSecret := (lookup "v1" "Secret" .Release.Namespace (printf "%s-webhook-certs" (include "api7-ingress-controller-manager.name.fullname" .))) -}}
+{{- $certSecret := (lookup "v1" "Secret" .Release.Namespace (include "api7-ingress-controller-manager.webhook.secretName" .)) -}}
 {{- if $certSecret }}
 {{- $certCert = (b64dec (get $certSecret.data "tls.crt")) -}}
 {{- $certKey = (b64dec (get $certSecret.data "tls.key")) -}}
@@ -35,7 +35,7 @@ webhooks:
     caBundle: {{ .Values.webhook.certificate.caBundle }}
     {{- end }}
     service:
-      name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-service
+      name: {{ include "api7-ingress-controller-manager.webhook.serviceName" . }}
       namespace: {{ .Release.Namespace }}
       path: /validate-apisix-apache-org-v2-apisixroute
   failurePolicy: {{ .Values.webhook.failurePolicy }}
@@ -57,7 +57,7 @@ webhooks:
     caBundle: {{ .Values.webhook.certificate.caBundle }}
     {{- end }}
     service:
-      name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-service
+      name: {{ include "api7-ingress-controller-manager.webhook.serviceName" . }}
       namespace: {{ .Release.Namespace }}
       path: /validate-apisix-apache-org-v2-apisixconsumer
   failurePolicy: {{ .Values.webhook.failurePolicy }}
@@ -79,7 +79,7 @@ webhooks:
     caBundle: {{ .Values.webhook.certificate.caBundle }}
     {{- end }}
     service:
-      name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-service
+      name: {{ include "api7-ingress-controller-manager.webhook.serviceName" . }}
       namespace: {{ .Release.Namespace }}
       path: /validate-apisix-apache-org-v2-apisixtls
   failurePolicy: {{ .Values.webhook.failurePolicy }}
@@ -101,7 +101,7 @@ webhooks:
     caBundle: {{ .Values.webhook.certificate.caBundle }}
     {{- end }}
     service:
-      name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-service
+      name: {{ include "api7-ingress-controller-manager.webhook.serviceName" . }}
       namespace: {{ .Release.Namespace }}
       path: /validate-apisix-apache-org-v1alpha1-consumer
   failurePolicy: {{ .Values.webhook.failurePolicy }}
@@ -123,7 +123,7 @@ webhooks:
     caBundle: {{ .Values.webhook.certificate.caBundle }}
     {{- end }}
     service:
-      name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-service
+      name: {{ include "api7-ingress-controller-manager.webhook.serviceName" . }}
       namespace: {{ .Release.Namespace }}
       path: /validate-apisix-apache-org-v1alpha1-gatewayproxy
   failurePolicy: {{ .Values.webhook.failurePolicy }}
@@ -145,7 +145,7 @@ webhooks:
     caBundle: {{ .Values.webhook.certificate.caBundle }}
     {{- end }}
     service:
-      name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-service
+      name: {{ include "api7-ingress-controller-manager.webhook.serviceName" . }}
       namespace: {{ .Release.Namespace }}
       path: /validate-networking-k8s-io-v1-ingress
   failurePolicy: {{ .Values.webhook.failurePolicy }}
@@ -167,7 +167,7 @@ webhooks:
     caBundle: {{ .Values.webhook.certificate.caBundle }}
     {{- end }}
     service:
-      name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-service
+      name: {{ include "api7-ingress-controller-manager.webhook.serviceName" . }}
       namespace: {{ .Release.Namespace }}
       path: /validate-networking-k8s-io-v1-ingressclass
   failurePolicy: {{ .Values.webhook.failurePolicy }}
@@ -189,7 +189,7 @@ webhooks:
     caBundle: {{ .Values.webhook.certificate.caBundle }}
     {{- end }}
     service:
-      name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-service
+      name: {{ include "api7-ingress-controller-manager.webhook.serviceName" . }}
       namespace: {{ .Release.Namespace }}
       path: /validate-gateway-networking-k8s-io-v1-gateway
   failurePolicy: {{ .Values.webhook.failurePolicy }}
@@ -207,7 +207,7 @@ webhooks:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-service
+  name: {{ include "api7-ingress-controller-manager.webhook.serviceName" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "api7-ingress-controller-manager.labels" . | nindent 4 }}
@@ -225,7 +225,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-certs
+  name: {{ include "api7-ingress-controller-manager.webhook.secretName" . }}
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "api7-ingress-controller-manager.labels" . | nindent 4 }}

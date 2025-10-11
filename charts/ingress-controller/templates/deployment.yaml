@@ -124,7 +124,7 @@ spec:
       {{- if .Values.webhook.enabled }}
       - name: webhook-certs
         secret:
-          secretName: {{ include "api7-ingress-controller-manager.name.fullname" . }}-webhook-certs
+          secretName: {{ include "api7-ingress-controller-manager.webhook.secretName" . }}
       {{- end }}
       securityContext:
         runAsNonRoot: false
