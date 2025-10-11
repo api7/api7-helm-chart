@@ -45,11 +45,11 @@ spec:
         - name: webhook-certs
           mountPath: /certs
           readOnly: true
+        {{- end }}
         ports:
         - name: webhook
           containerPort: {{ .Values.webhook.port }}
           protocol: TCP
-        {{- end }}
         livenessProbe:
           httpGet:
             path: /healthz
