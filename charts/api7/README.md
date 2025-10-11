@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.25](https://img.shields.io/badge/Version-0.17.25-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.14](https://img.shields.io/badge/AppVersion-3.8.14-informational?style=flat-square)
+![Version: 0.17.26](https://img.shields.io/badge/Version-0.17.26-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.14](https://img.shields.io/badge/AppVersion-3.8.14-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -222,13 +222,13 @@ A Helm chart for Kubernetes
 | prometheus.server.existingSecret | string | `""` |  |
 | prometheus.server.image.registry | string | `"docker.io"` |  |
 | prometheus.server.image.repository | string | `"api7/prometheus"` |  |
+| prometheus.server.image.tag | string | `"2.48.1-debian-11-r0"` |  |
 | prometheus.server.persistence.enabled | bool | `true` |  |
 | prometheus.server.persistence.size | string | `"120Gi"` |  |
 | prometheus.server.rbac.create | bool | `false` |  |
 | prometheus.server.service.ports.http | int | `9090` |  |
 | prometheus.server.service.type | string | `"ClusterIP"` |  |
 | prometheus.server.serviceAccount.create | bool | `false` |  |
-| prometheus.server.tag | string | `"2.48.1-debian-11-r0"` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
 | serviceAccount.annotations | object | `{}` |  |
