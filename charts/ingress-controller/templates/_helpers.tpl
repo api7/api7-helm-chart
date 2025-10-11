@@ -50,3 +50,23 @@ app.kubernetes.io/name: {{ include "api7-ingress-controller-manager.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end }}
+
+{{/*
+Webhook service name - ensure it stays within 63 character limit
+*/}}
+{{- define "api7-ingress-controller-manager.webhook.serviceName" -}}
+{{- $suffix := "-webhook-svc" -}}
+{{- $maxLen := sub 63 (len $suffix) | int -}}
+{{- $baseName := include "api7-ingress-controller-manager.name.fullname" . | trunc $maxLen | trimSuffix "-" -}}
+{{- printf "%s%s" $baseName $suffix -}}
+{{- end }}
+
+{{/*
+Webhook secret name - ensure it stays within 63 character limit
+*/}}
+{{- define "api7-ingress-controller-manager.webhook.secretName" -}}
+{{- $suffix := "-webhook-cert" -}}
+{{- $maxLen := sub 63 (len $suffix) | int -}}
+{{- $baseName := include "api7-ingress-controller-manager.name.fullname" . | trunc $maxLen | trimSuffix "-" -}}
+{{- printf "%s%s" $baseName $suffix -}}
+{{- end }}

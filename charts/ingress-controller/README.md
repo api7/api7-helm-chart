@@ -59,4 +59,9 @@ Ingress Controller for API7
 | podDisruptionBudget.enabled | bool | `false` | Enable or disable podDisruptionBudget |
 | podDisruptionBudget.maxUnavailable | int | `1` | Set the maxUnavailable of podDisruptionBudget |
 | podDisruptionBudget.minAvailable | string | `"90%"` | Set the `minAvailable` of podDisruptionBudget. You can specify only one of `maxUnavailable` and `minAvailable` in a single PodDisruptionBudget. See [Specifying a Disruption Budget for your Application](https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget) for more details |
+| webhook.certificate.provided | bool | `false` | Set to true if you want to provide your own certificate |
+| webhook.enabled | bool | `true` | Enable or disable admission webhook |
+| webhook.failurePolicy | string | `"Fail"` | Failure policy for the webhook (Fail or Ignore) |
+| webhook.port | int | `9443` | The port for the webhook server to listen on |
+| webhook.timeoutSeconds | int | `10` | Timeout in seconds for the webhook |
 
