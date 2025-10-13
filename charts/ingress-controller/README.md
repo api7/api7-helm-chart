@@ -1,6 +1,6 @@
 # api7-ingress-controller
 
-![Version: 0.1.13](https://img.shields.io/badge/Version-0.1.13-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.7](https://img.shields.io/badge/AppVersion-2.0.7-informational?style=flat-square)
+![Version: 0.1.14](https://img.shields.io/badge/Version-0.1.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.8](https://img.shields.io/badge/AppVersion-2.0.8-informational?style=flat-square)
 
 Ingress Controller for API7
 
@@ -44,7 +44,7 @@ Ingress Controller for API7
 | deployment.annotations | object | `{}` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"api7/api7-ingress-controller"` |  |
-| deployment.image.tag | string | `"2.0.7"` |  |
+| deployment.image.tag | string | `"2.0.8"` |  |
 | deployment.nodeSelector | object | `{}` |  |
 | deployment.podAnnotations | object | `{}` |  |
 | deployment.podSecurityContext | object | `{}` |  |
