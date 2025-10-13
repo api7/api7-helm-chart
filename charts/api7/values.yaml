@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.14"
+    tag: "v3.8.15"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -50,7 +50,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.14"
+    tag: "v3.8.15"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -84,7 +84,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.14"
+    tag: "v3.8.15"
 
   extraEnvVars: []
   extraVolumes: []
@@ -309,6 +309,7 @@ dashboard_configuration:
     max_idle_time: 30s
   prometheus:
     addr: "http://api7-prometheus-server:9090"
+    query_path_prefix: ""
     timeout: "30s"
     basic_auth:  # access the prometheus with basic-auth
       username: ""  # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
