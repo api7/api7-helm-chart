@@ -1,6 +1,6 @@
 # api7-ingress-controller
 
-![Version: 0.1.14](https://img.shields.io/badge/Version-0.1.14-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.8](https://img.shields.io/badge/AppVersion-2.0.8-informational?style=flat-square)
+![Version: 0.1.15](https://img.shields.io/badge/Version-0.1.15-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.9](https://img.shields.io/badge/AppVersion-2.0.9-informational?style=flat-square)
 
 Ingress Controller for API7
 
@@ -20,7 +20,7 @@ Ingress Controller for API7
 |-----|------|---------|-------------|
 | adc.image.pullPolicy | string | `"IfNotPresent"` |  |
 | adc.image.repository | string | `"ghcr.io/api7/adc"` |  |
-| adc.image.tag | string | `"0.21.1"` |  |
+| adc.image.tag | string | `"0.21.2"` |  |
 | adc.resources | object | `{}` |  |
 | adc.securityContext | object | `{}` |  |
 | autoscaling.enabled | bool | `false` |  |
@@ -44,7 +44,7 @@ Ingress Controller for API7
 | deployment.annotations | object | `{}` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"api7/api7-ingress-controller"` |  |
-| deployment.image.tag | string | `"2.0.8"` |  |
+| deployment.image.tag | string | `"2.0.9"` |  |
 | deployment.nodeSelector | object | `{}` |  |
 | deployment.podAnnotations | object | `{}` |  |
 | deployment.podSecurityContext | object | `{}` |  |
