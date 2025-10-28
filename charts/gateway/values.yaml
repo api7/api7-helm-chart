@@ -90,6 +90,9 @@ apisix:
       # -- in seconds
       ttl: 300
       count: 512
+      # -- in seconds
+      neg_ttl: 60
+      neg_count: 512
 
   # -- Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings,
   # click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict
@@ -132,7 +135,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.8.15
+    tag: 3.8.16
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment

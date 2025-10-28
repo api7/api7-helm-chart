@@ -102,9 +102,10 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.8.15"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.8.16"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
-| apisix.lru | object | `{"secret":{"count":512,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
+| apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
+| apisix.lru.secret.neg_ttl | int | `60` | in seconds |
 | apisix.lru.secret.ttl | int | `300` | in seconds |
 | apisix.meta.luaSharedDict.prometheus-metrics | string | `"15m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
