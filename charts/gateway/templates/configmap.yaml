@@ -143,6 +143,8 @@ data:
         secret:
           ttl: {{ .Values.apisix.lru.secret.ttl }} # seconds
           count: {{ .Values.apisix.lru.secret.count }}
+          neg_ttl: {{ .Values.apisix.lru.secret.neg_ttl }}
+          neg_count: {{ .Values.apisix.lru.secret.neg_count }}
 
     nginx_config:    # config for render the template to genarate nginx.conf
       error_log: "{{ .Values.logs.errorLog }}"
