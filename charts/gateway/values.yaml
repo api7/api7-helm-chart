@@ -583,3 +583,11 @@ soapProxy:
     tag: 1.0.0
     # -- SOAP proxy image pull policy
     pullPolicy: IfNotPresent
+
+control:
+  # -- Enable Control API
+  enabled: true
+  # -- which ip to listen on for Control API
+  ip: "127.0.0.1"
+  # -- which port to use for Control API
+  port: 9090
