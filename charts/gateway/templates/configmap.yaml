@@ -136,6 +136,13 @@ data:
         port: {{ .Values.api7ee.status_endpoint.port }}
       {{- end }}
 
+      enable_control: {{ .Values.control.enabled }}
+      {{- if .Values.control.enabled }}
+      control:
+        ip: {{ default "127.0.0.1" .Values.control.ip }}
+        port: {{ default 9090 .Values.control.port }}
+      {{- end }}
+
       disable_upstream_healthcheck: {{ .Values.api7ee.disable_upstream_healthcheck }}
 
       # fine tune the parameters of LRU cache for some features like secret

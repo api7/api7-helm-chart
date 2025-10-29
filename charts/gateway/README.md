@@ -137,6 +137,9 @@ The command removes all the Kubernetes components associated with the chart and 
 | autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
 | autoscaling.version | string | `"v2"` | HPA version, the value is "v2" or "v2beta1", default "v2" |
 | configurationSnippet | object | `{"httpAdmin":"","httpEnd":"","httpSrv":"","httpSrvLocation":"","httpStart":"","main":"","stream":""}` | Custom configuration snippet. |
+| control.enabled | bool | `true` | Enable Control API |
+| control.ip | string | `"127.0.0.1"` | which ip to listen on for Control API |
+| control.port | int | `9090` | which port to use for Control API |
 | deployment.certs | object | `{"cert":"","cert_key":"","certsSecret":"","mTLSCACert":"","mTLSCACertSecret":""}` | certs used for certificates in decoupled mode |
 | deployment.certs.cert | string | `""` | cert name in certsSecret |
 | deployment.certs.cert_key | string | `""` | cert key in certsSecret |
