@@ -35,6 +35,10 @@ dashboard:
   extraVolumes: []
   extraVolumeMounts: []
   podLabels: {}
+  # -- Topology Spread Constraints for pod assignment
+  # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  # The value is evaluated as a template
+  topologySpreadConstraints: []
   livenessProbe:
     initialDelaySeconds: 180
     periodSeconds: 10
@@ -67,6 +71,10 @@ dp_manager:
   extraVolumes: []
   extraVolumeMounts: []
   podLabels: {}
+  # -- Topology Spread Constraints for pod assignment
+  # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  # The value is evaluated as a template
+  topologySpreadConstraints: []
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 3
@@ -90,6 +98,10 @@ developer_portal:
   extraVolumes: []
   extraVolumeMounts: []
   podLabels: {}
+  # -- Topology Spread Constraints for pod assignment
+  # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  # The value is evaluated as a template
+  topologySpreadConstraints: []
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 3

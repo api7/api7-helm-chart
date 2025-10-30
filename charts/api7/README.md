@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.29](https://img.shields.io/badge/Version-0.17.29-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.16](https://img.shields.io/badge/AppVersion-3.8.16-informational?style=flat-square)
+![Version: 0.17.30](https://img.shields.io/badge/Version-0.17.30-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.16](https://img.shields.io/badge/AppVersion-3.8.16-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -39,6 +39,7 @@ A Helm chart for Kubernetes
 | dashboard.readinessProbe.initialDelaySeconds | int | `10` |  |
 | dashboard.readinessProbe.periodSeconds | int | `3` |  |
 | dashboard.replicaCount | int | `1` |  |
+| dashboard.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
 | dashboard_configuration.audit.retention_days | int | `60` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
 | dashboard_configuration.consumer_proxy.cache_failure_count | int | `512` |  |
@@ -114,6 +115,7 @@ A Helm chart for Kubernetes
 | developer_portal.readinessProbe.initialDelaySeconds | int | `10` |  |
 | developer_portal.readinessProbe.periodSeconds | int | `3` |  |
 | developer_portal.replicaCount | int | `1` |  |
+| developer_portal.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
 | developer_portal_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | developer_portal_configuration.database.max_idle_time | string | `"30s"` |  |
 | developer_portal_configuration.database.max_open_conns | int | `30` |  |
@@ -152,6 +154,7 @@ A Helm chart for Kubernetes
 | dp_manager.readinessProbe.initialDelaySeconds | int | `10` |  |
 | dp_manager.readinessProbe.periodSeconds | int | `3` |  |
 | dp_manager.replicaCount | int | `1` |  |
+| dp_manager.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
 | dp_manager_configuration.consumer_cache.evict_interval | string | `"5s"` |  |
 | dp_manager_configuration.consumer_cache.max_ttl | string | `"2h"` |  |
 | dp_manager_configuration.consumer_cache.size | int | `50000` |  |

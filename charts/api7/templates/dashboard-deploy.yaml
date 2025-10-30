@@ -136,7 +136,7 @@ spec:
       tolerations:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- with .Values.topologySpreadConstraints }}
+      {{- with or .Values.dashboard.topologySpreadConstraints .Values.topologySpreadConstraints }}
       topologySpreadConstraints:
         {{- tpl (. | toYaml) $ | nindent 8 }}
       {{- end }}
