@@ -221,6 +221,11 @@ tolerations: []
 
 affinity: {}
 
+# -- Topology Spread Constraints for pod assignment
+# https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+# The value is evaluated as a template
+topologySpreadConstraints: []
+
 busybox:
   image:
     repository: docker.io/busybox
