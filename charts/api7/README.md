@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.28](https://img.shields.io/badge/Version-0.17.28-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.16](https://img.shields.io/badge/AppVersion-3.8.16-informational?style=flat-square)
+![Version: 0.17.29](https://img.shields.io/badge/Version-0.17.29-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.16](https://img.shields.io/badge/AppVersion-3.8.16-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -236,4 +236,5 @@ A Helm chart for Kubernetes
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
 | tolerations | list | `[]` |  |
+| topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
 
