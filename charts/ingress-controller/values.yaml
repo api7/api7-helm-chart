@@ -61,6 +61,7 @@ config:
   probeAddr: ":8081"
   secureMetrics: false
   execADCTimeout: "15s"
+  disableGatewayApi: false  # Whether to disable the Gateway API support. The default value is false.
   provider:
     type: "api7ee"
     syncPeriod: "1h"

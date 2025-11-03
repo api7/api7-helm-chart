@@ -27,6 +27,7 @@ Ingress Controller for API7
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | config.controllerName | string | `"apisix.apache.org/apisix-ingress-controller"` |  |
+| config.disableGatewayApi | bool | `false` |  |
 | config.enableHTTP2 | bool | `false` |  |
 | config.execADCTimeout | string | `"15s"` |  |
 | config.leaderElection.disable | bool | `false` |  |
