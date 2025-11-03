@@ -80,6 +80,8 @@ spec:
           value: "ingress"
         - name: ADC_EXPERIMENTAL_FEATURE_FLAGS
           value: "remote-state-file,parallel-backend-request"
+        - name: ADC_INGRESS_LOG_LEVEL
+          value: "{{ .Values.adc.logLevel }}"
         ports:
         - name: http-status
           containerPort: 3001
