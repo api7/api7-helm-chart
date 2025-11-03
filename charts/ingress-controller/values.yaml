@@ -26,7 +26,10 @@ deployment:
   nodeSelector: {}
   tolerations: []
   affinity: {}
-  podSecurityContext: {}
+  # fsGroup: 2000 ensures containers can share Unix socket files via a common group.
+  podSecurityContext:
+    fsGroup: 2000
+  securityContext: {}
   topologySpreadConstraints: []
   image:
     repository: api7/api7-ingress-controller

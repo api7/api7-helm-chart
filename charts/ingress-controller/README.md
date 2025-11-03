@@ -48,9 +48,10 @@ Ingress Controller for API7
 | deployment.image.tag | string | `"2.0.9"` |  |
 | deployment.nodeSelector | object | `{}` |  |
 | deployment.podAnnotations | object | `{}` |  |
-| deployment.podSecurityContext | object | `{}` |  |
+| deployment.podSecurityContext.fsGroup | int | `2000` |  |
 | deployment.replicas | int | `1` |  |
 | deployment.resources | object | `{}` | Set pod resource requests & limits |
+| deployment.securityContext | object | `{}` |  |
 | deployment.tolerations | list | `[]` |  |
 | deployment.topologySpreadConstraints | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
