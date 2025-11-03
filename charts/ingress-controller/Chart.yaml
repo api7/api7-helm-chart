@@ -6,7 +6,7 @@ keywords:
   - api7
   - crd
 type: application
-version: 0.1.16
+version: 0.1.17
 appVersion: 2.0.10
 maintainers:
   - name: API7
