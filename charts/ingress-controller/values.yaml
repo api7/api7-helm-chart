@@ -40,6 +40,7 @@ adc:
     repository: ghcr.io/api7/adc
     tag: "0.21.2"
     pullPolicy: IfNotPresent
+  logLevel: "info"
   resources: {}
   securityContext: {}
 
@@ -59,7 +60,7 @@ config:
   execADCTimeout: "15s"
   provider:
     type: "api7ee"
-    syncPeriod: "0s"
+    syncPeriod: "1h"
     initSyncDelay: "20m"
 
 # Admission webhook configuration
