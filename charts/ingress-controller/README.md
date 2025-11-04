@@ -1,6 +1,6 @@
 # api7-ingress-controller
 
-![Version: 0.1.16](https://img.shields.io/badge/Version-0.1.16-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.9](https://img.shields.io/badge/AppVersion-2.0.9-informational?style=flat-square)
+![Version: 0.1.17](https://img.shields.io/badge/Version-0.1.17-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.10](https://img.shields.io/badge/AppVersion-2.0.10-informational?style=flat-square)
 
 Ingress Controller for API7
 
@@ -27,6 +27,7 @@ Ingress Controller for API7
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.minReplicas | int | `1` |  |
 | config.controllerName | string | `"apisix.apache.org/apisix-ingress-controller"` |  |
+| config.disableGatewayApi | bool | `false` |  |
 | config.enableHTTP2 | bool | `false` |  |
 | config.execADCTimeout | string | `"15s"` |  |
 | config.leaderElection.disable | bool | `false` |  |
@@ -45,12 +46,13 @@ Ingress Controller for API7
 | deployment.annotations | object | `{}` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"api7/api7-ingress-controller"` |  |
-| deployment.image.tag | string | `"2.0.9"` |  |
+| deployment.image.tag | string | `"2.0.10"` |  |
 | deployment.nodeSelector | object | `{}` |  |
 | deployment.podAnnotations | object | `{}` |  |
-| deployment.podSecurityContext | object | `{}` |  |
+| deployment.podSecurityContext.fsGroup | int | `2000` |  |
 | deployment.replicas | int | `1` |  |
 | deployment.resources | object | `{}` | Set pod resource requests & limits |
+| deployment.securityContext | object | `{}` |  |
 | deployment.tolerations | list | `[]` |  |
 | deployment.topologySpreadConstraints | list | `[]` |  |
 | fullnameOverride | string | `""` |  |
