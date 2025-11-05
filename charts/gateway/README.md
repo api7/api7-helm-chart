@@ -147,6 +147,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | deployment.certs.certsSecret | string | `""` | secret name used for decoupled mode |
 | deployment.certs.mTLSCACert | string | `""` | mTLS CA cert filename in mTLSCACertSecret |
 | deployment.certs.mTLSCACertSecret | string | `""` | trusted_ca_cert name in certsSecret |
+| deployment.fallback_cp | object | `{}` | use cloud storage as the fallback control plane, should be consistent with the same configuration in control plane side. |
 | discovery.enabled | bool | `false` | Enable or disable API7 Gateway integration service discovery |
 | discovery.registry | object | `{}` | Registry is the same to the one in APISIX [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L281), and refer to such file for more setting details. also refer to [this documentation for integration service discovery](https://apisix.apache.org/docs/apisix/discovery) |
 | dns.resolvers[0] | string | `"127.0.0.1"` |  |
