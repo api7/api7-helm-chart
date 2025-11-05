@@ -256,6 +256,13 @@ data:
     {{- end }}
 
     deployment:
+      {{- if .Values.deployment.fallback_cp }}
+      role: data_plane
+      role_data_plane:
+        config_provider: yaml
+      fallback_cp:
+        {{- toYaml .Values.deployment.fallback_cp | nindent 8 }}
+      {{- else }}
       role: traditional
       role_traditional:
         config_provider: etcd
@@ -334,5 +341,6 @@ data:
           sni: "{{ .Values.etcd.auth.tls.sni }}"
           {{- end }}
         {{- end }}
+      {{- end }}
     {{- end }}
 {{- end }}

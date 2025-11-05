@@ -236,6 +236,16 @@ rbac:
   create: false
 
 deployment:
+  # -- use cloud storage as the fallback control plane,
+  # should be consistent with the same configuration in control plane side.
+  fallback_cp: {}
+  #  aws_s3:
+  #    access_key: "access"
+  #    secret_key: "secret"
+  #    region: "ap-south-1"
+  #    resource_bucket: "to-push-resource-data"
+  #    config_bucket: "to-push-config-data"
+
   # -- certs used for certificates in decoupled mode
   certs:
     # -- secret name used for decoupled mode
