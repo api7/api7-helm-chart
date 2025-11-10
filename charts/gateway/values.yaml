@@ -462,7 +462,7 @@ logs:
   accessLogFormatEscape: default
   # -- Error log path
   errorLog: "/dev/stderr"
-  # -- Error log level
+  # -- Error log level, Allowed values: `debug`, `info`, `notice`, `warn`, `error`, `crit`, `alert`, `or` `emerg`
   errorLogLevel: "warn"
 
 dns:

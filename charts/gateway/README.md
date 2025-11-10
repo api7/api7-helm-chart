@@ -205,7 +205,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | logs.accessLogFormatEscape | string | `"default"` | Allows setting json or default characters escaping in variables |
 | logs.enableAccessLog | bool | `true` | Enable access log or not, default true |
 | logs.errorLog | string | `"/dev/stderr"` | Error log path |
-| logs.errorLogLevel | string | `"warn"` | Error log level |
+| logs.errorLogLevel | string | `"warn"` | Error log level, Allowed values: `debug`, `info`, `notice`, `warn`, `error`, `crit`, `alert`, `or` `emerg` |
 | nameOverride | string | `""` |  |
 | nginx.enableCPUAffinity | bool | `true` |  |
 | nginx.envs | list | `[]` |  |

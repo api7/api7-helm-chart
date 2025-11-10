@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.30](https://img.shields.io/badge/Version-0.17.30-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.16](https://img.shields.io/badge/AppVersion-3.8.16-informational?style=flat-square)
+![Version: 0.17.31](https://img.shields.io/badge/Version-0.17.31-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.17](https://img.shields.io/badge/AppVersion-3.8.17-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -29,7 +29,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.8.16"` |  |
+| dashboard.image.tag | string | `"v3.8.17"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.livenessProbe.failureThreshold | int | `30` |  |
 | dashboard.livenessProbe.initialDelaySeconds | int | `180` |  |
@@ -54,7 +54,7 @@ A Helm chart for Kubernetes
 | dashboard_configuration.developer_proxy.cache_failure_ttl | int | `15` |  |
 | dashboard_configuration.developer_proxy.cache_success_count | int | `256` |  |
 | dashboard_configuration.developer_proxy.cache_success_ttl | int | `15` |  |
-| dashboard_configuration.log.level | string | `"warn"` |  |
+| dashboard_configuration.log.level | string | `"warn"` | Allowed values: `debug`, `info`, `warn`, `error` |
 | dashboard_configuration.log.output | string | `"stderr"` |  |
 | dashboard_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
 | dashboard_configuration.prometheus.basic_auth.password | string | `""` |  |
@@ -72,6 +72,11 @@ A Helm chart for Kubernetes
 | dashboard_configuration.prometheus.whitelist[2] | string | `"/api/v1/format_query"` |  |
 | dashboard_configuration.prometheus.whitelist[3] | string | `"/api/v1/series"` |  |
 | dashboard_configuration.prometheus.whitelist[4] | string | `"/api/v1/labels"` |  |
+| dashboard_configuration.security.ip_restriction.allow_list | list | `[]` | empty means allow all |
+| dashboard_configuration.security.ip_restriction.deny_list | list | `[]` |  |
+| dashboard_configuration.security.ip_restriction.message | string | `"Access denied"` |  |
+| dashboard_configuration.security.ip_restriction.response_code | int | `403` |  |
+| dashboard_configuration.security.trusted_proxies | list | `["0.0.0.0/0","::/0"]` | A list of network origins (IPv4 addresses, IPv4 CIDRs, IPv6 addresses or IPv6 CIDRs) from which to trust request's headers("X-Forwarded-For", "X-Real-IP") that contain alternative client IP. |
 | dashboard_configuration.server.listen.disable | bool | `true` |  |
 | dashboard_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | dashboard_configuration.server.listen.port | int | `7080` |  |
@@ -105,7 +110,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraVolumes | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"Always"` |  |
 | developer_portal.image.repository | string | `"api7/api7-ee-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v3.8.16"` |  |
+| developer_portal.image.tag | string | `"v3.8.17"` |  |
 | developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.livenessProbe.failureThreshold | int | `10` |  |
 | developer_portal.livenessProbe.initialDelaySeconds | int | `60` |  |
@@ -120,7 +125,7 @@ A Helm chart for Kubernetes
 | developer_portal_configuration.database.max_idle_time | string | `"30s"` |  |
 | developer_portal_configuration.database.max_open_conns | int | `30` |  |
 | developer_portal_configuration.enable | bool | `true` |  |
-| developer_portal_configuration.log.level | string | `"warn"` |  |
+| developer_portal_configuration.log.level | string | `"warn"` | Allowed values: `debug`, `info`, `warn`, `error` |
 | developer_portal_configuration.log.output | string | `"stderr"` |  |
 | developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | developer_portal_configuration.server.listen.port | int | `4321` |  |
@@ -145,7 +150,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.8.16"` |  |
+| dp_manager.image.tag | string | `"v3.8.17"` |  |
 | dp_manager.livenessProbe.failureThreshold | int | `10` |  |
 | dp_manager.livenessProbe.initialDelaySeconds | int | `60` |  |
 | dp_manager.livenessProbe.periodSeconds | int | `3` |  |
@@ -161,7 +166,7 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dp_manager_configuration.database.max_idle_time | string | `"30s"` |  |
 | dp_manager_configuration.database.max_open_conns | int | `30` |  |
-| dp_manager_configuration.log.level | string | `"warn"` |  |
+| dp_manager_configuration.log.level | string | `"warn"` | Allowed values: `debug`, `info`, `warn`, `error` |
 | dp_manager_configuration.log.output | string | `"stderr"` |  |
 | dp_manager_configuration.prometheus.addr | string | `"http://api7-prometheus-server:9090"` |  |
 | dp_manager_configuration.prometheus.basic_auth.password | string | `""` |  |
