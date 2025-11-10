@@ -377,7 +377,7 @@ dashboard_configuration:
 
     # -- A list of network origins (IPv4 addresses, IPv4 CIDRs, IPv6 addresses or IPv6 CIDRs) from which to trust
     # request's headers("X-Forwarded-For", "X-Real-IP") that contain alternative client IP.
-    trusted_proxies: [ "0.0.0.0/0", "::/0" ]
+    trusted_proxies: ["0.0.0.0/0","::/0"]
     ip_restriction:
       # -- empty means allow all
       allow_list: []
