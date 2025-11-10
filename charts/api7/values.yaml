@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.16"
+    tag: "v3.8.17"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -54,7 +54,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.16"
+    tag: "v3.8.17"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -92,7 +92,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.16"
+    tag: "v3.8.17"
 
   extraEnvVars: []
   extraVolumes: []
@@ -318,6 +318,7 @@ dashboard_configuration:
     secure: false
     max_age: 86400
   log:
+    # -- Allowed values: `debug`, `info`, `warn`, `error`
     level: warn
     output: stderr
   database:
@@ -371,8 +372,19 @@ dashboard_configuration:
   #     config_bucket: "to-push-config-data"
   #   cron_spec: "@every 1m"
 
-  # security:
-  #   content_security_policy: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+  security:
+    # content_security_policy: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+
+    # -- A list of network origins (IPv4 addresses, IPv4 CIDRs, IPv6 addresses or IPv6 CIDRs) from which to trust
+    # request's headers("X-Forwarded-For", "X-Real-IP") that contain alternative client IP.
+    trusted_proxies: [ "0.0.0.0/0", "::/0" ]
+    ip_restriction:
+      # -- empty means allow all
+      allow_list: []
+      # -0 empty means deny none
+      deny_list: []
+      message: "Access denied"
+      response_code: 403
 
 dp_manager_configuration:
   server:
@@ -391,6 +403,7 @@ dp_manager_configuration:
       host: "127.0.0.1"
       port: 7902
   log:
+    # -- Allowed values: `debug`, `info`, `warn`, `error`
     level: warn
     output: stderr
   database:
@@ -435,6 +448,7 @@ developer_portal_configuration:
       host: "127.0.0.1"
       port: 4322
   log:
+    # -- Allowed values: `debug`, `info`, `warn`, `error`
     level: warn
     output: stderr
   database:
