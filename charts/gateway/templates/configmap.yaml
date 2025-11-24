@@ -20,6 +20,9 @@ data:
       node_listen:    # APISIX listening port
         - ip: {{ .Values.gateway.http.ip }}
           port: {{ .Values.gateway.http.containerPort }}
+          {{- if hasKey .Values.gateway.http "backlog" }}
+          backlog: {{ .Values.gateway.http.backlog }}
+          {{- end }}
         {{- with .Values.gateway.http.additionalContainerPorts }}
         {{- toYaml . | nindent 8}}
         {{- end }}
@@ -117,6 +120,9 @@ data:
         listen:
           - ip: {{ .Values.gateway.tls.ip }}
             port: {{ .Values.gateway.tls.containerPort }}
+            {{- if hasKey .Values.gateway.tls "backlog" }}
+            backlog: {{ .Values.gateway.tls.backlog }}
+            {{- end }}
             enable_http2: {{ .Values.gateway.tls.http2.enabled }}
           {{- with .Values.gateway.tls.additionalContainerPorts }}
           {{- toYaml . | nindent 10}}

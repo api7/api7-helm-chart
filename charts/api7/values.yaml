@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.17"
+    tag: "v3.8.18"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -54,7 +54,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.17"
+    tag: "v3.8.18"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -92,7 +92,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.17"
+    tag: "v3.8.18"
 
   extraEnvVars: []
   extraVolumes: []
@@ -364,13 +364,19 @@ dashboard_configuration:
   # dp_manager_address:
   #   - "https://dpm.api7.ai"
   # fallback_cp:
+  #   cron_spec: "@every 1m"
   #   aws_s3:
   #     access_key: "access"
   #     secret_key: "secret"
   #     region: "ap-south-1"
   #     resource_bucket: "to-push-resource-data"
   #     config_bucket: "to-push-config-data"
-  #   cron_spec: "@every 1m"
+  #   azure_blob:
+  #     account_name: "$YOUR_ACCOUNT_NAME"
+  #     account_key: "$YOUR_ACCOUNT_KEY"
+  #     resource_container: yaml
+  #     config_container: config
+  #     endpoint: "$YOUR_AZURE_BLOB_ENDPOINT"
 
   security:
     # content_security_policy: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
@@ -385,6 +391,8 @@ dashboard_configuration:
       deny_list: []
       message: "Access denied"
       response_code: 403
+  # license:
+  #   file_path: "/app/licenses/license.txt" # the file path of license file, (e.g. /app/licenses/license.txt)
 
 dp_manager_configuration:
   server:
