@@ -16,10 +16,17 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if (and (eq .Values.dashboard_service.type "NodePort") (not (empty .Values.dashboard_service.nodePort))) }}
+      nodePort: {{ .Values.dashboard_service.nodePort }}
+      {{- end }}
+
     - port: {{ .Values.dashboard_service.tlsPort }}
       targetPort: https
       protocol: TCP
       name: https
+      {{- if (and (eq .Values.dashboard_service.type "NodePort") (not (empty .Values.dashboard_service.tlsNodePort))) }}
+      nodePort: {{ .Values.dashboard_service.tlsNodePort }}
+      {{- end }}
 
   selector:
     {{- include "api7ee3.selectorLabels" . | nindent 4 }}
