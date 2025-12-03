@@ -142,6 +142,8 @@ dashboard_service:
   annotations: {}
   port: 7080
   tlsPort: 7443
+  # nodePort: 30080
+  # tlsNodePort: 30443
   ingress:
     enabled: false
     className: ""
