@@ -88,7 +88,7 @@ spec:
           containerPort: {{ .Values.gateway.tls.containerPort }}
           protocol: TCP
           {{- if and .Values.apisix.hostNetwork .Values.gateway.tls.ip }}
-          hostIP: {{ .Values.gateway.http.ip }}
+          hostIP: {{ .Values.gateway.tls.ip }}
           {{- end }}
         {{- range .Values.gateway.tls.additionalContainerPorts }}
         - name: tls-{{ .port | toString }}
