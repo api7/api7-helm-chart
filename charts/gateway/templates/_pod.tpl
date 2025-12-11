@@ -1,4 +1,5 @@
 {{- define "apisix.podTemplate" -}}
+{{- $global := . -}}
 metadata:
   annotations:
     checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
@@ -72,17 +73,29 @@ spec:
         - name: http
           containerPort: {{ .Values.gateway.http.containerPort }}
           protocol: TCP
+          {{- if and .Values.apisix.hostNetwork .Values.gateway.http.ip }}
+          hostIP: {{ .Values.gateway.http.ip }}
+          {{- end }}
         {{- range .Values.gateway.http.additionalContainerPorts }}
         - name: http-{{ .port | toString }}
           containerPort: {{ .port }}
           protocol: TCP
+          {{- if and $global.Values.apisix.hostNetwork .ip }}
+          hostIP: {{ .ip }}
+          {{- end }}
         {{- end }}
         - name: tls
           containerPort: {{ .Values.gateway.tls.containerPort }}
           protocol: TCP
+          {{- if and .Values.apisix.hostNetwork .Values.gateway.tls.ip }}
+          hostIP: {{ .Values.gateway.http.ip }}
+          {{- end }}
         {{- range .Values.gateway.tls.additionalContainerPorts }}
         - name: tls-{{ .port | toString }}
           containerPort: {{ .port }}
+          {{- if and $global.Values.apisix.hostNetwork .ip }}
+          hostIP: {{ .ip }}
+          {{- end }}
           protocol: TCP
         {{- end }}
         {{- if .Values.admin.enabled }}
@@ -98,6 +111,9 @@ spec:
         {{- if .Values.api7ee.status_endpoint.enabled }}
         - name: status
           containerPort: {{ .Values.api7ee.status_endpoint.port }}
+          {{- if and .Values.apisix.hostNetwork .Values.api7ee.status_endpoint.ip }}
+          hostIP: {{ .Values.api7ee.status_endpoint.ip }}
+          {{- end }}
           protocol: TCP
         {{- end }}
         {{- if and .Values.gateway.stream.enabled (or (gt (len .Values.gateway.stream.tcp) 0) (gt (len .Values.gateway.stream.udp) 0)) }}
