@@ -239,6 +239,8 @@ deployment:
   # -- use cloud storage as the fallback control plane,
   # should be consistent with the same configuration in control plane side.
   fallback_cp: {}
+  #  interval: 10
+  #  mode: "write"
   #  aws_s3:
   #    access_key: "access"
   #    secret_key: "secret"
