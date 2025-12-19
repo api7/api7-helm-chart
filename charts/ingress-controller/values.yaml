@@ -57,8 +57,8 @@ config:
     retryPeriod: "2s"
     disable: false
   metricsAddr: ":8080"
-  enableServer: false # The debug API is behind this server which is disabled by default for security reasons.
-  serverAddr: "127.0.0.1:9092" # Available endpoints: /debug can be used to debug in-memory state of translated adc configs to be synced with data plane.
+  enableServer: false           # The debug API is behind this server which is disabled by default for security reasons.
+  serverAddr: "127.0.0.1:9092"  # Available endpoints: /debug can be used to debug in-memory state of translated adc configs to be synced with data plane.
   enableHTTP2: false
   probeAddr: ":8081"
   secureMetrics: false
