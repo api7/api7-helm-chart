@@ -6,8 +6,8 @@ keywords:
   - api7
   - crd
 type: application
-version: 0.1.19
-appVersion: 2.0.12
+version: 0.1.20
+appVersion: 2.0.13
 maintainers:
   - name: API7
     email: support@api7.ai
