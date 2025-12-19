@@ -14,6 +14,8 @@ data:
       retry_period: {{ .Values.config.leaderElection.retryPeriod | default "2s" }}
       disable: {{ .Values.config.leaderElection.disable | default false }}
     metrics_addr: {{ .Values.config.metricsAddr | default ":8080" }}
+    enable_server: {{ .Values.config.enableServer | default false }}
+    server_addr: {{ .Values.config.serverAddr | default "127.0.0.1:9092" }}
     enable_http2: {{ .Values.config.enableHTTP2 | default false }}
     probe_addr: {{ .Values.config.probeAddr | default ":8081" }}
     secure_metrics: {{ .Values.config.secureMetrics | default false }}
