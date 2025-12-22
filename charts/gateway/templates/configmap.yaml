@@ -273,7 +273,7 @@ data:
       {{- if and (.Values.deployment.fallback_cp) (ne .Values.deployment.fallback_cp.mode "write") }}
       role: data_plane
       role_data_plane:
-        config_provider: yaml
+        config_provider: json
       {{- else }}
       role: traditional
       role_traditional:
