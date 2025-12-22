@@ -262,12 +262,14 @@ data:
     {{- end }}
 
     deployment:
+      {{- if and (.Values.deployment.fallback_cp) }}
+      fallback_cp:
+        {{- toYaml .Values.deployment.fallback_cp | nindent 8 }}
+      {{- end }}
       {{- if and (.Values.deployment.fallback_cp) (ne .Values.deployment.fallback_cp.mode "write") }}
       role: data_plane
       role_data_plane:
         config_provider: yaml
-      fallback_cp:
-        {{- toYaml .Values.deployment.fallback_cp | nindent 8 }}
       {{- else }}
       role: traditional
       role_traditional:
