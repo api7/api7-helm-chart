@@ -240,6 +240,7 @@ deployment:
   # should be consistent with the same configuration in control plane side.
   fallback_cp: {}
   #  interval: 10
+  # -- Allowed values: `write`, `read`, default `read`
   #  mode: "write"
   #  aws_s3:
   #    access_key: "access"
