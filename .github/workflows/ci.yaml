@@ -68,7 +68,7 @@ jobs:
                && helm repo add bitnami https://charts.bitnami.com/bitnami \
                && helm repo add apisix https://charts.apiseven.com \
                && ct install \
-                  --charts charts/gateway --helm-extra-set-args "--set etcd.enabled=true"'
+                  --charts charts/gateway --helm-extra-set-args "--set etcd.enabled=true --set apisix.extraEnvVars[0].name=API7_SKIP_FIRST_HEARTBEAT_DEBUG --set-string apisix.extraEnvVars[0].value=true"'
 
       - name: Setup Go
         uses: actions/setup-go@v4
