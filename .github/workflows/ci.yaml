@@ -64,6 +64,7 @@ jobs:
               --volume $HOME/.kube/config:/root/.kube/config \
               --volume $PWD:/workdir \
               --workdir /workdir \
+              -e API7_SKIP_FIRST_HEARTBEAT_DEBUG=true \
               quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
                && helm repo add bitnami https://charts.bitnami.com/bitnami \
                && helm repo add apisix https://charts.apiseven.com \
