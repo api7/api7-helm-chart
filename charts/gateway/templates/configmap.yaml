@@ -186,7 +186,11 @@ data:
           {{- toYaml .Values.apisix.stream.luaSharedDict | nindent 10 }}
         {{- end }}
       http:
+        {{- if and (.Values.deployment.fallback_cp) (eq .Values.deployment.fallback_cp.mode "write") }}
+        enable_access_log: false
+        {{- else }}
         enable_access_log: {{ .Values.logs.enableAccessLog }}
+        {{- end }}
         {{- if .Values.logs.enableAccessLog }}
         access_log: "{{ .Values.logs.accessLog }}"
         access_log_format: >-
@@ -262,12 +266,14 @@ data:
     {{- end }}
 
     deployment:
-      {{- if .Values.deployment.fallback_cp }}
-      role: data_plane
-      role_data_plane:
-        config_provider: yaml
+      {{- if and (.Values.deployment.fallback_cp) }}
       fallback_cp:
         {{- toYaml .Values.deployment.fallback_cp | nindent 8 }}
+      {{- end }}
+      {{- if and (.Values.deployment.fallback_cp) (ne .Values.deployment.fallback_cp.mode "write") }}
+      role: data_plane
+      role_data_plane:
+        config_provider: json
       {{- else }}
       role: traditional
       role_traditional:

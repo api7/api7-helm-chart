@@ -138,6 +138,9 @@ spec:
         {{- end }}
         {{- end }}
         {{- end }}
+      {{- if and .Values.deployment.fallback_cp.mode (eq .Values.deployment.fallback_cp.mode "write") }}
+      {{- /* Disable probes when fallback_cp mode is set to write */ -}}
+      {{- else }}
       {{- if .Values.gateway.readinessProbe }}
       readinessProbe:
       {{- toYaml .Values.gateway.readinessProbe | nindent 8 }}
@@ -154,6 +157,7 @@ spec:
       {{- if .Values.gateway.livenessProbe }}
       livenessProbe:
       {{- toYaml .Values.gateway.livenessProbe | nindent 8 }}
+      {{- end }}
       {{- end }}
       lifecycle:
         preStop:

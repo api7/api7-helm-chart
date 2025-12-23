@@ -236,20 +236,26 @@ rbac:
   create: false
 
 deployment:
-  # -- use cloud storage as the fallback control plane,
-  # should be consistent with the same configuration in control plane side.
+  # -- use cloud storage as the fallback control plane
   fallback_cp: {}
+  #  # Allowed values: `write`, `read`, default `read`
+  #  mode: "write"
+  #  # how often (in seconds) to sync data to cloud storage, only used when mode is `write`
+  #  interval: 10
+  #  # aws s3 configuration, when access key or secret key are not set, will use the IAM role attached to the pod
   #  aws_s3:
   #    access_key: "access"
   #    secret_key: "secret"
   #    region: "ap-south-1"
   #    resource_bucket: "to-push-resource-data"
   #    config_bucket: "to-push-config-data"
+  #  # azure blob storage configuration, when account key is not set, will use the Managed Identity attached to the pod
   #  azure_blob:
   #    account_name: "$YOUR_ACCOUNT_NAME"
   #    account_key: "$YOUR_ACCOUNT_KEY"
   #    resource_container: yaml
   #    config_container: config
+  #    # optional, when not set, will use the default endpoint: "https://$YOUR_ACCOUNT_NAME.blob.core.windows.net"
   #    endpoint: "$YOUR_AZURE_BLOB_ENDPOINT"
 
   # -- certs used for certificates in decoupled mode
