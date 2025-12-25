@@ -76,12 +76,18 @@ spec:
           {{- if and .Values.apisix.hostNetwork .Values.gateway.http.ip }}
           hostIP: {{ .Values.gateway.http.ip }}
           {{- end }}
+          {{- if .Values.gateway.http.hostPort }}
+          hostPort: {{ .Values.gateway.http.hostPort }}
+          {{- end }}
         {{- range .Values.gateway.http.additionalContainerPorts }}
         - name: http-{{ .port | toString }}
           containerPort: {{ .port }}
           protocol: TCP
           {{- if and $global.Values.apisix.hostNetwork .ip }}
           hostIP: {{ .ip }}
+          {{- end }}
+          {{- if .hostPort }}
+          hostPort: {{ .hostPort }}
           {{- end }}
         {{- end }}
         - name: tls
@@ -90,11 +96,17 @@ spec:
           {{- if and .Values.apisix.hostNetwork .Values.gateway.tls.ip }}
           hostIP: {{ .Values.gateway.tls.ip }}
           {{- end }}
+          {{- if .Values.gateway.tls.hostPort }}
+          hostPort: {{ .Values.gateway.tls.hostPort }}
+          {{- end }}
         {{- range .Values.gateway.tls.additionalContainerPorts }}
         - name: tls-{{ .port | toString }}
           containerPort: {{ .port }}
           {{- if and $global.Values.apisix.hostNetwork .ip }}
           hostIP: {{ .ip }}
+          {{- end }}
+          {{- if .hostPort }}
+          hostPort: {{ .hostPort }}
           {{- end }}
           protocol: TCP
         {{- end }}
