@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.21"
+    tag: "v3.9.0"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -54,7 +54,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.21"
+    tag: "v3.9.0"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -92,7 +92,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.8.21"
+    tag: "v3.9.0"
 
   extraEnvVars: []
   extraVolumes: []
@@ -312,9 +312,9 @@ dashboard_configuration:
       host: "127.0.0.1"
       port: 7081
     pprof:
-      enable: false
+      enable: true
       host: "127.0.0.1"
-      port: 7082
+      port: 6060
   session_options_config:
     same_site: "lax"  # means the value SameSiteNoneMode
     secure: false
@@ -323,10 +323,12 @@ dashboard_configuration:
     # -- Allowed values: `debug`, `info`, `warn`, `error`
     level: warn
     output: stderr
+    access_log: stdout
   database:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     max_open_conns: 30
     max_idle_time: 30s
+    timeout: 5s
   prometheus:
     addr: "http://api7-prometheus-server:9090"
     query_path_prefix: ""
@@ -409,17 +411,19 @@ dp_manager_configuration:
       host: "127.0.0.1"
       port: 7901
     pprof:
-      enable: false
+      enable: true
       host: "127.0.0.1"
-      port: 7902
+      port: 6060
   log:
     # -- Allowed values: `debug`, `info`, `warn`, `error`
     level: warn
     output: stderr
+    access_log: stdout
   database:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     max_open_conns: 30
     max_idle_time: 30s
+    timeout: 5s
   prometheus:
     addr: "http://api7-prometheus-server:9090"
     remote_write_path: "/api/v1/write"
@@ -457,11 +461,17 @@ developer_portal_configuration:
       disable: false
       host: "127.0.0.1"
       port: 4322
+    pprof:
+      enable: true
+      host: "127.0.0.1"
+      port: 6060
   log:
     # -- Allowed values: `debug`, `info`, `warn`, `error`
     level: warn
     output: stderr
+    access_log: stdout
   database:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     max_open_conns: 30
     max_idle_time: 30s
+    timeout: 5s
