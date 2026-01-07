@@ -55,9 +55,11 @@ The command removes all the Kubernetes components associated with the chart and 
 | api7ee.status_endpoint.enabled | bool | `false` | When enabled, APISIX will provide `/status` and `/status/ready` endpoints, /status endpoint will return 200 status code if APISIX has successfully started and running correctly, /status/ready endpoint will return 503 status code if none of the configured etcd (dp_manager) are available. |
 | api7ee.status_endpoint.ip | string | `"0.0.0.0"` | The IP address and port on which the status endpoint will listen. |
 | api7ee.status_endpoint.port | int | `7085` | The port on which the status endpoint will listen. |
+| api7ee.telemetry.compression_level | int | `-1` | gzip compression level. -1 uses library default (usually 6).Range 0-9; 1 fastest, 9 highest compression. Gzip is enabled by default. |
 | api7ee.telemetry.enable | bool | `true` | enable telemetry data report to the control plane |
 | api7ee.telemetry.interval | int | `15` | interval in seconds to send telemetry data to the control plane |
 | api7ee.telemetry.max_metrics_size | int | `33554432` | max size in bytes(default 32M) of the metrics data sent to the control plane, if the size exceeds, the data will be truncated |
+| api7ee.telemetry.metrics_batch_size | int | `4194304` | max batch size before compression (bytes, 4 MiB). |
 | apisix.affinity | object | `{}` | Set affinity for API7 Gateway deploy |
 | apisix.customLuaSharedDicts | list | `[]` | Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings, click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict |
 | apisix.customizedConfig | object | `{}` | If apisix.enableCustomizedConfig is true, full customized config.yaml. Please note that other settings about APISIX config will be ignored |

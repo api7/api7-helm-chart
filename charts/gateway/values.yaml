@@ -14,6 +14,10 @@ api7ee:
     interval: 15
     # -- max size in bytes(default 32M) of the metrics data sent to the control plane, if the size exceeds, the data will be truncated
     max_metrics_size: 33554432
+    # -- max batch size before compression (bytes, 4 MiB).
+    metrics_batch_size: 4194304
+    # -- gzip compression level. -1 uses library default (usually 6).Range 0-9; 1 fastest, 9 highest compression. Gzip is enabled by default.
+    compression_level: -1
   # -- healthcheck data report interval in seconds
   healthcheck_report_interval: 120
 
