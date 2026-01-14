@@ -197,10 +197,13 @@ data:
           {{- .Values.logs.accessLogFormat | nindent 10 }}
         access_log_format_escape: {{ .Values.logs.accessLogFormatEscape }}
         {{- end }}
-        keepalive_timeout: 60s         # timeout during which a keep-alive client connection will stay open on the server side.
-        client_header_timeout: 60s     # timeout for reading client request header, then 408 (Request Time-out) error is returned to the client
-        client_body_timeout: 60s       # timeout for reading client request body, then 408 (Request Time-out) error is returned to the client
-        send_timeout: 10s              # timeout for transmitting a response to the client.then the connection is closed
+        keepalive_timeout: {{ default "60s" .Values.nginx.http.keepaliveTimeout }}         # timeout during which a keep-alive client connection will stay open on the server side.
+        client_header_timeout: {{ default "60s" .Values.nginx.http.clientHeaderTimeout }}     # timeout for reading client request header, then 408 (Request Time-out) error is returned to the client
+        client_body_timeout: {{ default "60s" .Values.nginx.http.clientBodyTimeout }}     # timeout for reading client request body, then 408 (Request Time-out) error is returned to the client
+        send_timeout: {{ default "10s" .Values.nginx.http.sendTimeout }}              # timeout for transmitting a response to the client.then the connection is closed
+        client_max_body_size: {{ default 0 .Values.nginx.http.clientMaxBodySize }}        # The maximum allowed size of the client request body.
+                                       # If exceeded, the 413 (Request Entity Too Large) error is returned to the client.
+                                       # Note that unlike Nginx, we don't limit the body size by default.
         underscores_in_headers: "on"   # default enables the use of underscores in client request header fields
         real_ip_header: "X-Real-IP"    # http://nginx.org/en/docs/http/ngx_http_realip_module.html#real_ip_header
         real_ip_from:                  # http://nginx.org/en/docs/http/ngx_http_realip_module.html#set_real_ip_from
