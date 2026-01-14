@@ -425,6 +425,20 @@ nginx:
   workerProcesses: auto
   enableCPUAffinity: true
   envs: []
+  # -- HTTP timeout configurations
+  http:
+    # -- timeout during which a keep-alive client connection will stay open on the server side
+    keepaliveTimeout: "60s"
+    # -- timeout for reading client request header, then 408 (Request Time-out) error is returned to the client
+    clientHeaderTimeout: "60s"
+    # -- timeout for reading client request body, then 408 (Request Time-out) error is returned to the client
+    clientBodyTimeout: "60s"
+    # -- timeout for transmitting a response to the client, then the connection is closed
+    sendTimeout: "10s"
+    # -- The maximum allowed size of the client request body.
+    # If exceeded, the 413 (Request Entity Too Large) error is returned to the client.
+    # Note that unlike Nginx, we don't limit the body size by default (0 means no limit).
+    clientMaxBodySize: 0
 
 # -- Set APISIX plugin attributes, see [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L376) for more details
 pluginAttrs: {}

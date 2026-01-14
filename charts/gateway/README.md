@@ -211,6 +211,12 @@ The command removes all the Kubernetes components associated with the chart and 
 | nameOverride | string | `""` |  |
 | nginx.enableCPUAffinity | bool | `true` |  |
 | nginx.envs | list | `[]` |  |
+| nginx.http | object | `{"clientBodyTimeout":"60s","clientHeaderTimeout":"60s","clientMaxBodySize":0,"keepaliveTimeout":"60s","sendTimeout":"10s"}` | HTTP timeout configurations |
+| nginx.http.clientBodyTimeout | string | `"60s"` | timeout for reading client request body, then 408 (Request Time-out) error is returned to the client |
+| nginx.http.clientHeaderTimeout | string | `"60s"` | timeout for reading client request header, then 408 (Request Time-out) error is returned to the client |
+| nginx.http.clientMaxBodySize | int | `0` | The maximum allowed size of the client request body. If exceeded, the 413 (Request Entity Too Large) error is returned to the client. Note that unlike Nginx, we don't limit the body size by default (0 means no limit). |
+| nginx.http.keepaliveTimeout | string | `"60s"` | timeout during which a keep-alive client connection will stay open on the server side |
+| nginx.http.sendTimeout | string | `"10s"` | timeout for transmitting a response to the client, then the connection is closed |
 | nginx.workerConnections | string | `"10620"` |  |
 | nginx.workerProcesses | string | `"auto"` |  |
 | nginx.workerRlimitNofile | string | `"20480"` |  |
