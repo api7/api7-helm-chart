@@ -64,6 +64,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.customLuaSharedDicts | list | `[]` | Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings, click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict |
 | apisix.customizedConfig | object | `{}` | If apisix.enableCustomizedConfig is true, full customized config.yaml. Please note that other settings about APISIX config will be ignored |
 | apisix.deleteURITailSlash | bool | `false` | Delete the '/' at the end of the URI |
+| apisix.dnsConfig | object | `{}` | Custom DNS settings for the APISIX pods |
 | apisix.enableCustomizedConfig | bool | `false` | Enable full customized config.yaml |
 | apisix.enableIPv6 | bool | `true` | Enable nginx IPv6 resolver |
 | apisix.enableServerTokens | bool | `true` | Whether the APISIX version number should be shown in Server header |

@@ -236,6 +236,10 @@ spec:
   dnsPolicy: ClusterFirstWithHostNet
   {{- end }}
   hostNetwork: {{ .Values.apisix.hostNetwork }}
+  {{- with .Values.apisix.dnsConfig }}
+  dnsConfig:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   initContainers:
     {{- if .Values.etcd.enabled }}
     - name: wait-etcd
