@@ -195,6 +195,9 @@ apisix:
     #   memory: 128Mi
   hostNetwork: false
 
+  # -- Custom DNS settings for the APISIX pods
+  dnsConfig: {}
+
   # -- Node labels for API7 Gateway pod assignment
   nodeSelector: {}
   # -- List of node taints to tolerate
