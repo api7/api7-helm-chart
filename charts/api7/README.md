@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.42](https://img.shields.io/badge/Version-0.17.42-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.4](https://img.shields.io/badge/AppVersion-3.9.4-informational?style=flat-square)
+![Version: 0.17.43](https://img.shields.io/badge/Version-0.17.43-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.4](https://img.shields.io/badge/AppVersion-3.9.4-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
