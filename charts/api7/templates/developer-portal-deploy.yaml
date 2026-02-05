@@ -97,6 +97,9 @@ spec:
               name: ssl
               readOnly: true
           {{- end }}
+          {{- if .Values.developer_portal.extraVolumeMounts }}
+          {{- include "api7ee3.tplvalues.render" (dict "value" .Values.developer_portal.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
 
       {{- with .Values.nodeSelector }}
       nodeSelector:
