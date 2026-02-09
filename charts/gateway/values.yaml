@@ -145,6 +145,9 @@ apisix:
   # -- kind is DaemonSet, replicaCount not become effective
   replicaCount: 1
 
+  # -- termination grace period for API7 Gateway pods
+  terminationGracePeriodSeconds: 30
+
   # -- Set [priorityClassName](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#pod-priority) for API7 Gateway pods
   priorityClassName: ""
   # -- Annotations to add to each pod
@@ -423,6 +426,7 @@ admin:
 
 nginx:
   workerRlimitNofile: "20480"
+  workerShutdownTimeout: "240s"
   workerConnections: "10620"
   workerProcesses: auto
   enableCPUAffinity: true

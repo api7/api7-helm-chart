@@ -130,6 +130,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.stream.luaSharedDict.plugin-limit-conn-stream | string | `"10m"` |  |
 | apisix.stream.luaSharedDict.tars-stream | string | `"1m"` |  |
 | apisix.stream.luaSharedDict.worker-events-stream | string | `"10m"` |  |
+| apisix.terminationGracePeriodSeconds | int | `30` | termination grace period for API7 Gateway pods |
 | apisix.timezone | string | `""` | timezone is the timezone where apisix uses. For example: "UTC" or "Asia/Shanghai" This value will be set on apisix container's environment variable TZ. You may need to set the timezone to be consistent with your local time zone, otherwise the apisix's logs may used to retrieve event maybe in wrong timezone. |
 | apisix.tolerations | list | `[]` | List of node taints to tolerate |
 | apisix.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
@@ -220,6 +221,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | nginx.workerConnections | string | `"10620"` |  |
 | nginx.workerProcesses | string | `"auto"` |  |
 | nginx.workerRlimitNofile | string | `"20480"` |  |
+| nginx.workerShutdownTimeout | string | `"240s"` |  |
 | pluginAttrs | object | `{}` | Set APISIX plugin attributes, see [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L376) for more details |
 | rbac.create | bool | `false` |  |
 | serviceAccount.annotations | object | `{}` |  |

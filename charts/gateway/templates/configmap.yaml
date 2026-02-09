@@ -165,6 +165,7 @@ data:
       worker_processes: "{{ .Values.nginx.workerProcesses }}"
       enable_cpu_affinity: {{ and true .Values.nginx.enableCPUAffinity }}
       worker_rlimit_nofile: {{ default "20480" .Values.nginx.workerRlimitNofile }}  # the number of files a worker process can open, should be larger than worker_connections
+      worker_shutdown_timeout: "{{ .Values.nginx.workerShutdownTimeout }}"
       event:
         worker_connections: {{ default "10620" .Values.nginx.workerConnections  }}
       {{- with .Values.nginx.envs }}
