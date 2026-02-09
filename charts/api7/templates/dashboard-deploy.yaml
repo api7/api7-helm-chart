@@ -51,23 +51,6 @@ spec:
           secret:
             secretName: {{ .Values.prometheus.server.existingSecret | quote }}
       {{- end }}
-      {{- if or .Values.postgresql.builtin .Values.prometheus.builtin }}
-      initContainers:
-        {{- if .Values.postgresql.builtin }}
-        - name: wait-for-postgresql
-          image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-          command: [ 'sh', '-c', "until nc -z -v -w3 {{ .Values.postgresql.fullnameOverride }} {{ .Values.postgresql.primary.service.ports.postgresql }}; do echo waiting for builtin postgresql service `date`; sleep 2; done;" ]
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-        {{- end }}
-        {{- if .Values.prometheus.builtin }}
-        - name: wait-for-prometheus
-          image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-          command: [ 'sh', '-c', "until wget --timeout=3 -q --spider http://{{ .Values.prometheus.fullnameOverride }}-server:{{ .Values.prometheus.server.service.ports.http }}; do echo waiting for builtin prometheus service `date`; sleep 2; done;" ]
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
-        {{- end }}
-      {{- end }}
       containers:
         - name: dashboard
           securityContext:

@@ -240,11 +240,6 @@ affinity: {}
 # The value is evaluated as a template
 topologySpreadConstraints: []
 
-busybox:
-  image:
-    repository: docker.io/busybox
-    tag: 1.28
-
 prometheus:
   builtin: true
   fullnameOverride: "api7-prometheus"
