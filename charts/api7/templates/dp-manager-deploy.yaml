@@ -46,16 +46,6 @@ spec:
       {{- if .Values.dashboard.extraVolumes }}
       {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dashboard.extraVolumes "context" $) | nindent 8 }}
       {{- end }}
-      initContainers:
-        - name: wait-for-dashboard
-          image: "{{ .Values.busybox.image.repository }}:{{ .Values.busybox.image.tag }}"
-          {{- if not .Values.dashboard_configuration.server.listen.disable }}
-          command: [ 'sh', '-c', "until nc -z -v -w3 {{ include "api7ee3.fullname" . }}-dashboard {{ .Values.dashboard_service.port }};do echo waiting for dashboard `date`; sleep 2; done;" ]
-          {{- else }}
-          command: [ 'sh', '-c', "until nc -z -v -w3 {{ include "api7ee3.fullname" . }}-dashboard {{ .Values.dashboard_service.tlsPort }};do echo waiting for dashboard `date`; sleep 2; done;" ]
-          {{- end }}
-          securityContext:
-            {{- toYaml .Values.securityContext | nindent 12 }}
       containers:
         - name: dp-manager
           securityContext:
