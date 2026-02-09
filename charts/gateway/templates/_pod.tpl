@@ -27,6 +27,7 @@ spec:
   securityContext: 
     {{- . | toYaml | nindent 4 }}
   {{- end }}
+  terminationGracePeriodSeconds: {{ .Values.apisix.terminationGracePeriodSeconds }}
   {{- with .Values.apisix.priorityClassName }}
   priorityClassName: {{ . }}
   {{- end }}
