@@ -209,6 +209,11 @@ The command removes all the Kubernetes components associated with the chart and 
 | logs.enableAccessLog | bool | `true` | Enable access log or not, default true |
 | logs.errorLog | string | `"/dev/stderr"` | Error log path |
 | logs.errorLogLevel | string | `"warn"` | Error log level, Allowed values: `debug`, `info`, `notice`, `warn`, `error`, `crit`, `alert`, `or` `emerg` |
+| logs.stream | object | `{"accessLog":"logs/access_stream.log","accessLogFormat":"$remote_addr [$time_local] $protocol $status $bytes_sent $bytes_received $session_time $apisix_request_id","accessLogFormatEscape":"default","enableAccessLog":false}` | Stream access log and error log configuration |
+| logs.stream.accessLog | string | `"logs/access_stream.log"` | Stream access log path |
+| logs.stream.accessLogFormat | string | `"$remote_addr [$time_local] $protocol $status $bytes_sent $bytes_received $session_time $apisix_request_id"` | Stream access log format |
+| logs.stream.accessLogFormatEscape | string | `"default"` | Allows setting json or default characters escaping in variables for stream |
+| logs.stream.enableAccessLog | bool | `false` | Enable stream access log or not, default false |
 | nameOverride | string | `""` |  |
 | nginx.enableCPUAffinity | bool | `true` |  |
 | nginx.envs | list | `[]` |  |

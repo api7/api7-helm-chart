@@ -510,6 +510,16 @@ logs:
   errorLog: "/dev/stderr"
   # -- Error log level, Allowed values: `debug`, `info`, `notice`, `warn`, `error`, `crit`, `alert`, `or` `emerg`
   errorLogLevel: "warn"
+  # -- Stream access log and error log configuration
+  stream:
+    # -- Enable stream access log or not, default false
+    enableAccessLog: false
+    # -- Stream access log path
+    accessLog: "logs/access_stream.log"
+    # -- Stream access log format
+    accessLogFormat: '$remote_addr [$time_local] $protocol $status $bytes_sent $bytes_received $session_time $apisix_request_id'
+    # -- Allows setting json or default characters escaping in variables for stream
+    accessLogFormatEscape: default
 
 dns:
   resolvers:

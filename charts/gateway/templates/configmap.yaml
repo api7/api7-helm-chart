@@ -186,6 +186,17 @@ data:
         lua_shared_dict:
           {{- toYaml .Values.apisix.stream.luaSharedDict | nindent 10 }}
         {{- end }}
+        {{- if and (.Values.deployment.fallback_cp) (eq .Values.deployment.fallback_cp.mode "write") }}
+        enable_access_log: false
+        {{- else }}
+        enable_access_log: {{ .Values.logs.stream.enableAccessLog }}
+        {{- end }}
+        {{- if .Values.logs.stream.enableAccessLog }}
+        access_log: "{{ .Values.logs.stream.accessLog }}"
+        access_log_format: >-
+          {{- .Values.logs.stream.accessLogFormat | nindent 10 }}
+        access_log_format_escape: {{ .Values.logs.stream.accessLogFormatEscape }}
+        {{- end }}
       http:
         {{- if and (.Values.deployment.fallback_cp) (eq .Values.deployment.fallback_cp.mode "write") }}
         enable_access_log: false
