@@ -77,6 +77,9 @@ spec:
   - name: prometheus
     port: {{ .Values.serviceMonitor.containerPort }}
     targetPort: {{ .Values.serviceMonitor.containerPort }}
+    {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.serviceMonitor.nodePort))) }}
+    nodePort: {{ .Values.serviceMonitor.nodePort }}
+    {{- end }}
     protocol: TCP
   {{- end }}
   {{- if .Values.api7ee.status_endpoint.enabled }}
@@ -94,12 +97,23 @@ spec:
   {{- if kindIs "map" $port }}
     port: {{ splitList ":" ($port.addr | toString) | last }}
     targetPort: {{ splitList ":" ($port.addr | toString) | last }}
-    {{- if (and (eq $global.Values.gateway.type "NodePort") (not (empty $port.nodePort))) }}
+    {{- if eq $global.Values.gateway.type "NodePort" }}
+    {{- if $global.Values.gateway.stream.autoAssignNodePort }}
+    nodePort: {{ splitList ":" ($port.addr | toString) | last }}
+    {{- else }}
+    {{- if not (empty $port.nodePort) }}
     nodePort: {{ $port.nodePort }}
+    {{- end }}
+    {{- end }}
     {{- end }}
   {{- else }}
     port: {{ $port }}
     targetPort: {{ $port }}
+    {{- if eq $global.Values.gateway.type "NodePort" }}
+    {{- if $global.Values.gateway.stream.autoAssignNodePort }}
+    nodePort: {{ $port }}
+    {{- end }}
+    {{- end }}
   {{- end }}
   {{- end }}
   {{- end }}
@@ -110,12 +124,23 @@ spec:
   {{- if kindIs "map" $port }}
     port: {{ splitList ":" ($port.addr | toString) | last }}
     targetPort: {{ splitList ":" ($port.addr | toString) | last }}
-    {{- if (and (eq $global.Values.gateway.type "NodePort") (not (empty $port.nodePort))) }}
+    {{- if eq $global.Values.gateway.type "NodePort" }}
+    {{- if $global.Values.gateway.stream.autoAssignNodePort }}
+    nodePort: {{ splitList ":" ($port.addr | toString) | last }}
+    {{- else }}
+    {{- if not (empty $port.nodePort) }}
     nodePort: {{ $port.nodePort }}
+    {{- end }}
+    {{- end }}
     {{- end }}
   {{- else }}
     port: {{ $port }}
     targetPort: {{ $port }}
+    {{- if eq $global.Values.gateway.type "NodePort" }}
+    {{- if $global.Values.gateway.stream.autoAssignNodePort }}
+    nodePort: {{ $port }}
+    {{- end }}
+    {{- end }}
   {{- end }}
   {{- end }}
   {{- end }}
