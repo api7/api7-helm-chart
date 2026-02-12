@@ -309,12 +309,15 @@ gateway:
     ip: 0.0.0.0
     servicePort: 80
     containerPort: 9080
+    # -- The nodePort of kubernetes service, only used if service.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+    nodePort:
     # hostPort: 9080
     # backlog: 1024  # sets the backlog parameter in the listen() call that limits, the maximum length for the queue of pending connections. By default, backlog is set to -1 on FreeBSD, DragonFly BSD, and macOS, and to 511 on other platforms.
     # -- Support multiple http ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L24)
     additionalContainerPorts: []
       # - port: 9081
       #   hostPort: 9081
+      #   nodePort: 9081
       #   enable_http2: true          # If not set, the default value is `false`.
       #   backlog: 1024
       # - ip: 127.0.0.2               # Specific IP, If not set, the default value is `0.0.0.0`.
@@ -329,6 +332,8 @@ gateway:
     ip: 0.0.0.0
     servicePort: 443
     containerPort: 9443
+    # -- The nodePort of kubernetes service, only used if service.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+    nodePort:
     # hostPort: 9443
     # backlog: 1024
     # -- Support multiple https ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L99)
@@ -336,6 +341,7 @@ gateway:
       # - ip: 127.0.0.3           # Specific IP, If not set, the default value is `0.0.0.0`.
       #   port: 9445
       #   hostPort: 9445
+      #   nodePort: 9445
       #   enable_http2: true
       #   backlog: 1024
     # -- Specifies the name of Secret contains trusted CA certificates in the PEM format used to verify the certificate when APISIX needs to do SSL/TLS handshaking with external services (e.g. etcd)
@@ -353,6 +359,9 @@ gateway:
     enabled: false
     only: false
     tcp: []
+      # - addr: 192.168.31.10:5432
+      # - addr: 3302
+      #   nodePort: 3302
     udp: []
   # -- Using ingress access API7 Gateway service
   ingress:
