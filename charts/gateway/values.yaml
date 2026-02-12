@@ -529,7 +529,7 @@ logs:
     # -- Stream access log path
     accessLog: "logs/access_stream.log"
     # -- Stream access log format
-    accessLogFormat: '$remote_addr [$time_local] $protocol $status $bytes_sent $bytes_received $session_time $apisix_request_id'
+    accessLogFormat: '$remote_addr [$time_local] $protocol $status $bytes_sent $bytes_received $session_time'
     # -- Allows setting json or default characters escaping in variables for stream
     accessLogFormatEscape: default
 
