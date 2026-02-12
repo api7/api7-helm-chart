@@ -104,7 +104,7 @@ spec:
     {{- if not (empty $port.nodePort) }}
     nodePort: {{ $port.nodePort }}
     {{- end }}
-    {{- end}}
+    {{- end }}
     {{- end }}
   {{- else }}
     port: {{ $port }}
