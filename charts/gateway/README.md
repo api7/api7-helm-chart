@@ -183,21 +183,23 @@ The command removes all the Kubernetes components associated with the chart and 
 | fullnameOverride | string | `""` |  |
 | gateway.externalIPs | list | `[]` | IPs for which nodes in the cluster will also accept traffic for the servic annotations:   service.beta.kubernetes.io/aws-load-balancer-type: nlb |
 | gateway.externalTrafficPolicy | string | `"Cluster"` |  |
-| gateway.http | object | `{"additionalContainerPorts":[],"containerPort":9080,"enabled":true,"ip":"0.0.0.0","servicePort":80}` | API7 Gateway service settings for http |
+| gateway.http | object | `{"additionalContainerPorts":[],"containerPort":9080,"enabled":true,"ip":"0.0.0.0","nodePort":null,"servicePort":80}` | API7 Gateway service settings for http |
 | gateway.http.additionalContainerPorts | list | `[]` | Support multiple http ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L24) |
 | gateway.http.ip | string | `"0.0.0.0"` | which ip to listen on for API7 Gateway http service. |
+| gateway.http.nodePort | int | `nil` | The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | gateway.ingress | object | `{"annotations":{},"enabled":false,"hosts":[{"host":"apisix.local","paths":[]}],"tls":[]}` | Using ingress access API7 Gateway service |
 | gateway.ingress.annotations | object | `{}` | Ingress annotations |
 | gateway.labelsOverride | object | `{}` | Override default labels assigned to API7 Gateway gateway resources |
 | gateway.livenessProbe | object | `{}` | kubernetes liveness probe. |
 | gateway.readinessProbe | object | `{}` | kubernetes readiness probe, we will provide a probe based on tcpSocket to gateway's HTTP port by default. |
 | gateway.stream | object | `{"enabled":false,"only":false,"tcp":[],"udp":[]}` | API7 Gateway service settings for stream. L4 proxy (TCP/UDP) |
-| gateway.tls | object | `{"additionalContainerPorts":[],"certCAFilename":"","containerPort":9443,"enabled":true,"existingCASecret":"","fallbackSNI":"","http2":{"enabled":true},"ip":"0.0.0.0","servicePort":443,"sslProtocols":"TLSv1.2 TLSv1.3"}` | API7 Gateway service settings for tls |
+| gateway.tls | object | `{"additionalContainerPorts":[],"certCAFilename":"","containerPort":9443,"enabled":true,"existingCASecret":"","fallbackSNI":"","http2":{"enabled":true},"ip":"0.0.0.0","nodePort":null,"servicePort":443,"sslProtocols":"TLSv1.2 TLSv1.3"}` | API7 Gateway service settings for tls |
 | gateway.tls.additionalContainerPorts | list | `[]` | Support multiple https ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L99) |
 | gateway.tls.certCAFilename | string | `""` | Filename be used in the gateway.tls.existingCASecret |
 | gateway.tls.existingCASecret | string | `""` | Specifies the name of Secret contains trusted CA certificates in the PEM format used to verify the certificate when APISIX needs to do SSL/TLS handshaking with external services (e.g. etcd) |
 | gateway.tls.fallbackSNI | string | `""` | If set this, when the client doesn't send SNI during handshake, the fallback SNI will be used instead |
 | gateway.tls.ip | string | `"0.0.0.0"` | which ip to listen on for API7 Gateway https service. |
+| gateway.tls.nodePort | int | `nil` | The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | gateway.tls.sslProtocols | string | `"TLSv1.2 TLSv1.3"` | TLS protocols allowed to use. |
 | gateway.type | string | `"NodePort"` | API7 Gateway service type for user access itself |
 | global.imagePullSecrets | list | `[]` | Global Docker registry secret names as an array |
