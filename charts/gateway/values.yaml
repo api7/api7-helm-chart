@@ -363,6 +363,9 @@ gateway:
       # - addr: 3302
       #   nodePort: 3302
     udp: []
+      # - addr: 192.168.31.10:53
+      # - addr: 5353
+      #   nodePort: 5353
   # -- Using ingress access API7 Gateway service
   ingress:
     enabled: false

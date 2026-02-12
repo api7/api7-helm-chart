@@ -145,7 +145,11 @@ spec:
         {{- if (gt (len .udp) 0) }}
         {{- range $index, $port := .udp }}
         - name: proxy-udp-{{ $index | toString }}
+        {{- if kindIs "map" $port }}
+          containerPort: {{ splitList ":" ($port.addr | toString) | last }}
+        {{- else }}
           containerPort: {{ $port }}
+        {{- end }}
           protocol: UDP
         {{- end }}
         {{- end }}

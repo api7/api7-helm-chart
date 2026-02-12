@@ -102,7 +102,11 @@ data:
         udp:                        # UDP proxy port list
           {{- if gt (len .Values.gateway.stream.udp) 0}}
           {{- range .Values.gateway.stream.udp }}
+          {{- if kindIs "map" . }}
+          - addr: {{ .addr }}
+          {{- else }}
           - {{ . }}
+          {{- end }}
           {{- end }}
           {{- else}}
           - 9200
