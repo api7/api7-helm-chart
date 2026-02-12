@@ -193,7 +193,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | gateway.livenessProbe | object | `{}` | kubernetes liveness probe. |
 | gateway.readinessProbe | object | `{}` | kubernetes readiness probe, we will provide a probe based on tcpSocket to gateway's HTTP port by default. |
 | gateway.stream | object | `{"autoAssignNodePort":false,"enabled":false,"only":false,"tcp":[],"udp":[]}` | API7 Gateway service settings for stream. L4 proxy (TCP/UDP) |
-| gateway.stream.autoAssignNodePort | bool | `false` | Whether to set nodePort to the same value as the port for TCP/UDP ports when gateway.type is NodePort. Default false. |
+| gateway.stream.autoAssignNodePort | bool | `false` | Whether to set nodePort to the same value as the TCP/UDP port when gateway.type is NodePort, make sure the nodePort to be in the valid NodePort range of kubernetes service. |
 | gateway.tls | object | `{"additionalContainerPorts":[],"certCAFilename":"","containerPort":9443,"enabled":true,"existingCASecret":"","fallbackSNI":"","http2":{"enabled":true},"ip":"0.0.0.0","nodePort":null,"servicePort":443,"sslProtocols":"TLSv1.2 TLSv1.3"}` | API7 Gateway service settings for tls |
 | gateway.tls.additionalContainerPorts | list | `[]` | Support multiple https ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L99) |
 | gateway.tls.certCAFilename | string | `""` | Filename be used in the gateway.tls.existingCASecret |

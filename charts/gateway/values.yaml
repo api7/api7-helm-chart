@@ -358,7 +358,7 @@ gateway:
   stream:
     enabled: false
     only: false
-    # -- Whether to set nodePort to the same value as the TCP/UDP port when gateway.type is NodePort. Default false.
+    # -- Whether to set nodePort to the same value as the TCP/UDP port when gateway.type is NodePort, make sure the nodePort to be in the valid NodePort range of kubernetes service.
     autoAssignNodePort: false
     tcp: []
       # - addr: 192.168.31.10:5432
