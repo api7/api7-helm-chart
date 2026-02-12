@@ -97,18 +97,22 @@ spec:
   {{- if kindIs "map" $port }}
     port: {{ splitList ":" ($port.addr | toString) | last }}
     targetPort: {{ splitList ":" ($port.addr | toString) | last }}
+    {{- if eq $global.Values.gateway.type "NodePort" }}
     {{- if $global.Values.gateway.stream.autoAssignNodePort }}
     nodePort: {{ splitList ":" ($port.addr | toString) | last }}
     {{- else }}
-    {{- if (and (eq $global.Values.gateway.type "NodePort") (not (empty $port.nodePort))) }}
+    {{- if not (empty $port.nodePort) }}
     nodePort: {{ $port.nodePort }}
     {{- end }}
+    {{- end}}
     {{- end }}
   {{- else }}
     port: {{ $port }}
     targetPort: {{ $port }}
+    {{- if eq $global.Values.gateway.type "NodePort" }}
     {{- if $global.Values.gateway.stream.autoAssignNodePort }}
     nodePort: {{ $port }}
+    {{- end }}
     {{- end }}
   {{- end }}
   {{- end }}
@@ -120,18 +124,22 @@ spec:
   {{- if kindIs "map" $port }}
     port: {{ splitList ":" ($port.addr | toString) | last }}
     targetPort: {{ splitList ":" ($port.addr | toString) | last }}
+    {{- if eq $global.Values.gateway.type "NodePort" }}
     {{- if $global.Values.gateway.stream.autoAssignNodePort }}
     nodePort: {{ splitList ":" ($port.addr | toString) | last }}
     {{- else }}
-    {{- if (and (eq $global.Values.gateway.type "NodePort") (not (empty $port.nodePort))) }}
+    {{- if not (empty $port.nodePort) }}
     nodePort: {{ $port.nodePort }}
+    {{- end }}
     {{- end }}
     {{- end }}
   {{- else }}
     port: {{ $port }}
     targetPort: {{ $port }}
+    {{- if eq $global.Values.gateway.type "NodePort" }}
     {{- if $global.Values.gateway.stream.autoAssignNodePort }}
     nodePort: {{ $port }}
+    {{- end }}
     {{- end }}
   {{- end }}
   {{- end }}
