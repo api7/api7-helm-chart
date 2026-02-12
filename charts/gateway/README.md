@@ -192,7 +192,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | gateway.labelsOverride | object | `{}` | Override default labels assigned to API7 Gateway gateway resources |
 | gateway.livenessProbe | object | `{}` | kubernetes liveness probe. |
 | gateway.readinessProbe | object | `{}` | kubernetes readiness probe, we will provide a probe based on tcpSocket to gateway's HTTP port by default. |
-| gateway.stream | object | `{"enabled":false,"only":false,"tcp":[],"udp":[]}` | API7 Gateway service settings for stream. L4 proxy (TCP/UDP) |
+| gateway.stream | object | `{"autoAssignNodePort":false,"enabled":false,"only":false,"tcp":[],"udp":[]}` | API7 Gateway service settings for stream. L4 proxy (TCP/UDP) |
+| gateway.stream.autoAssignNodePort | bool | `false` | Whether to automatically assign nodePort for TCP/UDP ports when gateway.type is NodePort. Default false. |
 | gateway.tls | object | `{"additionalContainerPorts":[],"certCAFilename":"","containerPort":9443,"enabled":true,"existingCASecret":"","fallbackSNI":"","http2":{"enabled":true},"ip":"0.0.0.0","nodePort":null,"servicePort":443,"sslProtocols":"TLSv1.2 TLSv1.3"}` | API7 Gateway service settings for tls |
 | gateway.tls.additionalContainerPorts | list | `[]` | Support multiple https ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L99) |
 | gateway.tls.certCAFilename | string | `""` | Filename be used in the gateway.tls.existingCASecret |
@@ -234,7 +235,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `false` |  |
 | serviceAccount.name | string | `""` |  |
-| serviceMonitor | object | `{"annotations":{},"containerPort":9091,"enabled":false,"interval":"15s","labels":{},"metricPrefix":"apisix_","name":"","namespace":"","path":"/apisix/prometheus/metrics"}` | Observability configuration. ref: https://apisix.apache.org/docs/apisix/plugins/prometheus/ |
+| serviceMonitor | object | `{"annotations":{},"containerPort":9091,"enabled":false,"interval":"15s","labels":{},"metricPrefix":"apisix_","name":"","namespace":"","nodePort":null,"path":"/apisix/prometheus/metrics"}` | Observability configuration. ref: https://apisix.apache.org/docs/apisix/plugins/prometheus/ |
 | serviceMonitor.annotations | object | `{}` | @param serviceMonitor.annotations ServiceMonitor annotations |
 | serviceMonitor.containerPort | int | `9091` | container port where the metrics are exposed |
 | serviceMonitor.enabled | bool | `false` | Enable or disable API7 Gateway serviceMonitor |
@@ -243,6 +244,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | serviceMonitor.metricPrefix | string | `"apisix_"` | prefix of the metrics |
 | serviceMonitor.name | string | `""` | name of the serviceMonitor, by default, it is the same as the apisix fullname |
 | serviceMonitor.namespace | string | `""` | namespace where the serviceMonitor is deployed, by default, it is the same as the namespace of the apisix |
+| serviceMonitor.nodePort | int | `nil` | The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | serviceMonitor.path | string | `"/apisix/prometheus/metrics"` | path of the metrics endpoint |
 | soapProxy.enabled | bool | `false` | Enable or disable the SOAP proxy, this component is disabled by default, when use soap-proxy plugin in API7, you need to enable this component. |
 | soapProxy.image.pullPolicy | string | `"IfNotPresent"` | SOAP proxy image pull policy |

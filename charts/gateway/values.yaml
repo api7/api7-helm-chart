@@ -358,6 +358,8 @@ gateway:
   stream:
     enabled: false
     only: false
+    # -- Whether to automatically assign nodePort for TCP/UDP ports when gateway.type is NodePort. Default false.
+    autoAssignNodePort: false
     tcp: []
       # - addr: 192.168.31.10:5432
       # - addr: 3302
@@ -592,6 +594,8 @@ serviceMonitor:
   metricPrefix: apisix_
   # -- container port where the metrics are exposed
   containerPort: 9091
+  # -- (int) The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+  nodePort:
   # -- @param serviceMonitor.labels ServiceMonitor extra labels
   labels: {}
   # -- @param serviceMonitor.annotations ServiceMonitor annotations
