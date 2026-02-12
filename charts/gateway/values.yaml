@@ -358,7 +358,7 @@ gateway:
   stream:
     enabled: false
     only: false
-    # -- Whether to automatically assign nodePort for TCP/UDP ports when gateway.type is NodePort. Default false.
+    # -- Whether to set nodePort to the same value as the TCP/UDP port when gateway.type is NodePort. Default false.
     autoAssignNodePort: false
     tcp: []
       # - addr: 192.168.31.10:5432
