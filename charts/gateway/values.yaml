@@ -317,7 +317,7 @@ gateway:
     additionalContainerPorts: []
       # - port: 9081
       #   hostPort: 9081
-      #   nodePort: 9081
+      #   nodePort: 31081
       #   enable_http2: true          # If not set, the default value is `false`.
       #   backlog: 1024
       # - ip: 127.0.0.2               # Specific IP, If not set, the default value is `0.0.0.0`.
@@ -341,7 +341,7 @@ gateway:
       # - ip: 127.0.0.3           # Specific IP, If not set, the default value is `0.0.0.0`.
       #   port: 9445
       #   hostPort: 9445
-      #   nodePort: 9445
+      #   nodePort: 31045
       #   enable_http2: true
       #   backlog: 1024
     # -- Specifies the name of Secret contains trusted CA certificates in the PEM format used to verify the certificate when APISIX needs to do SSL/TLS handshaking with external services (e.g. etcd)
@@ -361,11 +361,11 @@ gateway:
     tcp: []
       # - addr: 192.168.31.10:5432
       # - addr: 3302
-      #   nodePort: 3302
+      #   nodePort: 31302
     udp: []
       # - addr: 192.168.31.10:53
       # - addr: 5353
-      #   nodePort: 5353
+      #   nodePort: 31353
   # -- Using ingress access API7 Gateway service
   ingress:
     enabled: false
