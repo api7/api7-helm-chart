@@ -186,7 +186,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | gateway.http | object | `{"additionalContainerPorts":[],"containerPort":9080,"enabled":true,"ip":"0.0.0.0","nodePort":null,"servicePort":80}` | API7 Gateway service settings for http |
 | gateway.http.additionalContainerPorts | list | `[]` | Support multiple http ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L24) |
 | gateway.http.ip | string | `"0.0.0.0"` | which ip to listen on for API7 Gateway http service. |
-| gateway.http.nodePort | int | `nil` | The nodePort of kubernetes service, only used if service.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
+| gateway.http.nodePort | int | `nil` | The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | gateway.ingress | object | `{"annotations":{},"enabled":false,"hosts":[{"host":"apisix.local","paths":[]}],"tls":[]}` | Using ingress access API7 Gateway service |
 | gateway.ingress.annotations | object | `{}` | Ingress annotations |
 | gateway.labelsOverride | object | `{}` | Override default labels assigned to API7 Gateway gateway resources |
@@ -199,7 +199,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | gateway.tls.existingCASecret | string | `""` | Specifies the name of Secret contains trusted CA certificates in the PEM format used to verify the certificate when APISIX needs to do SSL/TLS handshaking with external services (e.g. etcd) |
 | gateway.tls.fallbackSNI | string | `""` | If set this, when the client doesn't send SNI during handshake, the fallback SNI will be used instead |
 | gateway.tls.ip | string | `"0.0.0.0"` | which ip to listen on for API7 Gateway https service. |
-| gateway.tls.nodePort | int | `nil` | The nodePort of kubernetes service, only used if service.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
+| gateway.tls.nodePort | int | `nil` | The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | gateway.tls.sslProtocols | string | `"TLSv1.2 TLSv1.3"` | TLS protocols allowed to use. |
 | gateway.type | string | `"NodePort"` | API7 Gateway service type for user access itself |
 | global.imagePullSecrets | list | `[]` | Global Docker registry secret names as an array |

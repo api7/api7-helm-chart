@@ -309,7 +309,7 @@ gateway:
     ip: 0.0.0.0
     servicePort: 80
     containerPort: 9080
-    # -- (int) The nodePort of kubernetes service, only used if service.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+    # -- (int) The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes.
     nodePort:
     # hostPort: 9080
     # backlog: 1024  # sets the backlog parameter in the listen() call that limits, the maximum length for the queue of pending connections. By default, backlog is set to -1 on FreeBSD, DragonFly BSD, and macOS, and to 511 on other platforms.
@@ -332,7 +332,7 @@ gateway:
     ip: 0.0.0.0
     servicePort: 443
     containerPort: 9443
-    # -- (int) The nodePort of kubernetes service, only used if service.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+    # -- (int) The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes.
     nodePort:
     # hostPort: 9443
     # backlog: 1024
