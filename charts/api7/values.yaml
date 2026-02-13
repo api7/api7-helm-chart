@@ -271,6 +271,10 @@ prometheus:
         http: 9090
     configuration: ""
 
+jaeger:
+  builtin: true
+  fullnameOverride: "api7-jaeger"
+
 postgresql:
   builtin: true
   fullnameOverride: "api7-postgresql"
@@ -397,6 +401,9 @@ dashboard_configuration:
       response_code: 403
   # license:
   #   file_path: "/app/licenses/license.txt" # the file path of license file, (e.g. /app/licenses/license.txt)
+  jaeger:
+    addr: "http://api7-jaeger:16686"
+    timeout: 30s
 
 dp_manager_configuration:
   server:
@@ -424,6 +431,9 @@ dp_manager_configuration:
     max_open_conns: 30
     max_idle_time: 30s
     timeout: 5s
+  jaeger:
+    collector_addr: "http://api7-jaeger:4318"
+    timeout: 30s
   prometheus:
     addr: "http://api7-prometheus-server:9090"
     remote_write_path: "/api/v1/write"

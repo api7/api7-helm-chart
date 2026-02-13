@@ -38,3 +38,8 @@ dependencies:
     condition: postgresql.builtin
     version: "12.12.10"
     repository: "https://charts.bitnami.com/bitnami"
+
+  - name: jaeger
+    condition: jaeger.builtin
+    version: "4.4.7"
+    repository: "https://jaegertracing.github.io/helm-charts"

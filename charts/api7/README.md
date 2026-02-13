@@ -16,6 +16,7 @@ A Helm chart for Kubernetes
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | postgresql | 12.12.10 |
 | https://charts.bitnami.com/bitnami | prometheus | 0.5.1 |
+| https://jaegertracing.github.io/helm-charts | jaeger | 4.4.7 |
 
 ## Values
 
@@ -55,6 +56,8 @@ A Helm chart for Kubernetes
 | dashboard_configuration.developer_proxy.cache_failure_ttl | int | `15` |  |
 | dashboard_configuration.developer_proxy.cache_success_count | int | `256` |  |
 | dashboard_configuration.developer_proxy.cache_success_ttl | int | `15` |  |
+| dashboard_configuration.jaeger.addr | string | `"http://api7-jaeger:16686"` |  |
+| dashboard_configuration.jaeger.timeout | string | `"30s"` |  |
 | dashboard_configuration.log.access_log | string | `"stdout"` |  |
 | dashboard_configuration.log.level | string | `"warn"` | Allowed values: `debug`, `info`, `warn`, `error` |
 | dashboard_configuration.log.output | string | `"stderr"` |  |
@@ -174,6 +177,8 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.database.max_idle_time | string | `"30s"` |  |
 | dp_manager_configuration.database.max_open_conns | int | `30` |  |
 | dp_manager_configuration.database.timeout | string | `"5s"` |  |
+| dp_manager_configuration.jaeger.collector_addr | string | `"http://api7-jaeger:4318"` |  |
+| dp_manager_configuration.jaeger.timeout | string | `"30s"` |  |
 | dp_manager_configuration.log.access_log | string | `"stdout"` |  |
 | dp_manager_configuration.log.level | string | `"warn"` | Allowed values: `debug`, `info`, `warn`, `error` |
 | dp_manager_configuration.log.output | string | `"stderr"` |  |
@@ -215,6 +220,8 @@ A Helm chart for Kubernetes
 | fullnameOverride | string | `""` |  |
 | global.storageClass | string | `""` |  |
 | imagePullSecret | string | `""` |  |
+| jaeger.builtin | bool | `true` |  |
+| jaeger.fullnameOverride | string | `"api7-jaeger"` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
