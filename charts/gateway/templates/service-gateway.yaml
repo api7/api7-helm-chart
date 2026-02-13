@@ -1,3 +1,4 @@
+{{- $global := . -}}
 {{- if .Values.apisix.enabled }}
 apiVersion: v1
 kind: Service
@@ -41,35 +42,44 @@ spec:
   - name: apisix-gateway
     port: {{ .Values.gateway.http.servicePort }}
     targetPort: {{ .Values.gateway.http.containerPort }}
-  {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.gateway.http.nodePort))) }}
+    {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.gateway.http.nodePort))) }}
     nodePort: {{ .Values.gateway.http.nodePort }}
-  {{- end }}
+    {{- end }}
     protocol: TCP
   {{- end }}
   {{- range .Values.gateway.http.additionalContainerPorts }}
   - name: apisix-gateway-{{ .port | toString }}
     port: {{ .port }}
     targetPort: {{ .port }}
+    {{- if (and (eq $global.Values.gateway.type "NodePort") (not (empty .nodePort))) }}
+    nodePort: {{ .nodePort }}
+    {{- end }}
     protocol: TCP
   {{- end }}
   {{- if or .Values.gateway.tls.enabled }}
   - name: apisix-gateway-tls
     port: {{ .Values.gateway.tls.servicePort }}
     targetPort: {{ .Values.gateway.tls.containerPort }}
-  {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.gateway.tls.nodePort))) }}
+    {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.gateway.tls.nodePort))) }}
     nodePort: {{ .Values.gateway.tls.nodePort }}
-  {{- end }}
+    {{- end }}
     protocol: TCP
   {{- end }}
   {{- range .Values.gateway.tls.additionalContainerPorts }}
   - name: apisix-gateway-tls-{{ .port | toString }}
     port: {{ .port }}
     targetPort: {{ .port }}
+    {{- if (and (eq $global.Values.gateway.type "NodePort") (not (empty .nodePort))) }}
+    nodePort: {{ .nodePort }}
+    {{- end }}
   {{- end }}
   {{- if .Values.serviceMonitor.enabled }}
   - name: prometheus
     port: {{ .Values.serviceMonitor.containerPort }}
     targetPort: {{ .Values.serviceMonitor.containerPort }}
+    {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.serviceMonitor.nodePort))) }}
+    nodePort: {{ .Values.serviceMonitor.nodePort }}
+    {{- end }}
     protocol: TCP
   {{- end }}
   {{- if .Values.api7ee.status_endpoint.enabled }}
@@ -83,23 +93,55 @@ spec:
   {{- if (gt (len .tcp) 0) }}
   {{- range $index, $port := .tcp }}
   - name: proxy-tcp-{{ $index | toString }}
+    protocol: TCP
   {{- if kindIs "map" $port }}
     port: {{ splitList ":" ($port.addr | toString) | last }}
     targetPort: {{ splitList ":" ($port.addr | toString) | last }}
-    protocol: TCP
+    {{- if eq $global.Values.gateway.type "NodePort" }}
+    {{- if $global.Values.gateway.stream.autoAssignNodePort }}
+    nodePort: {{ splitList ":" ($port.addr | toString) | last }}
+    {{- else }}
+    {{- if not (empty $port.nodePort) }}
+    nodePort: {{ $port.nodePort }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
   {{- else }}
     port: {{ $port }}
     targetPort: {{ $port }}
-    protocol: TCP
+    {{- if eq $global.Values.gateway.type "NodePort" }}
+    {{- if $global.Values.gateway.stream.autoAssignNodePort }}
+    nodePort: {{ $port }}
+    {{- end }}
+    {{- end }}
   {{- end }}
   {{- end }}
   {{- end }}
   {{- if (gt (len .udp) 0) }}
   {{- range $index, $port := .udp }}
   - name: proxy-udp-{{ $index | toString }}
+    protocol: UDP
+  {{- if kindIs "map" $port }}
+    port: {{ splitList ":" ($port.addr | toString) | last }}
+    targetPort: {{ splitList ":" ($port.addr | toString) | last }}
+    {{- if eq $global.Values.gateway.type "NodePort" }}
+    {{- if $global.Values.gateway.stream.autoAssignNodePort }}
+    nodePort: {{ splitList ":" ($port.addr | toString) | last }}
+    {{- else }}
+    {{- if not (empty $port.nodePort) }}
+    nodePort: {{ $port.nodePort }}
+    {{- end }}
+    {{- end }}
+    {{- end }}
+  {{- else }}
     port: {{ $port }}
     targetPort: {{ $port }}
-    protocol: UDP
+    {{- if eq $global.Values.gateway.type "NodePort" }}
+    {{- if $global.Values.gateway.stream.autoAssignNodePort }}
+    nodePort: {{ $port }}
+    {{- end }}
+    {{- end }}
+  {{- end }}
   {{- end }}
   {{- end }}
   {{- end }}

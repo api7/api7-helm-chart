@@ -64,6 +64,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.customLuaSharedDicts | list | `[]` | Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings, click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict |
 | apisix.customizedConfig | object | `{}` | If apisix.enableCustomizedConfig is true, full customized config.yaml. Please note that other settings about APISIX config will be ignored |
 | apisix.deleteURITailSlash | bool | `false` | Delete the '/' at the end of the URI |
+| apisix.dnsConfig | object | `{}` | Custom DNS settings for the APISIX pods |
 | apisix.enableCustomizedConfig | bool | `false` | Enable full customized config.yaml |
 | apisix.enableIPv6 | bool | `true` | Enable nginx IPv6 resolver |
 | apisix.enableServerTokens | bool | `true` | Whether the APISIX version number should be shown in Server header |
@@ -95,7 +96,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.http.luaSharedDict.plugin-limit-count-advanced-redis-cluster-slot-lock | string | `"1m"` |  |
 | apisix.http.luaSharedDict.plugin-limit-count-redis-cluster-slot-lock | string | `"1m"` |  |
 | apisix.http.luaSharedDict.plugin-limit-req | string | `"10m"` |  |
-| apisix.http.luaSharedDict.saml_sessions | string | `"10m"` |  |
 | apisix.http.luaSharedDict.status_report | string | `"1m"` |  |
 | apisix.http.luaSharedDict.tars | string | `"1m"` |  |
 | apisix.http.luaSharedDict.tracing_buffer | string | `"10m"` |  |
@@ -104,7 +104,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.9.1"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.9.4"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
 | apisix.lru.secret.neg_ttl | int | `60` | in seconds |
@@ -130,6 +130,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.stream.luaSharedDict.plugin-limit-conn-stream | string | `"10m"` |  |
 | apisix.stream.luaSharedDict.tars-stream | string | `"1m"` |  |
 | apisix.stream.luaSharedDict.worker-events-stream | string | `"10m"` |  |
+| apisix.terminationGracePeriodSeconds | int | `30` | termination grace period for API7 Gateway pods |
 | apisix.timezone | string | `""` | timezone is the timezone where apisix uses. For example: "UTC" or "Asia/Shanghai" This value will be set on apisix container's environment variable TZ. You may need to set the timezone to be consistent with your local time zone, otherwise the apisix's logs may used to retrieve event maybe in wrong timezone. |
 | apisix.tolerations | list | `[]` | List of node taints to tolerate |
 | apisix.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
@@ -182,21 +183,24 @@ The command removes all the Kubernetes components associated with the chart and 
 | fullnameOverride | string | `""` |  |
 | gateway.externalIPs | list | `[]` | IPs for which nodes in the cluster will also accept traffic for the servic annotations:   service.beta.kubernetes.io/aws-load-balancer-type: nlb |
 | gateway.externalTrafficPolicy | string | `"Cluster"` |  |
-| gateway.http | object | `{"additionalContainerPorts":[],"containerPort":9080,"enabled":true,"ip":"0.0.0.0","servicePort":80}` | API7 Gateway service settings for http |
+| gateway.http | object | `{"additionalContainerPorts":[],"containerPort":9080,"enabled":true,"ip":"0.0.0.0","nodePort":null,"servicePort":80}` | API7 Gateway service settings for http |
 | gateway.http.additionalContainerPorts | list | `[]` | Support multiple http ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L24) |
 | gateway.http.ip | string | `"0.0.0.0"` | which ip to listen on for API7 Gateway http service. |
+| gateway.http.nodePort | int | `nil` | The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | gateway.ingress | object | `{"annotations":{},"enabled":false,"hosts":[{"host":"apisix.local","paths":[]}],"tls":[]}` | Using ingress access API7 Gateway service |
 | gateway.ingress.annotations | object | `{}` | Ingress annotations |
 | gateway.labelsOverride | object | `{}` | Override default labels assigned to API7 Gateway gateway resources |
 | gateway.livenessProbe | object | `{}` | kubernetes liveness probe. |
 | gateway.readinessProbe | object | `{}` | kubernetes readiness probe, we will provide a probe based on tcpSocket to gateway's HTTP port by default. |
-| gateway.stream | object | `{"enabled":false,"only":false,"tcp":[],"udp":[]}` | API7 Gateway service settings for stream. L4 proxy (TCP/UDP) |
-| gateway.tls | object | `{"additionalContainerPorts":[],"certCAFilename":"","containerPort":9443,"enabled":true,"existingCASecret":"","fallbackSNI":"","http2":{"enabled":true},"ip":"0.0.0.0","servicePort":443,"sslProtocols":"TLSv1.2 TLSv1.3"}` | API7 Gateway service settings for tls |
+| gateway.stream | object | `{"autoAssignNodePort":false,"enabled":false,"only":false,"tcp":[],"udp":[]}` | API7 Gateway service settings for stream. L4 proxy (TCP/UDP) |
+| gateway.stream.autoAssignNodePort | bool | `false` | Whether to set nodePort to the same value as the TCP/UDP port when gateway.type is NodePort, make sure the nodePort to be in the valid NodePort range of kubernetes service. |
+| gateway.tls | object | `{"additionalContainerPorts":[],"certCAFilename":"","containerPort":9443,"enabled":true,"existingCASecret":"","fallbackSNI":"","http2":{"enabled":true},"ip":"0.0.0.0","nodePort":null,"servicePort":443,"sslProtocols":"TLSv1.2 TLSv1.3"}` | API7 Gateway service settings for tls |
 | gateway.tls.additionalContainerPorts | list | `[]` | Support multiple https ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L99) |
 | gateway.tls.certCAFilename | string | `""` | Filename be used in the gateway.tls.existingCASecret |
 | gateway.tls.existingCASecret | string | `""` | Specifies the name of Secret contains trusted CA certificates in the PEM format used to verify the certificate when APISIX needs to do SSL/TLS handshaking with external services (e.g. etcd) |
 | gateway.tls.fallbackSNI | string | `""` | If set this, when the client doesn't send SNI during handshake, the fallback SNI will be used instead |
 | gateway.tls.ip | string | `"0.0.0.0"` | which ip to listen on for API7 Gateway https service. |
+| gateway.tls.nodePort | int | `nil` | The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | gateway.tls.sslProtocols | string | `"TLSv1.2 TLSv1.3"` | TLS protocols allowed to use. |
 | gateway.type | string | `"NodePort"` | API7 Gateway service type for user access itself |
 | global.imagePullSecrets | list | `[]` | Global Docker registry secret names as an array |
@@ -208,6 +212,11 @@ The command removes all the Kubernetes components associated with the chart and 
 | logs.enableAccessLog | bool | `true` | Enable access log or not, default true |
 | logs.errorLog | string | `"/dev/stderr"` | Error log path |
 | logs.errorLogLevel | string | `"warn"` | Error log level, Allowed values: `debug`, `info`, `notice`, `warn`, `error`, `crit`, `alert`, `or` `emerg` |
+| logs.stream | object | `{"accessLog":"logs/access_stream.log","accessLogFormat":"$remote_addr [$time_local] $protocol $status $bytes_sent $bytes_received $session_time","accessLogFormatEscape":"default","enableAccessLog":false}` | Stream access log and error log configuration |
+| logs.stream.accessLog | string | `"logs/access_stream.log"` | Stream access log path |
+| logs.stream.accessLogFormat | string | `"$remote_addr [$time_local] $protocol $status $bytes_sent $bytes_received $session_time"` | Stream access log format |
+| logs.stream.accessLogFormatEscape | string | `"default"` | Allows setting json or default characters escaping in variables for stream |
+| logs.stream.enableAccessLog | bool | `false` | Enable stream access log or not, default false |
 | nameOverride | string | `""` |  |
 | nginx.enableCPUAffinity | bool | `true` |  |
 | nginx.envs | list | `[]` |  |
@@ -220,12 +229,13 @@ The command removes all the Kubernetes components associated with the chart and 
 | nginx.workerConnections | string | `"10620"` |  |
 | nginx.workerProcesses | string | `"auto"` |  |
 | nginx.workerRlimitNofile | string | `"20480"` |  |
+| nginx.workerShutdownTimeout | string | `"240s"` |  |
 | pluginAttrs | object | `{}` | Set APISIX plugin attributes, see [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L376) for more details |
 | rbac.create | bool | `false` |  |
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `false` |  |
 | serviceAccount.name | string | `""` |  |
-| serviceMonitor | object | `{"annotations":{},"containerPort":9091,"enabled":false,"interval":"15s","labels":{},"metricPrefix":"apisix_","name":"","namespace":"","path":"/apisix/prometheus/metrics"}` | Observability configuration. ref: https://apisix.apache.org/docs/apisix/plugins/prometheus/ |
+| serviceMonitor | object | `{"annotations":{},"containerPort":9091,"enabled":false,"interval":"15s","labels":{},"metricPrefix":"apisix_","name":"","namespace":"","nodePort":null,"path":"/apisix/prometheus/metrics"}` | Observability configuration. ref: https://apisix.apache.org/docs/apisix/plugins/prometheus/ |
 | serviceMonitor.annotations | object | `{}` | @param serviceMonitor.annotations ServiceMonitor annotations |
 | serviceMonitor.containerPort | int | `9091` | container port where the metrics are exposed |
 | serviceMonitor.enabled | bool | `false` | Enable or disable API7 Gateway serviceMonitor |
@@ -234,6 +244,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | serviceMonitor.metricPrefix | string | `"apisix_"` | prefix of the metrics |
 | serviceMonitor.name | string | `""` | name of the serviceMonitor, by default, it is the same as the apisix fullname |
 | serviceMonitor.namespace | string | `""` | namespace where the serviceMonitor is deployed, by default, it is the same as the namespace of the apisix |
+| serviceMonitor.nodePort | int | `nil` | The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | serviceMonitor.path | string | `"/apisix/prometheus/metrics"` | path of the metrics endpoint |
 | soapProxy.enabled | bool | `false` | Enable or disable the SOAP proxy, this component is disabled by default, when use soap-proxy plugin in API7, you need to enable this component. |
 | soapProxy.image.pullPolicy | string | `"IfNotPresent"` | SOAP proxy image pull policy |

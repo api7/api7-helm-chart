@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.1"
+    tag: "v3.9.4"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -54,7 +54,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.1"
+    tag: "v3.9.4"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -92,7 +92,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.1"
+    tag: "v3.9.4"
 
   extraEnvVars: []
   extraVolumes: []
@@ -239,11 +239,6 @@ affinity: {}
 # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
 # The value is evaluated as a template
 topologySpreadConstraints: []
-
-busybox:
-  image:
-    repository: docker.io/busybox
-    tag: 1.28
 
 prometheus:
   builtin: true
@@ -449,6 +444,10 @@ dp_manager_configuration:
       cert_file: ""  # the file path of the certificate for requesting prometheus, (e.g. /app/prometheus/certs/tls.crt)
       ca_file: ""   # the file path of the ca to verify the prometheus tls server. (e.g. /app/prometheus/certs/ca.crt)
   consumer_cache:
+    size: 50000
+    max_ttl: 2h
+    evict_interval: 5s
+  developer_cache:
     size: 50000
     max_ttl: 2h
     evict_interval: 5s

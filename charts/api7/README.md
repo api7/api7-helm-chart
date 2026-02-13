@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.39](https://img.shields.io/badge/Version-0.17.39-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.1](https://img.shields.io/badge/AppVersion-3.9.1-informational?style=flat-square)
+![Version: 0.17.44](https://img.shields.io/badge/Version-0.17.44-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.4](https://img.shields.io/badge/AppVersion-3.9.4-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -23,14 +23,12 @@ A Helm chart for Kubernetes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
-| busybox.image.repository | string | `"docker.io/busybox"` |  |
-| busybox.image.tag | float | `1.28` |  |
 | dashboard.extraEnvVars | list | `[]` |  |
 | dashboard.extraVolumeMounts | list | `[]` |  |
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.9.1"` |  |
+| dashboard.image.tag | string | `"v3.9.4"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.livenessProbe.failureThreshold | int | `30` |  |
 | dashboard.livenessProbe.initialDelaySeconds | int | `180` |  |
@@ -115,7 +113,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraVolumes | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"Always"` |  |
 | developer_portal.image.repository | string | `"api7/api7-ee-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v3.9.1"` |  |
+| developer_portal.image.tag | string | `"v3.9.4"` |  |
 | developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.livenessProbe.failureThreshold | int | `10` |  |
 | developer_portal.livenessProbe.initialDelaySeconds | int | `60` |  |
@@ -160,7 +158,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.9.1"` |  |
+| dp_manager.image.tag | string | `"v3.9.4"` |  |
 | dp_manager.livenessProbe.failureThreshold | int | `10` |  |
 | dp_manager.livenessProbe.initialDelaySeconds | int | `60` |  |
 | dp_manager.livenessProbe.periodSeconds | int | `3` |  |
@@ -177,6 +175,9 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.database.max_idle_time | string | `"30s"` |  |
 | dp_manager_configuration.database.max_open_conns | int | `30` |  |
 | dp_manager_configuration.database.timeout | string | `"5s"` |  |
+| dp_manager_configuration.developer_cache.evict_interval | string | `"5s"` |  |
+| dp_manager_configuration.developer_cache.max_ttl | string | `"2h"` |  |
+| dp_manager_configuration.developer_cache.size | int | `50000` |  |
 | dp_manager_configuration.jaeger.collector_addr | string | `"http://api7-jaeger:4318"` |  |
 | dp_manager_configuration.jaeger.timeout | string | `"30s"` |  |
 | dp_manager_configuration.log.access_log | string | `"stdout"` |  |

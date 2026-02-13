@@ -83,7 +83,6 @@ data:
         only: {{ .Values.gateway.stream.only }}
         {{- if gt (len .Values.gateway.stream.tcp) 0 }}
         tcp:                        # TCP proxy port list
-          {{- if gt (len .Values.gateway.stream.tcp) 0}}
           {{- range .Values.gateway.stream.tcp }}
           {{- if kindIs "map" . }}
           - addr: {{ .addr }}
@@ -94,18 +93,15 @@ data:
           - {{ . }}
           {{- end }}
           {{- end }}
-          {{- else}}
-          - 9100
-          {{- end }}
         {{- end }}
         {{- if gt (len .Values.gateway.stream.udp) 0 }}
         udp:                        # UDP proxy port list
-          {{- if gt (len .Values.gateway.stream.udp) 0}}
           {{- range .Values.gateway.stream.udp }}
+          {{- if kindIs "map" . }}
+          - addr: {{ .addr }}
+          {{- else }}
           - {{ . }}
           {{- end }}
-          {{- else}}
-          - 9200
           {{- end }}
         {{- end }}
       {{- end }}
@@ -165,6 +161,7 @@ data:
       worker_processes: "{{ .Values.nginx.workerProcesses }}"
       enable_cpu_affinity: {{ and true .Values.nginx.enableCPUAffinity }}
       worker_rlimit_nofile: {{ default "20480" .Values.nginx.workerRlimitNofile }}  # the number of files a worker process can open, should be larger than worker_connections
+      worker_shutdown_timeout: "{{ .Values.nginx.workerShutdownTimeout }}"
       event:
         worker_connections: {{ default "10620" .Values.nginx.workerConnections  }}
       {{- with .Values.nginx.envs }}
@@ -184,6 +181,17 @@ data:
         {{- if .Values.apisix.stream.luaSharedDict }}
         lua_shared_dict:
           {{- toYaml .Values.apisix.stream.luaSharedDict | nindent 10 }}
+        {{- end }}
+        {{- if and (.Values.deployment.fallback_cp) (eq .Values.deployment.fallback_cp.mode "write") }}
+        enable_access_log: false
+        {{- else }}
+        enable_access_log: {{ .Values.logs.stream.enableAccessLog }}
+        {{- end }}
+        {{- if .Values.logs.stream.enableAccessLog }}
+        access_log: "{{ .Values.logs.stream.accessLog }}"
+        access_log_format: >-
+          {{- .Values.logs.stream.accessLogFormat | nindent 10 }}
+        access_log_format_escape: {{ .Values.logs.stream.accessLogFormatEscape }}
         {{- end }}
       http:
         {{- if and (.Values.deployment.fallback_cp) (eq .Values.deployment.fallback_cp.mode "write") }}

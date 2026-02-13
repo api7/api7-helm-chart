@@ -27,6 +27,7 @@ spec:
   securityContext: 
     {{- . | toYaml | nindent 4 }}
   {{- end }}
+  terminationGracePeriodSeconds: {{ .Values.apisix.terminationGracePeriodSeconds }}
   {{- with .Values.apisix.priorityClassName }}
   priorityClassName: {{ . }}
   {{- end }}
@@ -144,7 +145,11 @@ spec:
         {{- if (gt (len .udp) 0) }}
         {{- range $index, $port := .udp }}
         - name: proxy-udp-{{ $index | toString }}
+        {{- if kindIs "map" $port }}
+          containerPort: {{ splitList ":" ($port.addr | toString) | last }}
+        {{- else }}
           containerPort: {{ $port }}
+        {{- end }}
           protocol: UDP
         {{- end }}
         {{- end }}
@@ -236,6 +241,10 @@ spec:
   dnsPolicy: ClusterFirstWithHostNet
   {{- end }}
   hostNetwork: {{ .Values.apisix.hostNetwork }}
+  {{- with .Values.apisix.dnsConfig }}
+  dnsConfig:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   initContainers:
     {{- if .Values.etcd.enabled }}
     - name: wait-etcd

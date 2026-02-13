@@ -85,7 +85,6 @@ apisix:
       ext-plugin: 1m
       tars: 1m
       cas-auth: 10m
-      saml_sessions: 10m
       status_report: 1m
 
   # -- fine tune the parameters of LRU cache for some features like secret
@@ -139,12 +138,15 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.9.1
+    tag: 3.9.4
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
   # -- kind is DaemonSet, replicaCount not become effective
   replicaCount: 1
+
+  # -- termination grace period for API7 Gateway pods
+  terminationGracePeriodSeconds: 30
 
   # -- Set [priorityClassName](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#pod-priority) for API7 Gateway pods
   priorityClassName: ""
@@ -195,6 +197,9 @@ apisix:
     #   cpu: 100m
     #   memory: 128Mi
   hostNetwork: false
+
+  # -- Custom DNS settings for the APISIX pods
+  dnsConfig: {}
 
   # -- Node labels for API7 Gateway pod assignment
   nodeSelector: {}
@@ -304,12 +309,15 @@ gateway:
     ip: 0.0.0.0
     servicePort: 80
     containerPort: 9080
+    # -- (int) The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+    nodePort:
     # hostPort: 9080
     # backlog: 1024  # sets the backlog parameter in the listen() call that limits, the maximum length for the queue of pending connections. By default, backlog is set to -1 on FreeBSD, DragonFly BSD, and macOS, and to 511 on other platforms.
     # -- Support multiple http ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L24)
     additionalContainerPorts: []
       # - port: 9081
       #   hostPort: 9081
+      #   nodePort: 31081
       #   enable_http2: true          # If not set, the default value is `false`.
       #   backlog: 1024
       # - ip: 127.0.0.2               # Specific IP, If not set, the default value is `0.0.0.0`.
@@ -324,6 +332,8 @@ gateway:
     ip: 0.0.0.0
     servicePort: 443
     containerPort: 9443
+    # -- (int) The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+    nodePort:
     # hostPort: 9443
     # backlog: 1024
     # -- Support multiple https ports, See [Configuration](https://github.com/apache/apisix/blob/0bc65ea9acd726f79f80ae0abd8f50b7eb172e3d/conf/config-default.yaml#L99)
@@ -331,6 +341,7 @@ gateway:
       # - ip: 127.0.0.3           # Specific IP, If not set, the default value is `0.0.0.0`.
       #   port: 9445
       #   hostPort: 9445
+      #   nodePort: 31045
       #   enable_http2: true
       #   backlog: 1024
     # -- Specifies the name of Secret contains trusted CA certificates in the PEM format used to verify the certificate when APISIX needs to do SSL/TLS handshaking with external services (e.g. etcd)
@@ -347,8 +358,16 @@ gateway:
   stream:
     enabled: false
     only: false
+    # -- Whether to set nodePort to the same value as the TCP/UDP port when gateway.type is NodePort, make sure the nodePort to be in the valid NodePort range of kubernetes service.
+    autoAssignNodePort: false
     tcp: []
+      # - addr: 192.168.31.10:5432
+      # - addr: 3302
+      #   nodePort: 31302
     udp: []
+      # - addr: 192.168.31.10:53
+      # - addr: 5353
+      #   nodePort: 31353
   # -- Using ingress access API7 Gateway service
   ingress:
     enabled: false
@@ -421,6 +440,7 @@ admin:
 
 nginx:
   workerRlimitNofile: "20480"
+  workerShutdownTimeout: "240s"
   workerConnections: "10620"
   workerProcesses: auto
   enableCPUAffinity: true
@@ -504,6 +524,16 @@ logs:
   errorLog: "/dev/stderr"
   # -- Error log level, Allowed values: `debug`, `info`, `notice`, `warn`, `error`, `crit`, `alert`, `or` `emerg`
   errorLogLevel: "warn"
+  # -- Stream access log and error log configuration
+  stream:
+    # -- Enable stream access log or not, default false
+    enableAccessLog: false
+    # -- Stream access log path
+    accessLog: "logs/access_stream.log"
+    # -- Stream access log format
+    accessLogFormat: '$remote_addr [$time_local] $protocol $status $bytes_sent $bytes_received $session_time'
+    # -- Allows setting json or default characters escaping in variables for stream
+    accessLogFormatEscape: default
 
 dns:
   resolvers:
@@ -564,6 +594,8 @@ serviceMonitor:
   metricPrefix: apisix_
   # -- container port where the metrics are exposed
   containerPort: 9091
+  # -- (int) The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+  nodePort:
   # -- @param serviceMonitor.labels ServiceMonitor extra labels
   labels: {}
   # -- @param serviceMonitor.annotations ServiceMonitor annotations
