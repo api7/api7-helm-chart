@@ -138,7 +138,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.9.4
+    tag: 3.9.5
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
