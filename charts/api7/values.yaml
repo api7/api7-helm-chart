@@ -270,8 +270,6 @@ jaeger:
   builtin: true
   fullnameOverride: "api7-jaeger"
   jaeger:
-    enabled: true
-    replicas: 1
     image:
       registry: ""
       repository: jaegertracing/jaeger
