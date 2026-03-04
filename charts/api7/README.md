@@ -223,6 +223,9 @@ A Helm chart for Kubernetes
 | imagePullSecret | string | `""` |  |
 | jaeger.builtin | bool | `true` |  |
 | jaeger.fullnameOverride | string | `"api7-jaeger"` |  |
+| jaeger.jaeger.image.registry | string | `""` |  |
+| jaeger.jaeger.image.repository | string | `"jaegertracing/jaeger"` |  |
+| jaeger.jaeger.image.tag | string | `""` |  |
 | nameOverride | string | `""` |  |
 | nodeSelector | object | `{}` |  |
 | podAnnotations | object | `{}` |  |
