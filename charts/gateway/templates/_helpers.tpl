@@ -106,38 +106,37 @@ Scheme to use while connecting etcd
 {{- end }}
 
 {{/*
-Expand a port value (which may contain comma-separated ports and/or ranges)
-into a list of individual port numbers for K8s resource definitions.
-Input: a string like "1881,1888,2000-2100,3000" or "127.0.0.1:2000-2100" or "9100"
-Output: JSON {"ports": [1881, 1888, 2000, 2001, ..., 2100, 3000]}
+Expand a port value (which may contain a port range) into a list of individual
+port numbers for K8s resource definitions.
+Input: a string like "2000-2100" or "127.0.0.1:2000-2100" or "9100"
+Output: JSON {"ports": [2000, 2001, ..., 2100]}
 */}}
 {{- define "gateway.expandPorts" -}}
 {{- $result := list -}}
 {{- $s := . | toString -}}
-{{- $parts := splitList "," $s -}}
-{{- range $part := $parts -}}
-  {{- $trimmed := trim $part -}}
-  {{- if ne $trimmed "" -}}
-    {{- $portPart := splitList ":" $trimmed | last -}}
-    {{- if contains "-" $portPart -}}
-      {{- $bounds := splitList "-" $portPart -}}
-      {{- $start := index $bounds 0 | trim | int -}}
-      {{- $end := index $bounds 1 | trim | int -}}
-      {{- $count := add1 (sub $end $start) | int -}}
-      {{- range $i := until $count -}}
-        {{- $result = append $result (add $start $i | int) -}}
-      {{- end -}}
-    {{- else -}}
-      {{- $result = append $result ($portPart | trim | int) -}}
-    {{- end -}}
+{{- $portPart := splitList ":" $s | last -}}
+{{- if contains "-" $portPart -}}
+  {{- $bounds := splitList "-" $portPart -}}
+  {{- $start := index $bounds 0 | trim | int -}}
+  {{- $end := index $bounds 1 | trim | int -}}
+  {{- if gt $start $end -}}
+    {{- $tmp := $start -}}
+    {{- $start = $end -}}
+    {{- $end = $tmp -}}
   {{- end -}}
+  {{- $count := add1 (sub $end $start) | int -}}
+  {{- range $i := until $count -}}
+    {{- $result = append $result (add $start $i | int) -}}
+  {{- end -}}
+{{- else -}}
+  {{- $result = append $result ($portPart | trim | int) -}}
 {{- end -}}
 {{- dict "ports" $result | toJson -}}
 {{- end -}}
 
 {{/*
 Normalize a TCP port list into expanded individual port entries for K8s resources.
-Handles integers, strings (with ranges/commas), and map entries (with addr ranges/commas).
+Handles integers, strings (with ranges), and map entries (with addr ranges).
 Input: the .tcp array from values
 Output: JSON {"entries": [{"port": 9100, "nodePort": ""}, ...]}
 */}}
