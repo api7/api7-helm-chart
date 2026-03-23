@@ -1,0 +1,15 @@
+apiVersion: v2
+name: developer-portal-fe
+description: A Helm chart for API7 Developer Portal Frontend
+type: application
+version: 0.1.0
+appVersion: "0.5.7"
+maintainers:
+  - name: API7
+    email: support@api7.ai
+    url: https://api7.ai
+dependencies:
+  - name: postgresql
+    condition: postgresql.builtin
+    version: "12.12.10"
+    repository: "https://charts.bitnami.com/bitnami"
