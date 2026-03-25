@@ -2620,6 +2620,26 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/apisix-ingress-controller-0.14.0/apisix-ingress-controller-0.14.0.tgz
     version: 0.14.0
+  developer-portal-fe:
+  - apiVersion: v2
+    appVersion: 0.5.7
+    created: "2026-03-25T09:52:51.544364385Z"
+    dependencies:
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    description: A Helm chart for API7 Developer Portal Frontend
+    digest: 1116d238e2dbe9bfb5041dfbcddc2a390d4f20656b2dd5601280719808607284
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: developer-portal-fe
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/developer-portal-fe-0.1.0/developer-portal-fe-0.1.0.tgz
+    version: 0.1.0
   gateway:
   - apiVersion: v2
     appVersion: 3.9.7
@@ -3826,4 +3846,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2026-03-25T07:30:31.736072526Z"
+generated: "2026-03-25T09:52:51.544740486Z"
