@@ -1,0 +1,250 @@
+# ============================================================
+# Application Configuration
+# ============================================================
+developerPortal:
+  # Number of replicas
+  replicaCount: 1
+
+  # Container image configuration
+  image:
+    repository: api7/api7-ee-developer-portal-fe
+    pullPolicy: IfNotPresent
+    tag: "v0.5.7"
+
+  # Resource limits and requests
+  resources: {}
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi
+    # requests:
+    #   cpu: 250m
+    #   memory: 256Mi
+
+  # Extra environment variables
+  extraEnvVars: []
+  # - name: CUSTOM_VAR
+  #   value: "custom-value"
+
+  # Extra volumes
+  extraVolumes: []
+  # - name: custom-volume
+  #   emptyDir: {}
+
+  # Extra volume mounts
+  extraVolumeMounts: []
+  # - name: custom-volume
+  #   mountPath: /custom/path
+
+  # Additional labels for pods
+  podLabels: {}
+
+  # Additional annotations for pods
+  podAnnotations: {}
+
+  # Topology spread constraints
+  topologySpreadConstraints: []
+  # - maxSkew: 1
+  #   topologyKey: kubernetes.io/hostname
+  #   whenUnsatisfiable: DoNotSchedule
+  #   labelSelector:
+  #     matchLabels:
+  #       app.kubernetes.io/name: developer-portal-fe
+
+  # Skip TLS verification for Portal API (only for dev/self-signed certs)
+  # Set to false to enable NODE_TLS_REJECT_UNAUTHORIZED=0
+  tlsRejectUnauthorized: true
+
+  # Liveness probe configuration
+  livenessProbe:
+    path: /
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    failureThreshold: 10
+
+  # Readiness probe configuration
+  readinessProbe:
+    path: /
+    initialDelaySeconds: 10
+    periodSeconds: 5
+    failureThreshold: 3
+
+# ============================================================
+# Portal API Connection Configuration
+# ============================================================
+portal:
+  # Portal API endpoint (the developer portal backend from api7 chart)
+  url: "https://api7-developer-portal:4321"
+
+  # Portal token (plain text, lower priority than existingSecret)
+  token: ""
+
+  # Reference to existing secret containing portal token (recommended for production)
+  existingSecret: ""
+  existingSecretKey: "portal-token"
+
+# ============================================================
+# Database Configuration
+# ============================================================
+db:
+  # PostgreSQL connection string
+  # Format: postgres://username:password@host:port/database
+  url: "postgres://portal:portal123@developer-portal-fe-postgresql:5432/portal"
+
+  # Reference to existing secret containing database URL (recommended for production)
+  existingSecret: ""
+  existingSecretKey: "db-url"
+
+# ============================================================
+# Authentication Configuration
+# ============================================================
+auth:
+  # Better Auth secret key (at least 32 characters)
+  # Generate with: openssl rand -base64 32
+  secret: ""
+
+  # Reference to existing secret containing auth secret (recommended for production)
+  existingSecret: ""
+  existingSecretKey: "auth-secret"
+
+# ============================================================
+# Application URL Configuration
+# ============================================================
+app:
+  # Base URL for the application
+  baseURL: "http://localhost"
+
+  # Trusted origins for CORS
+  trustedOrigins:
+    - "http://localhost"
+
+# ============================================================
+# Service Configuration
+# ============================================================
+service:
+  # Service type (ClusterIP, NodePort, LoadBalancer)
+  type: ClusterIP
+
+  # Service port (exposed to the cluster)
+  port: 80
+
+  # Container port (the port the application listens on)
+  containerPort: 3001
+
+  # Service annotations
+  annotations: {}
+
+# ============================================================
+# Ingress Configuration
+# ============================================================
+ingress:
+  # Enable ingress
+  enabled: false
+
+  # Ingress class name
+  className: ""
+
+  # Ingress annotations
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # cert-manager.io/cluster-issuer: letsencrypt-prod
+
+  # Ingress hosts configuration
+  hosts:
+    - host: developer-portal.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+
+  # TLS configuration
+  tls: []
+  #  - secretName: developer-portal-tls
+  #    hosts:
+  #      - developer-portal.local
+
+# ============================================================
+# Built-in PostgreSQL Configuration
+# ============================================================
+postgresql:
+  # Enable built-in PostgreSQL (set to false to use external database)
+  builtin: true
+
+  # Override the full name of the PostgreSQL deployment
+  fullnameOverride: "developer-portal-fe-postgresql"
+
+  # Authentication settings
+  auth:
+    username: portal
+    password: portal123
+    database: portal
+
+  # PostgreSQL image configuration (use api7's image for compatibility)
+  image:
+    registry: docker.io
+    repository: api7/postgresql
+    tag: 15.4.0-debian-11-r45
+
+  # Primary node configuration
+  primary:
+    # Persistence configuration
+    persistence:
+      enabled: true
+      size: 10Gi
+
+    # Service configuration
+    service:
+      ports:
+        postgresql: 5432
+
+# ============================================================
+# Common Configuration
+# ============================================================
+# Image pull secret name
+imagePullSecret: ""
+
+# Override the name of the chart
+nameOverride: ""
+
+# Override the full name of the release
+fullnameOverride: ""
+
+# Service account configuration
+serviceAccount:
+  # Create a service account
+  create: true
+
+  # Annotations for the service account
+  annotations: {}
+
+  # Name of the service account (generated if not set)
+  name: ""
+
+# Pod annotations (global)
+podAnnotations: {}
+
+# Pod security context (global)
+podSecurityContext: {}
+  # fsGroup: 2000
+
+# Container security context (global)
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+# Node selector (global)
+nodeSelector: {}
+
+# Tolerations (global)
+tolerations: []
+
+# Affinity (global)
+affinity: {}
+
+# Topology spread constraints (global)
+topologySpreadConstraints: []
+
+# Global resource limits and requests
+resources: {}

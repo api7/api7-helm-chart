@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "developer-portal-fe.fullname" . }}-config
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "developer-portal-fe.labels" . | nindent 4 }}
+data:
+  config.yaml: |
+    # Portal API connection configuration
+    portal:
+      url: {{ .Values.portal.url | quote }}
+      token: ${PORTAL_TOKEN}
+
+    # Database configuration
+    db:
+      url: ${DB_URL}
+
+    # Authentication configuration
+    auth:
+      secret: ${AUTH_SECRET}
+
+    # Application configuration
+    app:
+      name: "Developer Portal"
+      baseURL: {{ .Values.app.baseURL | quote }}
+      trustedOrigins:
+        {{- toYaml .Values.app.trustedOrigins | nindent 8 }}

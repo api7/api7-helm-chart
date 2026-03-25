@@ -1,0 +1,128 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "developer-portal-fe.fullname" . }}
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "developer-portal-fe.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.developerPortal.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "developer-portal-fe.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: developer-portal-fe
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.developerPortal.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "developer-portal-fe.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: developer-portal-fe
+        {{- if .Values.developerPortal.podLabels }}
+        {{- range $key, $value := $.Values.developerPortal.podLabels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+    spec:
+      {{- if .Values.imagePullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.imagePullSecret }}
+      {{- end }}
+      serviceAccountName: {{ include "developer-portal-fe.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "developer-portal-fe.fullname" . }}-config
+      {{- if .Values.developerPortal.extraVolumes }}
+      {{- include "developer-portal-fe.tplvalues.render" (dict "value" .Values.developerPortal.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: developer-portal-fe
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.developerPortal.image.repository }}:{{ .Values.developerPortal.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.developerPortal.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.containerPort }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: {{ .Values.developerPortal.livenessProbe.path | default "/" }}
+              port: http
+            initialDelaySeconds: {{ .Values.developerPortal.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.developerPortal.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.developerPortal.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: {{ .Values.developerPortal.readinessProbe.path | default "/" }}
+              port: http
+            initialDelaySeconds: {{ .Values.developerPortal.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.developerPortal.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.developerPortal.readinessProbe.failureThreshold }}
+          resources:
+            {{- if .Values.developerPortal.resources }}
+            {{- toYaml .Values.developerPortal.resources | nindent 12 }}
+            {{- else }}
+            {{- toYaml .Values.resources | nindent 12 }}
+            {{- end }}
+          env:
+            - name: NODE_ENV
+              value: "production"
+            - name: PORT
+              value: {{ .Values.service.containerPort | quote }}
+            - name: HOSTNAME
+              value: "0.0.0.0"
+            - name: NODE_TLS_REJECT_UNAUTHORIZED
+              value: {{ if .Values.developerPortal.tlsRejectUnauthorized }}"1"{{ else }}"0"{{ end }}
+            - name: PORTAL_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.portal.existingSecret }}{{ .Values.portal.existingSecret }}{{ else }}{{ include "developer-portal-fe.secretName" . }}{{ end }}
+                  key: {{ .Values.portal.existingSecretKey }}
+            - name: DB_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.db.existingSecret }}{{ .Values.db.existingSecret }}{{ else }}{{ include "developer-portal-fe.secretName" . }}{{ end }}
+                  key: {{ .Values.db.existingSecretKey }}
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.auth.existingSecret }}{{ .Values.auth.existingSecret }}{{ else }}{{ include "developer-portal-fe.secretName" . }}{{ end }}
+                  key: {{ .Values.auth.existingSecretKey }}
+          {{- if .Values.developerPortal.extraEnvVars }}
+          {{- include "developer-portal-fe.tplvalues.render" (dict "value" .Values.developerPortal.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /app/apps/site/config.yaml
+              subPath: config.yaml
+          {{- if .Values.developerPortal.extraVolumeMounts }}
+          {{- include "developer-portal-fe.tplvalues.render" (dict "value" .Values.developerPortal.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with or .Values.developerPortal.topologySpreadConstraints .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- tpl (. | toYaml) $ | nindent 8 }}
+      {{- end }}
