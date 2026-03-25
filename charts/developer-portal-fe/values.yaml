@@ -177,6 +177,12 @@ postgresql:
     password: portal123
     database: portal
 
+  # PostgreSQL image configuration (use api7's image for compatibility)
+  image:
+    registry: docker.io
+    repository: api7/postgresql
+    tag: 15.4.0-debian-11-r45
+
   # Primary node configuration
   primary:
     # Persistence configuration

@@ -71,6 +71,9 @@ A Helm chart for API7 Developer Portal Frontend
 | postgresql.auth.username | string | `"portal"` |  |
 | postgresql.builtin | bool | `true` |  |
 | postgresql.fullnameOverride | string | `"developer-portal-fe-postgresql"` |  |
+| postgresql.image.registry | string | `"docker.io"` |  |
+| postgresql.image.repository | string | `"api7/postgresql"` |  |
+| postgresql.image.tag | string | `"15.4.0-debian-11-r45"` |  |
 | postgresql.primary.persistence.enabled | bool | `true` |  |
 | postgresql.primary.persistence.size | string | `"10Gi"` |  |
 | postgresql.primary.service.ports.postgresql | int | `5432` |  |
