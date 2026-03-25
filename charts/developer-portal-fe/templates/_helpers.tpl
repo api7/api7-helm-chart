@@ -75,12 +75,8 @@ Usage:
 {{- end -}}
 
 {{/*
-Get the secret name for portal token, auth secret, and db url
+Get the chart-managed secret name
 */}}
 {{- define "developer-portal-fe.secretName" -}}
-{{- if .Values.portal.existingSecret }}
-{{- .Values.portal.existingSecret }}
-{{- else }}
 {{- include "developer-portal-fe.fullname" . }}-secrets
-{{- end }}
 {{- end }}

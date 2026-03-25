@@ -87,7 +87,7 @@ spec:
             - name: PORTAL_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "developer-portal-fe.secretName" . }}
+                  name: {{ if .Values.portal.existingSecret }}{{ .Values.portal.existingSecret }}{{ else }}{{ include "developer-portal-fe.secretName" . }}{{ end }}
                   key: {{ .Values.portal.existingSecretKey }}
             - name: DB_URL
               valueFrom:
