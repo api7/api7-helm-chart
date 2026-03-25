@@ -57,14 +57,14 @@ spec:
               protocol: TCP
           livenessProbe:
             httpGet:
-              path: /healthz
+              path: {{ .Values.developerPortal.livenessProbe.path | default "/" }}
               port: http
             initialDelaySeconds: {{ .Values.developerPortal.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.developerPortal.livenessProbe.periodSeconds }}
             failureThreshold: {{ .Values.developerPortal.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: {{ .Values.developerPortal.readinessProbe.path | default "/" }}
               port: http
             initialDelaySeconds: {{ .Values.developerPortal.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.developerPortal.readinessProbe.periodSeconds }}

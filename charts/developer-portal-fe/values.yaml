@@ -56,12 +56,14 @@ developerPortal:
 
   # Liveness probe configuration
   livenessProbe:
+    path: /
     initialDelaySeconds: 30
     periodSeconds: 10
     failureThreshold: 10
 
   # Readiness probe configuration
   readinessProbe:
+    path: /
     initialDelaySeconds: 10
     periodSeconds: 5
     failureThreshold: 3
@@ -168,12 +170,6 @@ postgresql:
 
   # Override the full name of the PostgreSQL deployment
   fullnameOverride: "developer-portal-fe-postgresql"
-
-  # PostgreSQL image configuration
-  image:
-    registry: docker.io
-    repository: postgres
-    tag: "16"
 
   # Authentication settings
   auth:
