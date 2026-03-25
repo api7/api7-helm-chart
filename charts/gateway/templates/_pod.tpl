@@ -130,28 +130,20 @@ spec:
           protocol: TCP
         {{- end }}
         {{- if and .Values.gateway.stream.enabled (or (gt (len .Values.gateway.stream.tcp) 0) (gt (len .Values.gateway.stream.udp) 0)) }}
-        {{- with .Values.gateway.stream }}
-        {{- if (gt (len .tcp) 0) }}
-        {{- range $index, $port := .tcp }}
+        {{- if (gt (len .Values.gateway.stream.tcp) 0) }}
+        {{- $normalized := include "gateway.normalizedTcpPorts" .Values.gateway.stream.tcp | fromJson }}
+        {{- range $index, $entry := $normalized.entries }}
         - name: proxy-tcp-{{ $index | toString }}
-        {{- if kindIs "map" $port }}
-          containerPort: {{ splitList ":" ($port.addr | toString) | last }}
-        {{- else }}
-          containerPort: {{ $port }}
-        {{- end }}
+          containerPort: {{ $entry.port | int }}
           protocol: TCP
         {{- end }}
         {{- end }}
-        {{- if (gt (len .udp) 0) }}
-        {{- range $index, $port := .udp }}
+        {{- if (gt (len .Values.gateway.stream.udp) 0) }}
+        {{- $normalized := include "gateway.normalizedUdpPorts" .Values.gateway.stream.udp | fromJson }}
+        {{- range $index, $entry := $normalized.entries }}
         - name: proxy-udp-{{ $index | toString }}
-        {{- if kindIs "map" $port }}
-          containerPort: {{ splitList ":" ($port.addr | toString) | last }}
-        {{- else }}
-          containerPort: {{ $port }}
-        {{- end }}
+          containerPort: {{ $entry.port | int }}
           protocol: UDP
-        {{- end }}
         {{- end }}
         {{- end }}
         {{- end }}

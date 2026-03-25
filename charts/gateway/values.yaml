@@ -364,10 +364,15 @@ gateway:
       # - addr: 192.168.31.10:5432
       # - addr: 3302
       #   nodePort: 31302
+      # - "2000-2100"                   # port range (nginx native support)
+      # - addr: "3000-3100"             # port range in table form
+      # - addr: "127.0.0.1:4000-4100"   # address with port range
+      #   tls: true
     udp: []
       # - addr: 192.168.31.10:53
       # - addr: 5353
       #   nodePort: 31353
+      # - "9300-9310"                   # port range
   # -- Using ingress access API7 Gateway service
   ingress:
     enabled: false
