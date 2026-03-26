@@ -159,6 +159,8 @@ data:
           neg_ttl: {{ .Values.apisix.lru.secret.neg_ttl }}
           neg_count: {{ .Values.apisix.lru.secret.neg_count }}
 
+      tracing: {{ .Values.apisix.tracing }}
+
     nginx_config:    # config for render the template to genarate nginx.conf
       error_log: "{{ .Values.logs.errorLog }}"
       error_log_level: "{{ .Values.logs.errorLogLevel }}"    # warn,error
