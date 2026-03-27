@@ -97,6 +97,10 @@ apisix:
       neg_ttl: 60
       neg_count: 512
 
+  # -- Enable comprehensive request lifecycle tracing (SSL/SNI, rewrite, access, header_filter, body_filter, and log).
+  # When disabled, OpenTelemetry collects only a single span per request.
+  tracing: false
+
   # -- Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings,
   # click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict
   customLuaSharedDicts: []
