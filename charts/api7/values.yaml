@@ -456,7 +456,27 @@ dp_manager_configuration:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     max_open_conns: 30
     max_idle_time: 30s
+    # max_lifetime: 60s
     timeout: 5s
+    # vault:
+    #   enabled: false
+    #   address: "http://vault:8200"
+    #   namespace: ""
+    #   base_dsn: "postgres://api7-postgresql:5432/api7ee?sslmode=disable" # no username/password
+    #   cred_cache_ttl: 30s
+    #   auth:
+    #     method: "token" # token | approle | kubernetes
+    #     token: ""
+    #     # role_id: ""
+    #     # secret_id: ""
+    #     # role: ""        # for kubernetes auth
+    #     # mount_path: ""  # optional auth mount path
+    #   database:
+    #     mount_path: "database"
+    #     role: "api7ee"
+    #   tls:
+    #     ca_cert: ""
+    #     insecure: false
   jaeger:
     collector_addr: "http://api7-jaeger:4318"
     timeout: 30s
@@ -464,7 +484,7 @@ dp_manager_configuration:
     addr: "http://api7-prometheus-server:9090"
     remote_write_path: "/api/v1/write"
     timeout: "30s"
-    basic_auth:  #  access the prometheus with basic-auth
+    basic_auth:  # access the prometheus with basic-auth
       username: ""  # Basic-auth username. If the username is empty, basic-auth authentication is not performed when requesting prometheus.
       password: ""
     tls:
@@ -514,4 +534,24 @@ developer_portal_configuration:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     max_open_conns: 30
     max_idle_time: 30s
+    # max_lifetime: 60s
     timeout: 5s
+    # vault:
+    #   enabled: false
+    #   address: "http://vault:8200"
+    #   namespace: ""
+    #   base_dsn: "postgres://api7-postgresql:5432/api7ee?sslmode=disable" # no username/password
+    #   cred_cache_ttl: 30s
+    #   auth:
+    #     method: "token" # token | approle | kubernetes
+    #     token: ""
+    #     # role_id: ""
+    #     # secret_id: ""
+    #     # role: ""        # for kubernetes auth
+    #     # mount_path: ""  # optional auth mount path
+    #   database:
+    #     mount_path: "database"
+    #     role: "api7ee"
+    #   tls:
+    #     ca_cert: ""
+    #     insecure: false
