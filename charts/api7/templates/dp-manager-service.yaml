@@ -11,6 +11,14 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.dp_manager_service.type }}
+  {{- if and (eq .Values.dp_manager_service.type "NodePort") .Values.dp_manager_service.autoAssignNodePort }}
+  {{- if or (lt (int .Values.dp_manager_service.port) 30000) (gt (int .Values.dp_manager_service.port) 32767) }}
+  {{- fail (printf "dp_manager_service.port (%d) must be between 30000 and 32767 when autoAssignNodePort is true" (int .Values.dp_manager_service.port)) }}
+  {{- end }}
+  {{- if or (lt (int .Values.dp_manager_service.tlsPort) 30000) (gt (int .Values.dp_manager_service.tlsPort) 32767) }}
+  {{- fail (printf "dp_manager_service.tlsPort (%d) must be between 30000 and 32767 when autoAssignNodePort is true" (int .Values.dp_manager_service.tlsPort)) }}
+  {{- end }}
+  {{- end }}
   {{- if .Values.dp_manager_service.loadBalancerClass }}
   loadBalancerClass: {{ .Values.dp_manager_service.loadBalancerClass }}
   {{- end }}
