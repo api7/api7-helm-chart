@@ -171,6 +171,12 @@ dp_manager_service:
   annotations: {}
   port: 7900
   tlsPort: 7943
+  # -- Whether to set nodePort to the same value as the HTTP/HTTPS port when dp_manager_service.type is NodePort, make sure the nodePort to be in the valid NodePort range of kubernetes service.
+  autoAssignNodePort: false
+  # -- (int) The nodePort for HTTP service, only used if dp_manager_service.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+  nodePort: null
+  # -- (int) The nodePort for HTTPS service, only used if dp_manager_service.type is NodePort. If not set, a random port will be assigned by Kubernetes.
+  tlsNodePort: null
   ingress:
     enabled: false
     className: ""

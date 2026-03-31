@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.47](https://img.shields.io/badge/Version-0.17.47-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.7](https://img.shields.io/badge/AppVersion-3.9.7-informational?style=flat-square)
+![Version: 0.17.48](https://img.shields.io/badge/Version-0.17.48-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.7](https://img.shields.io/badge/AppVersion-3.9.7-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -208,6 +208,7 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.server.tls.host | string | `"0.0.0.0"` |  |
 | dp_manager_configuration.server.tls.port | int | `7943` |  |
 | dp_manager_service.annotations | object | `{}` |  |
+| dp_manager_service.autoAssignNodePort | bool | `false` | Whether to set nodePort to the same value as the HTTP/HTTPS port when dp_manager_service.type is NodePort, make sure the nodePort to be in the valid NodePort range of kubernetes service. |
 | dp_manager_service.ingress.annotations | object | `{}` |  |
 | dp_manager_service.ingress.className | string | `""` |  |
 | dp_manager_service.ingress.enabled | bool | `false` |  |
@@ -215,7 +216,9 @@ A Helm chart for Kubernetes
 | dp_manager_service.ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | dp_manager_service.ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
 | dp_manager_service.ingress.tls | list | `[]` |  |
+| dp_manager_service.nodePort | int | `nil` | The nodePort for HTTP service, only used if dp_manager_service.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | dp_manager_service.port | int | `7900` |  |
+| dp_manager_service.tlsNodePort | int | `nil` | The nodePort for HTTPS service, only used if dp_manager_service.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | dp_manager_service.tlsPort | int | `7943` |  |
 | dp_manager_service.type | string | `"ClusterIP"` |  |
 | fullnameOverride | string | `""` |  |

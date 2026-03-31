@@ -11,6 +11,14 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.dp_manager_service.type }}
+  {{- if and (eq .Values.dp_manager_service.type "NodePort") .Values.dp_manager_service.autoAssignNodePort }}
+  {{- if or (lt (int .Values.dp_manager_service.port) 30000) (gt (int .Values.dp_manager_service.port) 32767) }}
+  {{- fail (printf "dp_manager_service.port (%d) must be between 30000 and 32767 when autoAssignNodePort is true" (int .Values.dp_manager_service.port)) }}
+  {{- end }}
+  {{- if or (lt (int .Values.dp_manager_service.tlsPort) 30000) (gt (int .Values.dp_manager_service.tlsPort) 32767) }}
+  {{- fail (printf "dp_manager_service.tlsPort (%d) must be between 30000 and 32767 when autoAssignNodePort is true" (int .Values.dp_manager_service.tlsPort)) }}
+  {{- end }}
+  {{- end }}
   {{- if .Values.dp_manager_service.loadBalancerClass }}
   loadBalancerClass: {{ .Values.dp_manager_service.loadBalancerClass }}
   {{- end }}
@@ -19,10 +27,24 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if eq .Values.dp_manager_service.type "NodePort" }}
+      {{- if .Values.dp_manager_service.autoAssignNodePort }}
+      nodePort: {{ .Values.dp_manager_service.port }}
+      {{- else if .Values.dp_manager_service.nodePort }}
+      nodePort: {{ .Values.dp_manager_service.nodePort }}
+      {{- end }}
+      {{- end }}
     - port: {{ .Values.dp_manager_service.tlsPort }}
       targetPort: https
       protocol: TCP
       name: https
+      {{- if eq .Values.dp_manager_service.type "NodePort" }}
+      {{- if .Values.dp_manager_service.autoAssignNodePort }}
+      nodePort: {{ .Values.dp_manager_service.tlsPort }}
+      {{- else if .Values.dp_manager_service.tlsNodePort }}
+      nodePort: {{ .Values.dp_manager_service.tlsNodePort }}
+      {{- end }}
+      {{- end }}
 
   selector:
     {{- include "api7ee3.selectorLabels" . | nindent 4 }}
