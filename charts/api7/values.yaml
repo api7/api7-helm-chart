@@ -111,6 +111,42 @@ developer_portal:
     periodSeconds: 3
     failureThreshold: 3
 
+file_server:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: api7/api7-ee-file-server
+    pullPolicy: Always
+    tag: "v3.9.7"
+  # Resources of the deployment.
+  # It has a higher priority than the common resources configuration:
+  # when this field is configured, it is used first in the deployment,
+  # otherwise the common resources configuration is used.
+  # resources:
+  #   limits:
+  #     cpu: 100m
+  #     memory: 128Mi
+  #   requests:
+  #     cpu: 100m
+  #     memory: 128Mi
+
+  extraEnvVars: []
+  extraVolumes: []
+  extraVolumeMounts: []
+  podLabels: {}
+  # -- Topology Spread Constraints for pod assignment
+  # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
+  # The value is evaluated as a template
+  topologySpreadConstraints: []
+  livenessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 3
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 3
+    failureThreshold: 3
+
 imagePullSecret: ""
 nameOverride: ""
 fullnameOverride: ""
@@ -222,6 +258,11 @@ developer_portal_service:
     #  - secretName: developer-portal-tls
     #    hosts:
     #      - developer-portal.local
+
+file_server_service:
+  type: ClusterIP
+  annotations: {}
+  port: 8080
 
 resources: {}
   # We usually recommend not to specify default resources and to leave this as a conscious
@@ -513,5 +554,19 @@ developer_portal_configuration:
   database:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     max_open_conns: 30
+    max_idle_time: 30s
+    timeout: 5s
+
+file_server_configuration:
+  server:
+    listen:
+      host: "0.0.0.0"
+      port: 8080
+  log:
+    level: warn
+    output: stderr
+  database:
+    dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
+    max_open_conns: 10
     max_idle_time: 30s
     timeout: 5s

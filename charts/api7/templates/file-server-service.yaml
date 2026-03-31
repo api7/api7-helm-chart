@@ -1,0 +1,23 @@
+{{- if .Values.file_server.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-file-server
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "api7ee3.labels" . | nindent 4 }}
+  {{- with .Values.file_server_service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.file_server_service.type }}
+  ports:
+    - port: {{ .Values.file_server_service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    {{- include "api7ee3.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: file-server
+{{- end }}

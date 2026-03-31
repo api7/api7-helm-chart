@@ -221,6 +221,33 @@ A Helm chart for Kubernetes
 | dp_manager_service.tlsNodePort | int | `nil` | The nodePort for HTTPS service, only used if dp_manager_service.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | dp_manager_service.tlsPort | int | `7943` |  |
 | dp_manager_service.type | string | `"ClusterIP"` |  |
+| file_server.enabled | bool | `false` |  |
+| file_server.extraEnvVars | list | `[]` |  |
+| file_server.extraVolumeMounts | list | `[]` |  |
+| file_server.extraVolumes | list | `[]` |  |
+| file_server.image.pullPolicy | string | `"Always"` |  |
+| file_server.image.repository | string | `"api7/api7-ee-file-server"` |  |
+| file_server.image.tag | string | `"v3.9.7"` |  |
+| file_server.livenessProbe.failureThreshold | int | `3` |  |
+| file_server.livenessProbe.initialDelaySeconds | int | `10` |  |
+| file_server.livenessProbe.periodSeconds | int | `3` |  |
+| file_server.podLabels | object | `{}` |  |
+| file_server.readinessProbe.failureThreshold | int | `3` |  |
+| file_server.readinessProbe.initialDelaySeconds | int | `5` |  |
+| file_server.readinessProbe.periodSeconds | int | `3` |  |
+| file_server.replicaCount | int | `1` |  |
+| file_server.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
+| file_server_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
+| file_server_configuration.database.max_idle_time | string | `"30s"` |  |
+| file_server_configuration.database.max_open_conns | int | `10` |  |
+| file_server_configuration.database.timeout | string | `"5s"` |  |
+| file_server_configuration.log.level | string | `"warn"` |  |
+| file_server_configuration.log.output | string | `"stderr"` |  |
+| file_server_configuration.server.listen.host | string | `"0.0.0.0"` |  |
+| file_server_configuration.server.listen.port | int | `8080` |  |
+| file_server_service.annotations | object | `{}` |  |
+| file_server_service.port | int | `8080` |  |
+| file_server_service.type | string | `"ClusterIP"` |  |
 | fullnameOverride | string | `""` |  |
 | global.storageClass | string | `""` |  |
 | imagePullSecret | string | `""` |  |

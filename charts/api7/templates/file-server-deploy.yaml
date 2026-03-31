@@ -1,0 +1,106 @@
+{{- if .Values.file_server.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-file-server
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "api7ee3.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.file_server.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "api7ee3.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: file-server
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/file-server-configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "api7ee3.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: file-server
+        {{- if .Values.file_server.podLabels }}
+        {{- range $key, $value := $.Values.file_server.podLabels }}
+        {{ $key }}: {{ $value | quote }}
+        {{- end }}
+        {{- end }}
+    spec:
+      {{- if .Values.imagePullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecret }}
+      {{- end }}
+      serviceAccountName: {{ include "api7ee3.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "api7ee3.fullname" . }}-file-server-config
+      {{- if .Values.file_server.extraVolumes }}
+      {{- include "api7ee3.tplvalues.render" (dict "value" .Values.file_server.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: file-server
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.file_server.image.repository }}:{{ .Values.file_server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.file_server.image.pullPolicy }}
+          command:
+            - /usr/local/api7/api7-ee-file-server
+            - -c
+            - /api7-ee/config.yaml
+          ports:
+            - name: http
+              containerPort: {{ .Values.file_server_configuration.server.listen.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: {{ .Values.file_server.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.file_server.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.file_server.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: {{ .Values.file_server.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.file_server.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.file_server.readinessProbe.failureThreshold }}
+          volumeMounts:
+            - name: config
+              mountPath: /api7-ee
+          {{- if .Values.file_server.extraVolumeMounts }}
+          {{- include "api7ee3.tplvalues.render" (dict "value" .Values.file_server.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- if .Values.file_server.resources }}
+            {{- toYaml .Values.file_server.resources | nindent 12 }}
+            {{- else }}
+            {{- toYaml .Values.resources | nindent 12 }}
+            {{- end }}
+          env:
+          {{- if .Values.file_server.extraEnvVars }}
+          {{- include "api7ee3.tplvalues.render" (dict "value" .Values.file_server.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with or .Values.file_server.topologySpreadConstraints .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- tpl (. | toYaml) $ | nindent 8 }}
+      {{- end }}
+{{- end }}
