@@ -208,6 +208,7 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.server.tls.host | string | `"0.0.0.0"` |  |
 | dp_manager_configuration.server.tls.port | int | `7943` |  |
 | dp_manager_service.annotations | object | `{}` |  |
+| dp_manager_service.autoAssignNodePort | bool | `false` | Whether to set nodePort to the same value as the HTTP/HTTPS port when dp_manager_service.type is NodePort, make sure the nodePort to be in the valid NodePort range of kubernetes service. |
 | dp_manager_service.ingress.annotations | object | `{}` |  |
 | dp_manager_service.ingress.className | string | `""` |  |
 | dp_manager_service.ingress.enabled | bool | `false` |  |
@@ -215,7 +216,9 @@ A Helm chart for Kubernetes
 | dp_manager_service.ingress.hosts[0].paths[0].path | string | `"/"` |  |
 | dp_manager_service.ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
 | dp_manager_service.ingress.tls | list | `[]` |  |
+| dp_manager_service.nodePort | int | `nil` | The nodePort for HTTP service, only used if dp_manager_service.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | dp_manager_service.port | int | `7900` |  |
+| dp_manager_service.tlsNodePort | int | `nil` | The nodePort for HTTPS service, only used if dp_manager_service.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | dp_manager_service.tlsPort | int | `7943` |  |
 | dp_manager_service.type | string | `"ClusterIP"` |  |
 | fullnameOverride | string | `""` |  |

@@ -19,10 +19,24 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if eq .Values.dp_manager_service.type "NodePort" }}
+      {{- if .Values.dp_manager_service.autoAssignNodePort }}
+      nodePort: {{ .Values.dp_manager_service.port }}
+      {{- else if .Values.dp_manager_service.nodePort }}
+      nodePort: {{ .Values.dp_manager_service.nodePort }}
+      {{- end }}
+      {{- end }}
     - port: {{ .Values.dp_manager_service.tlsPort }}
       targetPort: https
       protocol: TCP
       name: https
+      {{- if eq .Values.dp_manager_service.type "NodePort" }}
+      {{- if .Values.dp_manager_service.autoAssignNodePort }}
+      nodePort: {{ .Values.dp_manager_service.tlsPort }}
+      {{- else if .Values.dp_manager_service.tlsNodePort }}
+      nodePort: {{ .Values.dp_manager_service.tlsNodePort }}
+      {{- end }}
+      {{- end }}
 
   selector:
     {{- include "api7ee3.selectorLabels" . | nindent 4 }}
