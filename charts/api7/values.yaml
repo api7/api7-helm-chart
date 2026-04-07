@@ -89,8 +89,8 @@ file_server:
   replicaCount: 1
   image:
     repository: api7/api7-ee-file-server
-    pullPolicy: IfNotPresent
-    tag: "dev"
+    pullPolicy: Always
+    tag: "v3.9.8"
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 3
