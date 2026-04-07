@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.49](https://img.shields.io/badge/Version-0.17.49-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.8](https://img.shields.io/badge/AppVersion-3.9.8-informational?style=flat-square)
+![Version: 0.17.50](https://img.shields.io/badge/Version-0.17.50-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.8](https://img.shields.io/badge/AppVersion-3.9.8-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -222,9 +222,9 @@ A Helm chart for Kubernetes
 | dp_manager_service.tlsPort | int | `7943` |  |
 | dp_manager_service.type | string | `"ClusterIP"` |  |
 | file_server.enabled | bool | `false` |  |
-| file_server.image.pullPolicy | string | `"IfNotPresent"` |  |
+| file_server.image.pullPolicy | string | `"Always"` |  |
 | file_server.image.repository | string | `"api7/api7-ee-file-server"` |  |
-| file_server.image.tag | string | `"dev"` |  |
+| file_server.image.tag | string | `"v3.9.8"` |  |
 | file_server.livenessProbe.failureThreshold | int | `10` |  |
 | file_server.livenessProbe.initialDelaySeconds | int | `60` |  |
 | file_server.livenessProbe.periodSeconds | int | `3` |  |
