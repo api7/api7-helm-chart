@@ -1,0 +1,87 @@
+{{- if .Values.file_server.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-file-server
+  namespace: {{ .Release.Namespace | quote }}
+  labels:
+    {{- include "api7ee3.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.file_server.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "api7ee3.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: file-server
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/file-server-configmap.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "api7ee3.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: file-server
+    spec:
+      {{- if .Values.imagePullSecret }}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecret }}
+      {{- end }}
+      serviceAccountName: {{ include "api7ee3.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "api7ee3.fullname" . }}-file-server-config
+      containers:
+        - name: file-server
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.file_server.image.repository }}:{{ .Values.file_server.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.file_server.image.pullPolicy }}
+          command:
+            - /usr/local/api7/api7-ee-file-server
+          args:
+            - -c
+            - /usr/local/api7/conf/config.yaml
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: {{ .Values.file_server.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.file_server.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.file_server.livenessProbe.failureThreshold }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: {{ .Values.file_server.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.file_server.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.file_server.readinessProbe.failureThreshold }}
+          volumeMounts:
+            - name: config
+              mountPath: /usr/local/api7/conf
+          resources:
+            {{- if .Values.file_server.resources }}
+            {{- toYaml .Values.file_server.resources | nindent 12 }}
+            {{- else }}
+            {{- toYaml .Values.resources | nindent 12 }}
+            {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+{{- end }}
