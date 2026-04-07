@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.7"
+    tag: "v3.9.8"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -54,7 +54,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
   # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.7"
+    tag: "v3.9.8"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -84,6 +84,22 @@ dp_manager:
     periodSeconds: 3
     failureThreshold: 3
 
+file_server:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: api7/api7-ee-file-server
+    pullPolicy: IfNotPresent
+    tag: "dev"
+  livenessProbe:
+    initialDelaySeconds: 60
+    periodSeconds: 3
+    failureThreshold: 10
+  readinessProbe:
+    initialDelaySeconds: 10
+    periodSeconds: 3
+    failureThreshold: 3
+
 developer_portal:
   replicaCount: 1
   # Specifies the name of Secret for developer portal TLS configuration, and files store under /app/certs directory
@@ -92,7 +108,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.7"
+    tag: "v3.9.8"
 
   extraEnvVars: []
   extraVolumes: []
@@ -197,6 +213,10 @@ dp_manager_service:
     #  - secretName: dp-manager-tls
     #    hosts:
     #      - dp-manager.local
+
+file_server_service:
+  type: ClusterIP
+  port: 8080
 
 developer_portal_service:
   type: ClusterIP
@@ -356,6 +376,7 @@ dashboard_configuration:
     #   database:
     #     mount_path: "database"
     #     role: "api7ee"
+    #     role_type: "dynamic" # "dynamic" (default) or "static"
     #   tls:
     #     ca_cert: ""
     #     insecure: false
@@ -474,6 +495,7 @@ dp_manager_configuration:
     #   database:
     #     mount_path: "database"
     #     role: "api7ee"
+    #     role_type: "dynamic" # "dynamic" (default) or "static"
     #   tls:
     #     ca_cert: ""
     #     insecure: false
@@ -552,6 +574,16 @@ developer_portal_configuration:
     #   database:
     #     mount_path: "database"
     #     role: "api7ee"
+    #     role_type: "dynamic" # "dynamic" (default) or "static"
     #   tls:
     #     ca_cert: ""
     #     insecure: false
+
+file_server_configuration:
+  file_server:
+    listen: "0.0.0.0:8080"
+  log:
+    level: warn
+    output: stderr
+  database:
+    dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"

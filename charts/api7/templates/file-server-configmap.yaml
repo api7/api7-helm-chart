@@ -1,0 +1,10 @@
+{{- if .Values.file_server.enabled }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ include "api7ee3.fullname" . }}-file-server-config
+  namespace: {{ .Release.Namespace | quote }}
+data:
+  config.yaml: |
+  {{- toYaml .Values.file_server_configuration | nindent 4 }}
+{{- end }}
