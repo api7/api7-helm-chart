@@ -30,7 +30,7 @@ The following table lists the key configurable parameters. See `values.yaml` for
 | Parameter | Description | Default |
 |-----------|-------------|---------|
 | `image.repository` | AISIX image repository | `ghcr.io/api7/aisix` |
-| `image.tag` | AISIX image tag | `0.1` |
+| `image.tag` | AISIX image tag | `0.1.0` |
 | `replicaCount` | Number of replicas | `1` |
 | `deployment.admin.adminKey` | Admin API key list | `[{key: "changeme"}]` |
 | `deployment.admin.existingSecret` | Existing Secret for admin key | `""` |
