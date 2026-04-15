@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aisix.fullname" . }}-proxy
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "aisix.labels" . | nindent 4 }}
+    app.kubernetes.io/service: aisix-proxy
+  {{- with .Values.proxyService.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.proxyService.type }}
+  {{- if or (eq .Values.proxyService.type "NodePort") (eq .Values.proxyService.type "LoadBalancer") }}
+  externalTrafficPolicy: {{ .Values.proxyService.externalTrafficPolicy }}
+  {{- end }}
+  {{- if gt (len .Values.proxyService.externalIPs) 0 }}
+  externalIPs:
+    {{- range .Values.proxyService.externalIPs }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+  ports:
+    - name: proxy
+      port: {{ .Values.proxyService.port }}
+      targetPort: proxy
+      protocol: TCP
+      {{- if and (eq .Values.proxyService.type "NodePort") (not (empty .Values.proxyService.nodePort)) }}
+      nodePort: {{ .Values.proxyService.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "aisix.selectorLabels" . | nindent 4 }}
