@@ -1,0 +1,20 @@
+apiVersion: v2
+name: aisix
+description: A Helm chart for AISIX AI Gateway
+
+type: application
+
+version: 0.1.0
+
+appVersion: "0.1"
+
+maintainers:
+  - name: API7
+    email: support@api7.ai
+    url: https://api7.ai
+
+dependencies:
+  - name: etcd
+    version: 8.7.7
+    repository: https://charts.bitnami.com/bitnami
+    condition: etcd.enabled

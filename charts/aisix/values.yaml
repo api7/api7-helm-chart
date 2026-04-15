@@ -1,0 +1,187 @@
+global:
+  # e.g.
+  # imagePullSecrets:
+  #   - my-registry-secrets
+  # -- Global Docker registry secret names as an array
+  imagePullSecrets: []
+
+image:
+  # -- AISIX image repository
+  repository: ghcr.io/api7/aisix
+  # -- AISIX image pull policy
+  pullPolicy: IfNotPresent
+  # -- AISIX image tag; overrides the chart appVersion
+  tag: "0.1"
+
+# -- Number of AISIX replicas
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: false
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  name: ""
+
+# -- Annotations to add to the pod
+podAnnotations: {}
+# -- Labels to add to the pod
+podLabels: {}
+# -- Set the securityContext for AISIX pods
+podSecurityContext: {}
+# -- Set the securityContext for AISIX container
+securityContext: {}
+
+# -- Set pod resource requests & limits
+resources: {}
+  # limits:
+  #   cpu: 500m
+  #   memory: 512Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# -- Node labels for pod assignment
+nodeSelector: {}
+# -- List of node taints to tolerate
+tolerations: []
+# -- Set affinity for deploy
+affinity: {}
+
+updateStrategy: {}
+  # type: RollingUpdate
+
+autoscaling:
+  enabled: false
+  # -- HPA version, the value is "v2" or "v2beta1", default "v2"
+  version: v2
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# -- Additional volumes
+extraVolumes: []
+# -- Additional volume mounts
+extraVolumeMounts: []
+# -- Additional init containers
+extraInitContainers: []
+
+# -- Additional environment variables
+extraEnvVars: []
+extraEnvVarsCM: ""
+extraEnvVarsSecret: ""
+
+# -- timezone for the container, e.g. "UTC" or "Asia/Shanghai"
+timezone: ""
+
+# AISIX deployment configuration — rendered into /etc/aisix/config.yaml
+deployment:
+  etcd:
+    # -- List of etcd hosts. Ignored when etcd.enabled is true (auto-constructed).
+    host:
+      - "http://etcd.host:2379"
+    # -- Key prefix used by aisix in etcd
+    prefix: /aisix
+    # -- etcd request timeout in seconds
+    timeout: 30
+  admin:
+    # -- Admin API key(s). Each entry must have a `key` field.
+    # IMPORTANT: change this before deploying to production.
+    adminKey:
+      - key: "changeme"
+    # -- Name of an existing Secret that contains an `admin-key` field.
+    # If set, adminKey above is ignored and the key is read from the Secret.
+    existingSecret: ""
+    # -- Key inside the existing Secret that holds the admin key value
+    existingSecretKey: "admin-key"
+
+server:
+  proxy:
+    # -- Proxy API listen address (host:port inside the container)
+    listen: "0.0.0.0:3000"
+    tls:
+      # -- Enable TLS for the proxy port
+      enabled: false
+      # -- Certificate file path (must be present in the container)
+      certFile: "cert.pem"
+      # -- Key file path (must be present in the container)
+      keyFile: "key.pem"
+  admin:
+    # -- Admin API listen address. Use 0.0.0.0:3001 to allow in-cluster access.
+    listen: "0.0.0.0:3001"
+
+# Proxy Service (port 3000) — user traffic
+proxyService:
+  # -- Service type: ClusterIP, NodePort, or LoadBalancer
+  type: NodePort
+  # -- Service port
+  port: 3000
+  # -- Container port
+  containerPort: 3000
+  # -- Optional static nodePort (only relevant when type is NodePort)
+  nodePort: ""
+  # -- externalTrafficPolicy (for NodePort / LoadBalancer)
+  externalTrafficPolicy: Cluster
+  externalIPs: []
+  annotations: {}
+
+# Admin Service (port 3001) — management UI and Admin API
+adminService:
+  # -- Service type: ClusterIP recommended for security
+  type: ClusterIP
+  # -- Service port
+  port: 3001
+  # -- Container port
+  containerPort: 3001
+  annotations: {}
+
+# -- Kubernetes liveness probe override
+livenessProbe: {}
+# -- Kubernetes readiness probe override
+readinessProbe: {}
+
+# -- Ingress for the proxy service
+ingress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: aisix.local
+      paths: []
+  tls: []
+
+# -- Ingress for the admin service
+adminIngress:
+  enabled: false
+  annotations: {}
+  hosts:
+    - host: aisix-admin.local
+      paths:
+        - "/ui"
+        - "/aisix/admin"
+  tls: []
+
+# -- etcd subchart (bitnami/etcd)
+etcd:
+  # -- Install etcd as a subchart. Set false to use an external etcd.
+  enabled: true
+  image:
+    repository: bitnami/etcd
+  auth:
+    rbac:
+      create: false
+      rootPassword: ""
+    tls:
+      enabled: false
+      existingSecret: ""
+      certFilename: ""
+      certKeyFilename: ""
+      verify: false
+      sni: ""
+  service:
+    port: 2379
+  replicaCount: 1
