@@ -11,7 +11,7 @@ image:
   # -- AISIX image pull policy
   pullPolicy: IfNotPresent
   # -- AISIX image tag; overrides the chart appVersion
-  tag: "0.1"
+  tag: "0.1.0"
 
 # -- Number of AISIX replicas
 replicaCount: 1
