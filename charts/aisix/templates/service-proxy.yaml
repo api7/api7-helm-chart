@@ -1,33 +1,33 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "aisix.fullname" . }}-proxy
+  name: {{ include "aisix.fullname" . }}-gateway
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "aisix.labels" . | nindent 4 }}
-    app.kubernetes.io/service: aisix-proxy
-  {{- with .Values.proxyService.annotations }}
+    app.kubernetes.io/service: aisix-gateway
+  {{- with .Values.gateway.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.proxyService.type }}
-  {{- if or (eq .Values.proxyService.type "NodePort") (eq .Values.proxyService.type "LoadBalancer") }}
-  externalTrafficPolicy: {{ .Values.proxyService.externalTrafficPolicy }}
+  type: {{ .Values.gateway.type }}
+  {{- if or (eq .Values.gateway.type "NodePort") (eq .Values.gateway.type "LoadBalancer") }}
+  externalTrafficPolicy: {{ .Values.gateway.externalTrafficPolicy }}
   {{- end }}
-  {{- if gt (len .Values.proxyService.externalIPs) 0 }}
+  {{- if gt (len .Values.gateway.externalIPs) 0 }}
   externalIPs:
-    {{- range .Values.proxyService.externalIPs }}
+    {{- range .Values.gateway.externalIPs }}
     - {{ . }}
     {{- end }}
   {{- end }}
   ports:
     - name: proxy
-      port: {{ .Values.proxyService.port }}
+      port: {{ .Values.gateway.servicePort }}
       targetPort: proxy
       protocol: TCP
-      {{- if and (eq .Values.proxyService.type "NodePort") (not (empty .Values.proxyService.nodePort)) }}
-      nodePort: {{ .Values.proxyService.nodePort }}
+      {{- if and (eq .Values.gateway.type "NodePort") (not (empty .Values.gateway.nodePort)) }}
+      nodePort: {{ .Values.gateway.nodePort }}
       {{- end }}
   selector:
     {{- include "aisix.selectorLabels" . | nindent 4 }}

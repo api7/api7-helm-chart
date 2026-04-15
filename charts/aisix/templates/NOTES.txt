@@ -2,32 +2,36 @@ AISIX has been installed. Check its status by running:
   kubectl --namespace {{ .Release.Namespace }} get pods -l "app.kubernetes.io/name={{ include "aisix.name" . }}"
 
 1. Get the Proxy API URL:
-{{- if .Values.ingress.enabled }}
-{{- range .Values.ingress.hosts }}
-  http{{ if $.Values.ingress.tls }}s{{ end }}://{{ .host }}
+{{- if .Values.gateway.ingress.enabled }}
+{{- range .Values.gateway.ingress.hosts }}
+  http{{ if $.Values.gateway.ingress.tls }}s{{ end }}://{{ .host }}
 {{- end }}
-{{- else if eq .Values.proxyService.type "NodePort" }}
-  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "aisix.fullname" . }}-proxy)
+{{- else if eq .Values.gateway.type "NodePort" }}
+  export NODE_PORT=$(kubectl get --namespace {{ .Release.Namespace }} -o jsonpath="{.spec.ports[0].nodePort}" services {{ include "aisix.fullname" . }}-gateway)
   export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
   echo "Proxy API: http://$NODE_IP:$NODE_PORT"
-{{- else if eq .Values.proxyService.type "LoadBalancer" }}
+{{- else if eq .Values.gateway.type "LoadBalancer" }}
   NOTE: It may take a few minutes for the LoadBalancer IP to be available.
-  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "aisix.fullname" . }}-proxy --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
-  echo "Proxy API: http://$SERVICE_IP:{{ .Values.proxyService.port }}"
+  export SERVICE_IP=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "aisix.fullname" . }}-gateway --template "{{"{{ range (index .status.loadBalancer.ingress 0) }}{{.}}{{ end }}"}}")
+  echo "Proxy API: http://$SERVICE_IP:{{ .Values.gateway.servicePort }}"
 {{- else }}
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "aisix.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3000:{{ .Values.proxyService.containerPort }}
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3000:{{ .Values.gateway.containerPort }}
   echo "Proxy API: http://127.0.0.1:3000"
 {{- end }}
 
 2. Get the Admin UI URL:
-{{- if .Values.adminIngress.enabled }}
-{{- range .Values.adminIngress.hosts }}
-  http{{ if $.Values.adminIngress.tls }}s{{ end }}://{{ .host }}/ui
+{{- if .Values.admin.enabled }}
+{{- if .Values.admin.ingress.enabled }}
+{{- range .Values.admin.ingress.hosts }}
+  http{{ if $.Values.admin.ingress.tls }}s{{ end }}://{{ .host }}/ui
 {{- end }}
 {{- else }}
   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "aisix.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3001:{{ .Values.adminService.containerPort }}
+  kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 3001:{{ .Values.admin.containerPort }}
   echo "Admin UI:  http://127.0.0.1:3001/ui"
   echo "Admin API: http://127.0.0.1:3001/aisix/admin"
+{{- end }}
+{{- else }}
+  Admin service is disabled. Enable it with --set admin.enabled=true
 {{- end }}

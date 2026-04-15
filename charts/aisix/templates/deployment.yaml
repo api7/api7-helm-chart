@@ -51,11 +51,13 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: proxy
-              containerPort: {{ .Values.proxyService.containerPort }}
+              containerPort: {{ .Values.gateway.containerPort }}
               protocol: TCP
+            {{- if .Values.admin.enabled }}
             - name: admin
-              containerPort: {{ .Values.adminService.containerPort }}
+              containerPort: {{ .Values.admin.containerPort }}
               protocol: TCP
+            {{- end }}
           {{- if .Values.livenessProbe }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
