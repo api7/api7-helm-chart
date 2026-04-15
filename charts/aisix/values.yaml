@@ -168,20 +168,28 @@ adminIngress:
 # -- etcd subchart (bitnami/etcd)
 etcd:
   # -- Install etcd as a subchart. Set false to use an external etcd.
-  enabled: true
+  enabled: false
   image:
     repository: api7/etcd
   auth:
     rbac:
+      # -- No authentication by default. Switch to enable RBAC authentication
       create: false
+      # -- root password for etcd. Requires etcd.auth.rbac.create to be true.
       rootPassword: ""
     tls:
+      # -- enable etcd client certificate
       enabled: false
+      # -- name of the secret contains etcd client cert
       existingSecret: ""
+      # -- etcd client cert filename using in etcd.auth.tls.existingSecret
       certFilename: ""
+      # -- etcd client cert key filename using in etcd.auth.tls.existingSecret
       certKeyFilename: ""
+      # -- whether to verify the etcd endpoint certificate when setup a TLS connection to etcd
       verify: false
+      # -- specify the TLS Server Name Indication extension, the ETCD endpoint hostname will be used when this setting is unset.
       sni: ""
   service:
     port: 2379
-  replicaCount: 1
+  replicaCount: 3
