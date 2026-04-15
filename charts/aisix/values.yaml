@@ -170,7 +170,7 @@ etcd:
   # -- Install etcd as a subchart. Set false to use an external etcd.
   enabled: true
   image:
-    repository: bitnami/etcd
+    repository: api7/etcd
   auth:
     rbac:
       create: false
