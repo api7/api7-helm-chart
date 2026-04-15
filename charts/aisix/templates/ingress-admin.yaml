@@ -1,4 +1,4 @@
-{{- if .Values.adminIngress.enabled -}}
+{{- if and .Values.admin.enabled .Values.admin.ingress.enabled -}}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -6,17 +6,17 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     {{- include "aisix.labels" . | nindent 4 }}
-  {{- with .Values.adminIngress.annotations }}
+  {{- with .Values.admin.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  {{- if .Values.adminIngress.tls }}
+  {{- if .Values.admin.ingress.tls }}
   tls:
-    {{- toYaml .Values.adminIngress.tls | nindent 4 }}
+    {{- toYaml .Values.admin.ingress.tls | nindent 4 }}
   {{- end }}
   rules:
-    {{- range .Values.adminIngress.hosts }}
+    {{- range .Values.admin.ingress.hosts }}
     - host: {{ .host | quote }}
       http:
         paths:
@@ -27,7 +27,7 @@ spec:
               service:
                 name: {{ include "aisix.fullname" $ }}-admin
                 port:
-                  number: {{ $.Values.adminService.port }}
+                  number: {{ $.Values.admin.servicePort }}
           {{- end }}
     {{- end }}
 {{- end }}

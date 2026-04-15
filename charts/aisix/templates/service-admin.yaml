@@ -1,3 +1,4 @@
+{{- if .Values.admin.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -6,16 +7,17 @@ metadata:
   labels:
     {{- include "aisix.labels" . | nindent 4 }}
     app.kubernetes.io/service: aisix-admin
-  {{- with .Values.adminService.annotations }}
+  {{- with .Values.admin.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
   {{- end }}
 spec:
-  type: {{ .Values.adminService.type }}
+  type: {{ .Values.admin.type }}
   ports:
     - name: admin
-      port: {{ .Values.adminService.port }}
+      port: {{ .Values.admin.servicePort }}
       targetPort: admin
       protocol: TCP
   selector:
     {{- include "aisix.selectorLabels" . | nindent 4 }}
+{{- end }}

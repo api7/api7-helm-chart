@@ -23,10 +23,8 @@ data:
 
     server:
       proxy:
-        listen: {{ .Values.server.proxy.listen | quote }}
+        listen: "{{ .Values.gateway.ip }}:{{ .Values.gateway.containerPort }}"
         tls:
-          enabled: {{ .Values.server.proxy.tls.enabled }}
-          cert_file: {{ .Values.server.proxy.tls.certFile | quote }}
-          key_file: {{ .Values.server.proxy.tls.keyFile | quote }}
+          enabled: false
       admin:
-        listen: {{ .Values.server.admin.listen | quote }}
+        listen: "{{ .Values.admin.ip }}:{{ .Values.admin.containerPort }}"
