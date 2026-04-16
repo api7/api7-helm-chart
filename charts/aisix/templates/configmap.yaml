@@ -15,11 +15,7 @@ data:
         timeout: {{ .Values.deployment.etcd.timeout }}
       admin:
         admin_key:
-          {{- if .Values.deployment.admin.existingSecret }}
           - key: "{{"{{"}}AISIX_ADMIN_KEY{{"}}"}}"
-          {{- else }}
-          {{- toYaml .Values.deployment.admin.adminKey | nindent 10 }}
-          {{- end }}
 
     server:
       proxy:
