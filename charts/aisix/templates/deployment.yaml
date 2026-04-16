@@ -30,7 +30,9 @@ spec:
     spec:
       {{- with .Values.global.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+        {{- range $.Values.global.imagePullSecrets }}
+        - name: {{ . }}
+        {{- end }}
       {{- end }}
       serviceAccountName: {{ include "aisix.serviceAccountName" . }}
       {{- with .Values.podSecurityContext }}
@@ -77,20 +79,29 @@ spec:
             {{- end }}
             - name: RUST_LOG
               value: "info"
-            {{- if .Values.deployment.admin.existingSecret }}
             - name: AISIX_ADMIN_KEY
               valueFrom:
                 secretKeyRef:
+                  {{- if .Values.deployment.admin.existingSecret }}
                   name: {{ .Values.deployment.admin.existingSecret }}
                   key: {{ .Values.deployment.admin.existingSecretKey }}
-            {{- end }}
+                  {{- else }}
+                  name: {{ include "aisix.fullname" . }}-admin-key
+                  key: admin-key
+                  {{- end }}
             {{- with .Values.extraEnvVars }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
-          {{- if .Values.extraEnvVarsCM }}
+          {{- if or .Values.extraEnvVarsCM .Values.extraEnvVarsSecret }}
           envFrom:
+            {{- if .Values.extraEnvVarsCM }}
             - configMapRef:
                 name: {{ .Values.extraEnvVarsCM }}
+            {{- end }}
+            {{- if .Values.extraEnvVarsSecret }}
+            - secretRef:
+                name: {{ .Values.extraEnvVarsSecret }}
+            {{- end }}
           {{- end }}
           volumeMounts:
             - name: aisix-config

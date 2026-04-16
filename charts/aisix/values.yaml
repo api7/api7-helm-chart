@@ -90,11 +90,11 @@ deployment:
     # -- etcd request timeout in seconds
     timeout: 30
   admin:
-    # -- Admin API key(s). Each entry must have a `key` field.
-    # IMPORTANT: change this before deploying to production.
+    # -- Admin API key. Used to create an internal Secret when existingSecret is not set.
+    # WARNING: change this before deploying to production.
     adminKey:
       - key: "changeme"
-    # -- Name of an existing Secret that contains an `admin-key` field.
+    # -- Name of an existing Secret that contains an admin key field.
     # If set, adminKey above is ignored and the key is read from the Secret.
     existingSecret: ""
     # -- Key inside the existing Secret that holds the admin key value
@@ -126,7 +126,8 @@ gateway:
       # kubernetes.io/tls-acme: "true"
     hosts:
       - host: aisix.local
-        paths: []
+        paths:
+          - "/"
     tls: []
 
 # -- AISIX admin service settings (port 3001) — Admin API and UI
@@ -169,7 +170,8 @@ etcd:
     repository: api7/etcd
   auth:
     rbac:
-      # -- No authentication by default. Switch to enable RBAC authentication
+      # -- No authentication by default. Enable RBAC (set create: true and configure rootPassword)
+      # for production or multi-tenant clusters to prevent unauthenticated etcd access.
       create: false
       # -- root password for etcd. Requires etcd.auth.rbac.create to be true.
       rootPassword: ""
