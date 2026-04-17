@@ -680,6 +680,24 @@ soapProxy:
     # -- SOAP proxy image pull policy
     pullPolicy: IfNotPresent
 
+openapiToMcp:
+  # -- Enable or disable the OpenAPI-to-MCP sidecar. Required when using the
+  # `openapi-to-mcp` or `mcp-tools-acl` plugins. The container runs alongside
+  # the gateway in the same pod and is reached on 127.0.0.1.
+  enabled: false
+  image:
+    # -- OpenAPI-to-MCP image repository
+    repository: api7/openapi-to-mcp
+    # -- OpenAPI-to-MCP image tag
+    tag: 0.0.1-beta
+    # -- OpenAPI-to-MCP image pull policy
+    pullPolicy: IfNotPresent
+  # -- Port that the sidecar listens on. Must match the `port` configured under
+  # `plugin_attr.openapi-to-mcp` in the gateway config (defaults to 3000).
+  port: 3000
+  # -- Resources for the OpenAPI-to-MCP sidecar container.
+  resources: {}
+
 control:
   # -- Enable Control API
   enabled: true

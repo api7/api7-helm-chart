@@ -231,6 +231,12 @@ The command removes all the Kubernetes components associated with the chart and 
 | nginx.workerProcesses | string | `"auto"` |  |
 | nginx.workerRlimitNofile | string | `"20480"` |  |
 | nginx.workerShutdownTimeout | string | `"240s"` |  |
+| openapiToMcp.enabled | bool | `false` | Enable or disable the OpenAPI-to-MCP sidecar. Required when using the `openapi-to-mcp` or `mcp-tools-acl` plugins. The container runs alongside the gateway in the same pod and is reached on 127.0.0.1. |
+| openapiToMcp.image.pullPolicy | string | `"IfNotPresent"` | OpenAPI-to-MCP image pull policy |
+| openapiToMcp.image.repository | string | `"api7/openapi-to-mcp"` | OpenAPI-to-MCP image repository |
+| openapiToMcp.image.tag | string | `"0.0.1-beta"` | OpenAPI-to-MCP image tag |
+| openapiToMcp.port | int | `3000` | Port that the sidecar listens on. Must match the `port` configured under `plugin_attr.openapi-to-mcp` in the gateway config (defaults to 3000). |
+| openapiToMcp.resources | object | `{}` | Resources for the OpenAPI-to-MCP sidecar container. |
 | pluginAttrs | object | `{}` | Set APISIX plugin attributes, see [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L376) for more details |
 | rbac.create | bool | `false` |  |
 | serviceAccount.annotations | object | `{}` |  |
