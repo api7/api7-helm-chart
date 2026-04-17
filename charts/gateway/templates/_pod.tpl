@@ -230,8 +230,9 @@ spec:
     {{- end }}
     {{- if .Values.openapiToMcp.enabled }}
     {{- $mcpAttr := (index .Values.pluginAttrs "openapi-to-mcp" | default dict) -}}
-    {{- if and (hasKey $mcpAttr "port") (ne (int (index $mcpAttr "port")) (int .Values.openapiToMcp.port)) -}}
-    {{- fail (printf "openapiToMcp.port (%v) must match pluginAttrs.openapi-to-mcp.port (%v)" .Values.openapiToMcp.port (index $mcpAttr "port")) -}}
+    {{- $pluginMcpPort := (index $mcpAttr "port" | default 3000 | int) -}}
+    {{- if ne $pluginMcpPort (int .Values.openapiToMcp.port) -}}
+    {{- fail (printf "openapiToMcp.port (%v) must match pluginAttrs.openapi-to-mcp.port (%v; default 3000)" .Values.openapiToMcp.port $pluginMcpPort) -}}
     {{- end }}
     - name: openapi-to-mcp
       image: {{ .Values.openapiToMcp.image.repository }}:{{ .Values.openapiToMcp.image.tag }}
