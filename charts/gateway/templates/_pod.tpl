@@ -243,35 +243,24 @@ spec:
       - containerPort: {{ .Values.openapiToMcp.port }}
         name: http
         protocol: TCP
-      # The OpenAPI2MCP server binds to 127.0.0.1 inside the container, so
-      # httpGet / tcpSocket probes (which kubelet runs against the pod IP)
-      # cannot reach it. Use an exec probe via the bundled node binary.
       readinessProbe:
+        httpGet:
+          path: /health
+          port: {{ .Values.openapiToMcp.port }}
         failureThreshold: 6
         initialDelaySeconds: 5
         periodSeconds: 5
         successThreshold: 1
         timeoutSeconds: 3
-        exec:
-          command:
-          - node
-          - -e
-          - |
-            const http = require('http');
-            http.get({host:'127.0.0.1',port:process.env.SSE_PORT||3000,path:'/health',timeout:2000}, r => process.exit(r.statusCode===200?0:1)).on('error', () => process.exit(1));
       livenessProbe:
+        httpGet:
+          path: /health
+          port: {{ .Values.openapiToMcp.port }}
         failureThreshold: 6
         initialDelaySeconds: 10
         periodSeconds: 10
         successThreshold: 1
         timeoutSeconds: 3
-        exec:
-          command:
-          - node
-          - -e
-          - |
-            const http = require('http');
-            http.get({host:'127.0.0.1',port:process.env.SSE_PORT||3000,path:'/health',timeout:2000}, r => process.exit(r.statusCode===200?0:1)).on('error', () => process.exit(1));
       resources:
       {{- toYaml .Values.openapiToMcp.resources | nindent 8 }}
     {{- end }}
