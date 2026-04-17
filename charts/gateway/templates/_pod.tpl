@@ -229,6 +229,10 @@ spec:
           scheme: HTTP
     {{- end }}
     {{- if .Values.openapiToMcp.enabled }}
+    {{- $mcpAttr := (index .Values.pluginAttrs "openapi-to-mcp" | default dict) -}}
+    {{- if and (hasKey $mcpAttr "port") (ne (int (index $mcpAttr "port")) (int .Values.openapiToMcp.port)) -}}
+    {{- fail (printf "openapiToMcp.port (%v) must match pluginAttrs.openapi-to-mcp.port (%v)" .Values.openapiToMcp.port (index $mcpAttr "port")) -}}
+    {{- end }}
     - name: openapi-to-mcp
       image: {{ .Values.openapiToMcp.image.repository }}:{{ .Values.openapiToMcp.image.tag }}
       imagePullPolicy: {{ .Values.openapiToMcp.image.pullPolicy }}
