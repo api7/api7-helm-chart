@@ -57,8 +57,6 @@ updateStrategy: {}
 
 autoscaling:
   enabled: false
-  # -- HPA version, the value is "v2" or "v2beta1", default "v2"
-  version: v2
   minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
