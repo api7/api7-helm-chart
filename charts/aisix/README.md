@@ -34,7 +34,6 @@ A Helm chart for AISIX AI Gateway
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
-| autoscaling.version | string | `"v2"` | HPA version, the value is "v2" or "v2beta1", default "v2" |
 | deployment.admin.adminKey | list | `[{"key":"changeme"}]` | Admin API key. Used to create an internal Secret when existingSecret is not set. WARNING: change this before deploying to production. |
 | deployment.admin.existingSecret | string | `""` | Name of an existing Secret that contains an admin key field. If set, adminKey above is ignored and the key is read from the Secret. |
 | deployment.admin.existingSecretKey | string | `"admin-key"` | Key inside the existing Secret that holds the admin key value |
