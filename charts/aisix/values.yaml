@@ -89,9 +89,8 @@ deployment:
     timeout: 30
   admin:
     # -- Admin API key. Used to create an internal Secret when existingSecret is not set.
-    # WARNING: change this before deploying to production.
-    adminKey:
-      - key: "changeme"
+    # Required when existingSecret is not set.
+    adminKey: ""
     # -- Name of an existing Secret that contains an admin key field.
     # If set, adminKey above is ignored and the key is read from the Secret.
     existingSecret: ""
@@ -118,6 +117,8 @@ gateway:
   # -- Using ingress access AISIX proxy service
   ingress:
     enabled: false
+    # -- IngressClass that will be be used to implement the Ingress
+    className: ""
     # -- Ingress annotations
     annotations: {}
       # kubernetes.io/ingress.class: nginx
@@ -144,6 +145,8 @@ admin:
   # -- Using ingress access AISIX admin service
   ingress:
     enabled: false
+    # -- IngressClass that will be be used to implement the Ingress
+    className: ""
     # -- Ingress annotations
     annotations: {}
       # kubernetes.io/ingress.class: nginx
