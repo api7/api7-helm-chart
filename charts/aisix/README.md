@@ -1,70 +1,91 @@
-# AISIX Helm Chart
+# aisix
 
-A Helm chart for [AISIX](https://github.com/api7/aisix) — an open-source, high-performance AI Gateway and LLM proxy built in Rust.
+![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
-## Prerequisites
+A Helm chart for AISIX AI Gateway
 
-- Kubernetes 1.21+
-- Helm 3.7+
+## Maintainers
 
-## Installing the Chart
+| Name | Email | Url |
+| ---- | ------ | --- |
+| API7 | <support@api7.ai> | <https://api7.ai> |
 
-```bash
-helm repo add api7 https://charts.api7.ai
-helm repo update
+## Requirements
 
-# Recommended: use an existing Secret for the admin key
-kubectl create secret generic aisix-admin-secret \
-  --from-literal=admin-key=<your-strong-key>
+| Repository | Name | Version |
+|------------|------|---------|
+| https://charts.bitnami.com/bitnami | etcd | 8.7.7 |
 
-helm install my-aisix api7/aisix \
-  --set deployment.admin.existingSecret=aisix-admin-secret
-```
+## Values
 
-## Uninstalling the Chart
+| Key | Type | Default | Description |
+|-----|------|---------|-------------|
+| admin | object | `{"annotations":{},"containerPort":3001,"enabled":true,"ingress":{"annotations":{},"enabled":false,"hosts":[{"host":"aisix-admin.local","paths":["/ui","/aisix/admin"]}],"tls":[]},"ip":"0.0.0.0","servicePort":3001,"type":"ClusterIP"}` | AISIX admin service settings (port 3001) — Admin API and UI |
+| admin.containerPort | int | `3001` | Container port |
+| admin.enabled | bool | `true` | Enable admin service |
+| admin.ingress | object | `{"annotations":{},"enabled":false,"hosts":[{"host":"aisix-admin.local","paths":["/ui","/aisix/admin"]}],"tls":[]}` | Using ingress access AISIX admin service |
+| admin.ingress.annotations | object | `{}` | Ingress annotations |
+| admin.ip | string | `"0.0.0.0"` | which ip to listen on for the admin service |
+| admin.servicePort | int | `3001` | Service port |
+| admin.type | string | `"ClusterIP"` | admin service type |
+| affinity | object | `{}` | Set affinity for deploy |
+| autoscaling.enabled | bool | `false` |  |
+| autoscaling.maxReplicas | int | `10` |  |
+| autoscaling.minReplicas | int | `1` |  |
+| autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
+| autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
+| autoscaling.version | string | `"v2"` | HPA version, the value is "v2" or "v2beta1", default "v2" |
+| deployment.admin.adminKey | list | `[{"key":"changeme"}]` | Admin API key. Used to create an internal Secret when existingSecret is not set. WARNING: change this before deploying to production. |
+| deployment.admin.existingSecret | string | `""` | Name of an existing Secret that contains an admin key field. If set, adminKey above is ignored and the key is read from the Secret. |
+| deployment.admin.existingSecretKey | string | `"admin-key"` | Key inside the existing Secret that holds the admin key value |
+| deployment.etcd.host | list | `["http://etcd.host:2379"]` | List of etcd hosts. Ignored when etcd.enabled is true (auto-constructed). |
+| deployment.etcd.prefix | string | `"/aisix"` | Key prefix used by aisix in etcd |
+| deployment.etcd.timeout | int | `30` | etcd request timeout in seconds |
+| etcd | object | `{"auth":{"rbac":{"create":false,"rootPassword":""},"tls":{"certFilename":"","certKeyFilename":"","enabled":false,"existingSecret":"","sni":"","verify":false}},"enabled":false,"image":{"repository":"api7/etcd"},"replicaCount":3,"service":{"port":2379}}` | etcd subchart (bitnami/etcd) |
+| etcd.auth.rbac.create | bool | `false` | No authentication by default. Enable RBAC (set create: true and configure rootPassword) for production or multi-tenant clusters to prevent unauthenticated etcd access. |
+| etcd.auth.rbac.rootPassword | string | `""` | root password for etcd. Requires etcd.auth.rbac.create to be true. |
+| etcd.auth.tls.certFilename | string | `""` | etcd client cert filename using in etcd.auth.tls.existingSecret |
+| etcd.auth.tls.certKeyFilename | string | `""` | etcd client cert key filename using in etcd.auth.tls.existingSecret |
+| etcd.auth.tls.enabled | bool | `false` | enable etcd client certificate |
+| etcd.auth.tls.existingSecret | string | `""` | name of the secret contains etcd client cert |
+| etcd.auth.tls.sni | string | `""` | specify the TLS Server Name Indication extension, the ETCD endpoint hostname will be used when this setting is unset. |
+| etcd.auth.tls.verify | bool | `false` | whether to verify the etcd endpoint certificate when setup a TLS connection to etcd |
+| etcd.enabled | bool | `false` | Install etcd as a subchart. Set false to use an external etcd. |
+| extraEnvVars | list | `[]` | Additional environment variables |
+| extraEnvVarsCM | string | `""` |  |
+| extraEnvVarsSecret | string | `""` |  |
+| extraInitContainers | list | `[]` | Additional init containers |
+| extraVolumeMounts | list | `[]` | Additional volume mounts |
+| extraVolumes | list | `[]` | Additional volumes |
+| fullnameOverride | string | `""` |  |
+| gateway | object | `{"annotations":{},"containerPort":3000,"externalIPs":[],"externalTrafficPolicy":"Cluster","ingress":{"annotations":{},"enabled":false,"hosts":[{"host":"aisix.local","paths":["/"]}],"tls":[]},"ip":"0.0.0.0","nodePort":"","servicePort":3000,"type":"NodePort"}` | AISIX proxy service settings (port 3000) — user traffic |
+| gateway.containerPort | int | `3000` | Container port |
+| gateway.externalIPs | list | `[]` | IPs for which nodes in the cluster will also accept traffic for the service |
+| gateway.externalTrafficPolicy | string | `"Cluster"` | Setting how the Service route external traffic |
+| gateway.ingress | object | `{"annotations":{},"enabled":false,"hosts":[{"host":"aisix.local","paths":["/"]}],"tls":[]}` | Using ingress access AISIX proxy service |
+| gateway.ingress.annotations | object | `{}` | Ingress annotations |
+| gateway.ip | string | `"0.0.0.0"` | which ip to listen on for the proxy service |
+| gateway.nodePort | string | `""` | Optional static nodePort (only relevant when type is NodePort) |
+| gateway.servicePort | int | `3000` | Service port |
+| gateway.type | string | `"NodePort"` | proxy service type |
+| global.imagePullSecrets | list | `[]` | Global Docker registry secret names as an array |
+| image.pullPolicy | string | `"IfNotPresent"` | AISIX image pull policy |
+| image.repository | string | `"ghcr.io/api7/aisix"` | AISIX image repository |
+| image.tag | string | `"0.1.0"` | AISIX image tag; overrides the chart appVersion |
+| livenessProbe | object | `{}` | Kubernetes liveness probe override |
+| nameOverride | string | `""` |  |
+| nodeSelector | object | `{}` | Node labels for pod assignment |
+| podAnnotations | object | `{}` | Annotations to add to the pod |
+| podLabels | object | `{}` | Labels to add to the pod |
+| podSecurityContext | object | `{}` | Set the securityContext for AISIX pods |
+| readinessProbe | object | `{}` | Kubernetes readiness probe override |
+| replicaCount | int | `1` | Number of AISIX replicas |
+| resources | object | `{}` | Set pod resource requests & limits |
+| securityContext | object | `{}` | Set the securityContext for AISIX container |
+| serviceAccount.annotations | object | `{}` | Annotations to add to the service account |
+| serviceAccount.create | bool | `false` | Specifies whether a service account should be created |
+| serviceAccount.name | string | `""` | The name of the service account to use. |
+| timezone | string | `""` | timezone for the container, e.g. "UTC" or "Asia/Shanghai" |
+| tolerations | list | `[]` | List of node taints to tolerate |
+| updateStrategy | object | `{}` |  |
 
-```bash
-helm uninstall my-aisix
-```
-
-## Configuration
-
-The following table lists the key configurable parameters. See `values.yaml` for the full list.
-
-| Parameter | Description | Default |
-|-----------|-------------|---------|
-| `image.repository` | AISIX image repository | `ghcr.io/api7/aisix` |
-| `image.tag` | AISIX image tag | `0.1.0` |
-| `replicaCount` | Number of replicas | `1` |
-| `deployment.admin.adminKey` | Admin API key (used to create an internal Secret) | `[{key: "changeme"}]` |
-| `deployment.admin.existingSecret` | Existing Secret for admin key (overrides adminKey) | `""` |
-| `deployment.etcd.host` | External etcd hosts (when `etcd.enabled=false`) | `["http://etcd.host:2379"]` |
-| `deployment.etcd.prefix` | etcd key prefix | `/aisix` |
-| `gateway.type` | Proxy Service type | `NodePort` |
-| `gateway.servicePort` | Proxy Service port | `3000` |
-| `gateway.ingress.enabled` | Enable Ingress for proxy | `false` |
-| `admin.enabled` | Enable admin Service and port | `true` |
-| `admin.type` | Admin Service type | `ClusterIP` |
-| `admin.servicePort` | Admin Service port | `3001` |
-| `admin.ingress.enabled` | Enable Ingress for admin | `false` |
-| `etcd.enabled` | Install bundled etcd | `false` |
-| `autoscaling.enabled` | Enable HPA | `false` |
-
-## Using an Existing Secret for the Admin Key
-
-```bash
-kubectl create secret generic aisix-admin-secret \
-  --from-literal=admin-key=<your-strong-key>
-
-helm install my-aisix api7/aisix \
-  --set deployment.admin.existingSecret=aisix-admin-secret
-```
-
-## Using an External etcd
-
-```bash
-helm install my-aisix api7/aisix \
-  --set etcd.enabled=false \
-  --set "deployment.etcd.host[0]=http://my-etcd:2379" \
-  --set deployment.admin.existingSecret=aisix-admin-secret
-```
