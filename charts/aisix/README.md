@@ -20,11 +20,12 @@ A Helm chart for AISIX AI Gateway
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| admin | object | `{"annotations":{},"containerPort":3001,"enabled":true,"ingress":{"annotations":{},"enabled":false,"hosts":[{"host":"aisix-admin.local","paths":["/ui","/aisix/admin"]}],"tls":[]},"ip":"0.0.0.0","servicePort":3001,"type":"ClusterIP"}` | AISIX admin service settings (port 3001) — Admin API and UI |
+| admin | object | `{"annotations":{},"containerPort":3001,"enabled":true,"ingress":{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"aisix-admin.local","paths":["/ui","/aisix/admin"]}],"tls":[]},"ip":"0.0.0.0","servicePort":3001,"type":"ClusterIP"}` | AISIX admin service settings (port 3001) — Admin API and UI |
 | admin.containerPort | int | `3001` | Container port |
 | admin.enabled | bool | `true` | Enable admin service |
-| admin.ingress | object | `{"annotations":{},"enabled":false,"hosts":[{"host":"aisix-admin.local","paths":["/ui","/aisix/admin"]}],"tls":[]}` | Using ingress access AISIX admin service |
+| admin.ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"aisix-admin.local","paths":["/ui","/aisix/admin"]}],"tls":[]}` | Using ingress access AISIX admin service |
 | admin.ingress.annotations | object | `{}` | Ingress annotations |
+| admin.ingress.className | string | `""` | IngressClass that will be be used to implement the Ingress |
 | admin.ip | string | `"0.0.0.0"` | which ip to listen on for the admin service |
 | admin.servicePort | int | `3001` | Service port |
 | admin.type | string | `"ClusterIP"` | admin service type |
@@ -34,7 +35,7 @@ A Helm chart for AISIX AI Gateway
 | autoscaling.minReplicas | int | `1` |  |
 | autoscaling.targetCPUUtilizationPercentage | int | `80` |  |
 | autoscaling.targetMemoryUtilizationPercentage | int | `80` |  |
-| deployment.admin.adminKey | list | `[{"key":"changeme"}]` | Admin API key. Used to create an internal Secret when existingSecret is not set. WARNING: change this before deploying to production. |
+| deployment.admin.adminKey | string | `""` | Admin API key. Used to create an internal Secret when existingSecret is not set. Required when existingSecret is not set. |
 | deployment.admin.existingSecret | string | `""` | Name of an existing Secret that contains an admin key field. If set, adminKey above is ignored and the key is read from the Secret. |
 | deployment.admin.existingSecretKey | string | `"admin-key"` | Key inside the existing Secret that holds the admin key value |
 | deployment.etcd.host | list | `["http://etcd.host:2379"]` | List of etcd hosts. Ignored when etcd.enabled is true (auto-constructed). |
@@ -57,12 +58,13 @@ A Helm chart for AISIX AI Gateway
 | extraVolumeMounts | list | `[]` | Additional volume mounts |
 | extraVolumes | list | `[]` | Additional volumes |
 | fullnameOverride | string | `""` |  |
-| gateway | object | `{"annotations":{},"containerPort":3000,"externalIPs":[],"externalTrafficPolicy":"Cluster","ingress":{"annotations":{},"enabled":false,"hosts":[{"host":"aisix.local","paths":["/"]}],"tls":[]},"ip":"0.0.0.0","nodePort":"","servicePort":3000,"type":"NodePort"}` | AISIX proxy service settings (port 3000) — user traffic |
+| gateway | object | `{"annotations":{},"containerPort":3000,"externalIPs":[],"externalTrafficPolicy":"Cluster","ingress":{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"aisix.local","paths":["/"]}],"tls":[]},"ip":"0.0.0.0","nodePort":"","servicePort":3000,"type":"NodePort"}` | AISIX proxy service settings (port 3000) — user traffic |
 | gateway.containerPort | int | `3000` | Container port |
 | gateway.externalIPs | list | `[]` | IPs for which nodes in the cluster will also accept traffic for the service |
 | gateway.externalTrafficPolicy | string | `"Cluster"` | Setting how the Service route external traffic |
-| gateway.ingress | object | `{"annotations":{},"enabled":false,"hosts":[{"host":"aisix.local","paths":["/"]}],"tls":[]}` | Using ingress access AISIX proxy service |
+| gateway.ingress | object | `{"annotations":{},"className":"","enabled":false,"hosts":[{"host":"aisix.local","paths":["/"]}],"tls":[]}` | Using ingress access AISIX proxy service |
 | gateway.ingress.annotations | object | `{}` | Ingress annotations |
+| gateway.ingress.className | string | `""` | IngressClass that will be be used to implement the Ingress |
 | gateway.ip | string | `"0.0.0.0"` | which ip to listen on for the proxy service |
 | gateway.nodePort | string | `""` | Optional static nodePort (only relevant when type is NodePort) |
 | gateway.servicePort | int | `3000` | Service port |
