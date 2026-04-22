@@ -689,7 +689,7 @@ openapiToMcp:
     # -- OpenAPI-to-MCP image repository
     repository: api7/openapi-to-mcp
     # -- OpenAPI-to-MCP image tag
-    tag: 1.0.0
+    tag: 1.0.1
     # -- OpenAPI-to-MCP image pull policy
     pullPolicy: IfNotPresent
   # -- Port that the sidecar listens on. Must match the `port` configured under
