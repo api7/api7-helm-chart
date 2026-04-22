@@ -228,6 +228,43 @@ spec:
           port: http
           scheme: HTTP
     {{- end }}
+    {{- if .Values.openapiToMcp.enabled }}
+    {{- $mcpAttr := (index .Values.pluginAttrs "openapi-to-mcp" | default dict) -}}
+    {{- $pluginMcpPort := (index $mcpAttr "port" | default 3000 | int) -}}
+    {{- if ne $pluginMcpPort (int .Values.openapiToMcp.port) -}}
+    {{- fail (printf "openapiToMcp.port (%v) must match pluginAttrs.openapi-to-mcp.port (%v; default 3000)" .Values.openapiToMcp.port $pluginMcpPort) -}}
+    {{- end }}
+    - name: openapi-to-mcp
+      image: {{ .Values.openapiToMcp.image.repository }}:{{ .Values.openapiToMcp.image.tag }}
+      imagePullPolicy: {{ .Values.openapiToMcp.image.pullPolicy }}
+      env:
+      - name: SSE_PORT
+        value: {{ .Values.openapiToMcp.port | quote }}
+      ports:
+      - containerPort: {{ .Values.openapiToMcp.port }}
+        name: http
+        protocol: TCP
+      readinessProbe:
+        httpGet:
+          path: /health
+          port: {{ .Values.openapiToMcp.port }}
+        failureThreshold: 6
+        initialDelaySeconds: 5
+        periodSeconds: 5
+        successThreshold: 1
+        timeoutSeconds: 3
+      livenessProbe:
+        httpGet:
+          path: /health
+          port: {{ .Values.openapiToMcp.port }}
+        failureThreshold: 6
+        initialDelaySeconds: 10
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 3
+      resources:
+      {{- toYaml .Values.openapiToMcp.resources | nindent 8 }}
+    {{- end }}
   {{- if .Values.apisix.hostNetwork }}
   hostNetwork: true
   dnsPolicy: ClusterFirstWithHostNet
