@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.51](https://img.shields.io/badge/Version-0.17.51-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.9](https://img.shields.io/badge/AppVersion-3.9.9-informational?style=flat-square)
+![Version: 0.17.52](https://img.shields.io/badge/Version-0.17.52-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.10](https://img.shields.io/badge/AppVersion-3.9.10-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -28,7 +28,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.9.9"` |  |
+| dashboard.image.tag | string | `"v3.9.10"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.livenessProbe.failureThreshold | int | `30` |  |
 | dashboard.livenessProbe.initialDelaySeconds | int | `180` |  |
@@ -97,6 +97,11 @@ A Helm chart for Kubernetes
 | dashboard_configuration.session_options_config.max_age | int | `86400` |  |
 | dashboard_configuration.session_options_config.same_site | string | `"lax"` |  |
 | dashboard_configuration.session_options_config.secure | bool | `false` |  |
+| dashboard_configuration.telemetry.compression_level | int | `-1` |  |
+| dashboard_configuration.telemetry.enable | bool | `true` |  |
+| dashboard_configuration.telemetry.interval | int | `15` |  |
+| dashboard_configuration.telemetry.max_metrics_size | int | `33554432` |  |
+| dashboard_configuration.telemetry.metrics_batch_size | int | `4194304` |  |
 | dashboard_service.annotations | object | `{}` |  |
 | dashboard_service.ingress.annotations | object | `{}` |  |
 | dashboard_service.ingress.className | string | `""` |  |
@@ -113,7 +118,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraVolumes | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"Always"` |  |
 | developer_portal.image.repository | string | `"api7/api7-ee-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v3.9.9"` |  |
+| developer_portal.image.tag | string | `"v3.9.10"` |  |
 | developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.livenessProbe.failureThreshold | int | `10` |  |
 | developer_portal.livenessProbe.initialDelaySeconds | int | `60` |  |
@@ -158,7 +163,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.9.9"` |  |
+| dp_manager.image.tag | string | `"v3.9.10"` |  |
 | dp_manager.livenessProbe.failureThreshold | int | `10` |  |
 | dp_manager.livenessProbe.initialDelaySeconds | int | `60` |  |
 | dp_manager.livenessProbe.periodSeconds | int | `3` |  |
@@ -224,7 +229,7 @@ A Helm chart for Kubernetes
 | file_server.enabled | bool | `false` |  |
 | file_server.image.pullPolicy | string | `"Always"` |  |
 | file_server.image.repository | string | `"api7/api7-ee-file-server"` |  |
-| file_server.image.tag | string | `"v3.9.9"` |  |
+| file_server.image.tag | string | `"v3.9.10"` |  |
 | file_server.livenessProbe.failureThreshold | int | `10` |  |
 | file_server.livenessProbe.initialDelaySeconds | int | `60` |  |
 | file_server.livenessProbe.periodSeconds | int | `3` |  |
