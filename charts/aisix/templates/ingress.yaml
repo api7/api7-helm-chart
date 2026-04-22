@@ -1,0 +1,43 @@
+{{- if .Values.gateway.ingress.enabled -}}
+{{- if and .Values.gateway.ingress.className (not (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion)) }}
+  {{- if not (hasKey .Values.gateway.ingress.annotations "kubernetes.io/ingress.class") }}
+  {{- $_ := set .Values.gateway.ingress.annotations "kubernetes.io/ingress.class" .Values.gateway.ingress.className }}
+  {{- end }}
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "aisix.fullname" . }}-gateway
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "aisix.labels" . | nindent 4 }}
+  {{- with .Values.gateway.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if and .Values.gateway.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
+  ingressClassName: {{ .Values.gateway.ingress.className }}
+  {{- end }}
+  {{- if .Values.gateway.ingress.tls }}
+  tls:
+    {{- toYaml .Values.gateway.ingress.tls | nindent 4 }}
+  {{- end }}
+  rules:
+    {{- range .Values.gateway.ingress.hosts }}
+    {{- if .paths }}
+    - host: {{ .host | quote }}
+      http:
+        paths:
+          {{- range .paths }}
+          - path: {{ . }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ include "aisix.fullname" $ }}-gateway
+                port:
+                  number: {{ $.Values.gateway.servicePort }}
+          {{- end }}
+    {{- end }}
+    {{- end }}
+{{- end }}

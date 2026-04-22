@@ -1,0 +1,23 @@
+{{- if .Values.admin.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aisix.fullname" . }}-admin
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "aisix.labels" . | nindent 4 }}
+    app.kubernetes.io/service: aisix-admin
+  {{- with .Values.admin.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.admin.type }}
+  ports:
+    - name: admin
+      port: {{ .Values.admin.servicePort }}
+      targetPort: admin
+      protocol: TCP
+  selector:
+    {{- include "aisix.selectorLabels" . | nindent 4 }}
+{{- end }}

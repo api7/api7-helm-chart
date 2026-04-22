@@ -1,0 +1,194 @@
+global:
+  # e.g.
+  # imagePullSecrets:
+  #   - my-registry-secrets
+  # -- Global Docker registry secret names as an array
+  imagePullSecrets: []
+
+image:
+  # -- AISIX image repository
+  repository: ghcr.io/api7/aisix
+  # -- AISIX image pull policy
+  pullPolicy: IfNotPresent
+  # -- AISIX image tag; overrides the chart appVersion
+  tag: "0.1.0"
+
+# -- Number of AISIX replicas
+replicaCount: 1
+
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Specifies whether a service account should be created
+  create: false
+  # -- Annotations to add to the service account
+  annotations: {}
+  # -- The name of the service account to use.
+  name: ""
+
+# -- Annotations to add to the pod
+podAnnotations: {}
+# -- Labels to add to the pod
+podLabels: {}
+# -- Set the securityContext for AISIX pods
+podSecurityContext: {}
+# -- Set the securityContext for AISIX container
+securityContext: {}
+
+# -- Set pod resource requests & limits
+resources: {}
+  # limits:
+  #   cpu: 500m
+  #   memory: 512Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+# -- Node labels for pod assignment
+nodeSelector: {}
+# -- List of node taints to tolerate
+tolerations: []
+# -- Set affinity for deploy
+affinity: {}
+
+updateStrategy: {}
+  # type: RollingUpdate
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: 80
+
+# -- Additional volumes
+extraVolumes: []
+# -- Additional volume mounts
+extraVolumeMounts: []
+# -- Additional init containers
+extraInitContainers: []
+
+# -- Additional environment variables
+extraEnvVars: []
+extraEnvVarsCM: ""
+extraEnvVarsSecret: ""
+
+# -- timezone for the container, e.g. "UTC" or "Asia/Shanghai"
+timezone: ""
+
+# AISIX deployment configuration — rendered into /etc/aisix/config.yaml
+deployment:
+  etcd:
+    # -- List of etcd hosts. Ignored when etcd.enabled is true (auto-constructed).
+    host:
+      - "http://etcd.host:2379"
+    # -- Key prefix used by aisix in etcd
+    prefix: /aisix
+    # -- etcd request timeout in seconds
+    timeout: 30
+  admin:
+    # -- Admin API key. Used to create an internal Secret when existingSecret is not set.
+    # Required when existingSecret is not set.
+    adminKey: ""
+    # -- Name of an existing Secret that contains an admin key field.
+    # If set, adminKey above is ignored and the key is read from the Secret.
+    existingSecret: ""
+    # -- Key inside the existing Secret that holds the admin key value
+    existingSecretKey: "admin-key"
+
+# -- AISIX proxy service settings (port 3000) — user traffic
+gateway:
+  # -- proxy service type
+  type: NodePort
+  # -- Setting how the Service route external traffic
+  externalTrafficPolicy: Cluster
+  # -- IPs for which nodes in the cluster will also accept traffic for the service
+  externalIPs: []
+  # -- which ip to listen on for the proxy service
+  ip: 0.0.0.0
+  # -- Service port
+  servicePort: 3000
+  # -- Container port
+  containerPort: 3000
+  # -- Optional static nodePort (only relevant when type is NodePort)
+  nodePort: ""
+  annotations: {}
+  # -- Using ingress access AISIX proxy service
+  ingress:
+    enabled: false
+    # -- IngressClass that will be be used to implement the Ingress
+    className: ""
+    # -- Ingress annotations
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: aisix.local
+        paths:
+          - "/"
+    tls: []
+
+# -- AISIX admin service settings (port 3001) — Admin API and UI
+admin:
+  # -- Enable admin service
+  enabled: true
+  # -- admin service type
+  type: ClusterIP
+  # -- which ip to listen on for the admin service
+  ip: 0.0.0.0
+  # -- Service port
+  servicePort: 3001
+  # -- Container port
+  containerPort: 3001
+  annotations: {}
+  # -- Using ingress access AISIX admin service
+  ingress:
+    enabled: false
+    # -- IngressClass that will be be used to implement the Ingress
+    className: ""
+    # -- Ingress annotations
+    annotations: {}
+      # kubernetes.io/ingress.class: nginx
+      # kubernetes.io/tls-acme: "true"
+    hosts:
+      - host: aisix-admin.local
+        paths:
+          - "/ui"
+          - "/aisix/admin"
+    tls: []
+
+# -- Kubernetes liveness probe override
+livenessProbe: {}
+# -- Kubernetes readiness probe override
+readinessProbe: {}
+
+# -- etcd subchart (bitnami/etcd)
+etcd:
+  # -- Install etcd as a subchart. Set false to use an external etcd.
+  enabled: false
+  image:
+    repository: api7/etcd
+  auth:
+    rbac:
+      # -- No authentication by default. Enable RBAC (set create: true and configure rootPassword)
+      # for production or multi-tenant clusters to prevent unauthenticated etcd access.
+      create: false
+      # -- root password for etcd. Requires etcd.auth.rbac.create to be true.
+      rootPassword: ""
+    tls:
+      # -- enable etcd client certificate
+      enabled: false
+      # -- name of the secret contains etcd client cert
+      existingSecret: ""
+      # -- etcd client cert filename using in etcd.auth.tls.existingSecret
+      certFilename: ""
+      # -- etcd client cert key filename using in etcd.auth.tls.existingSecret
+      certKeyFilename: ""
+      # -- whether to verify the etcd endpoint certificate when setup a TLS connection to etcd
+      verify: false
+      # -- specify the TLS Server Name Indication extension, the ETCD endpoint hostname will be used when this setting is unset.
+      sni: ""
+  service:
+    port: 2379
+  replicaCount: 3

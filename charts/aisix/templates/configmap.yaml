@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aisix.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "aisix.labels" . | nindent 4 }}
+data:
+  config.yaml: |-
+    deployment:
+      etcd:
+        host:
+          {{- include "aisix.etcd.hosts" . | nindent 10 }}
+        prefix: {{ .Values.deployment.etcd.prefix | quote }}
+        timeout: {{ .Values.deployment.etcd.timeout }}
+      admin:
+        admin_key:
+          - key: "{{"{{"}}AISIX_ADMIN_KEY{{"}}"}}"
+
+    server:
+      proxy:
+        listen: "{{ .Values.gateway.ip }}:{{ .Values.gateway.containerPort }}"
+        tls:
+          enabled: false
+      {{- if .Values.admin.enabled }}
+      admin:
+        listen: "{{ .Values.admin.ip }}:{{ .Values.admin.containerPort }}"
+      {{- end }}
