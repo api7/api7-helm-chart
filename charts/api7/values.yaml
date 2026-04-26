@@ -217,6 +217,7 @@ dp_manager_service:
 file_server_service:
   type: ClusterIP
   port: 8080
+  # nodePort: 30080
 
 developer_portal_service:
   type: ClusterIP

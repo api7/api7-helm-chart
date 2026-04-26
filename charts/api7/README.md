@@ -241,6 +241,7 @@ A Helm chart for Kubernetes
 | file_server_configuration.file_server.listen | string | `"0.0.0.0:8080"` |  |
 | file_server_configuration.log.level | string | `"warn"` |  |
 | file_server_configuration.log.output | string | `"stderr"` |  |
+| file_server_service.nodePort | int | `nil` | The nodePort for HTTP service, only used if file_server_service.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | file_server_service.port | int | `8080` |  |
 | file_server_service.type | string | `"ClusterIP"` |  |
 | fullnameOverride | string | `""` |  |
