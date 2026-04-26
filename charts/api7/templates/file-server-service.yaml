@@ -13,6 +13,9 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+      {{- if (and (eq .Values.file_server_service.type "NodePort") (not (empty .Values.file_server_service.nodePort))) }}
+      nodePort: {{ .Values.file_server_service.nodePort }}
+      {{- end }}
   selector:
     {{- include "api7ee3.selectorLabels" . | nindent 4 }}
     app.kubernetes.io/component: file-server
