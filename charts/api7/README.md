@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.52](https://img.shields.io/badge/Version-0.17.52-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.10](https://img.shields.io/badge/AppVersion-3.9.10-informational?style=flat-square)
+![Version: 0.17.53](https://img.shields.io/badge/Version-0.17.53-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.10](https://img.shields.io/badge/AppVersion-3.9.10-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -241,7 +241,6 @@ A Helm chart for Kubernetes
 | file_server_configuration.file_server.listen | string | `"0.0.0.0:8080"` |  |
 | file_server_configuration.log.level | string | `"warn"` |  |
 | file_server_configuration.log.output | string | `"stderr"` |  |
-| file_server_service.nodePort | int | `nil` | The nodePort for HTTP service, only used if file_server_service.type is NodePort. If not set, a random port will be assigned by Kubernetes. |
 | file_server_service.port | int | `8080` |  |
 | file_server_service.type | string | `"ClusterIP"` |  |
 | fullnameOverride | string | `""` |  |
