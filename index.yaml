@@ -475,6 +475,33 @@ entries:
     version: 0.0.1
   api7ee3:
   - apiVersion: v2
+    appVersion: 3.9.11
+    created: "2026-04-30T12:37:48.913850397Z"
+    dependencies:
+    - condition: prometheus.builtin
+      name: prometheus
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.5.1
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - condition: jaeger.builtin
+      name: jaeger
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 4.4.7
+    description: A Helm chart for Kubernetes
+    digest: 214e65eb96f8c37b8461fda1e8054be94b9d3ac44abffd1d024bb67539b42993
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: api7ee3
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-0.17.54/api7ee3-0.17.54.tgz
+    version: 0.17.54
+  - apiVersion: v2
     appVersion: 3.9.10
     created: "2026-04-26T12:51:27.422759983Z"
     dependencies:
@@ -2804,6 +2831,25 @@ entries:
     version: 0.1.0
   gateway:
   - apiVersion: v2
+    appVersion: 3.9.11
+    created: "2026-04-30T12:37:49.146521034Z"
+    dependencies:
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.7.7
+    description: A Helm chart for API7 Gateway
+    digest: 6e1233a3e542953b445bfc1899ed980f1352363b6ecdc0e6769407bbdb0cddf1
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.2.64/gateway-0.2.64.tgz
+    version: 0.2.64
+  - apiVersion: v2
     appVersion: 3.9.10-patch.1
     created: "2026-04-27T09:43:13.604562611Z"
     dependencies:
@@ -4122,4 +4168,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2026-04-27T09:43:13.605143762Z"
+generated: "2026-04-30T12:37:49.147269709Z"
