@@ -51,6 +51,10 @@ spec:
           secret:
             secretName: {{ .Values.prometheus.server.existingSecret | quote }}
       {{- end }}
+      {{- if .Values.dashboard.extraInitContainers }}
+      initContainers:
+        {{- toYaml .Values.dashboard.extraInitContainers | nindent 8 }}
+      {{- end }}
       containers:
         - name: dashboard
           securityContext:

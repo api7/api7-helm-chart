@@ -34,6 +34,7 @@ dashboard:
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []
+  extraInitContainers: []
   podLabels: {}
   # -- Topology Spread Constraints for pod assignment
   # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
@@ -70,6 +71,7 @@ dp_manager:
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []
+  extraInitContainers: []
   podLabels: {}
   # -- Topology Spread Constraints for pod assignment
   # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
@@ -113,6 +115,7 @@ developer_portal:
   extraEnvVars: []
   extraVolumes: []
   extraVolumeMounts: []
+  extraInitContainers: []
   podLabels: {}
   # -- Topology Spread Constraints for pod assignment
   # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
