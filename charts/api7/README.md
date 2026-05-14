@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 0.17.55](https://img.shields.io/badge/Version-0.17.55-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.12](https://img.shields.io/badge/AppVersion-3.9.12-informational?style=flat-square)
+![Version: 0.18.0](https://img.shields.io/badge/Version-0.18.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.12](https://img.shields.io/badge/AppVersion-3.9.12-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -24,6 +24,7 @@ A Helm chart for Kubernetes
 |-----|------|---------|-------------|
 | affinity | object | `{}` |  |
 | dashboard.extraEnvVars | list | `[]` |  |
+| dashboard.extraInitContainers | list | `[]` |  |
 | dashboard.extraVolumeMounts | list | `[]` |  |
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
@@ -114,6 +115,7 @@ A Helm chart for Kubernetes
 | dashboard_service.tlsPort | int | `7443` |  |
 | dashboard_service.type | string | `"ClusterIP"` |  |
 | developer_portal.extraEnvVars | list | `[]` |  |
+| developer_portal.extraInitContainers | list | `[]` |  |
 | developer_portal.extraVolumeMounts | list | `[]` |  |
 | developer_portal.extraVolumes | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"Always"` |  |
@@ -159,6 +161,7 @@ A Helm chart for Kubernetes
 | developer_portal_service.port | int | `4321` |  |
 | developer_portal_service.type | string | `"ClusterIP"` |  |
 | dp_manager.extraEnvVars | list | `[]` |  |
+| dp_manager.extraInitContainers | list | `[]` |  |
 | dp_manager.extraVolumeMounts | list | `[]` |  |
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |

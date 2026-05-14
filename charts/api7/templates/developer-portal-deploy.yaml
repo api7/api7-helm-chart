@@ -47,6 +47,10 @@ spec:
           secret:
             secretName: {{ .Values.developer_portal.keyCertSecret | quote }}
       {{- end }}
+      {{- if .Values.developer_portal.extraInitContainers }}
+      initContainers:
+        {{- include "api7ee3.tplvalues.render" (dict "value" .Values.developer_portal.extraInitContainers "context" $) | nindent 8 }}
+      {{- end }}
       containers:
         - name: developer-portal
           securityContext:
