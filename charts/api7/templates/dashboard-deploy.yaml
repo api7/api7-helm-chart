@@ -53,7 +53,7 @@ spec:
       {{- end }}
       {{- if .Values.dashboard.extraInitContainers }}
       initContainers:
-        {{- toYaml .Values.dashboard.extraInitContainers | nindent 8 }}
+        {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dashboard.extraInitContainers "context" $) | nindent 8 }}
       {{- end }}
       containers:
         - name: dashboard
