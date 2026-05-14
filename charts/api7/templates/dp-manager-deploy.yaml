@@ -48,7 +48,7 @@ spec:
       {{- end }}
       {{- if .Values.dp_manager.extraInitContainers }}
       initContainers:
-        {{- toYaml .Values.dp_manager.extraInitContainers | nindent 8 }}
+        {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dp_manager.extraInitContainers "context" $) | nindent 8 }}
       {{- end }}
       containers:
         - name: dp-manager

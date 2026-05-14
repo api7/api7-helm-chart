@@ -26,6 +26,7 @@ A Helm chart for Kubernetes
 | dashboard.extraEnvVars | list | `[]` |  |
 | dashboard.extraVolumeMounts | list | `[]` |  |
 | dashboard.extraVolumes | list | `[]` |  |
+| dashboard.extraInitContainers | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
 | dashboard.image.tag | string | `"v3.9.12"` |  |
@@ -116,6 +117,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraEnvVars | list | `[]` |  |
 | developer_portal.extraVolumeMounts | list | `[]` |  |
 | developer_portal.extraVolumes | list | `[]` |  |
+| developer_portal.extraInitContainers | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"Always"` |  |
 | developer_portal.image.repository | string | `"api7/api7-ee-developer-portal"` |  |
 | developer_portal.image.tag | string | `"v3.9.12"` |  |
@@ -161,6 +163,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraEnvVars | list | `[]` |  |
 | dp_manager.extraVolumeMounts | list | `[]` |  |
 | dp_manager.extraVolumes | list | `[]` |  |
+| dp_manager.extraInitContainers | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
 | dp_manager.image.tag | string | `"v3.9.12"` |  |
