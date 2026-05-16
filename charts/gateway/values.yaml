@@ -262,6 +262,8 @@ deployment:
   #    region: "ap-south-1"
   #    resource_bucket: "to-push-resource-data"
   #    config_bucket: "to-push-config-data"
+  #    # optional, set to use an S3-compatible endpoint (e.g., MinIO, Ceph, Aliyun OSS)
+  #    endpoint: ""
   #  # azure blob storage configuration, when account key is not set, will use the Managed Identity attached to the pod
   #  azure_blob:
   #    account_name: "$YOUR_ACCOUNT_NAME"
