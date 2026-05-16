@@ -476,6 +476,33 @@ entries:
   api7ee3:
   - apiVersion: v2
     appVersion: 3.9.12
+    created: "2026-05-16T01:36:08.096843649Z"
+    dependencies:
+    - condition: prometheus.builtin
+      name: prometheus
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.5.1
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - condition: jaeger.builtin
+      name: jaeger
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 4.4.7
+    description: A Helm chart for Kubernetes
+    digest: b405f666f27c24e35859239feba8f4a325aebbcc4ff0e34c4fab91c1ff6c9a00
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: api7ee3
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-0.18.1/api7ee3-0.18.1.tgz
+    version: 0.18.1
+  - apiVersion: v2
+    appVersion: 3.9.12
     created: "2026-05-14T13:54:07.446691656Z"
     dependencies:
     - condition: prometheus.builtin
@@ -2886,6 +2913,25 @@ entries:
   gateway:
   - apiVersion: v2
     appVersion: 3.9.12
+    created: "2026-05-16T01:36:08.246404485Z"
+    dependencies:
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.7.7
+    description: A Helm chart for API7 Gateway
+    digest: 0a289acd5de654744e0bcf7869fcf2cc4a7f3d8c7b5744ae01e487147ba24c6e
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.2.67/gateway-0.2.67.tgz
+    version: 0.2.67
+  - apiVersion: v2
+    appVersion: 3.9.12
     created: "2026-05-11T05:58:52.149317981Z"
     dependencies:
     - condition: etcd.enabled
@@ -4260,4 +4306,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2026-05-14T13:54:07.447267395Z"
+generated: "2026-05-16T01:36:08.246920301Z"
