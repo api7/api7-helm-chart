@@ -436,6 +436,8 @@ dashboard_configuration:
   #     region: "ap-south-1"
   #     resource_bucket: "to-push-resource-data"
   #     config_bucket: "to-push-config-data"
+  #     # optional, set to use an S3-compatible endpoint (e.g., MinIO, Ceph, Aliyun OSS)
+  #     custom_endpoint: ""
   #   azure_blob:
   #     account_name: "$YOUR_ACCOUNT_NAME"
   #     account_key: "$YOUR_ACCOUNT_KEY"
