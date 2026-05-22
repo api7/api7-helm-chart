@@ -82,7 +82,6 @@ apisix:
       jwks: 1m
       introspection: 10m
       access-tokens: 1m
-      ext-plugin: 1m
       tars: 1m
       cas-auth: 10m
       status_report: 1m
@@ -142,7 +141,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.9.12
+    tag: 3.9.13
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
