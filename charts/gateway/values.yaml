@@ -82,7 +82,6 @@ apisix:
       jwks: 1m
       introspection: 10m
       access-tokens: 1m
-      ext-plugin: 1m
       tars: 1m
       cas-auth: 10m
       status_report: 1m
@@ -115,6 +114,8 @@ apisix:
 
   extraLuaPath: ""
   extraLuaCPath: ""
+  # -- JSON library used to decode request bodies parsed by core.request. Also controls AI upstream request body encoding. Allowed values: `cjson`, `simdjson`, `qjson`.
+  requestBodyJsonLib: simdjson
 
   # -- Delete the '/' at the end of the URI
   deleteURITailSlash: false
@@ -142,7 +143,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.9.12
+    tag: 3.9.13
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
@@ -264,6 +265,7 @@ deployment:
   #    config_bucket: "to-push-config-data"
   #    # optional, set to use an S3-compatible endpoint (e.g., MinIO, Ceph, Aliyun OSS)
   #    endpoint: ""
+  #    use_path_style: true
   #  # azure blob storage configuration, when account key is not set, will use the Managed Identity attached to the pod
   #  azure_blob:
   #    account_name: "$YOUR_ACCOUNT_NAME"

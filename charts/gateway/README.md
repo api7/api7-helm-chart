@@ -82,7 +82,6 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.http.luaSharedDict.cas-auth | string | `"10m"` |  |
 | apisix.http.luaSharedDict.discovery | string | `"1m"` |  |
 | apisix.http.luaSharedDict.etcd-cluster-health-check | string | `"10m"` |  |
-| apisix.http.luaSharedDict.ext-plugin | string | `"1m"` |  |
 | apisix.http.luaSharedDict.internal-status | string | `"10m"` |  |
 | apisix.http.luaSharedDict.introspection | string | `"10m"` |  |
 | apisix.http.luaSharedDict.jwks | string | `"1m"` |  |
@@ -104,7 +103,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.9.12"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.9.13"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
 | apisix.lru.secret.neg_ttl | int | `60` | in seconds |
@@ -121,6 +120,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.podSecurityContext | object | `{}` | Set the securityContext for API7 Gateway pods |
 | apisix.priorityClassName | string | `""` | Set [priorityClassName](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#pod-priority) for API7 Gateway pods |
 | apisix.replicaCount | int | `1` | kind is DaemonSet, replicaCount not become effective |
+| apisix.requestBodyJsonLib | string | `"simdjson"` | JSON library used to decode request bodies parsed by core.request. Also controls AI upstream request body encoding. Allowed values: `cjson`, `simdjson`, `qjson`. |
 | apisix.resources | object | `{}` | Set pod resource requests & limits |
 | apisix.securityContext | object | `{}` | Set the securityContext for API7 Gateway container |
 | apisix.setIDFromPodUID | bool | `false` | Use Pod metadata.uid as the APISIX id. |
