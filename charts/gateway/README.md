@@ -120,6 +120,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.podSecurityContext | object | `{}` | Set the securityContext for API7 Gateway pods |
 | apisix.priorityClassName | string | `""` | Set [priorityClassName](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#pod-priority) for API7 Gateway pods |
 | apisix.replicaCount | int | `1` | kind is DaemonSet, replicaCount not become effective |
+| apisix.requestBodyJsonLib | string | `"simdjson"` | JSON library used to decode request bodies parsed by core.request. Also controls AI upstream request body encoding. Allowed values: `cjson`, `simdjson`, `qjson`. |
 | apisix.resources | object | `{}` | Set pod resource requests & limits |
 | apisix.securityContext | object | `{}` | Set the securityContext for API7 Gateway container |
 | apisix.setIDFromPodUID | bool | `false` | Use Pod metadata.uid as the APISIX id. |
