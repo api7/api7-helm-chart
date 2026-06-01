@@ -36,7 +36,6 @@ data:
       {{- if .Values.apisix.extraLuaCPath }}
       extra_lua_cpath: "{{ .Values.apisix.extraLuaCPath }};"
       {{- end }}
-      request_body_json_lib: {{ .Values.apisix.requestBodyJsonLib }}
 
       enable_dev_mode: false                       # Sets nginx worker_processes to 1 if set to true
       enable_reuseport: true                       # Enable nginx SO_REUSEPORT switch if set to true.
