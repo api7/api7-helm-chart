@@ -42,6 +42,13 @@ apisix:
   # -- Whether the APISIX version number should be shown in Server header
   enableServerTokens: true
 
+  # -- PROXY Protocol configuration.
+  proxyProtocol:
+    # -- Enable PROXY Protocol for TCP proxy. It works with gateway.stream.tcp.
+    enableTcpPP: false
+    # -- Send PROXY Protocol to the upstream server for TCP proxy.
+    enableTcpPPToUpstream: false
+
   # -- Use Pod metadata.uid as the APISIX id.
   setIDFromPodUID: false
 
