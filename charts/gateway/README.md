@@ -119,6 +119,9 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.podLabels | object | `{}` | Labels to add to each pod |
 | apisix.podSecurityContext | object | `{}` | Set the securityContext for API7 Gateway pods |
 | apisix.priorityClassName | string | `""` | Set [priorityClassName](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#pod-priority) for API7 Gateway pods |
+| apisix.proxyProtocol | object | `{"enableTcpPP":false,"enableTcpPPToUpstream":false}` | PROXY Protocol configuration. |
+| apisix.proxyProtocol.enableTcpPP | bool | `false` | Enable PROXY Protocol for TCP proxy. It works with gateway.stream.tcp. |
+| apisix.proxyProtocol.enableTcpPPToUpstream | bool | `false` | Send PROXY Protocol to the upstream server for TCP proxy. |
 | apisix.replicaCount | int | `1` | kind is DaemonSet, replicaCount not become effective |
 | apisix.resources | object | `{}` | Set pod resource requests & limits |
 | apisix.securityContext | object | `{}` | Set the securityContext for API7 Gateway container |

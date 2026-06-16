@@ -42,6 +42,12 @@ data:
       enable_ipv6: {{ .Values.apisix.enableIPv6 }} # Enable nginx IPv6 resolver
       enable_server_tokens: {{ .Values.apisix.enableServerTokens }} # Whether the APISIX version number should be shown in Server header
 
+      {{- if or .Values.apisix.proxyProtocol.enableTcpPP .Values.apisix.proxyProtocol.enableTcpPPToUpstream }}
+      proxy_protocol:
+        enable_tcp_pp: {{ .Values.apisix.proxyProtocol.enableTcpPP }}
+        enable_tcp_pp_to_upstream: {{ .Values.apisix.proxyProtocol.enableTcpPPToUpstream }}
+      {{- end }}
+
       # proxy_protocol:                   # Proxy Protocol configuration
       #   listen_http_port: 9181          # The port with proxy protocol for http, it differs from node_listen and admin_listen.
       #                                   # This port can only receive http request with proxy protocol, but node_listen & admin_listen
