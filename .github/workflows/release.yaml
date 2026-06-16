@@ -4,6 +4,14 @@ on:
   push:
     branches:
       - main
+      - 'release/**'
+
+# Every line (main + release/*) publishes to the same gh-pages index, so
+# serialize releases to avoid racing on the index commit. Do not cancel an
+# in-progress run, or a release could be dropped.
+concurrency:
+  group: helm-chart-release
+  cancel-in-progress: false
 
 jobs:
   release:
