@@ -114,8 +114,6 @@ apisix:
 
   extraLuaPath: ""
   extraLuaCPath: ""
-  # -- JSON library used to decode request bodies parsed by core.request. Also controls AI upstream request body encoding. Allowed values: `cjson`, `simdjson`, `qjson`.
-  requestBodyJsonLib: simdjson
 
   # -- Delete the '/' at the end of the URI
   deleteURITailSlash: false
