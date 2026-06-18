@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aisix-cloud.fullname" . }}-dpm
+  labels:
+    {{- include "aisix-cloud.labels" . | nindent 4 }}
+    {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "dpm") | nindent 4 }}
+spec:
+  replicas: {{ .Values.dpm.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "dpm") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "aisix-cloud.labels" . | nindent 8 }}
+        {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "dpm") | nindent 8 }}
+    spec:
+      {{- include "aisix-cloud.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "aisix-cloud.serviceAccountName" . }}
+      {{- with .Values.dpm.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        {{- include "aisix-cloud.pgWaitInitContainer" . | nindent 8 }}
+      containers:
+        - name: dpm
+          image: "{{ .Values.dpm.image.repository }}:{{ .Values.dpm.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.dpm.image.pullPolicy }}
+          {{- with .Values.dpm.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: tls
+              containerPort: 7944
+              protocol: TCP
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix-cloud.pgSecretName" . }}
+                  key: {{ include "aisix-cloud.pgPasswordSecretKey" . }}
+            - name: AISIX_DPMGR_LISTEN
+              value: ":7944"
+            - name: AISIX_DPMGR_DATABASE_URL
+              value: {{ include "aisix-cloud.databaseURL" . }}
+            - name: AISIX_DPMGR_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix-cloud.secretName" . }}
+                  key: master-key
+            - name: AISIX_DPMGR_MASTER_KEY_ID
+              value: {{ .Values.secrets.masterKeyID | quote }}
+            {{- with .Values.dpm.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          readinessProbe:
+            tcpSocket:
+              port: tls
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            tcpSocket:
+              port: tls
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          {{- with .Values.dpm.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.dpm.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dpm.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dpm.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
