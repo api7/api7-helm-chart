@@ -130,7 +130,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.9.14
+    tag: 3.9.15
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
@@ -359,6 +359,10 @@ gateway:
       # - addr: 192.168.31.10:5432
       # - addr: 3302
       #   nodePort: 31302
+      # - addr: 5432
+      #   proxy_protocol: true               # accept the proxy protocol on this port only
+      #   proxy_protocol_to_upstream: true   # send the proxy protocol to the upstream on this port only;
+      #                                      # both override the global proxy_protocol.enable_tcp_pp* defaults
       # - "2000-2100"                   # port range (nginx native support)
       # - addr: "3000-3100"             # port range in table form
       # - addr: "127.0.0.1:4000-4100"   # address with port range
