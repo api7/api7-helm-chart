@@ -1,5 +1,25 @@
 apiVersion: v1
 entries:
+  aisix-cloud:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-06-22T09:58:59.448624354Z"
+    dependencies:
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    description: Helm chart for AISIX-Cloud control plane (cp-api, dp-manager, dashboard)
+    digest: d580dc8cbda0f69a3fe8728b7cd9a9e0b4c125bfdddd3db385982d8006e58e8b
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: aisix-cloud
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/aisix-cloud-0.1.0/aisix-cloud-0.1.0.tgz
+    version: 0.1.0
   api7-ingress-controller:
   - apiVersion: v2
     appVersion: 2.1.0
@@ -4659,4 +4679,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2026-06-22T08:41:02.8305575Z"
+generated: "2026-06-22T09:58:59.449069454Z"
