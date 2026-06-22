@@ -47,8 +47,10 @@ data:
       #                                   # can only receive http request. If you enable proxy protocol, you must use this port to
       #                                   # receive http request with proxy protocol
       #   listen_https_port: 9182         # The port with proxy protocol for https
-      #   enable_tcp_pp: true             # Enable the proxy protocol for tcp proxy, it works for stream_proxy.tcp option
-      #   enable_tcp_pp_to_upstream: true # Enables the proxy protocol to the upstream server
+      #   enable_tcp_pp: true             # Accept the proxy protocol on every stream_proxy.tcp port. Acts as the default;
+      #                                   # override per port with the `proxy_protocol` field on a gateway.stream.tcp entry.
+      #   enable_tcp_pp_to_upstream: true # Send the proxy protocol to the upstream on every stream_proxy.tcp port. Acts as
+      #                                   # the default; override per port with `proxy_protocol_to_upstream` on an entry.
 
       proxy_cache:                         # Proxy Caching configuration
         cache_ttl: 10s                     # The default caching time if the upstream does not specify the cache time
@@ -87,6 +89,12 @@ data:
           - addr: {{ .addr | quote }}
           {{- if hasKey . "tls" }}
             tls: {{ .tls }}
+          {{- end }}
+          {{- if hasKey . "proxy_protocol" }}
+            proxy_protocol: {{ .proxy_protocol }}
+          {{- end }}
+          {{- if hasKey . "proxy_protocol_to_upstream" }}
+            proxy_protocol_to_upstream: {{ .proxy_protocol_to_upstream }}
           {{- end }}
           {{- else if kindIs "string" . }}
           - {{ . | quote }}

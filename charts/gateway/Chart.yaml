@@ -16,12 +16,12 @@ type: application
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
 # major.minor mirrors the API7 EE release line (3.9.x), patch is this chart's
 # own counter on that line and is decoupled from the app patch (see appVersion).
-version: 3.9.1
+version: 3.9.2
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
-appVersion: "3.9.14"
+appVersion: "3.9.15"
 
 maintainers:
   - name: API7
