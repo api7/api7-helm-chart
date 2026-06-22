@@ -30,7 +30,7 @@ Connect a data-plane (managed mode):
       -e AISIX_MANAGED__CP_KEY_PEM='<client-key-pem>' \
       -e AISIX_MANAGED__CP_CA_PEM='<ca-cert-pem>' \
       -v aisix-mtls:/var/lib/aisix \
-      ghcr.io/api7/aisix:dev
+      {{ .Values.api.dpImage | default (printf "ghcr.io/api7/aisix:%s" .Chart.AppVersion) }}
 {{- else }}
   DPM is a ClusterIP service. Expose it via Ingress, LoadBalancer, or port-forward:
     kubectl port-forward svc/{{ include "aisix-cloud.fullname" . }}-dpm {{ .Values.dpm.service.port }}:{{ .Values.dpm.service.port }} -n {{ .Release.Namespace }}

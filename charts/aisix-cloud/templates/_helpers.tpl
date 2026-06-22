@@ -130,7 +130,9 @@ Name of the Secret containing the PostgreSQL password.
 */}}
 {{- define "aisix-cloud.pgSecretName" -}}
 {{- if .Values.postgresql.builtin }}
-{{- if .Values.postgresql.fullnameOverride }}
+{{- if .Values.postgresql.auth.existingSecret }}
+{{- .Values.postgresql.auth.existingSecret }}
+{{- else if .Values.postgresql.fullnameOverride }}
 {{- .Values.postgresql.fullnameOverride }}
 {{- else }}
 {{- printf "%s-postgresql" .Release.Name }}
