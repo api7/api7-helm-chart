@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aisix-cloud.fullname" . }}-ui
+  labels:
+    {{- include "aisix-cloud.labels" . | nindent 4 }}
+    {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "ui") | nindent 4 }}
+spec:
+  replicas: {{ .Values.ui.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "ui") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "aisix-cloud.labels" . | nindent 8 }}
+        {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "ui") | nindent 8 }}
+    spec:
+      {{- include "aisix-cloud.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "aisix-cloud.serviceAccountName" . }}
+      {{- with .Values.ui.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: ui
+          image: "{{ .Values.ui.image.repository }}:{{ .Values.ui.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.ui.image.pullPolicy }}
+          {{- with .Values.ui.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix-cloud.pgSecretName" . }}
+                  key: {{ include "aisix-cloud.pgPasswordSecretKey" . }}
+            - name: BETTER_AUTH_URL
+              value: {{ .Values.api.publicBaseURL | quote }}
+            - name: BETTER_AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix-cloud.secretName" . }}
+                  key: better-auth-secret
+            - name: AISIX_CLOUD_DATABASE_URL
+              value: {{ include "aisix-cloud.databaseURL" . }}
+            - name: AISIX_DASHBOARD_LOCALE
+              value: {{ .Values.ui.defaultLocale | quote }}
+            {{- with .Values.ui.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          {{- with .Values.ui.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.ui.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ui.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.ui.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

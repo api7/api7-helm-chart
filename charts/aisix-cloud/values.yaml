@@ -1,0 +1,186 @@
+## @section Global parameters
+global:
+  storageClass: ""
+  imagePullSecrets: []
+
+## @section cp-api
+api:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/api7/aisix-cp-api
+    pullPolicy: IfNotPresent
+    tag: ""  # empty -> .Chart.AppVersion
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 101
+    fsGroup: 101
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+  publicBaseURL: "http://localhost:8080"
+  dpmgrBaseURL: ""
+  oauthEnabled: false
+  dpImage: ""  # empty -> ghcr.io/api7/aisix:<appVersion>
+
+## @section dp-manager
+dpm:
+  replicaCount: 1
+  image:
+    repository: ghcr.io/api7/aisix-cp-dpm
+    pullPolicy: IfNotPresent
+    tag: ""  # empty -> .Chart.AppVersion
+  service:
+    type: ClusterIP
+    port: 7944
+    nodePort: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: "1"
+      memory: 512Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 10001
+    runAsGroup: 101
+    fsGroup: 101
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+
+## @section dashboard (Next.js)
+ui:
+  replicaCount: 1
+  # Fixed dashboard UI language for this deployment. Supported: "en", "zh".
+  # There is no in-UI language switcher; the whole console renders in this
+  # locale (default English). Read server-side at request time.
+  defaultLocale: "en"
+  image:
+    repository: ghcr.io/api7/aisix-cp-ui
+    pullPolicy: IfNotPresent
+    tag: ""  # empty -> .Chart.AppVersion
+  service:
+    type: ClusterIP
+    port: 3000
+  resources:
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  podSecurityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 65533
+    fsGroup: 65533
+    seccompProfile:
+      type: RuntimeDefault
+  securityContext:
+    allowPrivilegeEscalation: false
+    readOnlyRootFilesystem: true
+    capabilities:
+      drop:
+        - ALL
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  extraEnvVars: []
+
+## @section ServiceAccount
+serviceAccount:
+  create: true
+  name: ""
+  annotations: {}
+
+## @section Secrets
+## IMPORTANT: You MUST replace the placeholder values below before deploying.
+## Deploying with CHANGE_ME placeholders will fail at helm render/install time.
+##
+## masterKey: base64-encoded 32-byte AES-256 key for envelope encryption.
+##   Generate with: openssl rand -base64 32
+## betterAuthSecret: random string used as HMAC signing secret for Better Auth sessions.
+##   Generate with: openssl rand -base64 48
+secrets:
+  masterKey: "CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_32"
+  masterKeyID: "env:default"
+  betterAuthSecret: "CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_48"
+
+## @section PostgreSQL
+## Set builtin=true to deploy Bitnami PostgreSQL subchart.
+## Set builtin=false and configure externalDatabase to use an existing PostgreSQL instance.
+postgresql:
+  builtin: true
+  fullnameOverride: ""
+  image:
+    registry: docker.io
+    repository: api7/postgresql
+    tag: 15.4.0-debian-11-r45
+  primary:
+    persistence:
+      size: 8Gi
+    service:
+      ports:
+        postgresql: 5432
+  auth:
+    ## Use the built-in PostgreSQL superuser for application connections.
+    ## cp-api currently runs schema and role migrations on startup, including
+    ## ALTER ROLE statements that require superuser privileges.
+    usePostgresUserForAppConnections: true
+    username: aisix
+    ## Inject DB credentials from a pre-created Secret instead of the values
+    ## below (the secure path). When set, the password fields are ignored and
+    ## the placeholder rejection is skipped.
+    existingSecret: ""
+    ## IMPORTANT: Set a stable password before deploying.
+    ## If left as default, the password is baked into the PG data volume on first init
+    ## and must remain unchanged across re-deploys.
+    ## The chart REJECTS the default 'changeme' at render/install time when
+    ## postgresql.builtin=true — set a real password (openssl rand -base64 24)
+    ## or use existingSecret above.
+    password: changeme
+    postgresPassword: changeme
+    database: aisix_cloud
+
+## @section External Database
+## Only used when postgresql.builtin is false.
+externalDatabase:
+  host: ""
+  port: 5432
+  username: aisix
+  database: aisix_cloud
+  ## Name of an existing Secret containing the database password (key: "password").
+  existingSecret: ""
+  ## If existingSecret is empty, this password is used directly.
+  password: ""
+  sslmode: disable

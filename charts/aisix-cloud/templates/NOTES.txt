@@ -1,0 +1,37 @@
+AISIX-Cloud control plane has been deployed.
+
+Components:
+  - cp-api:      {{ include "aisix-cloud.fullname" . }}-api:{{ .Values.api.service.port }}
+  - dp-manager:  {{ include "aisix-cloud.fullname" . }}-dpm:{{ .Values.dpm.service.port }}
+  - dashboard:   {{ include "aisix-cloud.fullname" . }}-ui:{{ .Values.ui.service.port }}
+  - PostgreSQL:  {{ include "aisix-cloud.pgHost" . }}:{{ include "aisix-cloud.pgPort" . }}
+
+Access the dashboard via cp-api (reverse proxy):
+  kubectl port-forward svc/{{ include "aisix-cloud.fullname" . }}-api {{ .Values.api.service.port }}:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
+  Then open http://localhost:{{ .Values.api.service.port }}
+
+Connect a data-plane (managed mode):
+{{- if eq .Values.dpm.service.type "NodePort" }}
+  DPM is exposed via NodePort.
+  {{- if .Values.dpm.service.nodePort }}
+  NodePort: {{ .Values.dpm.service.nodePort }}
+  {{- else }}
+  Get the assigned port:
+    kubectl get svc/{{ include "aisix-cloud.fullname" . }}-dpm -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}'
+  {{- end }}
+
+  Run the DP container (replace <node-ip> and <node-port> with actual values):
+
+    docker run --rm \
+      -e AISIX_CONFIG_PATH=/etc/aisix/config.managed.yaml \
+      -e AISIX_MANAGED__CP_BASE_URL=https://<node-ip>:<node-port> \
+      -e AISIX_MANAGED__CP_ETCD_ENDPOINT=<node-ip>:<node-port> \
+      -e AISIX_MANAGED__CP_CERT_PEM='<client-cert-pem>' \
+      -e AISIX_MANAGED__CP_KEY_PEM='<client-key-pem>' \
+      -e AISIX_MANAGED__CP_CA_PEM='<ca-cert-pem>' \
+      -v aisix-mtls:/var/lib/aisix \
+      {{ .Values.api.dpImage | default (printf "ghcr.io/api7/aisix:%s" .Chart.AppVersion) }}
+{{- else }}
+  DPM is a ClusterIP service. Expose it via Ingress, LoadBalancer, or port-forward:
+    kubectl port-forward svc/{{ include "aisix-cloud.fullname" . }}-dpm {{ .Values.dpm.service.port }}:{{ .Values.dpm.service.port }} -n {{ .Release.Namespace }}
+{{- end }}

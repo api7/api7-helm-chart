@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aisix-cloud.fullname" . }}-api
+  labels:
+    {{- include "aisix-cloud.labels" . | nindent 4 }}
+    {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "api") | nindent 4 }}
+spec:
+  replicas: {{ .Values.api.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "api") | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "aisix-cloud.labels" . | nindent 8 }}
+        {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "api") | nindent 8 }}
+    spec:
+      {{- include "aisix-cloud.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "aisix-cloud.serviceAccountName" . }}
+      {{- with .Values.api.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      initContainers:
+        {{- include "aisix-cloud.pgWaitInitContainer" . | nindent 8 }}
+      containers:
+        - name: api
+          image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.api.image.pullPolicy }}
+          {{- with .Values.api.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix-cloud.pgSecretName" . }}
+                  key: {{ include "aisix-cloud.pgPasswordSecretKey" . }}
+            - name: AISIX_CLOUD_LISTEN
+              value: ":8080"
+            - name: AISIX_CLOUD_DATABASE_URL
+              value: {{ include "aisix-cloud.databaseURL" . }}
+            - name: AISIX_CLOUD_PUBLIC_BASE_URL
+              value: {{ .Values.api.publicBaseURL | quote }}
+            - name: AISIX_CLOUD_MASTER_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix-cloud.secretName" . }}
+                  key: master-key
+            - name: AISIX_CLOUD_MASTER_KEY_ID
+              value: {{ .Values.secrets.masterKeyID | quote }}
+            - name: AISIX_CLOUD_DASHBOARD_URL
+              value: "http://{{ include "aisix-cloud.fullname" . }}-ui:{{ .Values.ui.service.port }}"
+            {{- if .Values.api.dpmgrBaseURL }}
+            - name: AISIX_CLOUD_DPMGR_BASE_URL
+              value: {{ .Values.api.dpmgrBaseURL | quote }}
+            {{- end }}
+            - name: AISIX_CLOUD_OAUTH_ENABLED
+              value: {{ .Values.api.oauthEnabled | quote }}
+            - name: AISIX_CLOUD_DP_IMAGE
+              value: {{ .Values.api.dpImage | default (printf "ghcr.io/api7/aisix:%s" .Chart.AppVersion) | quote }}
+            {{- with .Values.api.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          {{- with .Values.api.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+      {{- with .Values.api.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

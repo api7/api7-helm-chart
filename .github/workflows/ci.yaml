@@ -36,7 +36,8 @@ jobs:
                && ct lint \
                   --charts charts/api7 \
                   --charts charts/gateway \
-                  --charts charts/ingress-controller'
+                  --charts charts/ingress-controller \
+                  --charts charts/aisix-cloud'
 
       - name: Verify Chart.lock files
         run: |

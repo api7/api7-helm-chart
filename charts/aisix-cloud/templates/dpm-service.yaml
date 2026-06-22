@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aisix-cloud.fullname" . }}-dpm
+  labels:
+    {{- include "aisix-cloud.labels" . | nindent 4 }}
+    {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "dpm") | nindent 4 }}
+spec:
+  type: {{ .Values.dpm.service.type }}
+  ports:
+    - port: {{ .Values.dpm.service.port }}
+      targetPort: tls
+      protocol: TCP
+      name: tls
+      {{- if and (eq .Values.dpm.service.type "NodePort") .Values.dpm.service.nodePort }}
+      nodePort: {{ .Values.dpm.service.nodePort }}
+      {{- end }}
+  selector:
+    {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "dpm") | nindent 4 }}
