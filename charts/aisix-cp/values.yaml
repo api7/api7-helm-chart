@@ -7,7 +7,7 @@ global:
 api:
   replicaCount: 1
   image:
-    repository: ghcr.io/api7/aisix-cp-api
+    repository: docker.io/api7/aisix-cp-api
     pullPolicy: IfNotPresent
     tag: ""  # empty -> .Chart.AppVersion
   service:
@@ -40,13 +40,13 @@ api:
   publicBaseURL: "http://localhost:8080"
   dpmgrBaseURL: ""
   oauthEnabled: false
-  dpImage: ""  # empty -> ghcr.io/api7/aisix:<appVersion>
+  dpImage: ""  # empty -> docker.io/api7/aisix:<appVersion>
 
 ## @section dp-manager
 dpm:
   replicaCount: 1
   image:
-    repository: ghcr.io/api7/aisix-cp-dpm
+    repository: docker.io/api7/aisix-cp-dpm
     pullPolicy: IfNotPresent
     tag: ""  # empty -> .Chart.AppVersion
   service:
@@ -86,7 +86,7 @@ ui:
   # locale (default English). Read server-side at request time.
   defaultLocale: "en"
   image:
-    repository: ghcr.io/api7/aisix-cp-ui
+    repository: docker.io/api7/aisix-cp-ui
     pullPolicy: IfNotPresent
     tag: ""  # empty -> .Chart.AppVersion
   service:

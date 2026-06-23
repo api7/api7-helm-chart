@@ -8,7 +8,7 @@ This repo (`api7/api7-helm-chart`) holds the Helm charts for API7 EE components 
 | `gateway` (Data Plane) | `charts/gateway` | yes — appVersion is the EE version |
 | `api7-ingress-controller` | `charts/ingress-controller` | no — independent product version |
 | `developer-portal-fe` | `charts/developer-portal-fe` | no — independent product version |
-| `aisix-cloud` (AISIX private-deployment control plane) | `charts/aisix-cloud` | no — independent product version (source of truth: `api7/AISIX-Cloud` `helm/aisix-cloud`) |
+| `aisix-cp` (AISIX private-deployment control plane) | `charts/aisix-cp` | no — independent product version (source of truth: `api7/AISIX-Cloud` `helm/aisix-cp`) |
 
 ## Multi-line maintenance model
 

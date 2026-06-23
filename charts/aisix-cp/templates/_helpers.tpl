@@ -1,14 +1,14 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "aisix-cloud.name" -}}
+{{- define "aisix-cp.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Create a default fully qualified app name.
 */}}
-{{- define "aisix-cloud.fullname" -}}
+{{- define "aisix-cp.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -24,25 +24,25 @@ Create a default fully qualified app name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "aisix-cloud.chart" -}}
+{{- define "aisix-cp.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "aisix-cloud.labels" -}}
-helm.sh/chart: {{ include "aisix-cloud.chart" . }}
+{{- define "aisix-cp.labels" -}}
+helm.sh/chart: {{ include "aisix-cp.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
-app.kubernetes.io/part-of: aisix-cloud
+app.kubernetes.io/part-of: aisix-cp
 {{- end }}
 
 {{/*
 Selector labels for a component.
-Usage: {{ include "aisix-cloud.selectorLabels" (dict "root" . "component" "api") }}
+Usage: {{ include "aisix-cp.selectorLabels" (dict "root" . "component" "api") }}
 */}}
-{{- define "aisix-cloud.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "aisix-cloud.name" .root }}
+{{- define "aisix-cp.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "aisix-cp.name" .root }}
 app.kubernetes.io/instance: {{ .root.Release.Name }}
 app.kubernetes.io/component: {{ .component }}
 {{- end }}
@@ -50,7 +50,7 @@ app.kubernetes.io/component: {{ .component }}
 {{/*
 PostgreSQL host — uses builtin subchart service name or external host.
 */}}
-{{- define "aisix-cloud.pgHost" -}}
+{{- define "aisix-cp.pgHost" -}}
 {{- if .Values.postgresql.builtin }}
 {{- if .Values.postgresql.fullnameOverride }}
 {{- .Values.postgresql.fullnameOverride }}
@@ -65,7 +65,7 @@ PostgreSQL host — uses builtin subchart service name or external host.
 {{/*
 PostgreSQL port.
 */}}
-{{- define "aisix-cloud.pgPort" -}}
+{{- define "aisix-cp.pgPort" -}}
 {{- if .Values.postgresql.builtin }}
 {{- .Values.postgresql.primary.service.ports.postgresql }}
 {{- else }}
@@ -76,7 +76,7 @@ PostgreSQL port.
 {{/*
 PostgreSQL username.
 */}}
-{{- define "aisix-cloud.pgUser" -}}
+{{- define "aisix-cp.pgUser" -}}
 {{- if .Values.postgresql.builtin }}
 {{- if .Values.postgresql.auth.usePostgresUserForAppConnections }}
 {{- "postgres" }}
@@ -91,7 +91,7 @@ PostgreSQL username.
 {{/*
 PostgreSQL database name.
 */}}
-{{- define "aisix-cloud.pgDatabase" -}}
+{{- define "aisix-cp.pgDatabase" -}}
 {{- if .Values.postgresql.builtin }}
 {{- .Values.postgresql.auth.database }}
 {{- else }}
@@ -102,7 +102,7 @@ PostgreSQL database name.
 {{/*
 PostgreSQL SSL mode.
 */}}
-{{- define "aisix-cloud.pgSSLMode" -}}
+{{- define "aisix-cp.pgSSLMode" -}}
 {{- if .Values.postgresql.builtin }}
 {{- "disable" }}
 {{- else }}
@@ -114,21 +114,21 @@ PostgreSQL SSL mode.
 Database URL constructed from postgresql config.
 Uses $(PGPASSWORD) env var substitution for runtime secret injection.
 */}}
-{{- define "aisix-cloud.databaseURL" -}}
-postgres://{{ include "aisix-cloud.pgUser" . }}:$(PGPASSWORD)@{{ include "aisix-cloud.pgHost" . }}:{{ include "aisix-cloud.pgPort" . }}/{{ include "aisix-cloud.pgDatabase" . }}?sslmode={{ include "aisix-cloud.pgSSLMode" . }}
+{{- define "aisix-cp.databaseURL" -}}
+postgres://{{ include "aisix-cp.pgUser" . }}:$(PGPASSWORD)@{{ include "aisix-cp.pgHost" . }}:{{ include "aisix-cp.pgPort" . }}/{{ include "aisix-cp.pgDatabase" . }}?sslmode={{ include "aisix-cp.pgSSLMode" . }}
 {{- end }}
 
 {{/*
-Secret name for aisix-cloud secrets.
+Secret name for aisix-cp secrets.
 */}}
-{{- define "aisix-cloud.secretName" -}}
-{{ include "aisix-cloud.fullname" . }}-secrets
+{{- define "aisix-cp.secretName" -}}
+{{ include "aisix-cp.fullname" . }}-secrets
 {{- end }}
 
 {{/*
 Name of the Secret containing the PostgreSQL password.
 */}}
-{{- define "aisix-cloud.pgSecretName" -}}
+{{- define "aisix-cp.pgSecretName" -}}
 {{- if .Values.postgresql.builtin }}
 {{- if .Values.postgresql.auth.existingSecret }}
 {{- .Values.postgresql.auth.existingSecret }}
@@ -140,14 +140,14 @@ Name of the Secret containing the PostgreSQL password.
 {{- else if .Values.externalDatabase.existingSecret }}
 {{- .Values.externalDatabase.existingSecret }}
 {{- else }}
-{{- printf "%s-external-db" (include "aisix-cloud.fullname" .) }}
+{{- printf "%s-external-db" (include "aisix-cp.fullname" .) }}
 {{- end }}
 {{- end }}
 
 {{/*
 Secret key containing the PostgreSQL password for application connections.
 */}}
-{{- define "aisix-cloud.pgPasswordSecretKey" -}}
+{{- define "aisix-cp.pgPasswordSecretKey" -}}
 {{- if and .Values.postgresql.builtin .Values.postgresql.auth.usePostgresUserForAppConnections }}
 {{- "postgres-password" }}
 {{- else }}
@@ -158,9 +158,9 @@ Secret key containing the PostgreSQL password for application connections.
 {{/*
 ServiceAccount name.
 */}}
-{{- define "aisix-cloud.serviceAccountName" -}}
+{{- define "aisix-cp.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "aisix-cloud.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "aisix-cp.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}
@@ -169,7 +169,7 @@ ServiceAccount name.
 {{/*
 Image pull secrets from global config.
 */}}
-{{- define "aisix-cloud.imagePullSecrets" -}}
+{{- define "aisix-cp.imagePullSecrets" -}}
 {{- with .Values.global.imagePullSecrets }}
 imagePullSecrets:
   {{- toYaml . | nindent 2 }}
@@ -180,7 +180,7 @@ imagePullSecrets:
 Init container that blocks until PostgreSQL accepts connections.
 Reuses the same PG image shipped by the chart so no extra pull is needed.
 */}}
-{{- define "aisix-cloud.pgWaitInitContainer" -}}
+{{- define "aisix-cp.pgWaitInitContainer" -}}
 - name: wait-for-pg
   image: "{{ .Values.postgresql.image.registry }}/{{ .Values.postgresql.image.repository }}:{{ .Values.postgresql.image.tag }}"
   imagePullPolicy: IfNotPresent
@@ -188,13 +188,13 @@ Reuses the same PG image shipped by the chart so no extra pull is needed.
     - name: PGPASSWORD
       valueFrom:
         secretKeyRef:
-          name: {{ include "aisix-cloud.pgSecretName" . }}
-          key: {{ include "aisix-cloud.pgPasswordSecretKey" . }}
+          name: {{ include "aisix-cp.pgSecretName" . }}
+          key: {{ include "aisix-cp.pgPasswordSecretKey" . }}
   command:
     - sh
     - -c
     - |
-      until pg_isready -h {{ include "aisix-cloud.pgHost" . }} -p {{ include "aisix-cloud.pgPort" . }} -U {{ include "aisix-cloud.pgUser" . }}; do
+      until pg_isready -h {{ include "aisix-cp.pgHost" . }} -p {{ include "aisix-cp.pgPort" . }} -U {{ include "aisix-cp.pgUser" . }}; do
         echo "waiting for postgresql..."
         sleep 2
       done

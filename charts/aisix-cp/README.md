@@ -1,8 +1,8 @@
-# aisix-cloud
+# aisix-cp
 
 ![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
 
-Helm chart for AISIX-Cloud control plane (cp-api, dp-manager, dashboard)
+Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
 ## Maintainers
 
@@ -25,7 +25,7 @@ Helm chart for AISIX-Cloud control plane (cp-api, dp-manager, dashboard)
 | api.dpmgrBaseURL | string | `""` |  |
 | api.extraEnvVars | list | `[]` |  |
 | api.image.pullPolicy | string | `"IfNotPresent"` |  |
-| api.image.repository | string | `"ghcr.io/api7/aisix-cp-api"` |  |
+| api.image.repository | string | `"docker.io/api7/aisix-cp-api"` |  |
 | api.image.tag | string | `""` |  |
 | api.nodeSelector | object | `{}` |  |
 | api.oauthEnabled | bool | `false` |  |
@@ -49,7 +49,7 @@ Helm chart for AISIX-Cloud control plane (cp-api, dp-manager, dashboard)
 | dpm.affinity | object | `{}` |  |
 | dpm.extraEnvVars | list | `[]` |  |
 | dpm.image.pullPolicy | string | `"IfNotPresent"` |  |
-| dpm.image.repository | string | `"ghcr.io/api7/aisix-cp-dpm"` |  |
+| dpm.image.repository | string | `"docker.io/api7/aisix-cp-dpm"` |  |
 | dpm.image.tag | string | `""` |  |
 | dpm.nodeSelector | object | `{}` |  |
 | dpm.podSecurityContext.fsGroup | int | `101` |  |
@@ -101,7 +101,7 @@ Helm chart for AISIX-Cloud control plane (cp-api, dp-manager, dashboard)
 | ui.defaultLocale | string | `"en"` |  |
 | ui.extraEnvVars | list | `[]` |  |
 | ui.image.pullPolicy | string | `"IfNotPresent"` |  |
-| ui.image.repository | string | `"ghcr.io/api7/aisix-cp-ui"` |  |
+| ui.image.repository | string | `"docker.io/api7/aisix-cp-ui"` |  |
 | ui.image.tag | string | `""` |  |
 | ui.nodeSelector | object | `{}` |  |
 | ui.podSecurityContext.fsGroup | int | `65533` |  |
