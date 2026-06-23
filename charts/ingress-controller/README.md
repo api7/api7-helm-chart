@@ -20,7 +20,7 @@ Ingress Controller for API7
 |-----|------|---------|-------------|
 | adc.image.pullPolicy | string | `"IfNotPresent"` |  |
 | adc.image.repository | string | `"ghcr.io/api7/adc"` |  |
-| adc.image.tag | string | `"0.26.0"` |  |
+| adc.image.tag | string | `"0.27.1"` |  |
 | adc.logLevel | string | `"info"` |  |
 | adc.resources | object | `{}` |  |
 | adc.securityContext | object | `{}` |  |

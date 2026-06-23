@@ -41,7 +41,7 @@ deployment:
 adc:
   image:
     repository: ghcr.io/api7/adc
-    tag: "0.26.0"
+    tag: "0.27.1"
     pullPolicy: IfNotPresent
   logLevel: "info"
   resources: {}
