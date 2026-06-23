@@ -166,8 +166,10 @@ postgresql:
     ## If left as default, the password is baked into the PG data volume on first init
     ## and must remain unchanged across re-deploys.
     ## The chart REJECTS the default 'changeme' at render/install time when
-    ## postgresql.builtin=true — set a real password (openssl rand -base64 24)
-    ## or use existingSecret above.
+    ## postgresql.builtin=true — set a real password (openssl rand -hex 24).
+    ## Use a URL-safe value: the password is embedded in a postgres:// DSN,
+    ## so + / = (as produced by `openssl rand -base64`) corrupt URL parsing.
+    ## Or use existingSecret above.
     password: changeme
     postgresPassword: changeme
     database: aisix_cloud
