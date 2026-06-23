@@ -1,29 +1,29 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "aisix-cloud.fullname" . }}-api
+  name: {{ include "aisix-cp.fullname" . }}-api
   labels:
-    {{- include "aisix-cloud.labels" . | nindent 4 }}
-    {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "api") | nindent 4 }}
+    {{- include "aisix-cp.labels" . | nindent 4 }}
+    {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "api") | nindent 4 }}
 spec:
   replicas: {{ .Values.api.replicaCount }}
   selector:
     matchLabels:
-      {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "api") | nindent 6 }}
+      {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "api") | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "aisix-cloud.labels" . | nindent 8 }}
-        {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "api") | nindent 8 }}
+        {{- include "aisix-cp.labels" . | nindent 8 }}
+        {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "api") | nindent 8 }}
     spec:
-      {{- include "aisix-cloud.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "aisix-cloud.serviceAccountName" . }}
+      {{- include "aisix-cp.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "aisix-cp.serviceAccountName" . }}
       {{- with .Values.api.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       initContainers:
-        {{- include "aisix-cloud.pgWaitInitContainer" . | nindent 8 }}
+        {{- include "aisix-cp.pgWaitInitContainer" . | nindent 8 }}
       containers:
         - name: api
           image: "{{ .Values.api.image.repository }}:{{ .Values.api.image.tag | default .Chart.AppVersion }}"
@@ -40,23 +40,23 @@ spec:
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "aisix-cloud.pgSecretName" . }}
-                  key: {{ include "aisix-cloud.pgPasswordSecretKey" . }}
+                  name: {{ include "aisix-cp.pgSecretName" . }}
+                  key: {{ include "aisix-cp.pgPasswordSecretKey" . }}
             - name: AISIX_CLOUD_LISTEN
               value: ":8080"
             - name: AISIX_CLOUD_DATABASE_URL
-              value: {{ include "aisix-cloud.databaseURL" . }}
+              value: {{ include "aisix-cp.databaseURL" . }}
             - name: AISIX_CLOUD_PUBLIC_BASE_URL
               value: {{ .Values.api.publicBaseURL | quote }}
             - name: AISIX_CLOUD_MASTER_KEY
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "aisix-cloud.secretName" . }}
+                  name: {{ include "aisix-cp.secretName" . }}
                   key: master-key
             - name: AISIX_CLOUD_MASTER_KEY_ID
               value: {{ .Values.secrets.masterKeyID | quote }}
             - name: AISIX_CLOUD_DASHBOARD_URL
-              value: "http://{{ include "aisix-cloud.fullname" . }}-ui:{{ .Values.ui.service.port }}"
+              value: "http://{{ include "aisix-cp.fullname" . }}-ui:{{ .Values.ui.service.port }}"
             {{- if .Values.api.dpmgrBaseURL }}
             - name: AISIX_CLOUD_DPMGR_BASE_URL
               value: {{ .Values.api.dpmgrBaseURL | quote }}
@@ -64,7 +64,7 @@ spec:
             - name: AISIX_CLOUD_OAUTH_ENABLED
               value: {{ .Values.api.oauthEnabled | quote }}
             - name: AISIX_CLOUD_DP_IMAGE
-              value: {{ .Values.api.dpImage | default (printf "ghcr.io/api7/aisix:%s" .Chart.AppVersion) | quote }}
+              value: {{ .Values.api.dpImage | default (printf "docker.io/api7/aisix:%s" .Chart.AppVersion) | quote }}
             {{- with .Values.api.extraEnvVars }}
             {{- toYaml . | nindent 12 }}
             {{- end }}

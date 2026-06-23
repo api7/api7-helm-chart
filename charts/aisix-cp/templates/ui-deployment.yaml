@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "aisix-cloud.fullname" . }}-ui
+  name: {{ include "aisix-cp.fullname" . }}-ui
   labels:
-    {{- include "aisix-cloud.labels" . | nindent 4 }}
-    {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "ui") | nindent 4 }}
+    {{- include "aisix-cp.labels" . | nindent 4 }}
+    {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "ui") | nindent 4 }}
 spec:
   replicas: {{ .Values.ui.replicaCount }}
   selector:
     matchLabels:
-      {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "ui") | nindent 6 }}
+      {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "ui") | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "aisix-cloud.labels" . | nindent 8 }}
-        {{- include "aisix-cloud.selectorLabels" (dict "root" . "component" "ui") | nindent 8 }}
+        {{- include "aisix-cp.labels" . | nindent 8 }}
+        {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "ui") | nindent 8 }}
     spec:
-      {{- include "aisix-cloud.imagePullSecrets" . | nindent 6 }}
-      serviceAccountName: {{ include "aisix-cloud.serviceAccountName" . }}
+      {{- include "aisix-cp.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "aisix-cp.serviceAccountName" . }}
       {{- with .Values.ui.podSecurityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -38,17 +38,17 @@ spec:
             - name: PGPASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "aisix-cloud.pgSecretName" . }}
-                  key: {{ include "aisix-cloud.pgPasswordSecretKey" . }}
+                  name: {{ include "aisix-cp.pgSecretName" . }}
+                  key: {{ include "aisix-cp.pgPasswordSecretKey" . }}
             - name: BETTER_AUTH_URL
               value: {{ .Values.api.publicBaseURL | quote }}
             - name: BETTER_AUTH_SECRET
               valueFrom:
                 secretKeyRef:
-                  name: {{ include "aisix-cloud.secretName" . }}
+                  name: {{ include "aisix-cp.secretName" . }}
                   key: better-auth-secret
             - name: AISIX_CLOUD_DATABASE_URL
-              value: {{ include "aisix-cloud.databaseURL" . }}
+              value: {{ include "aisix-cp.databaseURL" . }}
             - name: AISIX_DASHBOARD_LOCALE
               value: {{ .Values.ui.defaultLocale | quote }}
             {{- with .Values.ui.extraEnvVars }}

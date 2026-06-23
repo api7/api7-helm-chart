@@ -37,7 +37,7 @@ jobs:
                   --charts charts/api7 \
                   --charts charts/gateway \
                   --charts charts/ingress-controller \
-                  --charts charts/aisix-cloud'
+                  --charts charts/aisix-cp'
 
       - name: Verify Chart.lock files
         run: |
