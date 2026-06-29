@@ -137,7 +137,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.10.1
+    tag: 3.10.2
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
@@ -370,6 +370,10 @@ gateway:
       # - addr: "3000-3100"             # port range in table form
       # - addr: "127.0.0.1:4000-4100"   # address with port range
       #   tls: true
+      # - addr: 9100                        # per-port PROXY protocol overrides for this entry
+      #   proxy_protocol: true              # accept the PROXY protocol on this port only
+      #   proxy_protocol_to_upstream: true  # send the PROXY protocol to the upstream on this port only;
+      #                                     # both override the global apisix.proxyProtocol.enableTcpPP* defaults
     udp: []
       # - addr: 192.168.31.10:53
       # - addr: 5353
