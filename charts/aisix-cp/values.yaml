@@ -52,6 +52,11 @@ dpm:
   service:
     type: ClusterIP
     port: 7944
+    # Plain-HTTP listen address for /healthz (outbox-poller liveness),
+    # probed by the kubelet (the mTLS port 7944 cannot be probed). Set to
+    # "" to disable the health server + httpGet probes (the probes then
+    # fall back to a TCP check on the mTLS port).
+    healthListen: ":7946"
     nodePort: ""
   resources:
     requests:

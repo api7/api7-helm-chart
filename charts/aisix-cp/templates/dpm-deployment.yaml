@@ -36,6 +36,11 @@ spec:
             - name: tls
               containerPort: 7944
               protocol: TCP
+            {{- if .Values.dpm.service.healthListen }}
+            - name: health
+              containerPort: {{ trimPrefix ":" .Values.dpm.service.healthListen | int }}
+              protocol: TCP
+            {{- end }}
           env:
             - name: PGPASSWORD
               valueFrom:
@@ -44,6 +49,8 @@ spec:
                   key: {{ include "aisix-cp.pgPasswordSecretKey" . }}
             - name: AISIX_DPMGR_LISTEN
               value: ":7944"
+            - name: AISIX_DPMGR_HEALTH_LISTEN
+              value: {{ .Values.dpm.service.healthListen | quote }}
             - name: AISIX_DPMGR_DATABASE_URL
               value: {{ include "aisix-cp.databaseURL" . }}
             - name: AISIX_DPMGR_MASTER_KEY
@@ -56,6 +63,28 @@ spec:
             {{- with .Values.dpm.extraEnvVars }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          # Probe the plain-HTTP /healthz (poller liveness), not the
+          # mTLS port: a kubelet cannot present a client cert, and a
+          # TCP check on 7944 stays green even if the outbox poller is
+          # dead/wedged. A stale poller fails readiness (removed from the
+          # Service) and liveness (pod restarted). When the health
+          # listener is disabled (healthListen=""), the dp-manager serves
+          # no /healthz, so fall back to a TCP check on the mTLS port.
+          {{- if .Values.dpm.service.healthListen }}
+          readinessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          livenessProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          {{- else }}
           readinessProbe:
             tcpSocket:
               port: tls
@@ -66,6 +95,7 @@ spec:
               port: tls
             initialDelaySeconds: 10
             periodSeconds: 10
+          {{- end }}
           {{- with .Values.dpm.resources }}
           resources:
             {{- toYaml . | nindent 12 }}
