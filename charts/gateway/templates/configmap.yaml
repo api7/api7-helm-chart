@@ -95,6 +95,12 @@ data:
           {{- if hasKey . "tls" }}
             tls: {{ .tls }}
           {{- end }}
+          {{- if hasKey . "proxy_protocol" }}
+            proxy_protocol: {{ .proxy_protocol }}
+          {{- end }}
+          {{- if hasKey . "proxy_protocol_to_upstream" }}
+            proxy_protocol_to_upstream: {{ .proxy_protocol_to_upstream }}
+          {{- end }}
           {{- else if kindIs "string" . }}
           - {{ . | quote }}
           {{- else }}
