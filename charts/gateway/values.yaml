@@ -7,8 +7,14 @@ global:
   imagePullSecrets: []
 
 api7ee:
-  # -- healthcheck data report interval in seconds
+  # -- Interval in seconds at which the gateway reports upstream healthcheck data to the control plane
   healthcheck_report_interval: 120
+
+  # -- Interval in seconds at which raw API call data (used by the API usage feature) is uploaded to the control plane
+  raw_api_calls_upload_interval: 3600
+
+  # -- HTTP timeout used while sending healthcheck and telemetry data to the control plane
+  http_timeout: 30s
 
   status_endpoint:
     # -- When enabled, APISIX will provide `/status` and `/status/ready` endpoints, /status endpoint will return 200 status code if APISIX has successfully started and running correctly, /status/ready endpoint will return 503 status code if none of the configured etcd (dp_manager) are available.
@@ -31,21 +37,64 @@ apisix:
   # -- Whether the APISIX version number should be shown in Server header
   enableServerTokens: true
 
+  # -- When true, the upstream status is always written to the `X-APISIX-Upstream-Status` response header; when false, it is written only for 5xx responses
+  showUpstreamStatusInResponseHeader: false
+
+  # -- List of IPs/CIDRs from which the gateway trusts the `X-Forwarded-*` headers passed in requests.
+  # CAUTION: when not configured, or when the request comes from an untrusted address, the gateway
+  # overrides `X-Forwarded-Proto/Host/Port` with trusted values and clears the `Forwarded` header.
+  # For `X-Forwarded-For`: when this list is configured and the request comes from an untrusted address,
+  # the header is reset so the upstream only sees the connection IP observed by the gateway; when not
+  # configured, it is preserved and the connection IP is appended (compatible default).
+  trustedAddresses: []
+    # - 127.0.0.1
+    # - 172.18.0.0/16
+
+  # -- Cap (in MB) on the request body read when matching `post_arg.*` route predicates
+  # for JSON and multipart requests. Set to 0 to disable the limit.
+  maxPostArgsReadableSize: 64
+
   # -- PROXY Protocol configuration.
   proxyProtocol:
-    # -- Enable PROXY Protocol for TCP proxy. It works with gateway.stream.tcp.
+    # -- (int) The HTTP port that accepts the PROXY Protocol. It differs from `gateway.http` ports and `admin` port:
+    # this port only accepts HTTP requests carrying the PROXY Protocol, while the other ports only accept plain HTTP
+    # requests. If you enable the PROXY Protocol, you must use this port to receive HTTP requests with it.
+    listenHttpPort:
+    # -- (int) The HTTPS port that accepts the PROXY Protocol.
+    listenHttpsPort:
+    # -- Accept the PROXY Protocol on every gateway.stream.tcp port. Acts as the default;
+    # override per port with the `proxy_protocol` field on a gateway.stream.tcp entry.
     enableTcpPP: false
-    # -- Send PROXY Protocol to the upstream server for TCP proxy.
+    # -- Send the PROXY Protocol to the upstream server on every gateway.stream.tcp port. Acts as the default;
+    # override per port with the `proxy_protocol_to_upstream` field on a gateway.stream.tcp entry.
     enableTcpPPToUpstream: false
 
   # -- Use Pod metadata.uid as the APISIX id.
   setIDFromPodUID: false
 
+  # -- Proxy caching configuration used by the proxy-cache plugin.
+  proxyCache:
+    # -- The default caching time in disk if the upstream does not specify the cache time
+    cacheTtl: 10s
+    # -- The parameters of a cache. The `memory_size` field stores the cache index for the
+    # disk strategy and the cache content for the memory strategy; `disk_size`, `disk_path`
+    # and `cache_levels` only apply to the disk strategy.
+    zones:
+      - name: disk_cache_one
+        memory_size: 50m
+        disk_size: 1G
+        disk_path: "/tmp/disk_cache_one"
+        cache_levels: "1:2"
+      - name: memory_cache
+        memory_size: 50m
+
   meta:
+    # -- Shared dict settings for the `meta` context (used by both HTTP and stream subsystems)
     luaSharedDict:
       prometheus-metrics: 15m
 
   stream:
+    # -- Shared dict settings for the stream (L4 proxy) subsystem
     luaSharedDict:
       etcd-cluster-health-check-stream: 10m
       lrucache-lock-stream: 10m
@@ -53,21 +102,27 @@ apisix:
       worker-events-stream: 10m
       tars-stream: 1m
       config-stream: 5m
+      nacos-stream: 20m
 
   http:
+    # -- Shared dict settings for the HTTP subsystem
     luaSharedDict:
       internal-status: 10m
       plugin-limit-req: 10m
       plugin-limit-count: 10m
       plugin-limit-conn: 10m
+      plugin-limit-conn-redis-cluster-slot-lock: 1m
       plugin-graphql-limit-count: 10m
       plugin-graphql-limit-count-reset-header: 10m
+      plugin-ai-rate-limiting: 10m
+      plugin-ai-rate-limiting-reset-header: 10m
       upstream-healthcheck: 10m
       worker-events: 10m
       lrucache-lock: 10m
       balancer-ewma: 10m
       balancer-ewma-locks: 10m
       balancer-ewma-last-touched-at: 10m
+      plugin-limit-req-redis-cluster-slot-lock: 1m
       plugin-limit-count-redis-cluster-slot-lock: 1m
       plugin-limit-count-advanced: 10m
       plugin-limit-count-advanced-redis-cluster-slot-lock: 1m
@@ -85,11 +140,13 @@ apisix:
   # -- fine tune the parameters of LRU cache for some features like secret
   lru:
     secret:
-      # -- in seconds
+      # -- TTL in seconds for cached secret values
       ttl: 300
+      # -- Maximum number of cached secret values
       count: 512
-      # -- in seconds
+      # -- TTL in seconds for cached negative (failed lookup) results
       neg_ttl: 60
+      # -- Maximum number of cached negative (failed lookup) results
       neg_count: 512
 
   # -- Enable comprehensive request lifecycle tracing (SSL/SNI, rewrite, access, header_filter, body_filter, and log).
@@ -108,7 +165,9 @@ apisix:
     # - name: bar
     #   size: 1m
 
+  # -- Extend lua_package_path to load third party Lua code
   extraLuaPath: ""
+  # -- Extend lua_package_cpath to load third party Lua C libraries
   extraLuaCPath: ""
 
   # -- Delete the '/' at the end of the URI
@@ -183,8 +242,6 @@ apisix:
 
   # -- Set pod resource requests & limits
   resources: {}
-    # -- Use the host's network namespace
-
     # We usually recommend not to specify default resources and to leave this as a conscious
     # choice for the user. This also increases chances charts run on environments with little
     # resources, such as Minikube. If you do want to specify resources, uncomment the following
@@ -195,6 +252,8 @@ apisix:
     # requests:
     #   cpu: 100m
     #   memory: 128Mi
+
+  # -- Use the host's network namespace
   hostNetwork: false
 
   # -- Custom DNS settings for the APISIX pods
@@ -225,22 +284,26 @@ apisix:
   #         name: SECRET_NAME
   #         key: KEY
   extraEnvVars: []
-  ## @param extraEnvVarsCM Name of existing ConfigMap containing extra env vars
-  ##
+  # -- Name of existing ConfigMap containing extra env vars
   extraEnvVarsCM: ""
-  ## @param extraEnvVarsSecret Name of existing Secret containing extra env vars
-  ##
+  # -- Name of existing Secret containing extra env vars
   extraEnvVarsSecret: ""
 
+# -- String to partially override the chart fullname
 nameOverride: ""
+# -- String to fully override the chart fullname
 fullnameOverride: ""
 
 serviceAccount:
+  # -- Whether a ServiceAccount should be created for the gateway pods
   create: false
+  # -- Annotations to add to the ServiceAccount
   annotations: {}
+  # -- Name of the ServiceAccount to use. If not set and create is true, a name is generated from the chart fullname
   name: ""
 
 rbac:
+  # -- Whether RBAC resources (ClusterRole and ClusterRoleBinding) should be created
   create: false
 
 deployment:
@@ -286,9 +349,8 @@ deployment:
 gateway:
   # -- API7 Gateway service type for user access itself
   type: NodePort
-  # -- Setting how the Service route external traffic
-  # If you want to keep the client source IP, you can set this to Local.
-
+  # -- Setting how the Service route external traffic.
+  # If you want to keep the client source IP, you can set this to Local,
   # ref: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/#preserving-the-client-source-ip
   externalTrafficPolicy: Cluster
   # type: LoadBalancer
@@ -306,10 +368,13 @@ gateway:
   livenessProbe: {}
   # -- API7 Gateway service settings for http
   http:
+    # -- Enable plain HTTP listeners
     enabled: true
     # -- which ip to listen on for API7 Gateway http service.
     ip: 0.0.0.0
+    # -- Kubernetes service port for HTTP traffic
     servicePort: 80
+    # -- Container port the gateway listens on for HTTP traffic
     containerPort: 9080
     # -- (int) The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes.
     nodePort:
@@ -329,10 +394,13 @@ gateway:
       #   backlog: 1024
   # -- API7 Gateway service settings for tls
   tls:
+    # -- Enable HTTPS listeners
     enabled: true
     # -- which ip to listen on for API7 Gateway https service.
     ip: 0.0.0.0
+    # -- Kubernetes service port for HTTPS traffic
     servicePort: 443
+    # -- Container port the gateway listens on for HTTPS traffic
     containerPort: 9443
     # -- (int) The nodePort of kubernetes service, only used if gateway.type is NodePort. If not set, a random port will be assigned by Kubernetes.
     nodePort:
@@ -351,14 +419,22 @@ gateway:
     # -- Filename be used in the gateway.tls.existingCASecret
     certCAFilename: ""
     http2:
+      # -- Enable HTTP/2 on the HTTPS listeners
       enabled: true
     # -- TLS protocols allowed to use.
     sslProtocols: "TLSv1.2 TLSv1.3"
+    # -- TLS cipher suites allowed to use, in OpenSSL cipher list format
+    sslCiphers: "ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA"
+    # -- Enable or disable TLS session tickets. Disabled by default because session tickets
+    # defeat Perfect Forward Secrecy (see https://github.com/mozilla/server-side-tls/issues/135)
+    sslSessionTickets: false
     # -- If set this, when the client doesn't send SNI during handshake, the fallback SNI will be used instead
     fallbackSNI: ""
   # -- API7 Gateway service settings for stream. L4 proxy (TCP/UDP)
   stream:
+    # -- Enable the stream (L4 proxy) subsystem
     enabled: false
+    # -- Use the stream proxy only, without enabling the HTTP subsystem
     only: false
     # -- Whether to set nodePort to the same value as the TCP/UDP port when gateway.type is NodePort, make sure the nodePort to be in the valid NodePort range of kubernetes service.
     autoAssignNodePort: false
@@ -381,14 +457,17 @@ gateway:
       # - "9300-9310"                   # port range
   # -- Using ingress access API7 Gateway service
   ingress:
+    # -- Enable an Ingress resource in front of the gateway service
     enabled: false
     # -- Ingress annotations
     annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
+    # -- Ingress host and path rules
     hosts:
       - host: apisix.local
         paths: []
+    # -- Ingress TLS settings
     tls: []
   #  - secretName: apisix-tls
   #    hosts:
@@ -434,29 +513,42 @@ admin:
       - 127.0.0.1/24
   # -- Using ingress access API7 Gateway admin service
   ingress:
+    # -- Enable an Ingress resource in front of the Admin API service
     enabled: false
     # -- Ingress annotations
     annotations:
       {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
+    # -- Ingress host and path rules
     hosts:
       - host: apisix-admin.local
         paths:
           - "/apisix"
+    # -- Ingress TLS settings
     tls: []
   #  - secretName: apisix-tls
   #    hosts:
   #      - chart-example.local
 
 nginx:
+  # -- The number of files a worker process can open, should be larger than nginx.workerConnections
   workerRlimitNofile: "20480"
+  # -- Timeout for a graceful shutdown of worker processes
   workerShutdownTimeout: "240s"
+  # -- The maximum number of connections that each worker process can open
   workerConnections: "10620"
+  # -- The number of nginx worker processes. `auto` means the number of CPU cores
   workerProcesses: auto
+  # -- Bind nginx worker processes to CPUs
   enableCPUAffinity: true
+  # -- Maximum number of pending timers. Increase it if you see "too many pending timers" error
+  maxPendingTimers: 16384
+  # -- Maximum number of running timers. Increase it if you see "lua_max_running_timers are not enough" error
+  maxRunningTimers: 4096
+  # -- List of environment variable names allowed to be accessed within nginx (rendered as nginx `env` directives)
   envs: []
-  # -- HTTP timeout configurations
+  # -- Nginx HTTP subsystem configurations
   http:
     # -- timeout during which a keep-alive client connection will stay open on the server side
     keepaliveTimeout: "60s"
@@ -470,10 +562,46 @@ nginx:
     # If exceeded, the 413 (Request Entity Too Large) error is returned to the client.
     # Note that unlike Nginx, we don't limit the body size by default (0 means no limit).
     clientMaxBodySize: 0
+    # -- Enable the use of underscores in client request header fields
+    underscoresInHeaders: "on"
+    # -- The request header used to determine the client's real IP address,
+    # see [real_ip_header](http://nginx.org/en/docs/http/ngx_http_realip_module.html#real_ip_header)
+    realIpHeader: "X-Real-IP"
+    # -- Whether to search for the real IP recursively when the header set in nginx.http.realIpHeader contains multiple addresses,
+    # see [real_ip_recursive](http://nginx.org/en/docs/http/ngx_http_realip_module.html#real_ip_recursive)
+    realIpRecursive: "off"
+    # -- Trusted addresses from which the real IP header is honored,
+    # see [set_real_ip_from](http://nginx.org/en/docs/http/ngx_http_realip_module.html#set_real_ip_from)
+    realIpFrom:
+      - 127.0.0.1
+      - "unix:"
+    # -- Enables or disables passing of the server name through TLS Server Name Indication extension (SNI, RFC 6066)
+    # when establishing a connection with the proxied HTTPS server
+    proxySslServerName: true
+    # -- Keepalive settings for connections from the gateway to upstream servers
+    upstream:
+      # -- Maximum number of idle keepalive connections to upstream servers that are preserved in the cache of each worker process.
+      # When this number is exceeded, the least recently used connections are closed
+      keepalive: 320
+      # -- Maximum number of requests that can be served through one keepalive connection.
+      # After the maximum number of requests is made, the connection is closed
+      keepaliveRequests: 1000
+      # -- Timeout during which an idle keepalive connection to an upstream server will stay open
+      keepaliveTimeout: 60s
+    # -- The charset added to the "Content-Type" response header field,
+    # see [charset](http://nginx.org/en/docs/http/ngx_http_charset_module.html#charset)
+    charset: utf-8
+    # -- The maximum size of the nginx variables hash table
+    variablesHashMaxSize: 2048
 
 # -- Set APISIX plugin attributes, see [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L376) for more details
 pluginAttrs: {}
 
+graphql:
+  # -- The maximum size in bytes of GraphQL queries the gateway parses when matching routes by GraphQL attributes (default 1MiB)
+  maxSize: 1048576
+
+# -- Update strategy of the workload (Deployment or DaemonSet), e.g. `type: RollingUpdate`
 updateStrategy: {}
   # type: RollingUpdate
 
@@ -482,7 +610,7 @@ extraVolumes: []
 # - name: extras
 #   emptyDir: {}
 
-# -- Additional `volume`, See [Kubernetes Volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the detail.
+# -- Additional `volumeMounts` for the gateway container, See [Kubernetes Volumes](https://kubernetes.io/docs/concepts/storage/volumes/) for the detail.
 extraVolumeMounts: []
 # - name: extras
 #   mountPath: /usr/share/extras
@@ -547,15 +675,18 @@ logs:
     accessLogFormatEscape: default
 
 dns:
-  resolvers:
-    - 127.0.0.1
-    - 172.20.0.10
-    - 114.114.114.114
-    - 223.5.5.5
-    - 1.1.1.1
-    - 8.8.8.8
+  # -- Nameservers used by the gateway to resolve upstream domain names.
+  # When empty (default), nameservers are read from `/etc/resolv.conf`,
+  # which is usually what you want inside Kubernetes
+  resolvers: []
+    # - 127.0.0.1
+    # - 8.8.8.8
+  # -- Override the TTL in seconds of valid DNS records
   validity: 30
+  # -- DNS resolver timeout in seconds
   timeout: 5
+  # -- Honor the `search` option in `/etc/resolv.conf` when resolving domain names
+  enableResolvSearchOpt: true
 
 initContainer:
   # -- Init container image
@@ -564,28 +695,42 @@ initContainer:
   tag: 1.28
 
 autoscaling:
+  # -- Enable HorizontalPodAutoscaler for the gateway (only when apisix.kind is Deployment)
   enabled: false
   # -- HPA version, the value is "v2" or "v2beta1", default "v2"
   version: v2
+  # -- Minimum number of gateway replicas
   minReplicas: 1
+  # -- Maximum number of gateway replicas
   maxReplicas: 100
+  # -- Target average CPU utilization percentage that triggers scaling
   targetCPUUtilizationPercentage: 80
+  # -- Target average memory utilization percentage that triggers scaling
   targetMemoryUtilizationPercentage: 80
 
-# -- Custom configuration snippet.
+# -- Custom nginx configuration snippets injected into the generated nginx.conf.
+# As arbitrary configuration can be added here, it is your responsibility to make sure
+# the snippets don't conflict with the configuration generated by the gateway.
 configurationSnippet:
+  # -- Snippet added to the nginx `main` (top-level) block
   main: |
 
+  # -- Snippet added to the beginning of the nginx `http` block
   httpStart: |
 
+  # -- Snippet added to the end of the nginx `http` block
   httpEnd: |
 
+  # -- Snippet added to the nginx `server` block that proxies regular traffic
   httpSrv: |
 
+  # -- Snippet added to the `location` block of the nginx `server` block that proxies regular traffic
   httpSrvLocation: |
 
+  # -- Snippet added to the nginx `server` block that serves the Admin API
   httpAdmin: |
 
+  # -- Snippet added to the nginx `stream` block
   stream: |
 
 # -- Observability configuration.
@@ -618,6 +763,7 @@ etcd:
   # -- install etcd(v3) by default, set false if do not want to install etcd(v3) together
   enabled: false
   image:
+    # -- etcd image repository, only used when etcd.enabled is true
     repository: api7/etcd
   # -- if etcd.enabled is false, use external etcd, support multiple address, if your etcd cluster enables TLS, please use https scheme, e.g. https://127.0.0.1:2379.
   host:
@@ -631,6 +777,10 @@ etcd:
   prefix: "/apisix"
   # -- Set the timeout value in seconds for subsequent socket operations from apisix to etcd cluster
   timeout: 30
+  # -- Set the timeout value in seconds for watching etcd
+  watchTimeout: 50
+  # -- The number of retries to etcd during startup
+  startupRetry: 2
 
   # -- if etcd.enabled is true, set more values of bitnami/etcd helm chart
   auth:
@@ -654,8 +804,10 @@ etcd:
       sni: ""
 
   service:
+    # -- etcd client service port
     port: 2379
 
+  # -- Number of etcd replicas, only used when etcd.enabled is true
   replicaCount: 3
 
 vault:
