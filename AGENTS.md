@@ -58,6 +58,17 @@ Operational rule: **on any `release/*` branch, only bump the charts you actually
 - `ci.yaml` (lint / ct install / helm-docs) also covers `release/**`.
 - after editing a chart, regenerate each chart's `README.md` with `helm-docs --chart-search-root=charts`, or the helm-docs CI check fails.
 
+## Gateway chart: which config to expose
+
+The gateway chart's `values.yaml`/configmap mirror the gateway's `conf/config-default.yaml`, **except** for config the control plane owns and delivers to the DP at runtime via the heartbeat config payload / etcd. Never expose these in the chart (a chart-set value would be overridden or would fight the CP):
+
+- `apisix.data_encryption` and `apisix.ssl.key_encrypt_salt` — per-gateway-group keyring (CP `GetDataplaneConfig`)
+- `api7ee.consumer_proxy`, `api7ee.developer_proxy`, `api7ee.telemetry` — CP system settings
+- dynamic service discovery (`api7_discovery`, K8s/Nacos) — configured per gateway group in the Dashboard
+- the enabled `plugins` / `stream_plugins` list — CP manages it through the etcd `/plugins` key, including custom plugins
+
+When adding values, keep defaults identical to `config-default.yaml` so a default render changes nothing. To verify a rendered config is valid, extract `config.yaml` from the rendered configmap and run it through the real image: `docker run --rm --entrypoint sh -v $PWD/config.yaml:/usr/local/apisix/conf/config.yaml api7/api7-ee-3-gateway:<ver> -c 'apisix init'` — the config schema is validated at init.
+
 ## User upgrade guidance
 
 - Follow the latest line: `helm repo update && helm upgrade <release> api7/<chart>` (picks the highest version, always the newest EE line).
