@@ -77,12 +77,18 @@ spec:
   - name: apisix-gateway-pp
     port: {{ .Values.apisix.proxyProtocol.listenHttpPort }}
     targetPort: {{ .Values.apisix.proxyProtocol.listenHttpPort }}
+    {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.apisix.proxyProtocol.listenHttpNodePort))) }}
+    nodePort: {{ .Values.apisix.proxyProtocol.listenHttpNodePort }}
+    {{- end }}
     protocol: TCP
   {{- end }}
   {{- if .Values.apisix.proxyProtocol.listenHttpsPort }}
   - name: apisix-gateway-pp-tls
     port: {{ .Values.apisix.proxyProtocol.listenHttpsPort }}
     targetPort: {{ .Values.apisix.proxyProtocol.listenHttpsPort }}
+    {{- if (and (eq .Values.gateway.type "NodePort") (not (empty .Values.apisix.proxyProtocol.listenHttpsNodePort))) }}
+    nodePort: {{ .Values.apisix.proxyProtocol.listenHttpsNodePort }}
+    {{- end }}
     protocol: TCP
   {{- end }}
   {{- if .Values.serviceMonitor.enabled }}
