@@ -73,6 +73,18 @@ spec:
     nodePort: {{ .nodePort }}
     {{- end }}
   {{- end }}
+  {{- if .Values.apisix.proxyProtocol.listenHttpPort }}
+  - name: apisix-gateway-pp
+    port: {{ .Values.apisix.proxyProtocol.listenHttpPort }}
+    targetPort: {{ .Values.apisix.proxyProtocol.listenHttpPort }}
+    protocol: TCP
+  {{- end }}
+  {{- if .Values.apisix.proxyProtocol.listenHttpsPort }}
+  - name: apisix-gateway-pp-tls
+    port: {{ .Values.apisix.proxyProtocol.listenHttpsPort }}
+    targetPort: {{ .Values.apisix.proxyProtocol.listenHttpsPort }}
+    protocol: TCP
+  {{- end }}
   {{- if .Values.serviceMonitor.enabled }}
   - name: prometheus
     port: {{ .Values.serviceMonitor.containerPort }}

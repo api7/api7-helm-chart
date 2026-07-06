@@ -41,7 +41,7 @@ data:
       enable_reuseport: true                       # Enable nginx SO_REUSEPORT switch if set to true.
       enable_ipv6: {{ .Values.apisix.enableIPv6 }} # Enable nginx IPv6 resolver
       enable_server_tokens: {{ .Values.apisix.enableServerTokens }} # Whether the APISIX version number should be shown in Server header
-      show_upstream_status_in_response_header: {{ .Values.apisix.showUpstreamStatusInResponseHeader }} # when true all upstream status write to `X-APISIX-Upstream-Status` otherwise only 5xx code
+      show_upstream_status_in_response_header: {{ .Values.apisix.showUpstreamStatusInResponseHeader }} # when true, all upstream statuses are written to `X-APISIX-Upstream-Status`; otherwise only 5xx codes
 
       {{- with .Values.apisix.trustedAddresses }}
       trusted_addresses:    # When configured, APISIX will trust the `X-Forwarded-*` Headers passed in requests from the IP/CIDR in the list.

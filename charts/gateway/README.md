@@ -104,8 +104,8 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.proxyProtocol | object | `{"enableTcpPP":false,"enableTcpPPToUpstream":false,"listenHttpPort":null,"listenHttpsPort":null}` | PROXY Protocol configuration. |
 | apisix.proxyProtocol.enableTcpPP | bool | `false` | Accept the PROXY Protocol on every gateway.stream.tcp port. Acts as the default; override per port with the `proxy_protocol` field on a gateway.stream.tcp entry. |
 | apisix.proxyProtocol.enableTcpPPToUpstream | bool | `false` | Send the PROXY Protocol to the upstream server on every gateway.stream.tcp port. Acts as the default; override per port with the `proxy_protocol_to_upstream` field on a gateway.stream.tcp entry. |
-| apisix.proxyProtocol.listenHttpPort | int | `nil` | The HTTP port that accepts the PROXY Protocol. It differs from `gateway.http` ports and `admin` port: this port only accepts HTTP requests carrying the PROXY Protocol, while the other ports only accept plain HTTP requests. If you enable the PROXY Protocol, you must use this port to receive HTTP requests with it. |
-| apisix.proxyProtocol.listenHttpsPort | int | `nil` | The HTTPS port that accepts the PROXY Protocol. |
+| apisix.proxyProtocol.listenHttpPort | int | `nil` | The HTTP port that accepts the PROXY Protocol. It differs from `gateway.http` ports and `admin` port: this port only accepts HTTP requests carrying the PROXY Protocol, while the other ports only accept plain HTTP requests. If you enable the PROXY Protocol, you must use this port to receive HTTP requests with it. When set, the port is also exposed on the gateway Service. |
+| apisix.proxyProtocol.listenHttpsPort | int | `nil` | The HTTPS port that accepts the PROXY Protocol. When set, the port is also exposed on the gateway Service. |
 | apisix.replicaCount | int | `1` | kind is DaemonSet, replicaCount not become effective |
 | apisix.resources | object | `{}` | Set pod resource requests & limits |
 | apisix.securityContext | object | `{}` | Set the securityContext for API7 Gateway container |
