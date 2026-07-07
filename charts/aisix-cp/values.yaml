@@ -191,3 +191,28 @@ externalDatabase:
   ## If existingSecret is empty, this password is used directly.
   password: ""
   sslmode: disable
+
+## @section Two-DSN tenant isolation (SaaS / multi-tenant only)
+## When enabled, cp-api opens TWO pools against the same database:
+##   - an admin pool on the privileged DSN above (builtin postgres or the
+##     externalDatabase user) that runs migrations + the cross-tenant paths;
+##   - a serving pool that connects AS the non-superuser `cp_api_app` role,
+##     so every tenant query is Row-Level-Security filtered and a path that
+##     forgets to scope fails closed (zero rows) instead of leaking.
+## cp-api provisions cp_api_app's LOGIN + password (from servingPassword)
+## on the admin pool at boot — you do NOT pre-create the role.
+##
+## Leave DISABLED for single-tenant / private (OP) deployments: there every
+## org is one trust domain, RLS is inert, and the single privileged DSN
+## handles everything (the current default behavior). See the internal
+## docs/rls-architecture.md for the full model.
+twoDSN:
+  enabled: false
+  ## Password cp-api assigns to the cp_api_app serving role and uses in the
+  ## serving DSN. Required when enabled unless existingSecret is set.
+  ## Use a URL-safe value (no + / =): it is embedded in a postgres:// DSN.
+  servingPassword: ""
+  ## Optionally source the serving password from an existing Secret instead
+  ## of servingPassword above. Key defaults to "serving-password".
+  existingSecret: ""
+  existingSecretKey: "serving-password"
