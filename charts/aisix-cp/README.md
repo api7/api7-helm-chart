@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.2.0](https://img.shields.io/badge/AppVersion-0.2.0-informational?style=flat-square)
+![Version: 0.3.0](https://img.shields.io/badge/Version-0.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.3.0](https://img.shields.io/badge/AppVersion-0.3.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -98,6 +98,10 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | serviceAccount.annotations | object | `{}` |  |
 | serviceAccount.create | bool | `true` |  |
 | serviceAccount.name | string | `""` |  |
+| twoDSN.enabled | bool | `false` |  |
+| twoDSN.existingSecret | string | `""` |  |
+| twoDSN.existingSecretKey | string | `"serving-password"` |  |
+| twoDSN.servingPassword | string | `""` |  |
 | ui.affinity | object | `{}` |  |
 | ui.defaultLocale | string | `"en"` |  |
 | ui.extraEnvVars | list | `[]` |  |

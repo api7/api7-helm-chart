@@ -42,10 +42,24 @@ spec:
                 secretKeyRef:
                   name: {{ include "aisix-cp.pgSecretName" . }}
                   key: {{ include "aisix-cp.pgPasswordSecretKey" . }}
+            {{- if .Values.twoDSN.enabled }}
+            - name: SERVING_PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix-cp.servingPasswordSecretName" . }}
+                  key: {{ include "aisix-cp.servingPasswordSecretKey" . }}
+            {{- end }}
             - name: AISIX_CLOUD_LISTEN
               value: ":8080"
+            {{- if .Values.twoDSN.enabled }}
+            - name: AISIX_CLOUD_ADMIN_DATABASE_URL
+              value: {{ include "aisix-cp.databaseURL" . }}
+            - name: AISIX_CLOUD_DATABASE_URL
+              value: {{ include "aisix-cp.servingDatabaseURL" . }}
+            {{- else }}
             - name: AISIX_CLOUD_DATABASE_URL
               value: {{ include "aisix-cp.databaseURL" . }}
+            {{- end }}
             - name: AISIX_CLOUD_PUBLIC_BASE_URL
               value: {{ .Values.api.publicBaseURL | quote }}
             - name: AISIX_CLOUD_MASTER_KEY

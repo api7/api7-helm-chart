@@ -119,6 +119,37 @@ postgres://{{ include "aisix-cp.pgUser" . }}:$(PGPASSWORD)@{{ include "aisix-cp.
 {{- end }}
 
 {{/*
+Serving database URL for two-DSN mode: same host/port/db, but connecting
+as the non-superuser cp_api_app role. Uses $(SERVING_PGPASSWORD) env-var
+substitution for runtime secret injection.
+*/}}
+{{- define "aisix-cp.servingDatabaseURL" -}}
+postgres://cp_api_app:$(SERVING_PGPASSWORD)@{{ include "aisix-cp.pgHost" . }}:{{ include "aisix-cp.pgPort" . }}/{{ include "aisix-cp.pgDatabase" . }}?sslmode={{ include "aisix-cp.pgSSLMode" . }}
+{{- end }}
+
+{{/*
+Name of the Secret holding the cp_api_app serving-role password.
+*/}}
+{{- define "aisix-cp.servingPasswordSecretName" -}}
+{{- if .Values.twoDSN.existingSecret }}
+{{- .Values.twoDSN.existingSecret }}
+{{- else }}
+{{- include "aisix-cp.secretName" . }}
+{{- end }}
+{{- end }}
+
+{{/*
+Secret key holding the cp_api_app serving-role password.
+*/}}
+{{- define "aisix-cp.servingPasswordSecretKey" -}}
+{{- if .Values.twoDSN.existingSecret }}
+{{- .Values.twoDSN.existingSecretKey | default "serving-password" }}
+{{- else }}
+{{- "serving-password" }}
+{{- end }}
+{{- end }}
+
+{{/*
 Secret name for aisix-cp secrets.
 */}}
 {{- define "aisix-cp.secretName" -}}
