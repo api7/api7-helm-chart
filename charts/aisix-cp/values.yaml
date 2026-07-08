@@ -41,6 +41,11 @@ api:
   dpmgrBaseURL: ""
   oauthEnabled: false
   dpImage: ""  # empty -> docker.io/api7/aisix:<appVersion>
+  ## Allow the dashboard playground to reach LLM endpoints on private /
+  ## internal networks. cp-api blocks private IPs by default (SSRF guard);
+  ## enable this only for self-hosted deployments whose models live on an
+  ## internal network the cp-api pod can route to.
+  playgroundAllowPrivateIPs: false
 
 ## @section dp-manager
 dpm:

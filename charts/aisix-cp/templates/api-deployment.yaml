@@ -77,6 +77,10 @@ spec:
             {{- end }}
             - name: AISIX_CLOUD_OAUTH_ENABLED
               value: {{ .Values.api.oauthEnabled | quote }}
+            {{- if .Values.api.playgroundAllowPrivateIPs }}
+            - name: AISIX_PLAYGROUND_ALLOW_PRIVATE_IPS
+              value: "1"
+            {{- end }}
             - name: AISIX_CLOUD_DP_IMAGE
               value: {{ .Values.api.dpImage | default (printf "docker.io/api7/aisix:%s" .Chart.AppVersion) | quote }}
             {{- with .Values.api.extraEnvVars }}
