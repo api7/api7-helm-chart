@@ -144,6 +144,7 @@ apisix:
       tars: 1m
       cas-auth: 10m
       status_report: 1m
+      api-calls-for-portal: 64m
 
   # -- fine tune the parameters of LRU cache for some features like secret
   lru:
@@ -163,15 +164,15 @@ apisix:
 
   # -- Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings,
   # click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict
-  customLuaSharedDicts: []
-    # - name: kubernetes
-    #   size: 20m
-    # - name: nacos
-    #   size: 20m
+  customLuaSharedDicts:
+    - name: kubernetes
+      size: 64m
+    - name: nacos
+      size: 64m
+    - name: consul
+      size: 64m
     # - name: foo
     #   size: 10k
-    # - name: bar
-    #   size: 1m
 
   # -- Extend lua_package_path to load third party Lua code
   extraLuaPath: ""
