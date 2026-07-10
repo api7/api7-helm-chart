@@ -646,6 +646,33 @@ entries:
     - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-3.10.0/api7ee3-3.10.0.tgz
     version: 3.10.0
   - apiVersion: v2
+    appVersion: 3.9.16
+    created: "2026-07-10T11:27:00.702614042Z"
+    dependencies:
+    - condition: prometheus.builtin
+      name: prometheus
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.5.1
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - condition: jaeger.builtin
+      name: jaeger
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 4.4.7
+    description: A Helm chart for Kubernetes
+    digest: cb5b5954133fdb4cf5fad202e3346d5f32db000afead63a594206b49092187cf
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: api7ee3
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-3.9.2/api7ee3-3.9.2.tgz
+    version: 3.9.2
+  - apiVersion: v2
     appVersion: 3.9.15
     created: "2026-06-22T08:41:02.680314136Z"
     dependencies:
@@ -3351,6 +3378,25 @@ entries:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-3.10.0/gateway-3.10.0.tgz
     version: 3.10.0
   - apiVersion: v2
+    appVersion: 3.9.16
+    created: "2026-07-10T11:27:00.85459979Z"
+    dependencies:
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.7.7
+    description: A Helm chart for API7 Gateway
+    digest: 2270c70234604d0b5e7dfd3fa87b3716fc34a4576c7c6f1042bb22fcd8c938ca
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/gateway-3.9.5/gateway-3.9.5.tgz
+    version: 3.9.5
+  - apiVersion: v2
     appVersion: 3.9.15
     created: "2026-07-10T10:06:13.708940054Z"
     dependencies:
@@ -4916,4 +4962,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-10T10:06:41.85861732Z"
+generated: "2026-07-10T11:27:00.855867393Z"
