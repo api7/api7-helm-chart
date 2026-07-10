@@ -73,6 +73,12 @@ data:
       # which is used under Tomcat.
       # Turn this option on if you want to be compatible with servlet when matching URI path.
       normalize_uri_like_servlet: {{ .Values.apisix.normalizeURILikeServlet }}
+      match_uri_encoded_slash: {{ .Values.apisix.matchURIEncodedSlash }}
+      max_post_args_readable_size: {{ .Values.apisix.maxPostArgsReadableSize }}
+      {{- with .Values.apisix.trustedAddresses }}
+      trusted_addresses:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       router:
         http: {{ .Values.apisix.httpRouter }}  # radixtree_uri: match route by uri(base on radixtree)
                                     # radixtree_host_uri: match route by host + uri(base on radixtree)
