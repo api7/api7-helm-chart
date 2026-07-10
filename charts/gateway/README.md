@@ -61,7 +61,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | api7ee.status_endpoint.ip | string | `"0.0.0.0"` | The IP address and port on which the status endpoint will listen. |
 | api7ee.status_endpoint.port | int | `7085` | The port on which the status endpoint will listen. |
 | apisix.affinity | object | `{}` | Set affinity for API7 Gateway deploy |
-| apisix.customLuaSharedDicts | list | `[]` | Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings, click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict |
+| apisix.customLuaSharedDicts | list | `[{"name":"kubernetes","size":"64m"},{"name":"nacos","size":"64m"},{"name":"consul","size":"64m"}]` | Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings, click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict |
 | apisix.customizedConfig | object | `{}` | If apisix.enableCustomizedConfig is true, full customized config.yaml. Please note that other settings about APISIX config will be ignored |
 | apisix.deleteURITailSlash | bool | `false` | Delete the '/' at the end of the URI |
 | apisix.dnsConfig | object | `{}` | Custom DNS settings for the APISIX pods |
@@ -75,7 +75,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.extraLuaCPath | string | `""` | Extend lua_package_cpath to load third party Lua C libraries |
 | apisix.extraLuaPath | string | `""` | Extend lua_package_path to load third party Lua code |
 | apisix.hostNetwork | bool | `false` | Use the host's network namespace |
-| apisix.http.luaSharedDict | object | `{"access-tokens":"1m","balancer-ewma":"10m","balancer-ewma-last-touched-at":"10m","balancer-ewma-locks":"10m","cas-auth":"10m","discovery":"1m","etcd-cluster-health-check":"10m","internal-status":"10m","introspection":"10m","jwks":"1m","lrucache-lock":"10m","plugin-ai-rate-limiting":"10m","plugin-ai-rate-limiting-reset-header":"10m","plugin-api-breaker":"10m","plugin-graphql-limit-count":"10m","plugin-graphql-limit-count-reset-header":"10m","plugin-limit-conn":"10m","plugin-limit-conn-redis-cluster-slot-lock":"1m","plugin-limit-count":"10m","plugin-limit-count-advanced":"10m","plugin-limit-count-advanced-redis-cluster-slot-lock":"1m","plugin-limit-count-redis-cluster-slot-lock":"1m","plugin-limit-req":"10m","plugin-limit-req-redis-cluster-slot-lock":"1m","status_report":"1m","tars":"1m","tracing_buffer":"10m","upstream-healthcheck":"10m","worker-events":"10m"}` | Shared dict settings for the HTTP subsystem |
+| apisix.http.luaSharedDict | object | `{"access-tokens":"1m","api-calls-for-portal":"64m","balancer-ewma":"10m","balancer-ewma-last-touched-at":"10m","balancer-ewma-locks":"10m","cas-auth":"10m","discovery":"1m","etcd-cluster-health-check":"10m","internal-status":"10m","introspection":"10m","jwks":"1m","lrucache-lock":"10m","plugin-ai-rate-limiting":"10m","plugin-ai-rate-limiting-reset-header":"10m","plugin-api-breaker":"10m","plugin-graphql-limit-count":"10m","plugin-graphql-limit-count-reset-header":"10m","plugin-limit-conn":"10m","plugin-limit-conn-redis-cluster-slot-lock":"1m","plugin-limit-count":"10m","plugin-limit-count-advanced":"10m","plugin-limit-count-advanced-redis-cluster-slot-lock":"1m","plugin-limit-count-redis-cluster-slot-lock":"1m","plugin-limit-req":"10m","plugin-limit-req-redis-cluster-slot-lock":"1m","status_report":"1m","tars":"1m","tracing_buffer":"32m","upstream-healthcheck":"10m","worker-events":"10m"}` | Shared dict settings for the HTTP subsystem |
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
@@ -87,7 +87,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.lru.secret.neg_ttl | int | `60` | TTL in seconds for cached negative (failed lookup) results |
 | apisix.lru.secret.ttl | int | `300` | TTL in seconds for cached secret values |
 | apisix.maxPostArgsReadableSize | int | `64` | Cap (in MB) on the request body read when matching `post_arg.*` route predicates for JSON and multipart requests. Set to 0 to disable the limit. |
-| apisix.meta.luaSharedDict | object | `{"prometheus-metrics":"15m"}` | Shared dict settings for the `meta` context (used by both HTTP and stream subsystems) |
+| apisix.meta.luaSharedDict | object | `{"prometheus-metrics":"256m"}` | Shared dict settings for the `meta` context (used by both HTTP and stream subsystems) |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.normalizeURILikeServlet | bool | `false` | The URI normalization in servlet is a little different from the RFC's. See https://github.com/jakartaee/servlet/blob/master/spec/src/main/asciidoc/servlet-spec-body.adoc#352-uri-path-canonicalization, which is used under Tomcat. Turn this option on if you want to be compatible with servlet when matching URI path. |
 | apisix.podAnnotations | object | `{}` | Annotations to add to each pod |
@@ -113,7 +113,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.securityContext | object | `{}` | Set the securityContext for API7 Gateway container |
 | apisix.setIDFromPodUID | bool | `false` | Use Pod metadata.uid as the APISIX id. |
 | apisix.showUpstreamStatusInResponseHeader | bool | `false` | When true, the upstream status is always written to the `X-APISIX-Upstream-Status` response header; when false, it is written only for 5xx responses |
-| apisix.stream.luaSharedDict | object | `{"config-stream":"5m","etcd-cluster-health-check-stream":"10m","lrucache-lock-stream":"10m","nacos-stream":"20m","plugin-limit-conn-stream":"10m","tars-stream":"1m","worker-events-stream":"10m"}` | Shared dict settings for the stream (L4 proxy) subsystem |
+| apisix.stream.luaSharedDict | object | `{"config-stream":"5m","etcd-cluster-health-check-stream":"10m","lrucache-lock-stream":"10m","nacos-stream":"64m","plugin-limit-conn-stream":"10m","tars-stream":"1m","worker-events-stream":"10m"}` | Shared dict settings for the stream (L4 proxy) subsystem |
 | apisix.terminationGracePeriodSeconds | int | `30` | termination grace period for API7 Gateway pods |
 | apisix.timezone | string | `""` | timezone is the timezone where apisix uses. For example: "UTC" or "Asia/Shanghai" This value will be set on apisix container's environment variable TZ. You may need to set the timezone to be consistent with your local time zone, otherwise the apisix's logs may used to retrieve event maybe in wrong timezone. |
 | apisix.tolerations | list | `[]` | List of node taints to tolerate |
