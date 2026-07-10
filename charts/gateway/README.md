@@ -104,7 +104,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
 | apisix.lru.secret.neg_ttl | int | `60` | in seconds |
 | apisix.lru.secret.ttl | int | `300` | in seconds |
-| apisix.meta.luaSharedDict.prometheus-metrics | string | `"256m"` |  |
+| apisix.meta.luaSharedDict.prometheus-metrics | string | `"128m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.normalizeURILikeServlet | bool | `false` | The URI normalization in servlet is a little different from the RFC's. See https://github.com/jakartaee/servlet/blob/master/spec/src/main/asciidoc/servlet-spec-body.adoc#352-uri-path-canonicalization, which is used under Tomcat. Turn this option on if you want to be compatible with servlet when matching URI path. |
 | apisix.podAnnotations | object | `{}` | Annotations to add to each pod |
