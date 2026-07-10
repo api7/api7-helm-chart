@@ -113,7 +113,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.securityContext | object | `{}` | Set the securityContext for API7 Gateway container |
 | apisix.setIDFromPodUID | bool | `false` | Use Pod metadata.uid as the APISIX id. |
 | apisix.showUpstreamStatusInResponseHeader | bool | `false` | When true, the upstream status is always written to the `X-APISIX-Upstream-Status` response header; when false, it is written only for 5xx responses |
-| apisix.stream.luaSharedDict | object | `{"config-stream":"5m","etcd-cluster-health-check-stream":"10m","lrucache-lock-stream":"10m","nacos-stream":"20m","plugin-limit-conn-stream":"10m","tars-stream":"1m","worker-events-stream":"10m"}` | Shared dict settings for the stream (L4 proxy) subsystem |
+| apisix.stream.luaSharedDict | object | `{"config-stream":"5m","etcd-cluster-health-check-stream":"10m","lrucache-lock-stream":"10m","nacos-stream":"64m","plugin-limit-conn-stream":"10m","tars-stream":"1m","worker-events-stream":"10m"}` | Shared dict settings for the stream (L4 proxy) subsystem |
 | apisix.terminationGracePeriodSeconds | int | `30` | termination grace period for API7 Gateway pods |
 | apisix.timezone | string | `""` | timezone is the timezone where apisix uses. For example: "UTC" or "Asia/Shanghai" This value will be set on apisix container's environment variable TZ. You may need to set the timezone to be consistent with your local time zone, otherwise the apisix's logs may used to retrieve event maybe in wrong timezone. |
 | apisix.tolerations | list | `[]` | List of node taints to tolerate |

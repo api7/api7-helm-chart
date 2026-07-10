@@ -110,7 +110,7 @@ apisix:
       worker-events-stream: 10m
       tars-stream: 1m
       config-stream: 5m
-      nacos-stream: 20m
+      nacos-stream: 64m
 
   http:
     # -- Shared dict settings for the HTTP subsystem
