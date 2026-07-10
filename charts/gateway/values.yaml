@@ -99,7 +99,7 @@ apisix:
   meta:
     # -- Shared dict settings for the `meta` context (used by both HTTP and stream subsystems)
     luaSharedDict:
-      prometheus-metrics: 256m
+      prometheus-metrics: 128m
 
   stream:
     # -- Shared dict settings for the stream (L4 proxy) subsystem

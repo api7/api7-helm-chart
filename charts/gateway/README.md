@@ -87,7 +87,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.lru.secret.neg_ttl | int | `60` | TTL in seconds for cached negative (failed lookup) results |
 | apisix.lru.secret.ttl | int | `300` | TTL in seconds for cached secret values |
 | apisix.maxPostArgsReadableSize | int | `64` | Cap (in MB) on the request body read when matching `post_arg.*` route predicates for JSON and multipart requests. Set to 0 to disable the limit. |
-| apisix.meta.luaSharedDict | object | `{"prometheus-metrics":"256m"}` | Shared dict settings for the `meta` context (used by both HTTP and stream subsystems) |
+| apisix.meta.luaSharedDict | object | `{"prometheus-metrics":"128m"}` | Shared dict settings for the `meta` context (used by both HTTP and stream subsystems) |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.normalizeURILikeServlet | bool | `false` | The URI normalization in servlet is a little different from the RFC's. See https://github.com/jakartaee/servlet/blob/master/spec/src/main/asciidoc/servlet-spec-body.adoc#352-uri-path-canonicalization, which is used under Tomcat. Turn this option on if you want to be compatible with servlet when matching URI path. |
 | apisix.podAnnotations | object | `{}` | Annotations to add to each pod |
