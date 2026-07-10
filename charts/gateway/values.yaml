@@ -36,7 +36,7 @@ apisix:
 
   meta:
     luaSharedDict:
-      prometheus-metrics: 256m
+      prometheus-metrics: 128m
 
   stream:
     luaSharedDict:
