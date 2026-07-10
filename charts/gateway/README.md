@@ -56,7 +56,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | api7ee.status_endpoint.ip | string | `"0.0.0.0"` | The IP address and port on which the status endpoint will listen. |
 | api7ee.status_endpoint.port | int | `7085` | The port on which the status endpoint will listen. |
 | apisix.affinity | object | `{}` | Set affinity for API7 Gateway deploy |
-| apisix.customLuaSharedDicts | list | `[]` | Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings, click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict |
+| apisix.customLuaSharedDicts | list | `[{"name":"kubernetes","size":"64m"},{"name":"nacos","size":"64m"},{"name":"consul","size":"64m"}]` | Add custom [lua_shared_dict](https://github.com/openresty/lua-nginx-module#toc88) settings, click [here](https://github.com/apache/apisix-helm-chart/blob/master/charts/apisix/values.yaml#L27-L30) to learn the format of a shared dict |
 | apisix.customizedConfig | object | `{}` | If apisix.enableCustomizedConfig is true, full customized config.yaml. Please note that other settings about APISIX config will be ignored |
 | apisix.deleteURITailSlash | bool | `false` | Delete the '/' at the end of the URI |
 | apisix.dnsConfig | object | `{}` | Custom DNS settings for the APISIX pods |
@@ -71,6 +71,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.extraLuaPath | string | `""` |  |
 | apisix.hostNetwork | bool | `false` |  |
 | apisix.http.luaSharedDict.access-tokens | string | `"1m"` |  |
+| apisix.http.luaSharedDict.api-calls-for-portal | string | `"64m"` |  |
 | apisix.http.luaSharedDict.balancer-ewma | string | `"10m"` |  |
 | apisix.http.luaSharedDict.balancer-ewma-last-touched-at | string | `"10m"` |  |
 | apisix.http.luaSharedDict.balancer-ewma-locks | string | `"10m"` |  |
@@ -92,7 +93,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.http.luaSharedDict.plugin-limit-req | string | `"10m"` |  |
 | apisix.http.luaSharedDict.status_report | string | `"1m"` |  |
 | apisix.http.luaSharedDict.tars | string | `"1m"` |  |
-| apisix.http.luaSharedDict.tracing_buffer | string | `"10m"` |  |
+| apisix.http.luaSharedDict.tracing_buffer | string | `"32m"` |  |
 | apisix.http.luaSharedDict.upstream-healthcheck | string | `"10m"` |  |
 | apisix.http.luaSharedDict.worker-events | string | `"10m"` |  |
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
@@ -103,7 +104,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
 | apisix.lru.secret.neg_ttl | int | `60` | in seconds |
 | apisix.lru.secret.ttl | int | `300` | in seconds |
-| apisix.meta.luaSharedDict.prometheus-metrics | string | `"15m"` |  |
+| apisix.meta.luaSharedDict.prometheus-metrics | string | `"256m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.normalizeURILikeServlet | bool | `false` | The URI normalization in servlet is a little different from the RFC's. See https://github.com/jakartaee/servlet/blob/master/spec/src/main/asciidoc/servlet-spec-body.adoc#352-uri-path-canonicalization, which is used under Tomcat. Turn this option on if you want to be compatible with servlet when matching URI path. |
 | apisix.podAnnotations | object | `{}` | Annotations to add to each pod |
