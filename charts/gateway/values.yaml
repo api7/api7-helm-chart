@@ -112,6 +112,12 @@ apisix:
   # which is used under Tomcat.
   # Turn this option on if you want to be compatible with servlet when matching URI path.
   normalizeURILikeServlet: false
+  # -- If true, keep URL-encoded slash (`%2F`) encoded when matching routes, so it is treated as part of a path parameter instead of a path separator.
+  matchURIEncodedSlash: false
+  # -- Cap in MiB on the request body read when matching `post_arg.*` route predicates for JSON and multipart requests. Set to 0 to disable the limit.
+  maxPostArgsReadableSize: 64
+  # -- IP/CIDR ranges whose `X-Forwarded-*` and `Forwarded` headers are trusted by API7 Gateway.
+  trustedAddresses: []
   # -- Defines how apisix handles routing:
   # - radixtree_uri: match route by uri(base on radixtree)
   # - radixtree_host_uri: match route by host + uri(base on radixtree)
@@ -131,7 +137,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.9.15
+    tag: 3.9.16
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment

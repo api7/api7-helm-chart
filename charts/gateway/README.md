@@ -99,11 +99,13 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.9.15"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.9.16"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
 | apisix.lru.secret.neg_ttl | int | `60` | in seconds |
 | apisix.lru.secret.ttl | int | `300` | in seconds |
+| apisix.matchURIEncodedSlash | bool | `false` | If true, keep URL-encoded slash (`%2F`) encoded when matching routes, so it is treated as part of a path parameter instead of a path separator. |
+| apisix.maxPostArgsReadableSize | int | `64` | Cap in MiB on the request body read when matching `post_arg.*` route predicates for JSON and multipart requests. Set to 0 to disable the limit. |
 | apisix.meta.luaSharedDict.prometheus-metrics | string | `"128m"` |  |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.normalizeURILikeServlet | bool | `false` | The URI normalization in servlet is a little different from the RFC's. See https://github.com/jakartaee/servlet/blob/master/spec/src/main/asciidoc/servlet-spec-body.adoc#352-uri-path-canonicalization, which is used under Tomcat. Turn this option on if you want to be compatible with servlet when matching URI path. |
@@ -130,6 +132,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | apisix.tolerations | list | `[]` | List of node taints to tolerate |
 | apisix.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
 | apisix.tracing | bool | `false` | Enable comprehensive request lifecycle tracing (SSL/SNI, rewrite, access, header_filter, body_filter, and log). When disabled, OpenTelemetry collects only a single span per request. |
+| apisix.trustedAddresses | list | `[]` | IP/CIDR ranges whose `X-Forwarded-*` and `Forwarded` headers are trusted by API7 Gateway. |
 | autoscaling.enabled | bool | `false` |  |
 | autoscaling.maxReplicas | int | `100` |  |
 | autoscaling.minReplicas | int | `1` |  |
