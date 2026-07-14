@@ -1,0 +1,45 @@
+ngxdig is installed as a DaemonSet — one collector Pod per node.
+
+Each Pod runs the ngxdig debug UI and can profile the OpenResty/Nginx (and
+APISIX) worker processes running on its own node.
+
+1. List the collector Pods and the node each one runs on:
+
+   kubectl get pods --namespace {{ .Release.Namespace }} \
+     -l "app.kubernetes.io/name={{ include "ngxdig.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" \
+     -o wide
+
+2. Open the debug UI for the node whose workload you want to inspect. The UI is
+   not a hardened multi-user service, so the recommended access is a
+   port-forward to the collector Pod on that exact node — no Service, nothing
+   exposed on the network:
+
+   export NODE=<node-name>   # a node from step 1 / `kubectl get nodes`
+   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} \
+     -l "app.kubernetes.io/name={{ include "ngxdig.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" \
+     --field-selector spec.nodeName=$NODE \
+     -o jsonpath="{.items[0].metadata.name}")
+   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:{{ .Values.containerPort }}
+
+   Then browse to http://127.0.0.1:8080/ , pick a worker PID, and run a
+   diagnostic action (profile / cpu-on / memsnap / latency).
+
+   The UI is also reachable through the Service
+   {{ include "ngxdig.fullname" . }}:{{ .Values.service.port }} (type {{ .Values.service.type }}).
+{{- if eq .Values.service.type "NodePort" }}
+   With type NodePort{{ if eq (toString .Values.service.externalTrafficPolicy) "Local" }} and externalTrafficPolicy Local{{ end }}, reach a
+   node's own collector at <that-node-IP>:<nodePort>:
+
+   kubectl get svc --namespace {{ .Release.Namespace }} {{ include "ngxdig.fullname" . }} -o jsonpath="{.spec.ports[0].nodePort}"
+{{- end }}
+
+3. Check host readiness for eBPF collection on a node:
+
+   kubectl --namespace {{ .Release.Namespace }} exec $POD_NAME -- ngxdig doctor
+
+Requirements: eBPF collection needs the node to expose kernel BTF
+({{ .Values.hostBtf.path }}){{ if not .Values.hostBtf.enabled }} — currently disabled via hostBtf.enabled=false{{ end }}, and the
+collector must keep CAP_BPF, CAP_PERFMON, CAP_SYS_PTRACE, and CAP_SYS_ADMIN with
+unconfined seccomp/AppArmor (the chart defaults grant these; CAP_SYS_ADMIN is
+needed for the perf_uprobe attachments in `cpu-on`/`latency`). If a diagnostic
+fails before collecting, `ngxdig doctor` reports the exact fix.

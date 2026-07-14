@@ -1,0 +1,94 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+## Install
+
+```sh
+helm repo add api7 https://charts.api7.ai
+helm repo update
+
+helm install ngxdig api7/ngxdig --namespace ngxdig --create-namespace
+```
+
+ngxdig is deployed as a DaemonSet — one collector Pod per node — so it can
+profile the OpenResty/Nginx (and APISIX) worker processes running on that node.
+
+## Accessing the debug UI
+
+The chart always creates a Service for the UI. Most deployments run a single
+collector — one node, or the DaemonSet pinned to one node (see below) — so the
+`ClusterIP` points at that one Pod.
+
+Quick local access — port-forward to the collector Pod. Scope the selector to
+this release, and on a multi-node install pick the Pod on the node you want with
+a `spec.nodeName` field selector:
+
+```sh
+NODE=<node-name>   # from `kubectl get nodes`; omit the field selector if single-node
+POD=$(kubectl -n ngxdig get pod \
+  -l app.kubernetes.io/name=ngxdig,app.kubernetes.io/instance=ngxdig \
+  --field-selector spec.nodeName=$NODE \
+  -o jsonpath='{.items[0].metadata.name}')
+kubectl -n ngxdig port-forward $POD 8080:8080
+# then open http://127.0.0.1:8080/
+```
+
+Node-IP access — set the Service to `NodePort`; with `externalTrafficPolicy:
+Local`, `<nodeIP>:<nodePort>` reaches the collector on that same node:
+
+```yaml
+# values.yaml
+service:
+  type: NodePort
+  externalTrafficPolicy: Local
+  # nodePort: 30080   # optional; auto-assigned when omitted
+```
+
+The UI is not a hardened multi-user service — keep it on a trusted network and
+prefer a port-forward over a public ingress. Note the `ClusterIP` Service is not
+node-specific: on a single-node or node-pinned install it points at the one
+collector, but when the DaemonSet spans several nodes it load-balances across
+collectors and each collector only sees its own node's processes — so target a
+specific node's Pod (the `spec.nodeName` selector above) rather than the Service.
+
+## Run on specific node(s) only
+
+Usually you only want a collector on the node running the workload you are
+debugging, not every node. Restrict the DaemonSet with a `nodeSelector`; the
+controller then creates a Pod only on matching nodes.
+
+Pin to a single node by its built-in `kubernetes.io/hostname` label (the value
+is the node name shown by `kubectl get nodes`):
+
+```sh
+helm install ngxdig api7/ngxdig --namespace ngxdig --create-namespace \
+  --set nodeSelector."kubernetes\.io/hostname"=<node-name>
+```
+
+To target a group of nodes, label them first and select by that label:
+
+```sh
+kubectl label node <node-a> <node-b> ngxdig=enabled
+```
+
+```yaml
+# values.yaml
+nodeSelector:
+  ngxdig: enabled
+```
+
+For rules that `nodeSelector` cannot express, use `affinity` instead. Note that
+for a DaemonSet you should not set the Pod's `.spec.nodeName` directly — node
+placement is owned by the DaemonSet controller, and `nodeSelector`/`affinity`
+is the supported way to constrain it.
+
+{{ template "chart.valuesSection" . }}

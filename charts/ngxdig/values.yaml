@@ -1,0 +1,144 @@
+# ============================================================
+# Image
+# ============================================================
+image:
+  # -- ngxdig image repository
+  repository: api7/ngxdig
+  # -- Image pull policy. Defaults to Always because the image tag is the moving
+  # `latest`, so nodes must re-pull to pick up newer builds
+  pullPolicy: Always
+  # -- Image tag. Defaults to the chart appVersion when left empty
+  tag: "latest"
+
+# -- Image pull secrets for a private registry
+imagePullSecrets: []
+
+# -- Override the chart name
+nameOverride: ""
+# -- Override the fully qualified release name
+fullnameOverride: ""
+
+serviceAccount:
+  # -- Create a ServiceAccount for the collector
+  create: true
+  # -- Annotations to add to the ServiceAccount
+  annotations: {}
+  # -- Name of the ServiceAccount to use. Generated from the fullname when empty
+  name: ""
+
+# ============================================================
+# Collector (DaemonSet)
+# ============================================================
+# ngxdig runs as a DaemonSet — one collector Pod per node — because it profiles
+# the OpenResty/Nginx worker processes running on that node, so it must be
+# co-located with its targets. There is no replicaCount.
+
+# -- Share the host PID namespace so the collector can see Nginx/OpenResty
+# worker processes elsewhere on the node. Required to profile targets outside
+# the collector's own Pod
+hostPID: true
+
+# -- Update strategy for the DaemonSet
+updateStrategy: {}
+
+# -- Extra arguments appended to the `ngxdig ui` command
+extraArgs: []
+
+# -- Extra environment variables for the collector container
+extraEnvVars: []
+
+# -- Pod-level security context
+podSecurityContext: {}
+
+# -- Container security context. The defaults grant exactly what the eBPF
+# collector needs: run as root, and the CAP_BPF / CAP_PERFMON / CAP_SYS_PTRACE /
+# CAP_SYS_ADMIN capabilities with unconfined seccomp/AppArmor so BPF, perf
+# events, ptrace, and the perf_uprobe PMU attachments used by `cpu-on` and
+# `latency` are all permitted. CAP_SYS_ADMIN is the smallest addition that
+# satisfies the uprobe perf_event check — `--privileged` is not required
+securityContext:
+  runAsUser: 0
+  capabilities:
+    add:
+      - BPF
+      - PERFMON
+      - SYS_PTRACE
+      - SYS_ADMIN
+  seccompProfile:
+    type: Unconfined
+  appArmorProfile:
+    type: Unconfined
+
+hostBtf:
+  # -- Mount the node's kernel BTF read-only. Required by the eBPF collector to
+  # resolve kernel types without DWARF
+  enabled: true
+  # -- Host path to the kernel BTF directory
+  path: /sys/kernel/btf
+
+output:
+  # -- Directory inside the container where run artifacts are written
+  path: /out
+  # -- sizeLimit for the artifact emptyDir volume. No limit when empty
+  sizeLimit: ""
+
+# ============================================================
+# Debug UI
+# ============================================================
+# -- Port the ngxdig UI listens on inside the container
+containerPort: 8080
+
+# The UI is exposed through a Service (always created). Most deployments run a
+# single collector — one node, or the DaemonSet pinned to one node — so a
+# ClusterIP points at that one Pod. Setting type to NodePort adds a
+# <nodeIP>:<nodePort> route; pair it with externalTrafficPolicy Local so that
+# route reaches the collector on that same node. For quick local access you can
+# also `kubectl port-forward` to the Pod — see the chart README / NOTES.
+service:
+  # -- Service type (ClusterIP, NodePort, or LoadBalancer)
+  type: ClusterIP
+  # -- Service port
+  port: 8080
+  # -- Static node port for type NodePort. Auto-assigned when empty
+  nodePort: ""
+  # -- externalTrafficPolicy for NodePort/LoadBalancer. Local keeps traffic on the
+  # receiving node, so <nodeIP>:<nodePort> reaches that node's own collector
+  # instead of being load-balanced to another node
+  externalTrafficPolicy: Local
+  # -- Service annotations
+  annotations: {}
+
+# -- Liveness probe for the collector container
+livenessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 15
+# -- Readiness probe for the collector container
+readinessProbe:
+  httpGet:
+    path: /
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+# -- Resource requests and limits for the collector container
+resources: {}
+
+# -- Node selector for the DaemonSet Pods
+nodeSelector: {}
+# -- Tolerations for the DaemonSet Pods (e.g. to also run on control-plane nodes)
+tolerations: []
+# -- Affinity rules for the DaemonSet Pods
+affinity: {}
+
+# -- Additional annotations for the Pods
+podAnnotations: {}
+# -- Additional labels for the Pods
+podLabels: {}
+
+# -- Extra volumes for the collector Pod
+extraVolumes: []
+# -- Extra volume mounts for the collector container
+extraVolumeMounts: []

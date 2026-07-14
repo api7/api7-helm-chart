@@ -37,7 +37,8 @@ jobs:
                   --charts charts/api7 \
                   --charts charts/gateway \
                   --charts charts/ingress-controller \
-                  --charts charts/aisix-cp'
+                  --charts charts/aisix-cp \
+                  --charts charts/ngxdig'
 
       - name: Verify Chart.lock files
         run: |
@@ -76,7 +77,8 @@ jobs:
                && helm repo add jaegertracing https://jaegertracing.github.io/helm-charts \
                && ct install \
                   --charts charts/api7 \
-                  --charts charts/ingress-controller'
+                  --charts charts/ingress-controller \
+                  --charts charts/ngxdig'
 
       - name: Test gateway charts
         run: |
