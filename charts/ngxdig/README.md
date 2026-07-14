@@ -30,16 +30,28 @@ profile the OpenResty/Nginx (and APISIX) worker processes running on that node.
 
 ## Accessing the debug UI
 
-Most deployments run a single collector — one node, or the DaemonSet pinned to
-one node (see below) — so the `ClusterIP` Service the chart creates points at
-that one Pod. For quick local access, port-forward straight to the collector
-Pod:
+The chart always creates a Service for the UI. Most deployments run a single
+collector — one node, or the DaemonSet pinned to one node (see below) — so the
+`ClusterIP` points at that one Pod.
+
+Quick local access — port-forward straight to the collector Pod:
 
 ```sh
 kubectl -n ngxdig port-forward \
   $(kubectl -n ngxdig get pod -l app.kubernetes.io/name=ngxdig -o jsonpath='{.items[0].metadata.name}') \
   8080:8080
 # then open http://127.0.0.1:8080/
+```
+
+Node-IP access — set the Service to `NodePort`; with `externalTrafficPolicy:
+Local`, `<nodeIP>:<nodePort>` reaches the collector on that same node:
+
+```yaml
+# values.yaml
+service:
+  type: NodePort
+  externalTrafficPolicy: Local
+  # nodePort: 30080   # optional; auto-assigned when omitted
 ```
 
 The UI is not a hardened multi-user service — keep it on a trusted network and
@@ -108,8 +120,10 @@ is the supported way to constrain it.
 | resources | object | `{}` | Resource requests and limits for the collector container |
 | securityContext | object | `{"appArmorProfile":{"type":"Unconfined"},"capabilities":{"add":["BPF","PERFMON","SYS_PTRACE","SYS_ADMIN"]},"runAsUser":0,"seccompProfile":{"type":"Unconfined"}}` | Container security context. The defaults grant exactly what the eBPF collector needs: run as root, and the CAP_BPF / CAP_PERFMON / CAP_SYS_PTRACE / CAP_SYS_ADMIN capabilities with unconfined seccomp/AppArmor so BPF, perf events, ptrace, and the perf_uprobe PMU attachments used by `cpu-on` and `latency` are all permitted. CAP_SYS_ADMIN is the smallest addition that satisfies the uprobe perf_event check — `--privileged` is not required |
 | service.annotations | object | `{}` | Service annotations |
+| service.externalTrafficPolicy | string | `"Local"` | externalTrafficPolicy for NodePort/LoadBalancer. Local keeps traffic on the receiving node, so <nodeIP>:<nodePort> reaches that node's own collector instead of being load-balanced to another node |
+| service.nodePort | string | `""` | Static node port for type NodePort. Auto-assigned when empty |
 | service.port | int | `8080` | Service port |
-| service.type | string | `"ClusterIP"` | Service type |
+| service.type | string | `"ClusterIP"` | Service type (ClusterIP, NodePort, or LoadBalancer) |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount |
 | serviceAccount.create | bool | `true` | Create a ServiceAccount for the collector |
 | serviceAccount.name | string | `""` | Name of the ServiceAccount to use. Generated from the fullname when empty |

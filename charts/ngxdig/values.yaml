@@ -88,15 +88,23 @@ output:
 # -- Port the ngxdig UI listens on inside the container
 containerPort: 8080
 
-# The UI is exposed through a Service. Most deployments run a single collector
-# (one node, or the DaemonSet pinned to one node), so the Service points at that
-# one Pod. For quick local access you can also `kubectl port-forward` straight to
-# the collector Pod — see the chart README / NOTES.
+# The UI is exposed through a Service (always created). Most deployments run a
+# single collector — one node, or the DaemonSet pinned to one node — so a
+# ClusterIP points at that one Pod. Setting type to NodePort adds a
+# <nodeIP>:<nodePort> route; pair it with externalTrafficPolicy Local so that
+# route reaches the collector on that same node. For quick local access you can
+# also `kubectl port-forward` to the Pod — see the chart README / NOTES.
 service:
-  # -- Service type
+  # -- Service type (ClusterIP, NodePort, or LoadBalancer)
   type: ClusterIP
   # -- Service port
   port: 8080
+  # -- Static node port for type NodePort. Auto-assigned when empty
+  nodePort: ""
+  # -- externalTrafficPolicy for NodePort/LoadBalancer. Local keeps traffic on the
+  # receiving node, so <nodeIP>:<nodePort> reaches that node's own collector
+  # instead of being load-balanced to another node
+  externalTrafficPolicy: Local
   # -- Service annotations
   annotations: {}
 

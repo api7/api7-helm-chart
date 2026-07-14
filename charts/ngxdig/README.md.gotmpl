@@ -24,16 +24,28 @@ profile the OpenResty/Nginx (and APISIX) worker processes running on that node.
 
 ## Accessing the debug UI
 
-Most deployments run a single collector — one node, or the DaemonSet pinned to
-one node (see below) — so the `ClusterIP` Service the chart creates points at
-that one Pod. For quick local access, port-forward straight to the collector
-Pod:
+The chart always creates a Service for the UI. Most deployments run a single
+collector — one node, or the DaemonSet pinned to one node (see below) — so the
+`ClusterIP` points at that one Pod.
+
+Quick local access — port-forward straight to the collector Pod:
 
 ```sh
 kubectl -n ngxdig port-forward \
   $(kubectl -n ngxdig get pod -l app.kubernetes.io/name=ngxdig -o jsonpath='{.items[0].metadata.name}') \
   8080:8080
 # then open http://127.0.0.1:8080/
+```
+
+Node-IP access — set the Service to `NodePort`; with `externalTrafficPolicy:
+Local`, `<nodeIP>:<nodePort>` reaches the collector on that same node:
+
+```yaml
+# values.yaml
+service:
+  type: NodePort
+  externalTrafficPolicy: Local
+  # nodePort: 30080   # optional; auto-assigned when omitted
 ```
 
 The UI is not a hardened multi-user service — keep it on a trusted network and

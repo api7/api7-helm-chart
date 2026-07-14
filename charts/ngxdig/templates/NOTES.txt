@@ -24,8 +24,14 @@ APISIX) worker processes running on its own node.
    Then browse to http://127.0.0.1:8080/ , pick a worker PID, and run a
    diagnostic action (profile / cpu-on / memsnap / latency).
 
-   In-cluster clients can also reach the UI through the Service
+   The UI is also reachable through the Service
    {{ include "ngxdig.fullname" . }}:{{ .Values.service.port }} (type {{ .Values.service.type }}).
+{{- if eq .Values.service.type "NodePort" }}
+   With type NodePort{{ if eq (toString .Values.service.externalTrafficPolicy) "Local" }} and externalTrafficPolicy Local{{ end }}, reach a
+   node's own collector at <that-node-IP>:<nodePort>:
+
+   kubectl get svc --namespace {{ .Release.Namespace }} {{ include "ngxdig.fullname" . }} -o jsonpath="{.spec.ports[0].nodePort}"
+{{- end }}
 
 3. Check host readiness for eBPF collection on a node:
 
