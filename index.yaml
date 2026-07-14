@@ -4962,4 +4962,31 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-0.1.0/gateway-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-10T11:27:00.855867393Z"
+  ngxdig:
+  - apiVersion: v2
+    appVersion: 0.1.0
+    created: "2026-07-14T03:54:39.5841288Z"
+    description: eBPF on-CPU flame graphs and guided CPU/memory/latency diagnosis
+      for OpenResty/Nginx, deployed as a per-node collector
+    digest: d42efdeb1122a310af06c36fde1e8ab44e47a42828495956ec3f6d82fe3cba7b
+    home: https://github.com/api7/ngx-flame
+    keywords:
+    - ebpf
+    - profiling
+    - flamegraph
+    - openresty
+    - nginx
+    - apisix
+    - diagnostics
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: ngxdig
+    sources:
+    - https://github.com/api7/ngx-flame
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-07-14T03:54:39.584621049Z"
