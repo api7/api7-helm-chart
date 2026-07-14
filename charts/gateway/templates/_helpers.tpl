@@ -199,14 +199,15 @@ Output: JSON {"entries": [{"port": 9200, "nodePort": ""}, ...]}
 
 {{/*
 Build the value of `apisix.ssl.ssl_trusted_certificate` — the gateway's outbound
-trust store. Starts from the system CA bundle (`system`), then appends the
-Control Plane CA (gateway.tls.existingCASecret) and every entry in
-gateway.tls.additionalTrustedCAs, matching the mount paths rendered in _pod.tpl.
-Returns an empty string when TLS is disabled or no CA is configured, so the
-caller can omit the key entirely.
+trust store, used to verify external services the gateway dials (etcd/Control
+Plane, openid-connect, loggers, ...). It is independent of the inbound HTTPS
+listener (gateway.tls.enabled). Starts from the system CA bundle (`system`),
+then appends the Control Plane CA (gateway.tls.existingCASecret) and every entry
+in gateway.tls.additionalTrustedCAs, matching the mount paths rendered in
+_pod.tpl. Returns an empty string when no CA is configured, so the caller can
+omit the key entirely.
 */}}
 {{- define "gateway.sslTrustedCertificate" -}}
-{{- if .Values.gateway.tls.enabled -}}
 {{- $paths := list -}}
 {{- if .Values.gateway.tls.existingCASecret -}}
 {{- $paths = append $paths (printf "/usr/local/apisix/conf/ssl/%s" .Values.gateway.tls.certCAFilename) -}}
@@ -216,6 +217,5 @@ caller can omit the key entirely.
 {{- end -}}
 {{- if $paths -}}
 {{- printf "system,%s" (join "," $paths) -}}
-{{- end -}}
 {{- end -}}
 {{- end -}}
