@@ -34,12 +34,17 @@ The chart always creates a Service for the UI. Most deployments run a single
 collector — one node, or the DaemonSet pinned to one node (see below) — so the
 `ClusterIP` points at that one Pod.
 
-Quick local access — port-forward straight to the collector Pod:
+Quick local access — port-forward to the collector Pod. Scope the selector to
+this release, and on a multi-node install pick the Pod on the node you want with
+a `spec.nodeName` field selector:
 
 ```sh
-kubectl -n ngxdig port-forward \
-  $(kubectl -n ngxdig get pod -l app.kubernetes.io/name=ngxdig -o jsonpath='{.items[0].metadata.name}') \
-  8080:8080
+NODE=<node-name>   # from `kubectl get nodes`; omit the field selector if single-node
+POD=$(kubectl -n ngxdig get pod \
+  -l app.kubernetes.io/name=ngxdig,app.kubernetes.io/instance=ngxdig \
+  --field-selector spec.nodeName=$NODE \
+  -o jsonpath='{.items[0].metadata.name}')
+kubectl -n ngxdig port-forward $POD 8080:8080
 # then open http://127.0.0.1:8080/
 ```
 
@@ -55,9 +60,11 @@ service:
 ```
 
 The UI is not a hardened multi-user service — keep it on a trusted network and
-prefer a port-forward over a public ingress. When the DaemonSet spans several
-nodes, each collector only sees its own node's processes, so select the Pod on
-the node you want with `--field-selector spec.nodeName=<node>`.
+prefer a port-forward over a public ingress. Note the `ClusterIP` Service is not
+node-specific: on a single-node or node-pinned install it points at the one
+collector, but when the DaemonSet spans several nodes it load-balances across
+collectors and each collector only sees its own node's processes — so target a
+specific node's Pod (the `spec.nodeName` selector above) rather than the Service.
 
 ## Run on specific node(s) only
 
