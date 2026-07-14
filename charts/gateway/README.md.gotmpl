@@ -31,6 +31,86 @@ helm delete [RELEASE_NAME] --namespace api7
 The command removes all the Kubernetes components associated with the chart and deletes the release.
 
 
+## Configuration examples
+
+The full list of values is in the [Parameters](#parameters) table below. The snippets here cover a
+few common setups — put them in a `values.yaml` and pass it with `-f values.yaml`, or translate each
+line into a `--set key=value` flag.
+
+### Trust additional CA certificates for outbound TLS
+
+The gateway verifies the TLS certificate of any external service it dials (for example an
+`openid-connect` identity provider) against its outbound trust store, which is the system CA bundle
+plus `gateway.tls.existingCASecret`. In a Control Plane-managed deployment `existingCASecret` already
+carries the Control Plane CA, so use `gateway.tls.additionalTrustedCAs` to trust an extra private or
+enterprise CA **on top of** it, without modifying that Secret.
+
+Create a Secret that holds the CA certificate:
+
+```sh
+kubectl -n api7 create secret generic keycloak-ca --from-file=keycloak-ca.crt=./keycloak-ca.crt
+```
+
+Reference it (each entry mounts `filename` from `secretName` and appends it to the trust store):
+
+```yaml
+gateway:
+  tls:
+    additionalTrustedCAs:
+      - secretName: keycloak-ca
+        filename: keycloak-ca.crt
+```
+
+The rendered `ssl_trusted_certificate` becomes `system,<existingCASecret CA>,<additional CA>`, so the
+system CAs and the existing CA are preserved. The trust store is merged when the gateway starts, so
+restart the gateway Pods after adding an entry or changing the Secret contents:
+
+```sh
+kubectl -n api7 rollout restart deploy/[RELEASE_NAME]
+```
+
+### Expose the gateway through a LoadBalancer
+
+`gateway.type` defaults to `NodePort`. To publish the proxy through a cloud load balancer instead:
+
+```yaml
+gateway:
+  type: LoadBalancer
+  http:
+    servicePort: 80
+  tls:
+    servicePort: 443
+```
+
+### Set replicas and resource limits
+
+```yaml
+apisix:
+  replicaCount: 3
+  resources:
+    requests:
+      cpu: 500m
+      memory: 512Mi
+    limits:
+      cpu: "2"
+      memory: 2Gi
+```
+
+### Inject extra environment variables
+
+```yaml
+apisix:
+  extraEnvVars:
+    - name: MY_ENV
+      value: "my-value"
+    - name: TOKEN_ENV
+      valueFrom:
+        secretKeyRef:
+          name: my-secret
+          key: token
+```
+
+
 ## Parameters
 
 {{ template "chart.valuesSection" . }}
