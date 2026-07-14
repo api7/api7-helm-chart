@@ -10,16 +10,31 @@ APISIX) worker processes running on its own node.
      -o wide
 
 2. Open the debug UI for the node whose workload you want to inspect. The UI is
-   not a hardened multi-user service, so reach it over a port-forward rather
-   than exposing it:
+   not a hardened multi-user service, so the recommended access is a
+   port-forward to the collector Pod on that exact node — no Service, nothing
+   exposed on the network:
 
+   export NODE=<node-name>   # a node from step 1 / `kubectl get nodes`
    export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} \
      -l "app.kubernetes.io/name={{ include "ngxdig.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" \
+     --field-selector spec.nodeName=$NODE \
      -o jsonpath="{.items[0].metadata.name}")
-   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:{{ .Values.service.containerPort }}
+   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:{{ .Values.containerPort }}
 
    Then browse to http://127.0.0.1:8080/ , pick a worker PID, and run a
    diagnostic action (profile / cpu-on / memsnap / latency).
+{{- if .Values.service.enabled }}
+
+   A Service is enabled (type {{ .Values.service.type }}).
+   {{- if eq .Values.service.type "NodePort" }} With externalTrafficPolicy
+   {{ .Values.service.externalTrafficPolicy }}, reach a node's own collector at
+   <that-node-IP>:<nodePort>:
+
+   kubectl get svc --namespace {{ .Release.Namespace }} {{ include "ngxdig.fullname" . }} -o jsonpath="{.spec.ports[0].nodePort}"
+   {{- else }} Note it load-balances across every node's collector, so it is
+   only unambiguous when the DaemonSet is pinned to a single node.
+   {{- end }}
+{{- end }}
 
 3. Check host readiness for eBPF collection on a node:
 
@@ -27,6 +42,7 @@ APISIX) worker processes running on its own node.
 
 Requirements: eBPF collection needs the node to expose kernel BTF
 ({{ .Values.hostBtf.path }}){{ if not .Values.hostBtf.enabled }} — currently disabled via hostBtf.enabled=false{{ end }}, and the
-collector must keep CAP_BPF, CAP_PERFMON, and CAP_SYS_PTRACE with unconfined
-seccomp/AppArmor (the chart defaults grant these). If a diagnostic fails before
-collecting, `ngxdig doctor` reports the exact fix.
+collector must keep CAP_BPF, CAP_PERFMON, CAP_SYS_PTRACE, and CAP_SYS_ADMIN with
+unconfined seccomp/AppArmor (the chart defaults grant these; CAP_SYS_ADMIN is
+needed for the perf_uprobe attachments in `cpu-on`/`latency`). If a diagnostic
+fails before collecting, `ngxdig doctor` reports the exact fix.

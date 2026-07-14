@@ -42,7 +42,7 @@ spec:
           args:
             - ui
             - --listen
-            - ":{{ .Values.service.containerPort }}"
+            - ":{{ .Values.containerPort }}"
             - --output
             - {{ .Values.output.path | quote }}
             - --ngxdig
@@ -52,7 +52,7 @@ spec:
             {{- end }}
           ports:
             - name: http
-              containerPort: {{ .Values.service.containerPort }}
+              containerPort: {{ .Values.containerPort }}
               protocol: TCP
           {{- with .Values.securityContext }}
           securityContext:

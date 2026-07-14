@@ -51,9 +51,11 @@ extraEnvVars: []
 podSecurityContext: {}
 
 # -- Container security context. The defaults grant exactly what the eBPF
-# collector needs: run as root, the CAP_BPF / CAP_PERFMON / CAP_SYS_PTRACE
-# capabilities, and unconfined seccomp/AppArmor so BPF, perf events, and ptrace
-# of target processes are permitted
+# collector needs: run as root, and the CAP_BPF / CAP_PERFMON / CAP_SYS_PTRACE /
+# CAP_SYS_ADMIN capabilities with unconfined seccomp/AppArmor so BPF, perf
+# events, ptrace, and the perf_uprobe PMU attachments used by `cpu-on` and
+# `latency` are all permitted. CAP_SYS_ADMIN is the smallest addition that
+# satisfies the uprobe perf_event check — `--privileged` is not required
 securityContext:
   runAsUser: 0
   capabilities:
@@ -61,6 +63,7 @@ securityContext:
       - BPF
       - PERFMON
       - SYS_PTRACE
+      - SYS_ADMIN
   seccompProfile:
     type: Unconfined
   appArmorProfile:
@@ -80,16 +83,33 @@ output:
   sizeLimit: ""
 
 # ============================================================
-# Service (Debug UI)
+# Debug UI
 # ============================================================
+# -- Port the ngxdig UI listens on inside the container
+containerPort: 8080
+
+# The recommended way to reach the UI is `kubectl port-forward` to the collector
+# Pod on the node you want to inspect (see the chart README / NOTES) — it needs
+# no Service, targets an exact node, and keeps the unhardened UI off the network.
 service:
-  # -- Service type. The debug UI is not a hardened multi-user service; keep it
-  # ClusterIP and reach a specific node's Pod with `kubectl port-forward`
+  # -- Expose the UI through a Service. Off by default: a plain ClusterIP Service
+  # load-balances across every node's collector, and each collector only sees its
+  # own node's processes, so a shared Service address hops between nodes. When you
+  # do need a standing endpoint, use type NodePort with externalTrafficPolicy
+  # Local (below) so <nodeIP>:<nodePort> deterministically reaches that node's own
+  # collector
+  enabled: false
+  # -- Service type. NodePort (with externalTrafficPolicy Local) is the useful
+  # one for this DaemonSet; ClusterIP only makes sense when pinned to one node
   type: ClusterIP
   # -- Service port
   port: 8080
-  # -- Container port the UI listens on
-  containerPort: 8080
+  # -- Static node port for type NodePort. Auto-assigned when empty
+  nodePort: ""
+  # -- externalTrafficPolicy for NodePort/LoadBalancer. Local keeps traffic on the
+  # receiving node, so <nodeIP>:<nodePort> reaches that node's own collector
+  # instead of being load-balanced to another node
+  externalTrafficPolicy: Local
   # -- Service annotations
   annotations: {}
 
