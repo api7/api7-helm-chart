@@ -16,6 +16,50 @@ eBPF on-CPU flame graphs and guided CPU/memory/latency diagnosis for OpenResty/N
 
 * <https://github.com/api7/ngx-flame>
 
+## Install
+
+```sh
+helm repo add api7 https://charts.api7.ai
+helm repo update
+
+helm install ngxdig api7/ngxdig --namespace ngxdig --create-namespace
+```
+
+ngxdig is deployed as a DaemonSet — one collector Pod per node — so it can
+profile the OpenResty/Nginx (and APISIX) worker processes running on that node.
+
+### Run on specific node(s) only
+
+Usually you only want to profile the node running the workload you are
+debugging, not every node in the cluster. Restrict the DaemonSet with a
+`nodeSelector`; the DaemonSet controller then creates a collector Pod only on
+matching nodes.
+
+Pin to a single node by its built-in `kubernetes.io/hostname` label (the value
+is the node name shown by `kubectl get nodes`):
+
+```sh
+helm install ngxdig api7/ngxdig --namespace ngxdig --create-namespace \
+  --set nodeSelector."kubernetes\.io/hostname"=<node-name>
+```
+
+To target a group of nodes, label them first and select by that label:
+
+```sh
+kubectl label node <node-a> <node-b> ngxdig=enabled
+```
+
+```yaml
+# values.yaml
+nodeSelector:
+  ngxdig: enabled
+```
+
+For rules that `nodeSelector` cannot express, use `affinity` instead. Note that
+for a DaemonSet you should not set the Pod's `.spec.nodeName` directly — node
+placement is owned by the DaemonSet controller, and `nodeSelector`/`affinity`
+is the supported way to constrain it.
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -53,4 +97,3 @@ eBPF on-CPU flame graphs and guided CPU/memory/latency diagnosis for OpenResty/N
 | serviceAccount.name | string | `""` | Name of the ServiceAccount to use. Generated from the fullname when empty |
 | tolerations | list | `[]` | Tolerations for the DaemonSet Pods (e.g. to also run on control-plane nodes) |
 | updateStrategy | object | `{}` | Update strategy for the DaemonSet |
-
