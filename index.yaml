@@ -592,6 +592,33 @@ entries:
     version: 0.0.1
   api7ee3:
   - apiVersion: v2
+    appVersion: 3.10.3
+    created: "2026-07-14T07:24:39.819471782Z"
+    dependencies:
+    - condition: prometheus.builtin
+      name: prometheus
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.5.1
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - condition: jaeger.builtin
+      name: jaeger
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 4.4.7
+    description: A Helm chart for Kubernetes
+    digest: 2daf4d48b96b495b0d89321e5b2543c98e6177f8b457d48cbf8f955822c767bc
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: api7ee3
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-3.10.2/api7ee3-3.10.2.tgz
+    version: 3.10.2
+  - apiVersion: v2
     appVersion: 3.10.2
     created: "2026-06-29T12:59:17.409917642Z"
     dependencies:
@@ -3245,6 +3272,25 @@ entries:
     version: 0.1.0
   gateway:
   - apiVersion: v2
+    appVersion: 3.10.3
+    created: "2026-07-14T07:24:39.957969253Z"
+    dependencies:
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.7.7
+    description: A Helm chart for API7 Gateway
+    digest: 1c42a9a29bfa74705ee7619dd39b75ffc14afb3396cfb2d57496b8bcdd6515b2
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/gateway-3.10.7/gateway-3.10.7.tgz
+    version: 3.10.7
+  - apiVersion: v2
     appVersion: 3.10.2
     created: "2026-07-10T10:06:41.858207053Z"
     dependencies:
@@ -4989,4 +5035,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-14T03:54:39.584621049Z"
+generated: "2026-07-14T07:24:39.958588991Z"
