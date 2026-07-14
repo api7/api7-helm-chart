@@ -55,7 +55,6 @@ Reference it (each entry mounts `filename` from `secretName` and appends it to t
 ```yaml
 gateway:
   tls:
-    enabled: true # default; additionalTrustedCAs only applies while the TLS listener is enabled
     additionalTrustedCAs:
       - secretName: keycloak-ca
         filename: keycloak-ca.crt
@@ -79,7 +78,6 @@ gateway:
   http:
     servicePort: 80
   tls:
-    enabled: true # required to expose the HTTPS port
     servicePort: 443
 ```
 
