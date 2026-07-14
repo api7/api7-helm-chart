@@ -189,6 +189,13 @@ spec:
           name: ssl
           subPath: {{ .Values.gateway.tls.certCAFilename }}
       {{- end }}
+      {{- if .Values.gateway.tls.enabled }}
+      {{- range $i, $ca := .Values.gateway.tls.additionalTrustedCAs }}
+        - mountPath: /usr/local/apisix/conf/ssl/additional-ca-{{ $i }}
+          name: additional-ca-{{ $i }}
+          readOnly: true
+      {{- end }}
+      {{- end }}
 
       {{- if .Values.etcd.auth.tls.enabled }}
         - mountPath: /etcd-ssl
@@ -295,6 +302,16 @@ spec:
     - secret:
         secretName: {{ .Values.gateway.tls.existingCASecret | quote }}
       name: ssl
+    {{- end }}
+    {{- if .Values.gateway.tls.enabled }}
+    {{- range $i, $ca := .Values.gateway.tls.additionalTrustedCAs }}
+    - secret:
+        secretName: {{ $ca.secretName | quote }}
+        items:
+          - key: {{ $ca.filename | quote }}
+            path: {{ $ca.filename | quote }}
+      name: additional-ca-{{ $i }}
+    {{- end }}
     {{- end }}
     {{- if .Values.etcd.auth.tls.enabled }}
     - secret:

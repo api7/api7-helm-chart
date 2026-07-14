@@ -140,8 +140,8 @@ data:
         ssl_protocols: {{ .Values.gateway.tls.sslProtocols | quote }}
         ssl_ciphers: {{ .Values.gateway.tls.sslCiphers | quote }}
         ssl_session_tickets: {{ .Values.gateway.tls.sslSessionTickets }}
-        {{- if and .Values.gateway.tls.enabled .Values.gateway.tls.existingCASecret }}
-        ssl_trusted_certificate: "system,/usr/local/apisix/conf/ssl/{{ .Values.gateway.tls.certCAFilename }}"
+        {{- with (include "gateway.sslTrustedCertificate" .) }}
+        ssl_trusted_certificate: {{ . | quote }}
         {{- end }}
       {{- if .Values.gateway.tls.fallbackSNI }}
         fallback_sni: {{ .Values.gateway.tls.fallbackSNI }}
