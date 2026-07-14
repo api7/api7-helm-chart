@@ -9,6 +9,7 @@ This repo (`api7/api7-helm-chart`) holds the Helm charts for API7 EE components 
 | `api7-ingress-controller` | `charts/ingress-controller` | no — independent product version |
 | `developer-portal-fe` | `charts/developer-portal-fe` | no — independent product version |
 | `aisix-cp` (AISIX private-deployment control plane) | `charts/aisix-cp` | no — independent product version (source of truth: `api7/AISIX-Cloud` `helm/aisix-cp`) |
+| `ngxdig` (eBPF flame-graph / diagnosis agent, DaemonSet) | `charts/ngxdig` | no — independent product version (source of truth: `api7/ngx-flame`) |
 
 ## Multi-line maintenance model
 

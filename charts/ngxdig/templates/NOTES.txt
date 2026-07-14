@@ -1,0 +1,32 @@
+ngxdig is installed as a DaemonSet — one collector Pod per node.
+
+Each Pod runs the ngxdig debug UI and can profile the OpenResty/Nginx (and
+APISIX) worker processes running on its own node.
+
+1. List the collector Pods and the node each one runs on:
+
+   kubectl get pods --namespace {{ .Release.Namespace }} \
+     -l "app.kubernetes.io/name={{ include "ngxdig.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" \
+     -o wide
+
+2. Open the debug UI for the node whose workload you want to inspect. The UI is
+   not a hardened multi-user service, so reach it over a port-forward rather
+   than exposing it:
+
+   export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} \
+     -l "app.kubernetes.io/name={{ include "ngxdig.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" \
+     -o jsonpath="{.items[0].metadata.name}")
+   kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:{{ .Values.service.containerPort }}
+
+   Then browse to http://127.0.0.1:8080/ , pick a worker PID, and run a
+   diagnostic action (profile / cpu-on / memsnap / latency).
+
+3. Check host readiness for eBPF collection on a node:
+
+   kubectl --namespace {{ .Release.Namespace }} exec $POD_NAME -- ngxdig doctor
+
+Requirements: eBPF collection needs the node to expose kernel BTF
+({{ .Values.hostBtf.path }}){{ if not .Values.hostBtf.enabled }} — currently disabled via hostBtf.enabled=false{{ end }}, and the
+collector must keep CAP_BPF, CAP_PERFMON, and CAP_SYS_PTRACE with unconfined
+seccomp/AppArmor (the chart defaults grant these). If a diagnostic fails before
+collecting, `ngxdig doctor` reports the exact fix.

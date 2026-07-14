@@ -1,0 +1,21 @@
+apiVersion: v2
+name: ngxdig
+description: eBPF on-CPU flame graphs and guided CPU/memory/latency diagnosis for OpenResty/Nginx, deployed as a per-node collector
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - ebpf
+  - profiling
+  - flamegraph
+  - openresty
+  - nginx
+  - apisix
+  - diagnostics
+home: https://github.com/api7/ngx-flame
+sources:
+  - https://github.com/api7/ngx-flame
+maintainers:
+  - name: API7
+    email: support@api7.ai
+    url: https://api7.ai
