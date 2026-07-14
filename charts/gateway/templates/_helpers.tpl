@@ -196,3 +196,26 @@ Output: JSON {"entries": [{"port": 9200, "nodePort": ""}, ...]}
 {{- end -}}
 {{- dict "entries" $result | toJson -}}
 {{- end -}}
+
+{{/*
+Build the value of `apisix.ssl.ssl_trusted_certificate` — the gateway's outbound
+trust store. Starts from the system CA bundle (`system`), then appends the
+Control Plane CA (gateway.tls.existingCASecret) and every entry in
+gateway.tls.additionalTrustedCAs, matching the mount paths rendered in _pod.tpl.
+Returns an empty string when TLS is disabled or no CA is configured, so the
+caller can omit the key entirely.
+*/}}
+{{- define "gateway.sslTrustedCertificate" -}}
+{{- if .Values.gateway.tls.enabled -}}
+{{- $paths := list -}}
+{{- if .Values.gateway.tls.existingCASecret -}}
+{{- $paths = append $paths (printf "/usr/local/apisix/conf/ssl/%s" .Values.gateway.tls.certCAFilename) -}}
+{{- end -}}
+{{- range $i, $ca := .Values.gateway.tls.additionalTrustedCAs -}}
+{{- $paths = append $paths (printf "/usr/local/apisix/conf/ssl/additional-ca-%d/%s" $i $ca.filename) -}}
+{{- end -}}
+{{- if $paths -}}
+{{- printf "system,%s" (join "," $paths) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
