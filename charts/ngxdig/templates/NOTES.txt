@@ -23,18 +23,9 @@ APISIX) worker processes running on its own node.
 
    Then browse to http://127.0.0.1:8080/ , pick a worker PID, and run a
    diagnostic action (profile / cpu-on / memsnap / latency).
-{{- if .Values.service.enabled }}
 
-   A Service is enabled (type {{ .Values.service.type }}).
-   {{- if eq .Values.service.type "NodePort" }} With externalTrafficPolicy
-   {{ .Values.service.externalTrafficPolicy }}, reach a node's own collector at
-   <that-node-IP>:<nodePort>:
-
-   kubectl get svc --namespace {{ .Release.Namespace }} {{ include "ngxdig.fullname" . }} -o jsonpath="{.spec.ports[0].nodePort}"
-   {{- else }} Note it load-balances across every node's collector, so it is
-   only unambiguous when the DaemonSet is pinned to a single node.
-   {{- end }}
-{{- end }}
+   In-cluster clients can also reach the UI through the Service
+   {{ include "ngxdig.fullname" . }}:{{ .Values.service.port }} (type {{ .Values.service.type }}).
 
 3. Check host readiness for eBPF collection on a node:
 

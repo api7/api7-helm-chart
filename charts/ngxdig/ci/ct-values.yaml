@@ -1,8 +1,5 @@
 # Values used by chart-testing (`ct install`) to validate the chart on a
 # single-node kind cluster. Tolerate any node taint so the DaemonSet Pod is
-# guaranteed to schedule on the CI node, and enable the (default-off) Service so
-# its template is exercised too.
+# guaranteed to schedule on the CI node.
 tolerations:
   - operator: Exists
-service:
-  enabled: true

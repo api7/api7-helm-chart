@@ -30,41 +30,22 @@ profile the OpenResty/Nginx (and APISIX) worker processes running on that node.
 
 ## Accessing the debug UI
 
-The debug UI is not a hardened multi-user service, and each collector only sees
-its own node's processes. So the access method has to target one specific node.
-
-### Recommended: port-forward to the target node's Pod
-
-This needs no Service, exposes nothing on the network, and is scoped to exactly
-the node you want. Select the collector Pod by node name and forward to it:
+Most deployments run a single collector — one node, or the DaemonSet pinned to
+one node (see below) — so the `ClusterIP` Service the chart creates points at
+that one Pod. For quick local access, port-forward straight to the collector
+Pod:
 
 ```sh
-NODE=<node-name>   # from `kubectl get nodes`
-POD=$(kubectl get pod -n ngxdig \
-  -l app.kubernetes.io/name=ngxdig \
-  --field-selector spec.nodeName=$NODE \
-  -o jsonpath='{.items[0].metadata.name}')
-kubectl -n ngxdig port-forward $POD 8080:8080
+kubectl -n ngxdig port-forward \
+  $(kubectl -n ngxdig get pod -l app.kubernetes.io/name=ngxdig -o jsonpath='{.items[0].metadata.name}') \
+  8080:8080
 # then open http://127.0.0.1:8080/
 ```
 
-### Standing endpoint: NodePort with externalTrafficPolicy: Local
-
-A plain `ClusterIP` Service is unhelpful here — it load-balances across every
-node's collector, so the UI you reach hops between nodes. If you need a lasting
-endpoint, expose a `NodePort` with `externalTrafficPolicy: Local` so
-`<nodeIP>:<nodePort>` deterministically reaches that node's own collector:
-
-```yaml
-# values.yaml
-service:
-  enabled: true
-  type: NodePort
-  externalTrafficPolicy: Local
-  # nodePort: 30080   # optional; auto-assigned when omitted
-```
-
-Only do this on a trusted network — the UI has no authentication.
+The UI is not a hardened multi-user service — keep it on a trusted network and
+prefer a port-forward over a public ingress. When the DaemonSet spans several
+nodes, each collector only sees its own node's processes, so select the Pod on
+the node you want with `--field-selector spec.nodeName=<node>`.
 
 ## Run on specific node(s) only
 
@@ -127,11 +108,8 @@ is the supported way to constrain it.
 | resources | object | `{}` | Resource requests and limits for the collector container |
 | securityContext | object | `{"appArmorProfile":{"type":"Unconfined"},"capabilities":{"add":["BPF","PERFMON","SYS_PTRACE","SYS_ADMIN"]},"runAsUser":0,"seccompProfile":{"type":"Unconfined"}}` | Container security context. The defaults grant exactly what the eBPF collector needs: run as root, and the CAP_BPF / CAP_PERFMON / CAP_SYS_PTRACE / CAP_SYS_ADMIN capabilities with unconfined seccomp/AppArmor so BPF, perf events, ptrace, and the perf_uprobe PMU attachments used by `cpu-on` and `latency` are all permitted. CAP_SYS_ADMIN is the smallest addition that satisfies the uprobe perf_event check — `--privileged` is not required |
 | service.annotations | object | `{}` | Service annotations |
-| service.enabled | bool | `false` | Expose the UI through a Service. Off by default: a plain ClusterIP Service load-balances across every node's collector, and each collector only sees its own node's processes, so a shared Service address hops between nodes. When you do need a standing endpoint, use type NodePort with externalTrafficPolicy Local (below) so <nodeIP>:<nodePort> deterministically reaches that node's own collector |
-| service.externalTrafficPolicy | string | `"Local"` | externalTrafficPolicy for NodePort/LoadBalancer. Local keeps traffic on the receiving node, so <nodeIP>:<nodePort> reaches that node's own collector instead of being load-balanced to another node |
-| service.nodePort | string | `""` | Static node port for type NodePort. Auto-assigned when empty |
 | service.port | int | `8080` | Service port |
-| service.type | string | `"ClusterIP"` | Service type. NodePort (with externalTrafficPolicy Local) is the useful one for this DaemonSet; ClusterIP only makes sense when pinned to one node |
+| service.type | string | `"ClusterIP"` | Service type |
 | serviceAccount.annotations | object | `{}` | Annotations to add to the ServiceAccount |
 | serviceAccount.create | bool | `true` | Create a ServiceAccount for the collector |
 | serviceAccount.name | string | `""` | Name of the ServiceAccount to use. Generated from the fullname when empty |

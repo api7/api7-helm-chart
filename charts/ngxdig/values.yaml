@@ -88,28 +88,15 @@ output:
 # -- Port the ngxdig UI listens on inside the container
 containerPort: 8080
 
-# The recommended way to reach the UI is `kubectl port-forward` to the collector
-# Pod on the node you want to inspect (see the chart README / NOTES) — it needs
-# no Service, targets an exact node, and keeps the unhardened UI off the network.
+# The UI is exposed through a Service. Most deployments run a single collector
+# (one node, or the DaemonSet pinned to one node), so the Service points at that
+# one Pod. For quick local access you can also `kubectl port-forward` straight to
+# the collector Pod — see the chart README / NOTES.
 service:
-  # -- Expose the UI through a Service. Off by default: a plain ClusterIP Service
-  # load-balances across every node's collector, and each collector only sees its
-  # own node's processes, so a shared Service address hops between nodes. When you
-  # do need a standing endpoint, use type NodePort with externalTrafficPolicy
-  # Local (below) so <nodeIP>:<nodePort> deterministically reaches that node's own
-  # collector
-  enabled: false
-  # -- Service type. NodePort (with externalTrafficPolicy Local) is the useful
-  # one for this DaemonSet; ClusterIP only makes sense when pinned to one node
+  # -- Service type
   type: ClusterIP
   # -- Service port
   port: 8080
-  # -- Static node port for type NodePort. Auto-assigned when empty
-  nodePort: ""
-  # -- externalTrafficPolicy for NodePort/LoadBalancer. Local keeps traffic on the
-  # receiving node, so <nodeIP>:<nodePort> reaches that node's own collector
-  # instead of being load-balanced to another node
-  externalTrafficPolicy: Local
   # -- Service annotations
   annotations: {}
 

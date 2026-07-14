@@ -24,41 +24,22 @@ profile the OpenResty/Nginx (and APISIX) worker processes running on that node.
 
 ## Accessing the debug UI
 
-The debug UI is not a hardened multi-user service, and each collector only sees
-its own node's processes. So the access method has to target one specific node.
-
-### Recommended: port-forward to the target node's Pod
-
-This needs no Service, exposes nothing on the network, and is scoped to exactly
-the node you want. Select the collector Pod by node name and forward to it:
+Most deployments run a single collector — one node, or the DaemonSet pinned to
+one node (see below) — so the `ClusterIP` Service the chart creates points at
+that one Pod. For quick local access, port-forward straight to the collector
+Pod:
 
 ```sh
-NODE=<node-name>   # from `kubectl get nodes`
-POD=$(kubectl get pod -n ngxdig \
-  -l app.kubernetes.io/name=ngxdig \
-  --field-selector spec.nodeName=$NODE \
-  -o jsonpath='{.items[0].metadata.name}')
-kubectl -n ngxdig port-forward $POD 8080:8080
+kubectl -n ngxdig port-forward \
+  $(kubectl -n ngxdig get pod -l app.kubernetes.io/name=ngxdig -o jsonpath='{.items[0].metadata.name}') \
+  8080:8080
 # then open http://127.0.0.1:8080/
 ```
 
-### Standing endpoint: NodePort with externalTrafficPolicy: Local
-
-A plain `ClusterIP` Service is unhelpful here — it load-balances across every
-node's collector, so the UI you reach hops between nodes. If you need a lasting
-endpoint, expose a `NodePort` with `externalTrafficPolicy: Local` so
-`<nodeIP>:<nodePort>` deterministically reaches that node's own collector:
-
-```yaml
-# values.yaml
-service:
-  enabled: true
-  type: NodePort
-  externalTrafficPolicy: Local
-  # nodePort: 30080   # optional; auto-assigned when omitted
-```
-
-Only do this on a trusted network — the UI has no authentication.
+The UI is not a hardened multi-user service — keep it on a trusted network and
+prefer a port-forward over a public ingress. When the DaemonSet spans several
+nodes, each collector only sees its own node's processes, so select the Pod on
+the node you want with `--field-selector spec.nodeName=<node>`.
 
 ## Run on specific node(s) only
 
