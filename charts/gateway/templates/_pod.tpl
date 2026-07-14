@@ -307,6 +307,9 @@ spec:
     {{- range $i, $ca := .Values.gateway.tls.additionalTrustedCAs }}
     - secret:
         secretName: {{ $ca.secretName | quote }}
+        items:
+          - key: {{ $ca.filename | quote }}
+            path: {{ $ca.filename | quote }}
       name: additional-ca-{{ $i }}
     {{- end }}
     {{- end }}
