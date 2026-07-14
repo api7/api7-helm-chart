@@ -4,8 +4,9 @@
 image:
   # -- ngxdig image repository
   repository: api7/ngxdig
-  # -- Image pull policy
-  pullPolicy: IfNotPresent
+  # -- Image pull policy. Defaults to Always because the image tag is the moving
+  # `latest`, so nodes must re-pull to pick up newer builds
+  pullPolicy: Always
   # -- Image tag. Defaults to the chart appVersion when left empty
   tag: "latest"
 

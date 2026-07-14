@@ -29,7 +29,7 @@ eBPF on-CPU flame graphs and guided CPU/memory/latency diagnosis for OpenResty/N
 | hostBtf.enabled | bool | `true` | Mount the node's kernel BTF read-only. Required by the eBPF collector to resolve kernel types without DWARF |
 | hostBtf.path | string | `"/sys/kernel/btf"` | Host path to the kernel BTF directory |
 | hostPID | bool | `true` | Share the host PID namespace so the collector can see Nginx/OpenResty worker processes elsewhere on the node. Required to profile targets outside the collector's own Pod |
-| image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| image.pullPolicy | string | `"Always"` | Image pull policy. Defaults to Always because the image tag is the moving `latest`, so nodes must re-pull to pick up newer builds |
 | image.repository | string | `"api7/ngxdig"` | ngxdig image repository |
 | image.tag | string | `"latest"` | Image tag. Defaults to the chart appVersion when left empty |
 | imagePullSecrets | list | `[]` | Image pull secrets for a private registry |
