@@ -22,6 +22,25 @@ entries:
     version: 0.1.0
   aisix-cp:
   - apiVersion: v2
+    appVersion: 0.4.0
+    created: "2026-07-16T05:37:50.664683181Z"
+    dependencies:
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    description: Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
+    digest: dda3567c7f4814b59b3b4b2b6894d6727433ac0b2053d4a5a40b30787942562d
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: aisix-cp
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/aisix-cp-0.4.0/aisix-cp-0.4.0.tgz
+    version: 0.4.0
+  - apiVersion: v2
     appVersion: 0.3.1
     created: "2026-07-08T03:59:58.266412227Z"
     dependencies:
@@ -5111,4 +5130,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-14T14:21:23.162483208Z"
+generated: "2026-07-16T05:37:50.66491981Z"
