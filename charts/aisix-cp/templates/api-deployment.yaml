@@ -81,6 +81,10 @@ spec:
             - name: AISIX_PLAYGROUND_ALLOW_PRIVATE_IPS
               value: "1"
             {{- end }}
+            {{- if .Values.api.notifyAllowPrivateURLs }}
+            - name: AISIX_CLOUD_NOTIFY_ALLOW_PRIVATE_URLS
+              value: "true"
+            {{- end }}
             - name: AISIX_CLOUD_DP_IMAGE
               value: {{ .Values.api.dpImage | default (printf "docker.io/api7/aisix:%s" .Chart.AppVersion) | quote }}
             {{- with .Values.api.extraEnvVars }}
