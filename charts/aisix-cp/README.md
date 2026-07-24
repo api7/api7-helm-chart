@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 0.4.0](https://img.shields.io/badge/Version-0.4.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.4.0](https://img.shields.io/badge/AppVersion-0.4.0-informational?style=flat-square)
+![Version: 0.5.0](https://img.shields.io/badge/Version-0.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.5.0](https://img.shields.io/badge/AppVersion-0.5.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -28,6 +28,7 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | api.image.repository | string | `"docker.io/api7/aisix-cp-api"` |  |
 | api.image.tag | string | `""` |  |
 | api.nodeSelector | object | `{}` |  |
+| api.notifyAllowPrivateURLs | bool | `false` |  |
 | api.oauthEnabled | bool | `false` |  |
 | api.playgroundAllowPrivateIPs | bool | `false` |  |
 | api.podSecurityContext.fsGroup | int | `101` |  |

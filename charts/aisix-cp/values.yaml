@@ -46,6 +46,11 @@ api:
   ## enable this only for self-hosted deployments whose models live on an
   ## internal network the cp-api pod can route to.
   playgroundAllowPrivateIPs: false
+  ## Allow notification channels (budget alert webhooks / Slack) to point
+  ## at private / internal addresses. Blocked by default (SSRF guard);
+  ## enable only for self-hosted deployments whose webhook receivers live
+  ## on an intranet the cp-api pod can route to.
+  notifyAllowPrivateURLs: false
 
 ## @section dp-manager
 dpm:

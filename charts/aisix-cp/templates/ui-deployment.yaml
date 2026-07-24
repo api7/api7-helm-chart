@@ -70,6 +70,17 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          volumeMounts:
+            # Next.js standalone writes its image/fetch cache under
+            # .next/cache. With readOnlyRootFilesystem and no writable
+            # mount here, every cache write fails and a failed write can
+            # permanently wedge the /_next/image in-flight dedup entry
+            # for a variant (requests then hang until the LB times out).
+            - name: next-cache
+              mountPath: /app/.next/cache
+      volumes:
+        - name: next-cache
+          emptyDir: {}
       {{- with .Values.ui.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
