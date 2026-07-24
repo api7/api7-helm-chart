@@ -70,7 +70,24 @@ spec:
           # Service) and liveness (pod restarted). When the health
           # listener is disabled (healthListen=""), the dp-manager serves
           # no /healthz, so fall back to a TCP check on the mTLS port.
+          #
+          # On a cold start the dp-manager binds NEITHER port until
+          # bootstrapCertManagerWithRetry succeeds: cp-api owns the
+          # schema migration, so on a first boot dp-manager sits in an
+          # in-process retry loop (~2 min budget) waiting for the shared
+          # tables to appear. The liveness settings below would kill it
+          # ~30s in — well inside its own retry window — turning a
+          # benign, self-healing boot race into a crash loop. The
+          # startupProbe suspends liveness and readiness until the first
+          # success, with a budget that must stay LONGER than that
+          # in-process retry window (see ci-helm.yml, which asserts it).
           {{- if .Values.dpm.service.healthListen }}
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: health
+            periodSeconds: 5
+            failureThreshold: 36
           readinessProbe:
             httpGet:
               path: /healthz
@@ -85,6 +102,11 @@ spec:
             periodSeconds: 10
             failureThreshold: 3
           {{- else }}
+          startupProbe:
+            tcpSocket:
+              port: tls
+            periodSeconds: 5
+            failureThreshold: 36
           readinessProbe:
             tcpSocket:
               port: tls

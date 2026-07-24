@@ -2,7 +2,7 @@ apiVersion: v2
 name: aisix-cp
 description: Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 type: application
-version: 0.5.0
+version: 0.5.1
 appVersion: "0.5.0"
 
 maintainers:
