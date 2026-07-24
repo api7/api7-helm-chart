@@ -90,6 +90,18 @@ spec:
             {{- with .Values.api.extraEnvVars }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
+          # cp-api runs the schema migration (db.OpenAndMigrate) before
+          # it binds :8080, so /healthz does not answer for the whole
+          # migration. On an upgrade against a populated database that
+          # can outlast the liveness budget below and kill the pod
+          # MID-MIGRATION. The startupProbe suspends liveness and
+          # readiness until the server is actually up.
+          startupProbe:
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+            failureThreshold: 60
           livenessProbe:
             httpGet:
               path: /healthz
