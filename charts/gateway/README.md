@@ -158,7 +158,7 @@ apisix:
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.10.3"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.10.4"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
 | apisix.lru.secret.count | int | `512` | Maximum number of cached secret values |
@@ -328,6 +328,8 @@ apisix:
 | nginx.http.variablesHashMaxSize | int | `2048` | The maximum size of the nginx variables hash table |
 | nginx.maxPendingTimers | int | `16384` | Maximum number of pending timers. Increase it if you see "too many pending timers" error |
 | nginx.maxRunningTimers | int | `4096` | Maximum number of running timers. Increase it if you see "lua_max_running_timers are not enough" error |
+| nginx.stream | object | `{"realIpFrom":[]}` | Nginx stream subsystem configurations |
+| nginx.stream.realIpFrom | list | `[]` | Trusted addresses known to send a correct PROXY protocol header on stream (TCP/UDP) ports. On a connection from a trusted address that carries an inbound PROXY protocol header, the client address is replaced by the one in the header. Only takes effect on ports that accept the PROXY protocol (`apisix.stream.tcp[].proxyProtocol`). Empty by default, so the client address is always the directly connected peer, see [set_real_ip_from](https://nginx.org/en/docs/stream/ngx_stream_realip_module.html#set_real_ip_from) |
 | nginx.workerConnections | string | `"10620"` | The maximum number of connections that each worker process can open |
 | nginx.workerProcesses | string | `"auto"` | The number of nginx worker processes. `auto` means the number of CPU cores |
 | nginx.workerRlimitNofile | string | `"20480"` | The number of files a worker process can open, should be larger than nginx.workerConnections |
