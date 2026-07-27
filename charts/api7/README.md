@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 3.10.2](https://img.shields.io/badge/Version-3.10.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.10.3](https://img.shields.io/badge/AppVersion-3.10.3-informational?style=flat-square)
+![Version: 3.10.3](https://img.shields.io/badge/Version-3.10.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.10.4](https://img.shields.io/badge/AppVersion-3.10.4-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -29,7 +29,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.10.3"` |  |
+| dashboard.image.tag | string | `"v3.10.4"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.livenessProbe.failureThreshold | int | `30` |  |
 | dashboard.livenessProbe.initialDelaySeconds | int | `180` |  |
@@ -42,6 +42,8 @@ A Helm chart for Kubernetes
 | dashboard.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
 | dashboard_configuration.audit.retention_days | int | `60` |  |
 | dashboard_configuration.console.addr | string | `"http://127.0.0.1:3000"` |  |
+| dashboard_configuration.console.hybrid_mode | bool | `false` | hybrid_mode hides the license and core-quota UI, for deployments where the license is operated for the user rather than by them. |
+| dashboard_configuration.console.sentry | object | `{"dsn":"","enabled":false,"release":""}` | sentry configures the console's browser error reporting. |
 | dashboard_configuration.consumer_proxy.cache_failure_count | int | `512` |  |
 | dashboard_configuration.consumer_proxy.cache_failure_ttl | int | `60` |  |
 | dashboard_configuration.consumer_proxy.cache_success_count | int | `512` |  |
@@ -49,6 +51,7 @@ A Helm chart for Kubernetes
 | dashboard_configuration.consumer_proxy.enable | bool | `false` |  |
 | dashboard_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dashboard_configuration.database.max_idle_time | string | `"30s"` |  |
+| dashboard_configuration.database.max_lifetime | string | `"1h"` | Maximum lifetime of a pooled connection. Bounded by default so that connections pinned to a primary demoted by a failover are eventually retired; do not set it to 0 |
 | dashboard_configuration.database.max_open_conns | int | `30` |  |
 | dashboard_configuration.database.timeout | string | `"5s"` |  |
 | dashboard_configuration.developer_proxy.cache_failure_count | int | `256` |  |
@@ -120,7 +123,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraVolumes | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"Always"` |  |
 | developer_portal.image.repository | string | `"api7/api7-ee-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v3.10.3"` |  |
+| developer_portal.image.tag | string | `"v3.10.4"` |  |
 | developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.livenessProbe.failureThreshold | int | `10` |  |
 | developer_portal.livenessProbe.initialDelaySeconds | int | `60` |  |
@@ -133,6 +136,7 @@ A Helm chart for Kubernetes
 | developer_portal.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
 | developer_portal_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | developer_portal_configuration.database.max_idle_time | string | `"30s"` |  |
+| developer_portal_configuration.database.max_lifetime | string | `"1h"` | Maximum lifetime of a pooled connection. Bounded by default so that connections pinned to a primary demoted by a failover are eventually retired; do not set it to 0 |
 | developer_portal_configuration.database.max_open_conns | int | `30` |  |
 | developer_portal_configuration.database.timeout | string | `"5s"` |  |
 | developer_portal_configuration.enable | bool | `true` |  |
@@ -166,7 +170,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.10.3"` |  |
+| dp_manager.image.tag | string | `"v3.10.4"` |  |
 | dp_manager.livenessProbe.failureThreshold | int | `10` |  |
 | dp_manager.livenessProbe.initialDelaySeconds | int | `60` |  |
 | dp_manager.livenessProbe.periodSeconds | int | `3` |  |
@@ -181,6 +185,7 @@ A Helm chart for Kubernetes
 | dp_manager_configuration.consumer_cache.size | int | `50000` |  |
 | dp_manager_configuration.database.dsn | string | `"postgres://api7ee:changeme@api7-postgresql:5432/api7ee"` |  |
 | dp_manager_configuration.database.max_idle_time | string | `"30s"` |  |
+| dp_manager_configuration.database.max_lifetime | string | `"1h"` | Maximum lifetime of a pooled connection. Bounded by default so that connections pinned to a primary demoted by a failover are eventually retired; do not set it to 0 |
 | dp_manager_configuration.database.max_open_conns | int | `30` |  |
 | dp_manager_configuration.database.timeout | string | `"5s"` |  |
 | dp_manager_configuration.developer_cache.evict_interval | string | `"5s"` |  |
@@ -232,7 +237,7 @@ A Helm chart for Kubernetes
 | file_server.enabled | bool | `false` |  |
 | file_server.image.pullPolicy | string | `"Always"` |  |
 | file_server.image.repository | string | `"api7/api7-ee-file-server"` |  |
-| file_server.image.tag | string | `"v3.10.3"` |  |
+| file_server.image.tag | string | `"v3.10.4"` |  |
 | file_server.livenessProbe.failureThreshold | int | `10` |  |
 | file_server.livenessProbe.initialDelaySeconds | int | `60` |  |
 | file_server.livenessProbe.periodSeconds | int | `3` |  |
