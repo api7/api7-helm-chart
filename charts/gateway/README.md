@@ -178,7 +178,7 @@ apisix:
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.9.16"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.9.17"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
 | apisix.lru.secret.neg_ttl | int | `60` | in seconds |
@@ -305,6 +305,8 @@ apisix:
 | nginx.http.clientMaxBodySize | int | `0` | The maximum allowed size of the client request body. If exceeded, the 413 (Request Entity Too Large) error is returned to the client. Note that unlike Nginx, we don't limit the body size by default (0 means no limit). |
 | nginx.http.keepaliveTimeout | string | `"60s"` | timeout during which a keep-alive client connection will stay open on the server side |
 | nginx.http.sendTimeout | string | `"10s"` | timeout for transmitting a response to the client, then the connection is closed |
+| nginx.stream | object | `{"realIpFrom":[]}` | Nginx stream subsystem configurations |
+| nginx.stream.realIpFrom | list | `[]` | Trusted addresses known to send a correct PROXY protocol header on stream (TCP/UDP) ports. On a connection from a trusted address that carries an inbound PROXY protocol header, the client address is replaced by the one in the header. Only takes effect on ports that accept the PROXY protocol (`apisix.stream.tcp[].proxyProtocol`). Empty by default, so the client address is always the directly connected peer, see [set_real_ip_from](https://nginx.org/en/docs/stream/ngx_stream_realip_module.html#set_real_ip_from) |
 | nginx.workerConnections | string | `"10620"` |  |
 | nginx.workerProcesses | string | `"auto"` |  |
 | nginx.workerRlimitNofile | string | `"20480"` |  |

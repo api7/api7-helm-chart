@@ -137,7 +137,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.9.16
+    tag: 3.9.17
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
@@ -460,6 +460,16 @@ nginx:
   workerProcesses: auto
   enableCPUAffinity: true
   envs: []
+  # -- Nginx stream subsystem configurations
+  stream:
+    # -- Trusted addresses known to send a correct PROXY protocol header on stream (TCP/UDP) ports.
+    # On a connection from a trusted address that carries an inbound PROXY protocol header, the client
+    # address is replaced by the one in the header. Only takes effect on ports that accept the PROXY
+    # protocol (`apisix.stream.tcp[].proxyProtocol`). Empty by default, so the client address is always
+    # the directly connected peer,
+    # see [set_real_ip_from](https://nginx.org/en/docs/stream/ngx_stream_realip_module.html#set_real_ip_from)
+    realIpFrom: []
+    # - 192.168.1.0/24
   # -- HTTP timeout configurations
   http:
     # -- timeout during which a keep-alive client connection will stay open on the server side
