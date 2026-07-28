@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.16"
+    tag: "v3.9.17"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -55,7 +55,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.16"
+    tag: "v3.9.17"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -92,7 +92,7 @@ file_server:
   image:
     repository: api7/api7-ee-file-server
     pullPolicy: Always
-    tag: "v3.9.16"
+    tag: "v3.9.17"
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 3
@@ -110,7 +110,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.16"
+    tag: "v3.9.17"
 
   extraEnvVars: []
   extraVolumes: []
@@ -362,7 +362,9 @@ dashboard_configuration:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     max_open_conns: 30
     max_idle_time: 30s
-    # max_lifetime: 60s
+    # -- Maximum lifetime of a pooled connection. Bounded by default so that connections
+    # pinned to a primary demoted by a failover are eventually retired; do not set it to 0
+    max_lifetime: 1h
     timeout: 5s
     # vault:
     #   enabled: false
@@ -406,6 +408,22 @@ dashboard_configuration:
       - "/api/v1/labels"
   console:
     addr: "http://127.0.0.1:3000"
+    # -- hybrid_mode hides the license and core-quota UI, for deployments where
+    # the license is operated for the user rather than by them.
+    hybrid_mode: false
+    # -- sentry configures the console's browser error reporting.
+    sentry:
+      enabled: false
+      dsn: ""
+      release: ""
+    # -- custom_menu_group adds an extra group of external links to the gateway
+    # sidebar. Every item needs a non-empty name and an absolute http/https
+    # url; the whole group is dropped when it does not validate.
+    # custom_menu_group:
+    #   title: "Resources"
+    #   items:
+    #     - name: "API7 Docs"
+    #       url: "https://docs.api7.ai"
   audit:
     retention_days: 60
   consumer_proxy:
@@ -490,7 +508,9 @@ dp_manager_configuration:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     max_open_conns: 30
     max_idle_time: 30s
-    # max_lifetime: 60s
+    # -- Maximum lifetime of a pooled connection. Bounded by default so that connections
+    # pinned to a primary demoted by a failover are eventually retired; do not set it to 0
+    max_lifetime: 1h
     timeout: 5s
     # vault:
     #   enabled: false
@@ -569,7 +589,9 @@ developer_portal_configuration:
     dsn: "postgres://api7ee:changeme@api7-postgresql:5432/api7ee"
     max_open_conns: 30
     max_idle_time: 30s
-    # max_lifetime: 60s
+    # -- Maximum lifetime of a pooled connection. Bounded by default so that connections
+    # pinned to a primary demoted by a failover are eventually retired; do not set it to 0
+    max_lifetime: 1h
     timeout: 5s
     # vault:
     #   enabled: false
