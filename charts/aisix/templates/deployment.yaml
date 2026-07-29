@@ -18,15 +18,18 @@ spec:
       {{- include "aisix.selectorLabels" . | nindent 6 }}
   template:
     metadata:
+      {{- if or (not .Values.controlPlane.certificate.existingSecret) .Values.podAnnotations }}
       annotations:
-        # Roll the pods when the certificate bundle changes, so a rotated
-        # bundle takes effect without a manual restart.
         {{- if not .Values.controlPlane.certificate.existingSecret }}
+        # Roll the pods when the chart-managed bundle changes, so a rotated
+        # certificate takes effect without a manual restart. An existingSecret
+        # has its own lifecycle — restart the Deployment after rotating it.
         checksum/mtls: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
+      {{- end }}
       labels:
         {{- include "aisix.labels" . | nindent 8 }}
         {{- include "aisix.selectorLabels" . | nindent 8 }}
