@@ -114,8 +114,8 @@ rateLimit:
     existingSecretKey: "redis-url"
 
 ## HorizontalPodAutoscaler. Scaling is safe by construction: a new replica is
-## kept out of the Service until `/readyz` passes, which happens only after it
-## has loaded its configuration from the control plane.
+## kept out of the Service until its readiness probe passes, which happens
+## only after it has loaded its configuration from the control plane.
 ##
 ## Requires a metrics source for the chosen metrics (metrics-server for the
 ## CPU / memory targets below). Mutually exclusive with `keda.enabled`.
@@ -225,10 +225,10 @@ securityContext:
     add:
       - NET_BIND_SERVICE
 
-## Probes hit the proxy listener. `/readyz` reports 503 until the gateway has
-## applied configuration from the control plane and again while it drains, so
-## a scaled-up replica joins the Service only once it can actually serve, and
-## a scaled-down one leaves it before it stops.
+## Liveness and startup probe the proxy listener's `/livez`; readiness probes
+## `/status/ready` on the metrics listener, which reports 503 until the
+## gateway has applied configuration from the control plane. A scaled-up
+## replica therefore joins the Service only once it can actually serve.
 startupProbe:
   # -- Gate liveness and readiness until the proxy listener is bound
   enabled: true

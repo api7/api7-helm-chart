@@ -87,14 +87,15 @@ autoscaling:
 ```
 
 Requires `metrics-server` in the cluster. A replica the autoscaler adds is kept out
-of the Service until `/readyz` passes, which happens only after it has loaded its
-configuration from the control plane — so a scaling event never routes traffic to a
-gateway that cannot serve it.
+of the Service until its readiness probe passes, which happens only after it has
+loaded its configuration from the control plane — so a scaling event never routes
+traffic to a gateway that cannot serve it.
 
-Scale-down is equally guarded: the gateway stops reporting ready, then drains
-in-flight requests. Because a streaming response can run for minutes,
-`terminationGracePeriodSeconds` defaults to 120 rather than the Kubernetes default
-of 30. Raise it if your workloads stream for longer.
+Scale-down is guarded from the other side: a terminating pod leaves the Service
+first, pauses while that removal propagates, then drains in-flight requests.
+Because a streaming response can run for minutes, `terminationGracePeriodSeconds`
+defaults to 120 rather than the Kubernetes default of 30. Raise it if your
+workloads stream for longer.
 
 ### Autoscale on request load with KEDA
 
