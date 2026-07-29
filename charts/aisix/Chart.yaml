@@ -1,0 +1,21 @@
+apiVersion: v2
+name: aisix
+description: Helm chart for the AISIX AI gateway data plane
+type: application
+version: 0.6.0
+appVersion: "0.6.0"
+
+keywords:
+  - ai-gateway
+  - llm
+  - gateway
+  - proxy
+
+home: https://api7.ai
+sources:
+  - https://github.com/api7/api7-helm-chart
+
+maintainers:
+  - name: API7
+    email: support@api7.ai
+    url: https://api7.ai

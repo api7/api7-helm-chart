@@ -9,6 +9,7 @@ This repo (`api7/api7-helm-chart`) holds the Helm charts for API7 EE components 
 | `api7-ingress-controller` | `charts/ingress-controller` | no — independent product version |
 | `developer-portal-fe` | `charts/developer-portal-fe` | no — independent product version |
 | `aisix-cp` (AISIX private-deployment control plane) | `charts/aisix-cp` | no — independent product version (source of truth: `api7/AISIX-Cloud` `helm/aisix-cp`) |
+| `aisix` (AISIX AI gateway data plane) | `charts/aisix` | no — independent product version; **this repo is the source of truth** (unlike `aisix-cp`, no dev-repo counterpart to sync from) |
 | `ngxdig` (eBPF flame-graph / diagnosis agent, DaemonSet) | `charts/ngxdig` | no — independent product version (source of truth: `api7/ngx-flame`) |
 
 ## Multi-line maintenance model
@@ -38,6 +39,8 @@ Why: in the shared `charts.api7.ai` index, `3.9.x < 3.10.x`, so a plain `helm up
 Cost: within a single line the chart can no longer use a major bump for breaking changes — but a maintenance line should only take backward-compatible bug fixes; breaking changes ride the next minor (a new EE line).
 
 For **independently-versioned sub-charts** (`ingress-controller`, `developer-portal-fe`): their version axis is not the EE minor, so they are **shared across EE lines and not forked per line** by default. Only fork them onto their **own product minor** when an older EE line must ship a different version of them and keep patching it.
+
+The **AISIX charts (`aisix-cp`, `aisix`) release as a pair**, on the AISIX OP version axis rather than the EE one: at each OP release both get `version` **and** `appVersion` set to that release. `appVersion` pins the image tag on both sides, so the two charts must never carry different `appVersion`s — a control plane and a data plane from different releases is not a combination we ship.
 
 ## Release decision
 

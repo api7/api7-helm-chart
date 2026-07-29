@@ -38,6 +38,7 @@ jobs:
                   --charts charts/gateway \
                   --charts charts/ingress-controller \
                   --charts charts/aisix-cp \
+                  --charts charts/aisix \
                   --charts charts/ngxdig'
 
       - name: Verify Chart.lock files

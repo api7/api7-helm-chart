@@ -1,0 +1,184 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "aisix.fullname" . }}
+  labels:
+    {{- include "aisix.labels" . | nindent 4 }}
+    {{- include "aisix.selectorLabels" . | nindent 4 }}
+spec:
+  {{- if not (or .Values.autoscaling.enabled .Values.keda.enabled) }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  {{- with .Values.updateStrategy }}
+  strategy:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "aisix.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        # Roll the pods when the certificate bundle changes, so a rotated
+        # bundle takes effect without a manual restart.
+        {{- if not .Values.controlPlane.certificate.existingSecret }}
+        checksum/mtls: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "aisix.labels" . | nindent 8 }}
+        {{- include "aisix.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      # The gateway reads every AISIX_-prefixed environment variable as a
+      # configuration override and rejects unknown keys. Service links inject
+      # one variable per Service in the namespace, so any Service whose name
+      # starts with "aisix" — this chart's own, or a control plane installed
+      # alongside it — stops the gateway from booting ("unknown field
+      # `cp_ui_service_port_http`"). Not a value: there is no working setting
+      # other than false.
+      enableServiceLinks: false
+      {{- include "aisix.imagePullSecrets" . | nindent 6 }}
+      serviceAccountName: {{ include "aisix.serviceAccountName" . }}
+      {{- with .Values.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      containers:
+        - name: aisix
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          ports:
+            - name: proxy
+              containerPort: {{ .Values.containerPorts.proxy }}
+              protocol: TCP
+            - name: metrics
+              containerPort: {{ .Values.containerPorts.metrics }}
+              protocol: TCP
+          env:
+            - name: AISIX_CONFIG_PATH
+              value: /etc/aisix/config.managed.yaml
+            - name: AISIX_PROXY__ADDR
+              value: "0.0.0.0:{{ .Values.containerPorts.proxy }}"
+            - name: AISIX_OBSERVABILITY__METRICS__PROMETHEUS__ADDR
+              value: "0.0.0.0:{{ .Values.containerPorts.metrics }}"
+            - name: AISIX_MANAGED__CP_BASE_URL
+              value: {{ .Values.controlPlane.baseURL | quote }}
+            {{- with .Values.controlPlane.etcdEndpoint }}
+            - name: AISIX_MANAGED__CP_ETCD_ENDPOINT
+              value: {{ . | quote }}
+            {{- end }}
+            - name: AISIX_MANAGED__HEARTBEAT_INTERVAL_SECS
+              value: {{ .Values.controlPlane.heartbeatIntervalSeconds | quote }}
+            - name: AISIX_MANAGED__CP_CERT_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix.certSecretName" . }}
+                  key: {{ .Values.controlPlane.certificate.certKey }}
+            - name: AISIX_MANAGED__CP_KEY_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix.certSecretName" . }}
+                  key: {{ .Values.controlPlane.certificate.keyKey }}
+            - name: AISIX_MANAGED__CP_CA_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix.certSecretName" . }}
+                  key: {{ .Values.controlPlane.certificate.caKey }}
+            {{- if eq .Values.rateLimit.backend "redis" }}
+            - name: AISIX_RATELIMIT__BACKEND
+              value: "redis"
+            - name: AISIX_RATELIMIT__REDIS__URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix.redisSecretName" . }}
+                  key: {{ include "aisix.redisSecretKey" . }}
+            {{- end }}
+            {{- with .Values.extraEnvVars }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+          {{- if .Values.startupProbe.enabled }}
+          # /livez answers as soon as the proxy listener is bound. Gating on
+          # it keeps liveness and readiness quiet during boot.
+          startupProbe:
+            httpGet:
+              path: /livez
+              port: proxy
+            periodSeconds: {{ .Values.startupProbe.periodSeconds }}
+            failureThreshold: {{ .Values.startupProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.readinessProbe.enabled }}
+          # /readyz is 503 until configuration has been applied from the
+          # control plane, and again once draining begins — so a new replica
+          # joins the Service only when it can serve, and a terminating one
+          # leaves it before it stops accepting connections.
+          readinessProbe:
+            httpGet:
+              path: /readyz
+              port: proxy
+            periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          {{- end }}
+          {{- if .Values.livenessProbe.enabled }}
+          livenessProbe:
+            httpGet:
+              path: /livez
+              port: proxy
+            initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          {{- end }}
+          {{- if gt (int .Values.preStopSleepSeconds) 0 }}
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sleep", "{{ .Values.preStopSleepSeconds }}"]
+          {{- end }}
+          {{- with .Values.resources }}
+          resources:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          volumeMounts:
+            # The gateway writes its mTLS material, gateway id, and
+            # configuration snapshot here. Per-pod and ephemeral by design:
+            # replicas share one certificate but register as separate
+            # instances, and a restarted pod re-registers.
+            - name: state
+              mountPath: /var/lib/aisix
+            {{- with .Values.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+      volumes:
+        - name: state
+          emptyDir: {}
+        {{- with .Values.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.topologySpreadConstraints }}
+      topologySpreadConstraints:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
