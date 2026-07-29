@@ -1,0 +1,8 @@
+# Values used by chart-testing. The chart deliberately fails to render
+# without a control-plane endpoint and a certificate bundle, so CI supplies
+# placeholders for both. The referenced Secret is never created — this file
+# drives `ct lint` only, not `ct install`.
+controlPlane:
+  baseURL: "https://dp-manager.example.com:7944"
+  certificate:
+    existingSecret: "aisix-gateway-certificate"

@@ -1,0 +1,57 @@
+AISIX gateway {{ .Chart.AppVersion }} has been deployed as {{ include "aisix.fullname" . }}.
+
+It connects out to the control plane at {{ .Values.controlPlane.baseURL }} and
+appears in that environment's Data planes view once its first heartbeat lands.
+
+Watch it come up:
+
+  kubectl rollout status deploy/{{ include "aisix.fullname" . }} -n {{ .Release.Namespace }}
+
+Send a request through it:
+{{- if eq .Values.service.type "ClusterIP" }}
+
+  kubectl port-forward svc/{{ include "aisix.fullname" . }} 8080:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+  curl http://localhost:8080/v1/models -H "Authorization: Bearer <api-key>"
+{{- else if eq .Values.service.type "NodePort" }}
+
+  export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}')
+  export NODE_PORT=$(kubectl get svc {{ include "aisix.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}')
+  curl http://$NODE_IP:$NODE_PORT/v1/models -H "Authorization: Bearer <api-key>"
+{{- else }}
+
+  export LB_IP=$(kubectl get svc {{ include "aisix.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+  curl http://$LB_IP:{{ .Values.service.port }}/v1/models -H "Authorization: Bearer <api-key>"
+{{- end }}
+
+{{ if .Values.autoscaling.enabled -}}
+Autoscaling is on (HorizontalPodAutoscaler, {{ .Values.autoscaling.minReplicas }}-{{ .Values.autoscaling.maxReplicas }} replicas). Watch scaling
+decisions and the metrics behind them:
+
+  kubectl get hpa {{ include "aisix.fullname" . }} -n {{ .Release.Namespace }} --watch
+  kubectl describe hpa {{ include "aisix.fullname" . }} -n {{ .Release.Namespace }}
+
+CPU-target autoscaling needs metrics-server running in the cluster.
+{{ else if .Values.keda.enabled -}}
+Autoscaling is on (KEDA ScaledObject, {{ .Values.keda.minReplicas }}-{{ .Values.keda.maxReplicas }} replicas). Watch scaling
+decisions and the triggers behind them:
+
+  kubectl get scaledobject {{ include "aisix.fullname" . }} -n {{ .Release.Namespace }}
+  kubectl describe hpa keda-hpa-{{ include "aisix.fullname" . }} -n {{ .Release.Namespace }}
+{{ else -}}
+Running {{ .Values.replicaCount }} fixed replica(s). To scale on load, set
+`autoscaling.enabled=true` (CPU / memory) or `keda.enabled=true` with triggers
+of your own.
+{{ end }}
+{{- if eq .Values.rateLimit.backend "memory" }}
+{{- if or .Values.autoscaling.enabled .Values.keda.enabled }}
+
+WARNING: rateLimit.backend is "memory", so each replica counts requests on its
+own and every replica the autoscaler adds multiplies the effective rate limit.
+Point rateLimit.redis.url at a shared Redis and set rateLimit.backend=redis.
+{{- else if gt (int .Values.replicaCount) 1 }}
+
+WARNING: rateLimit.backend is "memory", so each replica counts requests on its
+own and {{ .Values.replicaCount }} replicas enforce {{ .Values.replicaCount }}x every configured rate limit. Point
+rateLimit.redis.url at a shared Redis and set rateLimit.backend=redis.
+{{- end }}
+{{- end }}

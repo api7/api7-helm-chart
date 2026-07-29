@@ -1,0 +1,286 @@
+global:
+  # -- Image pull secrets applied to every pod created by this chart
+  imagePullSecrets: []
+
+# -- Number of gateway replicas. Ignored once `autoscaling.enabled` or
+# `keda.enabled` is true — the autoscaler owns the replica count from then on
+# and the Deployment omits `spec.replicas` so `helm upgrade` cannot reset it.
+replicaCount: 2
+
+# -- Override the chart name used in resource names
+nameOverride: ""
+# -- Override the fully qualified resource name prefix
+fullnameOverride: ""
+
+image:
+  # -- Gateway image repository
+  repository: docker.io/api7/aisix
+  # -- Image pull policy
+  pullPolicy: IfNotPresent
+  # -- Image tag. Empty resolves to the chart `appVersion`
+  tag: ""
+
+## The gateway runs as an AISIX Cloud data plane: it authenticates to the
+## control plane's data-plane manager with the mTLS bundle issued from
+## **Data planes** in the console, then reads its configuration from the
+## control plane. Everything in this section comes from that view.
+controlPlane:
+  # -- Data-plane manager mTLS endpoint the gateway connects out to, e.g.
+  # `https://dpm.example.com:7944`. Required.
+  baseURL: ""
+  # -- Control-plane etcd endpoint as bare `host:port`. Leave empty unless the
+  # control plane publishes an etcd endpoint distinct from `baseURL`
+  etcdEndpoint: ""
+  # -- Heartbeat interval in seconds. The control plane marks a gateway
+  # connected on its first heartbeat. Clamped to [5, 300] by the gateway
+  heartbeatIntervalSeconds: 15
+  certificate:
+    # -- Read the bundle from an existing Secret instead of the PEM values
+    # below. Recommended: it keeps the private key out of your values file
+    existingSecret: ""
+    # -- Secret key holding the client certificate PEM
+    certKey: "cert.pem"
+    # -- Secret key holding the private key PEM
+    keyKey: "key.pem"
+    # -- Secret key holding the CA bundle PEM
+    caKey: "ca.pem"
+    # -- Client certificate PEM. Used only when `existingSecret` is empty
+    cert: ""
+    # -- Private key PEM. Used only when `existingSecret` is empty
+    key: ""
+    # -- CA bundle PEM. Used only when `existingSecret` is empty
+    ca: ""
+
+containerPorts:
+  # -- Port the proxy listener binds inside the container. The image carries
+  # the `CAP_NET_BIND_SERVICE` file capability, so a privileged port works
+  # without running as root — see `securityContext` below
+  proxy: 3000
+  # -- Port the Prometheus metrics listener binds inside the container
+  metrics: 9090
+
+service:
+  # -- Proxy Service type
+  type: ClusterIP
+  # -- Proxy Service port
+  port: 80
+  # -- Proxy Service nodePort, when `service.type` is NodePort or LoadBalancer
+  nodePort: ""
+  # -- Extra annotations for the proxy Service, e.g. cloud load-balancer settings
+  annotations: {}
+  # -- `externalTrafficPolicy` for the proxy Service. `Local` preserves the
+  # client source IP on NodePort / LoadBalancer types
+  externalTrafficPolicy: ""
+
+metrics:
+  # -- Publish the gateway's Prometheus metrics on a separate ClusterIP
+  # Service, so scraping never rides the (possibly public) proxy Service
+  enabled: true
+  service:
+    # -- Metrics Service port
+    port: 9090
+    # -- Extra annotations for the metrics Service
+    annotations: {}
+  serviceMonitor:
+    # -- Create a Prometheus Operator ServiceMonitor for the metrics Service
+    enabled: false
+    # -- Namespace to create the ServiceMonitor in. Empty uses the release namespace
+    namespace: ""
+    # -- Scrape interval
+    interval: 30s
+    # -- Scrape timeout. Empty leaves the Prometheus default
+    scrapeTimeout: ""
+    # -- Extra labels, e.g. the `release` label your Prometheus selects on
+    labels: {}
+    # -- Scrape-time relabeling rules
+    relabelings: []
+    # -- Metric relabeling rules
+    metricRelabelings: []
+
+## Rate-limit counters are per-replica by default, so N replicas enforce N×
+## every configured limit. Point the gateway at a shared Redis before running
+## more than one replica — including any replica an autoscaler adds.
+rateLimit:
+  # -- Rate-limit counter backend: `memory` (per-replica) or `redis` (shared)
+  backend: memory
+  redis:
+    # -- Redis connection URL, e.g. `redis://redis.default.svc:6379`. Required
+    # when `rateLimit.backend` is redis and `existingSecret` is empty
+    url: ""
+    # -- Read the connection URL from an existing Secret instead, so a URL
+    # carrying a password stays out of your values file
+    existingSecret: ""
+    # -- Secret key holding the connection URL
+    existingSecretKey: "redis-url"
+
+## HorizontalPodAutoscaler. Scaling is safe by construction: a new replica is
+## kept out of the Service until its readiness probe passes, which happens
+## only after it has loaded its configuration from the control plane.
+##
+## Requires a metrics source for the chosen metrics (metrics-server for the
+## CPU / memory targets below). Mutually exclusive with `keda.enabled`.
+autoscaling:
+  # -- Create a HorizontalPodAutoscaler for the gateway Deployment
+  enabled: false
+  # -- Lower replica bound
+  minReplicas: 2
+  # -- Upper replica bound
+  maxReplicas: 10
+  # -- Target average CPU utilization, in percent of the CPU request. Set to
+  # null to drop the CPU metric
+  targetCPUUtilizationPercentage: 70
+  # -- Target average memory utilization, in percent of the memory request.
+  # Null by default: gateway memory tracks in-flight streams more than load
+  targetMemoryUtilizationPercentage: null
+  # -- Extra `spec.metrics` entries appended verbatim — Pods / Object /
+  # External metrics such as a Prometheus adapter series
+  extraMetrics: []
+  # -- `spec.behavior` for the HPA. Empty uses the Kubernetes defaults
+  # (immediate scale-up, 5-minute scale-down stabilization). A gateway that
+  # carries long streaming responses usually wants a gentler scale-down, e.g.
+  # `scaleDown: {policies: [{type: Pods, value: 1, periodSeconds: 60}]}`
+  behavior: {}
+
+## KEDA ScaledObject, for scaling on request-driven signals rather than
+## CPU / memory — e.g. a Prometheus query over the gateway's own
+## `aisix_llm_requests_total`. Requires KEDA in the cluster.
+## Mutually exclusive with `autoscaling.enabled`.
+keda:
+  # -- Create a KEDA ScaledObject for the gateway Deployment
+  enabled: false
+  # -- Lower replica bound
+  minReplicas: 2
+  # -- Upper replica bound
+  maxReplicas: 10
+  # -- How often KEDA evaluates the triggers, in seconds
+  pollingInterval: 15
+  # -- Seconds to wait after the last trigger fires before scaling down
+  cooldownPeriod: 300
+  # -- Restore the original replica count when the ScaledObject is deleted
+  restoreToOriginalReplicaCount: false
+  # -- Replica count to fall back to when a trigger source is unreachable,
+  # e.g. `{failureThreshold: 3, replicas: 4}`
+  fallback: {}
+  # -- Extra annotations for the ScaledObject
+  annotations: {}
+  # -- KEDA triggers. Required when `keda.enabled` is true. For example:
+  # `[{type: prometheus, metadata: {serverAddress: "http://prometheus:9090",
+  # query: "sum(rate(aisix_llm_requests_total[2m]))", threshold: "100"}}]`
+  triggers: []
+  # -- `behavior` for the HPA KEDA creates. Empty uses the Kubernetes defaults
+  behavior: {}
+
+podDisruptionBudget:
+  # -- Create a PodDisruptionBudget so voluntary disruptions (node drains,
+  # cluster upgrades) cannot take the whole gateway down at once
+  enabled: false
+  # -- Minimum available pods. Takes precedence over `maxUnavailable`
+  minAvailable: ""
+  # -- Maximum unavailable pods
+  maxUnavailable: 1
+
+serviceAccount:
+  # -- Create a ServiceAccount for the gateway
+  create: true
+  # -- ServiceAccount name. Defaults to the release fullname
+  name: ""
+  # -- ServiceAccount annotations
+  annotations: {}
+
+## No CPU limit by default: CFS throttling adds tail latency on a proxy and
+## suppresses the very CPU signal the HorizontalPodAutoscaler scales on. The
+## CPU *request* is mandatory for CPU-target autoscaling and is set below.
+resources:
+  requests:
+    cpu: 500m
+    memory: 256Mi
+  limits:
+    memory: 1Gi
+
+## The image already runs as uid 10001. `runAsUser` is repeated here because
+## the image declares its user by name, and the kubelet cannot verify a named
+## user against `runAsNonRoot`.
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  # fsGroup owns the state directory emptyDir so the gateway can write its
+  # mTLS material, gateway id, and configuration snapshot under a read-only
+  # root filesystem.
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+## NET_BIND_SERVICE is added back after dropping ALL because the gateway
+## binary carries `cap_net_bind_service=+ep` as a file capability (so it can
+## bind privileged ports without root). With that capability's effective bit
+## set, exec fails outright if the capability is missing from the container's
+## bounding set — dropping ALL without adding it back yields a pod that never
+## starts.
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop:
+      - ALL
+    add:
+      - NET_BIND_SERVICE
+
+## Liveness and startup probe the proxy listener's `/livez`; readiness probes
+## `/status/ready` on the metrics listener, which reports 503 until the
+## gateway has applied configuration from the control plane. A scaled-up
+## replica therefore joins the Service only once it can actually serve.
+startupProbe:
+  # -- Gate liveness and readiness until the proxy listener is bound. The
+  # budget here (period x threshold) must stay longer than the gateway's own
+  # boot retries — it connects to the control plane before it binds, retrying
+  # for about 25s — or a recoverable boot race becomes a crash loop.
+  enabled: true
+  periodSeconds: 2
+  failureThreshold: 30
+readinessProbe:
+  enabled: true
+  periodSeconds: 3
+  failureThreshold: 3
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 3
+
+# -- Seconds the gateway may take to drain in-flight requests after SIGTERM.
+# It drains without a deadline of its own, so this value is the real cap — and
+# a streaming LLM response can run for minutes. The Kubernetes default of 30s
+# would cut those connections during a scale-down or a rolling update.
+terminationGracePeriodSeconds: 120
+
+# -- Seconds to sleep in a `preStop` hook before the gateway receives SIGTERM.
+# Endpoint removal and SIGTERM are concurrent, so without this pause a
+# terminating pod can still be handed new connections by a kube-proxy that has
+# not caught up. Set to 0 to drop the hook.
+preStopSleepSeconds: 5
+
+# -- Extra environment variables for the gateway container. Every gateway
+# configuration field is reachable as `AISIX_<SECTION>__<FIELD>`
+extraEnvVars: []
+
+# -- Extra volumes for the gateway pod
+extraVolumes: []
+# -- Extra volume mounts for the gateway container
+extraVolumeMounts: []
+
+# -- Annotations for the gateway pods
+podAnnotations: {}
+# -- Labels for the gateway pods
+podLabels: {}
+# -- Node selector for the gateway pods
+nodeSelector: {}
+# -- Tolerations for the gateway pods
+tolerations: []
+# -- Affinity rules for the gateway pods
+affinity: {}
+# -- Topology spread constraints, e.g. to spread replicas across zones
+topologySpreadConstraints: []
+# -- Deployment update strategy
+updateStrategy: {}
+# -- Pod priority class
+priorityClassName: ""

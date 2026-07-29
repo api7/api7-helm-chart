@@ -1,0 +1,16 @@
+.DS_Store
+.git/
+.gitignore
+.bzr/
+.bzrignore
+.hg/
+.hgignore
+.svn/
+*.tmproj
+*.orig
+*.rej
+*.swp
+.idea/
+.vscode/
+README.md.gotmpl
+ci/
