@@ -128,11 +128,12 @@ spec:
           # been applied, 200 from then on. A replica the autoscaler adds
           # therefore joins the Service only once it can actually serve.
           #
-          # Not the proxy listener's /readyz: that one also withdraws an
-          # instance whose configuration watch has gone five minutes without
-          # an event, which an idle environment does routinely — every
-          # replica would leave the Service while perfectly healthy. See
-          # https://docs.api7.ai/ai-gateway/reference/config-status.
+          # Not the proxy listener's /readyz: up to and including the
+          # appVersion this chart pins, that one also withdraws an instance
+          # whose configuration watch has gone five minutes without an event,
+          # which an idle environment does routinely — every replica leaves
+          # the Service while perfectly healthy. Fixed in api7/aisix#841;
+          # switch this probe to /readyz once appVersion carries that fix.
           readinessProbe:
             httpGet:
               path: /status/ready
