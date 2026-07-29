@@ -280,7 +280,7 @@ extraEnvVars:
 | serviceAccount.annotations | object | `{}` | ServiceAccount annotations |
 | serviceAccount.create | bool | `true` | Create a ServiceAccount for the gateway |
 | serviceAccount.name | string | `""` | ServiceAccount name. Defaults to the release fullname |
-| startupProbe.enabled | bool | `true` | Gate liveness and readiness until the proxy listener is bound |
+| startupProbe.enabled | bool | `true` | Gate liveness and readiness until the proxy listener is bound. The budget here (period x threshold) must stay longer than the gateway's own boot retries — it connects to the control plane before it binds, retrying for about 25s — or a recoverable boot race becomes a crash loop. |
 | startupProbe.failureThreshold | int | `30` |  |
 | startupProbe.periodSeconds | int | `2` |  |
 | terminationGracePeriodSeconds | int | `120` | Seconds the gateway may take to drain in-flight requests after SIGTERM. It drains without a deadline of its own, so this value is the real cap — and a streaming LLM response can run for minutes. The Kubernetes default of 30s would cut those connections during a scale-down or a rolling update. |

@@ -230,7 +230,10 @@ securityContext:
 ## gateway has applied configuration from the control plane. A scaled-up
 ## replica therefore joins the Service only once it can actually serve.
 startupProbe:
-  # -- Gate liveness and readiness until the proxy listener is bound
+  # -- Gate liveness and readiness until the proxy listener is bound. The
+  # budget here (period x threshold) must stay longer than the gateway's own
+  # boot retries — it connects to the control plane before it binds, retrying
+  # for about 25s — or a recoverable boot race becomes a crash loop.
   enabled: true
   periodSeconds: 2
   failureThreshold: 30
