@@ -1,5 +1,28 @@
 apiVersion: v1
 entries:
+  aisix:
+  - apiVersion: v2
+    appVersion: 0.6.0
+    created: "2026-07-29T15:16:30.769991768Z"
+    description: Helm chart for the AISIX AI gateway data plane
+    digest: b6d1b5562f08e1c375d40eb81d8fd933579f52852470a222bee23dededf11eeb
+    home: https://api7.ai
+    keywords:
+    - ai-gateway
+    - llm
+    - gateway
+    - proxy
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: aisix
+    sources:
+    - https://github.com/api7/api7-helm-chart
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/aisix-0.6.0/aisix-0.6.0.tgz
+    version: 0.6.0
   aisix-cloud:
   - apiVersion: v2
     appVersion: 0.1.0
@@ -5279,4 +5302,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-07-29T07:33:04.573383938Z"
+generated: "2026-07-29T15:16:30.770568004Z"
