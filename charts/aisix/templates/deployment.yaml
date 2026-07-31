@@ -123,21 +123,21 @@ spec:
             failureThreshold: {{ .Values.startupProbe.failureThreshold }}
           {{- end }}
           {{- if .Values.readinessProbe.enabled }}
-          # /status/ready on the metrics listener is the configuration-source
-          # readiness gate: 503 until the control plane's configuration has
-          # been applied, 200 from then on. A replica the autoscaler adds
-          # therefore joins the Service only once it can actually serve.
+          # /readyz answers 503 while the instance is draining or before the
+          # control plane's configuration has been applied, 200 from then on.
+          # A replica the autoscaler adds therefore joins the Service only
+          # once it can actually serve, and leaves it as soon as it starts
+          # draining — both measured on the listener that carries the traffic.
           #
-          # Not the proxy listener's /readyz: up to and including the
-          # appVersion this chart pins, that one also withdraws an instance
-          # whose configuration watch has gone five minutes without an event,
-          # which an idle environment does routinely — every replica leaves
-          # the Service while perfectly healthy. Fixed in api7/aisix#841;
-          # switch this probe to /readyz once appVersion carries that fix.
+          # It no longer withdraws an instance whose configuration watch has
+          # merely gone quiet, which an idle environment does routinely and
+          # which used to empty the Service of every healthy replica at once
+          # (api7/aisix#841, shipped in appVersion 0.7.0). Configuration
+          # freshness stays visible on /status/config and aisix_config_*.
           readinessProbe:
             httpGet:
-              path: /status/ready
-              port: metrics
+              path: /readyz
+              port: proxy
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           {{- end }}
