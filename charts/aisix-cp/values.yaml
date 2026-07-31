@@ -38,6 +38,10 @@ api:
   affinity: {}
   extraEnvVars: []
   publicBaseURL: "http://localhost:8080"
+  ## dp-manager /dp/* mTLS endpoint that data-plane hosts dial, as baked
+  ## into the generated install snippets. Also passed to the dpm
+  ## deployment, which seeds this host into the TLS server certificate it
+  ## presents — so an IP address works here, not only a DNS name.
   dpmgrBaseURL: ""
   oauthEnabled: false
   dpImage: ""  # empty -> docker.io/api7/aisix:<appVersion>
