@@ -63,6 +63,10 @@ spec:
             initialDelaySeconds: {{ .Values.file_server.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.file_server.readinessProbe.periodSeconds }}
             failureThreshold: {{ .Values.file_server.readinessProbe.failureThreshold }}
+          {{- if .Values.file_server.extraEnvVars }}
+          env:
+          {{- include "api7ee3.tplvalues.render" (dict "value" .Values.file_server.extraEnvVars "context" $) | nindent 12 }}
+          {{- end }}
           volumeMounts:
             - name: config
               mountPath: /usr/local/api7/conf
