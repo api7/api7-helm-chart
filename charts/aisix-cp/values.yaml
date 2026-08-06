@@ -47,12 +47,12 @@ api:
   dpImage: ""  # empty -> docker.io/api7/aisix:<appVersion>
   ## Allow the dashboard playground to reach LLM endpoints on private /
   ## internal networks. cp-api blocks private IPs by default (SSRF guard);
-  ## enable this only for self-hosted deployments whose models live on an
+  ## enable this only for On-Premises deployments whose models live on an
   ## internal network the cp-api pod can route to.
   playgroundAllowPrivateIPs: false
   ## Allow notification channels (budget alert webhooks / Slack) to point
   ## at private / internal addresses. Blocked by default (SSRF guard);
-  ## enable only for self-hosted deployments whose webhook receivers live
+  ## enable only for On-Premises deployments whose webhook receivers live
   ## on an intranet the cp-api pod can route to.
   notifyAllowPrivateURLs: false
 
