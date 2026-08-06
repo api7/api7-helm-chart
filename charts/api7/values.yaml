@@ -428,6 +428,8 @@ dashboard_configuration:
     #       url: "https://docs.api7.ai"
   audit:
     retention_days: 60
+
+  # the following configuration takes effect for the gateway
   consumer_proxy:
     enable: false
     cache_success_count: 512
@@ -465,7 +467,8 @@ dashboard_configuration:
   #     resource_container: yaml
   #     config_container: config
   #     endpoint: "$YOUR_AZURE_BLOB_ENDPOINT"
-
+  # model_catalog_source_endpoint: "https://models.dev/api.json" # URL of the upstream model catalog; leave empty to disable sync
+  # model_catalog_sync_interval: 0   # Periodic sync interval in seconds (0 = disabled; minimum 60; e.g. 3600 = 1h, 86400 = 24h)
   security:
     # content_security_policy: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
 
