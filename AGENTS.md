@@ -12,6 +12,8 @@ This repo (`api7/api7-helm-chart`) holds the Helm charts for API7 EE components 
 | `aisix` (AISIX AI gateway data plane) | `charts/aisix` | no — independent product version; **this repo is the source of truth** (unlike `aisix-cp`, no dev-repo counterpart to sync from) |
 | `ngxdig` (eBPF flame-graph / diagnosis agent, DaemonSet) | `charts/ngxdig` | no — independent product version (source of truth: `api7/ngx-flame`) |
 
+`charts/api7` has a downstream copy: `api7/api7ee-3-control-plane` `helm/` is the same chart, packaged as `api7ee3-dev.tgz` and used by CP's e2e. This repo is the source of truth, and nothing checks parity — a template/values change here needs a matching PR there, or the two drift silently.
+
 ## Multi-line maintenance model
 
 API7 EE supports several release lines at once (e.g. 3.9.x and 3.10.x). The charts must let each line receive patches without disturbing the others.
