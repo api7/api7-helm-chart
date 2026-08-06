@@ -93,6 +93,8 @@ file_server:
     repository: api7/api7-ee-file-server
     pullPolicy: Always
     tag: "v3.9.17"
+
+  extraEnvVars: []
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 3
