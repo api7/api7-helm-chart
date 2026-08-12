@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 3.9.4](https://img.shields.io/badge/Version-3.9.4-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.17](https://img.shields.io/badge/AppVersion-3.9.17-informational?style=flat-square)
+![Version: 3.9.5](https://img.shields.io/badge/Version-3.9.5-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.18](https://img.shields.io/badge/AppVersion-3.9.18-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -29,7 +29,7 @@ A Helm chart for Kubernetes
 | dashboard.extraVolumes | list | `[]` |  |
 | dashboard.image.pullPolicy | string | `"Always"` |  |
 | dashboard.image.repository | string | `"api7/api7-ee-3-integrated"` |  |
-| dashboard.image.tag | string | `"v3.9.17"` |  |
+| dashboard.image.tag | string | `"v3.9.18"` |  |
 | dashboard.keyCertSecret | string | `""` |  |
 | dashboard.livenessProbe.failureThreshold | int | `30` |  |
 | dashboard.livenessProbe.initialDelaySeconds | int | `180` |  |
@@ -123,7 +123,7 @@ A Helm chart for Kubernetes
 | developer_portal.extraVolumes | list | `[]` |  |
 | developer_portal.image.pullPolicy | string | `"Always"` |  |
 | developer_portal.image.repository | string | `"api7/api7-ee-developer-portal"` |  |
-| developer_portal.image.tag | string | `"v3.9.17"` |  |
+| developer_portal.image.tag | string | `"v3.9.18"` |  |
 | developer_portal.keyCertSecret | string | `""` |  |
 | developer_portal.livenessProbe.failureThreshold | int | `10` |  |
 | developer_portal.livenessProbe.initialDelaySeconds | int | `60` |  |
@@ -143,6 +143,9 @@ A Helm chart for Kubernetes
 | developer_portal_configuration.log.access_log | string | `"stdout"` |  |
 | developer_portal_configuration.log.level | string | `"warn"` | Allowed values: `debug`, `info`, `warn`, `error` |
 | developer_portal_configuration.log.output | string | `"stderr"` |  |
+| developer_portal_configuration.security.ssrf_protection | object | `{"allow_list":[],"deny_list":[],"enable":false}` | ssrf_protection restricts the destinations the developer portal connects to when it requests a user-configured network endpoint (approval webhooks, the DCR client registration bridge). Disabled by default so internal endpoints keep working; enable to block SSRF to internal, loopback, link-local and cloud-metadata addresses. |
+| developer_portal_configuration.security.ssrf_protection.allow_list | list | `[]` | CIDRs always permitted even if otherwise internal |
+| developer_portal_configuration.security.ssrf_protection.deny_list | list | `[]` | extra CIDRs to block on top of the built-in internal ranges |
 | developer_portal_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | developer_portal_configuration.server.listen.port | int | `4321` |  |
 | developer_portal_configuration.server.listen.tls.cert_file | string | `""` |  |
@@ -170,7 +173,7 @@ A Helm chart for Kubernetes
 | dp_manager.extraVolumes | list | `[]` |  |
 | dp_manager.image.pullPolicy | string | `"Always"` |  |
 | dp_manager.image.repository | string | `"api7/api7-ee-dp-manager"` |  |
-| dp_manager.image.tag | string | `"v3.9.17"` |  |
+| dp_manager.image.tag | string | `"v3.9.18"` |  |
 | dp_manager.livenessProbe.failureThreshold | int | `10` |  |
 | dp_manager.livenessProbe.initialDelaySeconds | int | `60` |  |
 | dp_manager.livenessProbe.periodSeconds | int | `3` |  |
@@ -238,7 +241,7 @@ A Helm chart for Kubernetes
 | file_server.extraEnvVars | list | `[]` |  |
 | file_server.image.pullPolicy | string | `"Always"` |  |
 | file_server.image.repository | string | `"api7/api7-ee-file-server"` |  |
-| file_server.image.tag | string | `"v3.9.17"` |  |
+| file_server.image.tag | string | `"v3.9.18"` |  |
 | file_server.livenessProbe.failureThreshold | int | `10` |  |
 | file_server.livenessProbe.initialDelaySeconds | int | `60` |  |
 | file_server.livenessProbe.periodSeconds | int | `3` |  |
