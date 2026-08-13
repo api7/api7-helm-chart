@@ -128,4 +128,3 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | ui.service.type | string | `"ClusterIP"` |  |
 | ui.tolerations | list | `[]` |  |
 
-----------------------------------------------
