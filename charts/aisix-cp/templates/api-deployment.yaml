@@ -96,12 +96,25 @@ spec:
           # can outlast the liveness budget below and kill the pod
           # MID-MIGRATION. The startupProbe suspends liveness and
           # readiness until the server is actually up.
+          #
+          # 30 minutes, because a migration that REWRITES a table is
+          # bounded by table size, not by a fixed bootstrap cost. The
+          # 0.9.0 widening of dpmgr_usage_events.request_id (uuid ->
+          # text) measured 6m21s on 10M rows — roughly what 30 days of
+          # retention holds at a sustained 4 req/s — and it scales
+          # linearly from there. The previous 5-minute budget would have
+          # turned that upgrade into the exact crash loop this probe
+          # exists to prevent.
+          #
+          # The cost is that a genuinely wedged cp-api goes unrestarted
+          # for up to 30 minutes on FIRST start only; once the probe
+          # succeeds, the liveness budget below takes over unchanged.
           startupProbe:
             httpGet:
               path: /healthz
               port: http
             periodSeconds: 5
-            failureThreshold: 60
+            failureThreshold: 360
           livenessProbe:
             httpGet:
               path: /healthz
