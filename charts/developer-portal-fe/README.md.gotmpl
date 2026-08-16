@@ -109,3 +109,16 @@ developerPortal:
 ```
 
 {{ template "chart.valuesSection" . }}
+
+## Upgrading
+
+### To 0.2.0
+
+The bundled application moves from 0.5.7 to 0.14.0, which requires `auth.secret`
+to be at least 32 characters — a shorter secret fails validation at startup.
+Rotate it before upgrading (`openssl rand -base64 32`); rotating signs existing
+users out, so they will have to sign in again.
+
+`auth.socialProviders` is the one config field to avoid on this application
+version: its schema is mis-declared upstream and the Pod fails to start when the
+field is set. Use `auth.genericOAuthProviders` instead.

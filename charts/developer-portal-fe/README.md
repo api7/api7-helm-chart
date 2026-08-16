@@ -1,6 +1,6 @@
 # developer-portal-fe
 
-![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.5.7](https://img.shields.io/badge/AppVersion-0.5.7-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.14.0](https://img.shields.io/badge/AppVersion-0.14.0-informational?style=flat-square)
 
 A Helm chart for API7 Developer Portal Frontend
 
@@ -135,7 +135,7 @@ developerPortal:
 | developerPortal.extraVolumes | list | `[]` |  |
 | developerPortal.image.pullPolicy | string | `"IfNotPresent"` |  |
 | developerPortal.image.repository | string | `"api7/api7-ee-developer-portal-fe"` |  |
-| developerPortal.image.tag | string | `"v0.5.7"` |  |
+| developerPortal.image.tag | string | `"v0.14.0"` |  |
 | developerPortal.livenessProbe.failureThreshold | int | `10` |  |
 | developerPortal.livenessProbe.initialDelaySeconds | int | `30` |  |
 | developerPortal.livenessProbe.path | string | `"/"` |  |
@@ -189,3 +189,16 @@ developerPortal:
 | serviceAccount.name | string | `""` |  |
 | tolerations | list | `[]` |  |
 | topologySpreadConstraints | list | `[]` |  |
+
+## Upgrading
+
+### To 0.2.0
+
+The bundled application moves from 0.5.7 to 0.14.0, which requires `auth.secret`
+to be at least 32 characters — a shorter secret fails validation at startup.
+Rotate it before upgrading (`openssl rand -base64 32`); rotating signs existing
+users out, so they will have to sign in again.
+
+`auth.socialProviders` is the one config field to avoid on this application
+version: its schema is mis-declared upstream and the Pod fails to start when the
+field is set. Use `auth.genericOAuthProviders` instead.

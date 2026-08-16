@@ -36,10 +36,9 @@ developerPortal:
       twoFactor:
         enabled: true
         required: true
-      socialProviders:
-        github:
-          clientId: devportal
-          clientSecret: ${GITHUB_CLIENT_SECRET}
+      # auth.socialProviders is deliberately absent: the application's own
+      # schema mis-declares it and fails to parse a config that sets it
+      # (fixed after 0.14.0). genericOAuthProviders covers the same ground.
       genericOAuthProviders:
         - providerId: keycloak
           discoveryUrl: https://sso.example.com/realms/main/.well-known/openid-configuration
@@ -70,11 +69,6 @@ developerPortal:
         secretKeyRef:
           name: devportal-db-ca
           key: ca.crt
-    - name: GITHUB_CLIENT_SECRET
-      valueFrom:
-        secretKeyRef:
-          name: devportal-github
-          key: client-secret
     - name: OIDC_CLIENT_SECRET
       valueFrom:
         secretKeyRef:
