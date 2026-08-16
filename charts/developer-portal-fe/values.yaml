@@ -24,7 +24,7 @@ developerPortal:
   # string value supports ${VAR} / ${VAR:default} substitution at startup, so
   # reference a placeholder here and inject the real value through
   # developerPortal.extraEnvVars below.
-  # -- Developer Portal application config, rendered verbatim into `config.yaml`
+  # -- Developer Portal application config, copied into `config.yaml` with the chart-owned connection settings merged over it
   config:
     app:
       name: "Developer Portal"

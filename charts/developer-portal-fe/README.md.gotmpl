@@ -19,15 +19,16 @@ helm install developer-portal-fe api7/developer-portal-fe --namespace api7 --cre
 
 ## Configuring the portal application
 
-The chart renders the application's `config.yaml` from `developerPortal.config`,
-which is passed through verbatim. Any field the application's config schema
-accepts can be set there — `app.name`, `app.desc`, `auth.emailAndPassword`,
+The chart renders the application's `config.yaml` from `developerPortal.config`:
+the block is copied into the file as it is written, and the connection settings
+below are then merged over it. Any field the application's config schema accepts
+can be set there — `app.name`, `app.desc`, `auth.emailAndPassword`,
 `auth.genericOAuthProviders`, `db.ssl`, and so on — without waiting for a chart
 release. Which fields exist depends on the deployed application version
 (`developerPortal.image.tag`).
 
-The connection settings stay with the chart and are merged in last, so they
-always win over `developerPortal.config`:
+These are the paths the chart owns. They are merged in last, so they always win
+over `developerPortal.config` and setting them there has no effect:
 
 | Config path | Comes from |
 | :--- | :--- |
