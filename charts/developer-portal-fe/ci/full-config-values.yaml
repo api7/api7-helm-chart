@@ -1,0 +1,82 @@
+# Renders every part of the Developer Portal config surface through
+# developerPortal.config, so a template change that breaks the pass-through is
+# caught by `ct lint`. Credentials are ${ENV} placeholders on purpose — that is
+# the documented way to keep them out of the ConfigMap.
+portal:
+  url: "https://api7-developer-portal:4321"
+
+app:
+  baseURL: "https://portal.example.com"
+  trustedOrigins:
+    - "https://portal.example.com"
+
+developerPortal:
+  config:
+    db:
+      schema: portal
+      pool:
+        max: 30
+        min: 2
+        idleTimeout: 60000
+        connectionTimeout: 5000
+        allowExitOnIdle: false
+      ssl:
+        rejectUnauthorized: true
+        ca: ${DB_CA_PEM}
+    auth:
+      adminUserIds:
+        - usr_admin
+      session:
+        expiresIn: 604800
+        updateAge: 86400
+      emailAndPassword:
+        enabled: false
+        requireEmailVerification: true
+        revokeSessionsOnPasswordReset: true
+      twoFactor:
+        enabled: true
+        required: true
+      socialProviders:
+        github:
+          clientId: devportal
+          clientSecret: ${GITHUB_CLIENT_SECRET}
+      genericOAuthProviders:
+        - providerId: keycloak
+          discoveryUrl: https://sso.example.com/realms/main/.well-known/openid-configuration
+          clientId: devportal
+          clientSecret: ${OIDC_CLIENT_SECRET}
+          scopes: ["openid", "profile", "email"]
+      sso:
+        providers:
+          - providerId: keycloak
+            domains:
+              - '@example\.com$'
+    app:
+      name: "Example APIs"
+      desc: "Everything you need to build on Example."
+      signUpConsentLabel: 'I agree to the <a href="https://example.com/tos">Terms</a>.'
+      applicationDetail:
+        subscriptions: true
+        usage: false
+        credentialsTabs:
+          keyAuth: true
+          basicAuth: false
+          oauth: false
+      apiHub:
+        enabled: true
+  extraEnvVars:
+    - name: DB_CA_PEM
+      valueFrom:
+        secretKeyRef:
+          name: devportal-db-ca
+          key: ca.crt
+    - name: GITHUB_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: devportal-github
+          key: client-secret
+    - name: OIDC_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: devportal-oidc
+          key: client-secret

@@ -1,6 +1,6 @@
 # developer-portal-fe
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.5.7](https://img.shields.io/badge/AppVersion-0.5.7-informational?style=flat-square)
+![Version: 0.2.0](https://img.shields.io/badge/Version-0.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.5.7](https://img.shields.io/badge/AppVersion-0.5.7-informational?style=flat-square)
 
 A Helm chart for API7 Developer Portal Frontend
 
@@ -16,6 +16,106 @@ A Helm chart for API7 Developer Portal Frontend
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | postgresql | 12.12.10 |
 
+## Install
+
+```sh
+helm repo add api7 https://charts.api7.ai
+helm repo update
+
+helm install developer-portal-fe api7/developer-portal-fe --namespace api7 --create-namespace
+```
+
+## Configuring the portal application
+
+The chart renders the application's `config.yaml` from `developerPortal.config`,
+which is passed through verbatim. Any field the application's config schema
+accepts can be set there — `app.name`, `app.desc`, `auth.emailAndPassword`,
+`auth.genericOAuthProviders`, `db.ssl`, and so on — without waiting for a chart
+release. Which fields exist depends on the deployed application version
+(`developerPortal.image.tag`).
+
+The connection settings stay with the chart and are merged in last, so they
+always win over `developerPortal.config`:
+
+| Config path | Comes from |
+| :--- | :--- |
+| `portal.url` | `portal.url` |
+| `portal.token` | `${PORTAL_TOKEN}` — Secret (`portal.existingSecret`) |
+| `db.url` | `${DB_URL}` — Secret (`db.existingSecret`) |
+| `auth.secret` | `${AUTH_SECRET}` — Secret (`auth.existingSecret`) |
+| `app.baseURL`, `app.trustedOrigins` | `app.baseURL`, `app.trustedOrigins` |
+
+Changing `developerPortal.config` rolls the Pods automatically — the Deployment
+carries a checksum of the rendered ConfigMap.
+
+### Keep credentials out of the ConfigMap
+
+`developerPortal.config` is rendered into a ConfigMap, so it is the wrong place
+for a client secret or a database password. The application substitutes
+`${VAR}` and `${VAR:default}` in every string value of `config.yaml` at startup,
+so put a placeholder in the config and inject the real value as an environment
+variable with `developerPortal.extraEnvVars`:
+
+```yaml
+developerPortal:
+  config:
+    auth:
+      genericOAuthProviders:
+        - providerId: keycloak
+          discoveryUrl: https://sso.example.com/realms/main/.well-known/openid-configuration
+          clientId: devportal
+          clientSecret: ${OIDC_CLIENT_SECRET}
+  extraEnvVars:
+    - name: OIDC_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: devportal-oidc
+          key: client-secret
+```
+
+A missing variable is a startup error, not an empty string — the Pod fails
+fast instead of running with a blank secret.
+
+### Examples
+
+Name and describe the portal:
+
+```yaml
+developerPortal:
+  config:
+    app:
+      name: "Example APIs"
+      desc: "Everything you need to build on Example."
+```
+
+Turn off password sign-in and require two-factor authentication:
+
+```yaml
+developerPortal:
+  config:
+    auth:
+      emailAndPassword:
+        enabled: false
+      twoFactor:
+        enabled: true
+        required: true
+```
+
+Connect to a managed PostgreSQL that requires TLS, in its own schema:
+
+```yaml
+developerPortal:
+  config:
+    db:
+      schema: portal
+      ssl:
+        rejectUnauthorized: true
+        ca: ${DB_CA_PEM}
+      pool:
+        max: 30
+        min: 2
+```
+
 ## Values
 
 | Key | Type | Default | Description |
@@ -29,6 +129,7 @@ A Helm chart for API7 Developer Portal Frontend
 | db.existingSecret | string | `""` |  |
 | db.existingSecretKey | string | `"db-url"` |  |
 | db.url | string | `"postgres://portal:portal123@developer-portal-fe-postgresql:5432/portal"` |  |
+| developerPortal.config | object | `{"app":{"name":"Developer Portal"}}` | Developer Portal application config, rendered verbatim into `config.yaml` |
 | developerPortal.extraEnvVars | list | `[]` |  |
 | developerPortal.extraVolumeMounts | list | `[]` |  |
 | developerPortal.extraVolumes | list | `[]` |  |
@@ -88,4 +189,3 @@ A Helm chart for API7 Developer Portal Frontend
 | serviceAccount.name | string | `""` |  |
 | tolerations | list | `[]` |  |
 | topologySpreadConstraints | list | `[]` |  |
-

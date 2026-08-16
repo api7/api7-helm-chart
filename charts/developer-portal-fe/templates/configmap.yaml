@@ -6,23 +6,18 @@ metadata:
   labels:
     {{- include "developer-portal-fe.labels" . | nindent 4 }}
 data:
+  {{- /*
+    developerPortal.config passes the whole application config schema through.
+    The connection settings the chart owns are merged last so they win over
+    anything set there — in particular the ${...} placeholders that keep the
+    portal token, database URL and auth secret in a Secret instead of here.
+    deepCopy is required: mergeOverwrite mutates its first argument in place.
+  */}}
+  {{- $owned := dict
+        "portal" (dict "url" .Values.portal.url "token" "${PORTAL_TOKEN}")
+        "db"     (dict "url" "${DB_URL}")
+        "auth"   (dict "secret" "${AUTH_SECRET}")
+        "app"    (dict "baseURL" .Values.app.baseURL
+                       "trustedOrigins" .Values.app.trustedOrigins) }}
   config.yaml: |
-    # Portal API connection configuration
-    portal:
-      url: {{ .Values.portal.url | quote }}
-      token: ${PORTAL_TOKEN}
-
-    # Database configuration
-    db:
-      url: ${DB_URL}
-
-    # Authentication configuration
-    auth:
-      secret: ${AUTH_SECRET}
-
-    # Application configuration
-    app:
-      name: "Developer Portal"
-      baseURL: {{ .Values.app.baseURL | quote }}
-      trustedOrigins:
-        {{- toYaml .Values.app.trustedOrigins | nindent 8 }}
+    {{- toYaml (mergeOverwrite (deepCopy (.Values.developerPortal.config | default dict)) $owned) | nindent 4 }}
