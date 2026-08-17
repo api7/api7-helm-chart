@@ -2,8 +2,8 @@ apiVersion: v2
 name: developer-portal-fe
 description: A Helm chart for API7 Developer Portal Frontend
 type: application
-version: 0.1.0
-appVersion: "0.5.7"
+version: 0.2.0
+appVersion: "0.14.0"
 maintainers:
   - name: API7
     email: support@api7.ai

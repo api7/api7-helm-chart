@@ -9,7 +9,38 @@ developerPortal:
   image:
     repository: api7/api7-ee-developer-portal-fe
     pullPolicy: IfNotPresent
-    tag: "v0.5.7"
+    tag: "v0.14.0"
+
+  # Any field the application's config schema accepts can be set here, so new
+  # application config does not need a chart release. See the chart README for
+  # the fields in common use and for complete examples.
+  #
+  # The connection settings the chart owns are merged in last and always win,
+  # so setting them here has no effect: portal.url (from portal.url),
+  # portal.token / db.url / auth.secret (Secret-backed ${...} placeholders),
+  # app.baseURL and app.trustedOrigins (from app.baseURL / app.trustedOrigins).
+  #
+  # Keep credentials OUT of this block — it renders into a ConfigMap. Every
+  # string value supports ${VAR} / ${VAR:default} substitution at startup, so
+  # reference a placeholder here and inject the real value through
+  # developerPortal.extraEnvVars below.
+  # -- Developer Portal application config, copied into `config.yaml` with the chart-owned connection settings merged over it
+  config:
+    app:
+      name: "Developer Portal"
+      # desc: "Explore and integrate with our APIs."
+    # auth:
+    #   emailAndPassword:
+    #     enabled: true
+    #     requireEmailVerification: false
+    #   genericOAuthProviders:
+    #     - providerId: keycloak
+    #       discoveryUrl: https://sso.example.com/realms/main/.well-known/openid-configuration
+    #       clientId: devportal
+    #       clientSecret: ${OIDC_CLIENT_SECRET}
+    # db:
+    #   schema: portal
+    #   ssl: true
 
   # Resource limits and requests
   resources: {}

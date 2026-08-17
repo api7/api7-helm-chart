@@ -1,0 +1,125 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+## Install
+
+```sh
+helm repo add api7 https://charts.api7.ai
+helm repo update
+
+helm install developer-portal-fe api7/developer-portal-fe --namespace api7 --create-namespace
+```
+
+## Configuring the portal application
+
+The chart renders the application's `config.yaml` from `developerPortal.config`:
+the block is copied into the file as it is written, and the connection settings
+below are then merged over it. Any field the application's config schema accepts
+can be set there — `app.name`, `app.desc`, `auth.emailAndPassword`,
+`auth.genericOAuthProviders`, `db.ssl`, and so on — without waiting for a chart
+release. Which fields exist depends on the deployed application version
+(`developerPortal.image.tag`).
+
+These are the paths the chart owns. They are merged in last, so they always win
+over `developerPortal.config` and setting them there has no effect:
+
+| Config path | Comes from |
+| :--- | :--- |
+| `portal.url` | `portal.url` |
+| `portal.token` | `${PORTAL_TOKEN}` — Secret (`portal.existingSecret`) |
+| `db.url` | `${DB_URL}` — Secret (`db.existingSecret`) |
+| `auth.secret` | `${AUTH_SECRET}` — Secret (`auth.existingSecret`) |
+| `app.baseURL`, `app.trustedOrigins` | `app.baseURL`, `app.trustedOrigins` |
+
+Changing `developerPortal.config` rolls the Pods automatically — the Deployment
+carries a checksum of the rendered ConfigMap.
+
+### Keep credentials out of the ConfigMap
+
+`developerPortal.config` is rendered into a ConfigMap, so it is the wrong place
+for a client secret or a database password. The application substitutes
+`${VAR}` and `${VAR:default}` in every string value of `config.yaml` at startup,
+so put a placeholder in the config and inject the real value as an environment
+variable with `developerPortal.extraEnvVars`:
+
+```yaml
+developerPortal:
+  config:
+    auth:
+      genericOAuthProviders:
+        - providerId: keycloak
+          discoveryUrl: https://sso.example.com/realms/main/.well-known/openid-configuration
+          clientId: devportal
+          clientSecret: ${OIDC_CLIENT_SECRET}
+  extraEnvVars:
+    - name: OIDC_CLIENT_SECRET
+      valueFrom:
+        secretKeyRef:
+          name: devportal-oidc
+          key: client-secret
+```
+
+A missing variable is a startup error, not an empty string — the Pod fails
+fast instead of running with a blank secret.
+
+### Examples
+
+Name and describe the portal:
+
+```yaml
+developerPortal:
+  config:
+    app:
+      name: "Example APIs"
+      desc: "Everything you need to build on Example."
+```
+
+Turn off password sign-in and require two-factor authentication:
+
+```yaml
+developerPortal:
+  config:
+    auth:
+      emailAndPassword:
+        enabled: false
+      twoFactor:
+        enabled: true
+        required: true
+```
+
+Connect to a managed PostgreSQL that requires TLS, in its own schema:
+
+```yaml
+developerPortal:
+  config:
+    db:
+      schema: portal
+      ssl:
+        rejectUnauthorized: true
+        ca: ${DB_CA_PEM}
+      pool:
+        max: 30
+        min: 2
+```
+
+{{ template "chart.valuesSection" . }}
+
+## Upgrading
+
+### To 0.2.0
+
+The bundled application moves from 0.5.7 to 0.14.0, which requires `auth.secret`
+to be at least 32 characters — a shorter secret fails validation at startup.
+Rotate it before upgrading (`openssl rand -base64 32`); rotating signs existing
+users out, so they will have to sign in again.
+
+`auth.socialProviders` is the one config field to avoid on this application
+version: its schema is mis-declared upstream and the Pod fails to start when the
+field is set. Use `auth.genericOAuthProviders` instead.
