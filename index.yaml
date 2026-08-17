@@ -3779,6 +3779,25 @@ entries:
     version: 0.14.0
   developer-portal-fe:
   - apiVersion: v2
+    appVersion: 0.14.0
+    created: "2026-08-17T00:52:27.360060214Z"
+    dependencies:
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    description: A Helm chart for API7 Developer Portal Frontend
+    digest: 1a38d55dca5a666709ebbef4c8f84a574a46192e444237b63a9cb868dc9ae253
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: developer-portal-fe
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/developer-portal-fe-0.2.0/developer-portal-fe-0.2.0.tgz
+    version: 0.2.0
+  - apiVersion: v2
     appVersion: 0.5.7
     created: "2026-03-25T09:52:51.544364385Z"
     dependencies:
@@ -5714,4 +5733,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-13T10:24:29.212747211Z"
+generated: "2026-08-17T00:52:27.360456331Z"
