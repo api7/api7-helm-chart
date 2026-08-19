@@ -247,17 +247,25 @@ livenessProbe:
   periodSeconds: 10
   failureThreshold: 3
 
-# -- Seconds the gateway may take to drain in-flight requests after SIGTERM.
-# It drains without a deadline of its own, so this value is the real cap — and
-# a streaming LLM response can run for minutes. The Kubernetes default of 30s
-# would cut those connections during a scale-down or a rolling update.
-terminationGracePeriodSeconds: 120
+# -- Seconds the whole termination sequence may take, from the pod being
+# marked for deletion to SIGKILL. It covers the `preStop` sleep, the gateway's
+# own drain window, and the in-flight drain that follows — the gateway drains
+# without a deadline of its own, so this value is the real cap, and a streaming
+# LLM response can run for minutes. The Kubernetes default of 30s would cut
+# those connections during a scale-down or a rolling update.
+terminationGracePeriodSeconds: 180
 
 # -- Seconds to sleep in a `preStop` hook before the gateway receives SIGTERM.
 # Endpoint removal and SIGTERM are concurrent, so without this pause a
 # terminating pod can still be handed new connections by a kube-proxy that has
 # not caught up. Set to 0 to drop the hook.
-preStopSleepSeconds: 5
+#
+# This covers balancers that learn about the pod from the Kubernetes API. One
+# that polls a health check instead learns nothing here — the pod is still
+# fully ready throughout the sleep — and is covered by the gateway's own drain
+# window (`shutdown.min_drain_secs`, 30s by default), which starts at SIGTERM
+# with `/readyz` already answering 503.
+preStopSleepSeconds: 30
 
 # -- Extra environment variables for the gateway container. Every gateway
 # configuration field is reachable as `AISIX_<SECTION>__<FIELD>`

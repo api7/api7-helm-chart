@@ -91,11 +91,29 @@ of the Service until its readiness probe passes, which happens only after it has
 loaded its configuration from the control plane — so a scaling event never routes
 traffic to a gateway that cannot serve it.
 
-Scale-down is guarded from the other side: a terminating pod leaves the Service
-first, pauses while that removal propagates, then drains in-flight requests.
-Because a streaming response can run for minutes, `terminationGracePeriodSeconds`
-defaults to 120 rather than the Kubernetes default of 30. Raise it if your
-workloads stream for longer.
+Scale-down is guarded from the other side, in two stages that cover the two ways
+a balancer can learn a pod is going away.
+
+A balancer that watches the Kubernetes API — a Service, or a cloud load balancer
+wired to one — sees the endpoint removed the moment the pod is marked for
+deletion. That removal and SIGTERM are concurrent, so the `preStop` sleep holds
+the pod in place while it propagates.
+
+A balancer that polls a health check instead sees nothing during that sleep: the
+pod is still fully ready. It is covered by the gateway itself, which on SIGTERM
+answers `/readyz` with 503 while continuing to accept for
+`shutdown.min_drain_secs` (30s by default) — long enough for the next health
+check to withdraw it. Point such a check at `/readyz`, not at a bare TCP connect:
+a TCP check cannot see readiness at all, so the only signal it ever gets is the
+listener closing, which is the very event the drain exists to avoid.
+
+Only then does the gateway stop accepting, and only once nothing is left in
+flight. In-flight requests drain with no deadline of the gateway's own, so
+`terminationGracePeriodSeconds` is the real cap on the whole sequence — the
+`preStop` sleep counts against it too. It defaults to 180: 30s of `preStop`, 30s
+of drain window, and 120s left for in-flight requests, which matters because a
+streaming response can run for minutes. Raise it if your workloads stream for
+longer.
 
 ### Autoscale on request load with KEDA
 
@@ -255,7 +273,7 @@ extraEnvVars:
 | podSecurityContext.runAsNonRoot | bool | `true` |  |
 | podSecurityContext.runAsUser | int | `10001` |  |
 | podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
-| preStopSleepSeconds | int | `5` | Seconds to sleep in a `preStop` hook before the gateway receives SIGTERM. Endpoint removal and SIGTERM are concurrent, so without this pause a terminating pod can still be handed new connections by a kube-proxy that has not caught up. Set to 0 to drop the hook. |
+| preStopSleepSeconds | int | `30` | Seconds to sleep in a `preStop` hook before the gateway receives SIGTERM. Endpoint removal and SIGTERM are concurrent, so without this pause a terminating pod can still be handed new connections by a kube-proxy that has not caught up. Set to 0 to drop the hook.  This covers balancers that learn about the pod from the Kubernetes API. One that polls a health check instead learns nothing here — the pod is still fully ready throughout the sleep — and is covered by the gateway's own drain window (`shutdown.min_drain_secs`, 30s by default), which starts at SIGTERM with `/readyz` already answering 503. |
 | priorityClassName | string | `""` | Pod priority class |
 | rateLimit.backend | string | `"memory"` | Rate-limit counter backend: `memory` (per-replica) or `redis` (shared) |
 | rateLimit.redis.existingSecret | string | `""` | Read the connection URL from an existing Secret instead, so a URL carrying a password stays out of your values file |
@@ -283,7 +301,7 @@ extraEnvVars:
 | startupProbe.enabled | bool | `true` | Gate liveness and readiness until the proxy listener is bound. The budget here (period x threshold) must stay longer than the gateway's own boot retries — it connects to the control plane before it binds, retrying for about 25s — or a recoverable boot race becomes a crash loop. |
 | startupProbe.failureThreshold | int | `30` |  |
 | startupProbe.periodSeconds | int | `2` |  |
-| terminationGracePeriodSeconds | int | `120` | Seconds the gateway may take to drain in-flight requests after SIGTERM. It drains without a deadline of its own, so this value is the real cap — and a streaming LLM response can run for minutes. The Kubernetes default of 30s would cut those connections during a scale-down or a rolling update. |
+| terminationGracePeriodSeconds | int | `180` | Seconds the whole termination sequence may take, from the pod being marked for deletion to SIGKILL. It covers the `preStop` sleep, the gateway's own drain window, and the in-flight drain that follows — the gateway drains without a deadline of its own, so this value is the real cap, and a streaming LLM response can run for minutes. The Kubernetes default of 30s would cut those connections during a scale-down or a rolling update. |
 | tolerations | list | `[]` | Tolerations for the gateway pods |
 | topologySpreadConstraints | list | `[]` | Topology spread constraints, e.g. to spread replicas across zones |
 | updateStrategy | object | `{}` | Deployment update strategy |
