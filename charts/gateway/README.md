@@ -195,6 +195,7 @@ apisix:
 | apisix.podDisruptionBudget.minAvailable | string | `"90%"` | Set the `minAvailable` of podDisruptionBudget. You can specify only one of `maxUnavailable` and `minAvailable` in a single PodDisruptionBudget. See [Specifying a Disruption Budget for your Application](https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget) for more details |
 | apisix.podLabels | object | `{}` | Labels to add to each pod |
 | apisix.podSecurityContext | object | `{}` | Set the securityContext for API7 Gateway pods |
+| apisix.preStopSleepSeconds | int | `30` | Seconds to sleep in a `preStop` hook before the gateway is sent SIGTERM. Endpoint removal and SIGTERM are concurrent, so without this pause a terminating pod can still be handed new connections by a kube-proxy that has not caught up yet. The sleep runs inside `terminationGracePeriodSeconds`, so that budget has to cover this pause plus the graceful shutdown that follows (bounded by `nginx.workerShutdownTimeout`). Set to 0 to drop the hook. |
 | apisix.priorityClassName | string | `""` | Set [priorityClassName](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#pod-priority) for API7 Gateway pods |
 | apisix.replicaCount | int | `1` | kind is DaemonSet, replicaCount not become effective |
 | apisix.resources | object | `{}` | Set pod resource requests & limits |
