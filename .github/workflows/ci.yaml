@@ -31,7 +31,6 @@ jobs:
               --workdir /workdir \
               quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
                && helm repo add bitnami https://charts.bitnami.com/bitnami \
-               && helm repo add apisix https://charts.apiseven.com \
                && helm repo add jaegertracing https://jaegertracing.github.io/helm-charts \
                && ct lint \
                   --charts charts/api7 \
@@ -49,7 +48,6 @@ jobs:
               --workdir /workdir \
               quay.io/helmpack/chart-testing:v3.10.1 sh -c '
                 helm repo add bitnami https://charts.bitnami.com/bitnami && \
-                helm repo add apisix https://charts.apiseven.com && \
                 helm repo add jaegertracing https://jaegertracing.github.io/helm-charts && \
                 for chart_dir in charts/*/; do
                   if [ -f "${chart_dir}Chart.lock" ]; then
@@ -75,7 +73,6 @@ jobs:
               --workdir /workdir \
               quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
                && helm repo add bitnami https://charts.bitnami.com/bitnami \
-               && helm repo add apisix https://charts.apiseven.com \
                && helm repo add jaegertracing https://jaegertracing.github.io/helm-charts \
                && ct install \
                   --charts charts/api7 \
@@ -92,7 +89,6 @@ jobs:
               --workdir /workdir \
               quay.io/helmpack/chart-testing:v3.10.1 sh -c 'git config --global --add safe.directory /workdir \
                && helm repo add bitnami https://charts.bitnami.com/bitnami \
-               && helm repo add apisix https://charts.apiseven.com \
                && helm repo add jaegertracing https://jaegertracing.github.io/helm-charts \
                && ct install \
                   --charts charts/gateway --helm-extra-set-args "--set etcd.enabled=true --set apisix.extraEnvVars[0].name=API7_SKIP_FIRST_HEARTBEAT_DEBUG --set-string apisix.extraEnvVars[0].value=true"'
