@@ -212,8 +212,14 @@ apisix:
   # -- kind is DaemonSet, replicaCount not become effective
   replicaCount: 1
 
-  # -- termination grace period for API7 Gateway pods
-  terminationGracePeriodSeconds: 30
+  # -- Seconds the whole termination sequence may take, from the pod being
+  # marked for deletion to SIGKILL. It covers the `preStop` sleep and the
+  # graceful shutdown that follows, during which nginx finishes in-flight
+  # requests before exiting (bounded by `nginx.workerShutdownTimeout`, 240s by
+  # default). At the Kubernetes default of 30s the `preStop` sleep alone
+  # consumes the entire budget, so in-flight requests are cut off during a
+  # rolling update or a scale-down.
+  terminationGracePeriodSeconds: 180
 
   # -- Seconds to sleep in a `preStop` hook before the gateway is sent SIGTERM.
   # Endpoint removal and SIGTERM are concurrent, so without this pause a
