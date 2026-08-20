@@ -168,13 +168,15 @@ spec:
       {{- toYaml .Values.gateway.livenessProbe | nindent 8 }}
       {{- end }}
       {{- end }}
+      {{- if gt (int .Values.apisix.preStopSleepSeconds) 0 }}
       lifecycle:
         preStop:
           exec:
             command:
               - /bin/sh
               - -c
-              - "sleep 30"
+              - "sleep {{ .Values.apisix.preStopSleepSeconds }}"
+      {{- end }}
       volumeMounts:
       {{- if .Values.apisix.setIDFromPodUID }}
         - mountPath: /usr/local/apisix/conf/apisix.uid

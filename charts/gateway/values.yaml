@@ -215,6 +215,14 @@ apisix:
   # -- termination grace period for API7 Gateway pods
   terminationGracePeriodSeconds: 30
 
+  # -- Seconds to sleep in a `preStop` hook before the gateway is sent SIGTERM.
+  # Endpoint removal and SIGTERM are concurrent, so without this pause a
+  # terminating pod can still be handed new connections by a kube-proxy that has
+  # not caught up yet. The sleep runs inside `terminationGracePeriodSeconds`, so
+  # that budget has to cover this pause plus the graceful shutdown that follows
+  # (bounded by `nginx.workerShutdownTimeout`). Set to 0 to drop the hook.
+  preStopSleepSeconds: 30
+
   # -- Set [priorityClassName](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/#pod-priority) for API7 Gateway pods
   priorityClassName: ""
   # -- Annotations to add to each pod
