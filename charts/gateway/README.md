@@ -207,7 +207,7 @@ apisix:
 | apisix.stream.luaSharedDict.plugin-limit-conn-stream | string | `"10m"` |  |
 | apisix.stream.luaSharedDict.tars-stream | string | `"1m"` |  |
 | apisix.stream.luaSharedDict.worker-events-stream | string | `"10m"` |  |
-| apisix.terminationGracePeriodSeconds | int | `30` | termination grace period for API7 Gateway pods |
+| apisix.terminationGracePeriodSeconds | int | `180` | Seconds the whole termination sequence may take, from the pod being marked for deletion to SIGKILL. It covers the `preStop` sleep and the graceful shutdown that follows, during which nginx finishes in-flight requests before exiting (bounded by `nginx.workerShutdownTimeout`, 240s by default). At the Kubernetes default of 30s the `preStop` sleep alone consumes the entire budget, so in-flight requests are cut off during a rolling update or a scale-down. |
 | apisix.timezone | string | `""` | timezone is the timezone where apisix uses. For example: "UTC" or "Asia/Shanghai" This value will be set on apisix container's environment variable TZ. You may need to set the timezone to be consistent with your local time zone, otherwise the apisix's logs may used to retrieve event maybe in wrong timezone. |
 | apisix.tolerations | list | `[]` | List of node taints to tolerate |
 | apisix.topologySpreadConstraints | list | `[]` | Topology Spread Constraints for pod assignment https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/ The value is evaluated as a template |
