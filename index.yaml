@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   aisix:
   - apiVersion: v2
+    appVersion: 0.10.0
+    created: "2026-08-20T11:52:42.817555309Z"
+    description: Helm chart for the AISIX AI gateway data plane
+    digest: 9b2c0a7b782069acd6406a1c95d3d51158eec96ccdb4b6cccb887a8d257610e7
+    home: https://api7.ai
+    keywords:
+    - ai-gateway
+    - llm
+    - gateway
+    - proxy
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: aisix
+    sources:
+    - https://github.com/api7/api7-helm-chart
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/aisix-0.10.0/aisix-0.10.0.tgz
+    version: 0.10.0
+  - apiVersion: v2
     appVersion: 0.9.0
     created: "2026-08-13T10:24:28.959584765Z"
     description: Helm chart for the AISIX AI gateway data plane
@@ -176,6 +198,25 @@ entries:
     - https://github.com/api7/api7-helm-chart/releases/download/aisix-cloud-0.1.0/aisix-cloud-0.1.0.tgz
     version: 0.1.0
   aisix-cp:
+  - apiVersion: v2
+    appVersion: 0.10.0
+    created: "2026-08-20T11:52:42.985117643Z"
+    dependencies:
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    description: Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
+    digest: 3e7fb04e791228e956190e449a66d52c40bb8ff4549271f961823a56b411a2d5
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: aisix-cp
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/aisix-cp-0.10.0/aisix-cp-0.10.0.tgz
+    version: 0.10.0
   - apiVersion: v2
     appVersion: 0.9.0
     created: "2026-08-13T10:24:29.212182514Z"
@@ -5771,4 +5812,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-20T11:16:18.087474018Z"
+generated: "2026-08-20T11:52:42.985614994Z"
