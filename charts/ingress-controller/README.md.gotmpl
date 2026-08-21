@@ -1,0 +1,37 @@
+{{ template "chart.header" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.maintainersSection" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+## Upgrading
+
+Helm never applies `crds/` after the first install, so apply the CRDs yourself before upgrading:
+
+```sh
+helm repo update
+helm pull api7/api7-ingress-controller --untar
+kubectl apply --server-side --force-conflicts -f api7-ingress-controller/crds/
+helm upgrade [RELEASE_NAME] api7/api7-ingress-controller --namespace [NAMESPACE]
+```
+
+Skipping this does not fail. `helm upgrade` reports success and the controller silently stops
+reconciling anything whose CRD it did not get.
+
+### To 0.1.26 (api7-ingress-controller 2.2.0)
+
+Gateway API moves to v1.6.0, where `v1alpha2` is no longer served: change your own TCPRoute,
+TLSRoute and UDPRoute manifests to `v1`. Objects already in the cluster are converted in place.
+
+Needs Kubernetes 1.30+, since the bundled Gateway API CRDs include a `ValidatingAdmissionPolicy`;
+the controller recommends 1.31+ and only warns below it.
+
+{{ template "chart.requirementsSection" . }}
+
+{{ template "chart.valuesSection" . }}

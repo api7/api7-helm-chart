@@ -1,6 +1,6 @@
 # api7-ingress-controller
 
-![Version: 0.1.25](https://img.shields.io/badge/Version-0.1.25-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.1.0](https://img.shields.io/badge/AppVersion-2.1.0-informational?style=flat-square)
+![Version: 0.1.26](https://img.shields.io/badge/Version-0.1.26-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.0](https://img.shields.io/badge/AppVersion-2.2.0-informational?style=flat-square)
 
 Ingress Controller for API7
 
@@ -14,13 +14,35 @@ Ingress Controller for API7
 
 * <https://github.com/api7/api7-helm-chart>
 
+## Upgrading
+
+Helm never applies `crds/` after the first install, so apply the CRDs yourself before upgrading:
+
+```sh
+helm repo update
+helm pull api7/api7-ingress-controller --untar
+kubectl apply --server-side --force-conflicts -f api7-ingress-controller/crds/
+helm upgrade [RELEASE_NAME] api7/api7-ingress-controller --namespace [NAMESPACE]
+```
+
+Skipping this does not fail. `helm upgrade` reports success and the controller silently stops
+reconciling anything whose CRD it did not get.
+
+### To 0.1.26 (api7-ingress-controller 2.2.0)
+
+Gateway API moves to v1.6.0, where `v1alpha2` is no longer served: change your own TCPRoute,
+TLSRoute and UDPRoute manifests to `v1`. Objects already in the cluster are converted in place.
+
+Needs Kubernetes 1.30+, since the bundled Gateway API CRDs include a `ValidatingAdmissionPolicy`;
+the controller recommends 1.31+ and only warns below it.
+
 ## Values
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | adc.image.pullPolicy | string | `"IfNotPresent"` |  |
 | adc.image.repository | string | `"ghcr.io/api7/adc"` |  |
-| adc.image.tag | string | `"0.26.0"` |  |
+| adc.image.tag | string | `"0.27.1"` |  |
 | adc.logLevel | string | `"info"` |  |
 | adc.resources | object | `{}` |  |
 | adc.securityContext | object | `{}` |  |
@@ -36,6 +58,7 @@ Ingress Controller for API7
 | config.leaderElection.leaseDuration | string | `"15s"` |  |
 | config.leaderElection.renewDeadline | string | `"10s"` |  |
 | config.leaderElection.retryPeriod | string | `"2s"` |  |
+| config.listenerPortMatchMode | string | `"off"` | How a Gateway API route is matched to a listener port: `off`, `auto` or `explicit`. |
 | config.logLevel | string | `"info"` |  |
 | config.metricsAddr | string | `":8080"` |  |
 | config.probeAddr | string | `":8081"` |  |
@@ -48,7 +71,7 @@ Ingress Controller for API7
 | deployment.annotations | object | `{}` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"api7/api7-ingress-controller"` |  |
-| deployment.image.tag | string | `"2.1.0"` |  |
+| deployment.image.tag | string | `"2.2.0"` |  |
 | deployment.nodeSelector | object | `{}` |  |
 | deployment.podAnnotations | object | `{}` |  |
 | deployment.podSecurityContext.fsGroup | int | `2000` |  |
@@ -66,7 +89,6 @@ Ingress Controller for API7
 | podDisruptionBudget.minAvailable | string | `"90%"` | Set the `minAvailable` of podDisruptionBudget. You can specify only one of `maxUnavailable` and `minAvailable` in a single PodDisruptionBudget. See [Specifying a Disruption Budget for your Application](https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget) for more details |
 | webhook.certificate.provided | bool | `false` | Set to true if you want to provide your own certificate |
 | webhook.enabled | bool | `true` | Enable or disable admission webhook |
-| webhook.failurePolicy | string | `"Fail"` | Failure policy for the webhook (Fail or Ignore) |
+| webhook.failurePolicy | string | `"Ignore"` | Failure policy for the webhook (Fail or Ignore) |
 | webhook.port | int | `9443` | The port for the webhook server to listen on |
 | webhook.timeoutSeconds | int | `10` | Timeout in seconds for the webhook |
-
