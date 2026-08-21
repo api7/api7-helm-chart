@@ -21,6 +21,7 @@ data:
     secure_metrics: {{ .Values.config.secureMetrics | default false }}
     exec_adc_timeout: {{ .Values.config.execADCTimeout | default "15s" }}
     disable_gateway_api: {{ .Values.config.disableGatewayApi | default false }}
+    listener_port_match_mode: {{ .Values.config.listenerPortMatchMode | default "off" | quote }}
     provider:
       type: {{ .Values.config.provider.type | default "api7ee" }}
       sync_period: {{ .Values.config.provider.syncPeriod | default "0s" }}
