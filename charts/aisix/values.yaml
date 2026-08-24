@@ -252,9 +252,10 @@ livenessProbe:
 # own drain window, and the in-flight drain that follows — the gateway drains
 # without a deadline of its own, so this value is the real cap. The default is
 # sized to protect request success rate across a rolling update, and the
-# trade-off is that a rolling update can take longer: it allows two chained
+# trade-off is that a rolling update can take longer: it budgets two chained
 # requests at the ten-minute timeout mainstream agent clients default to, plus
-# the `preStop` sleep. See "Termination and draining" in the README.
+# the `preStop` sleep. It is a budget, not a guarantee — a response still running
+# when it expires is cut. See "Termination and draining" in the README.
 terminationGracePeriodSeconds: 1230
 
 # -- Seconds to sleep in a `preStop` hook before the gateway receives SIGTERM.
