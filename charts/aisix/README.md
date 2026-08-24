@@ -71,6 +71,40 @@ certificate.
 helm delete aisix --namespace aisix
 ```
 
+## Termination and draining
+
+`terminationGracePeriodSeconds` defaults to 1230 seconds, far above the
+Kubernetes default of 30. It is sized to protect request success rate across a
+rolling update; the trade-off is that a rolling update can take longer.
+
+On SIGTERM the gateway answers `/readyz` with 503 and keeps serving. It stops
+accepting only once nothing is left in flight, and it drains with no deadline of
+its own — so this value is the real cap on the whole sequence, and the `preStop`
+sleep counts against it. When the cap expires Kubernetes sends SIGKILL, and every
+request still in flight fails in the caller's hands.
+
+The default is derived from how HTTP clients behave, not from any particular
+workload. The gateway never closes a pooled connection itself: it marks responses
+`Connection: close` and leaves the closing to the client, because a server that
+closes a keep-alive connection races with the client putting a request on it.
+Streaming responses are the case that does not fit. A stream that was already
+sending when SIGTERM arrived has its headers on the wire, and HTTP/1.1 offers no
+way to retire a connection after that, so it runs to completion and the
+connection returns to the client's pool unmarked. The client may reuse it once;
+that response is generated during the drain, carries `Connection: close`, and
+ends the chain there.
+
+The worst case is therefore two chained requests, each lasting until its own
+client gives up. Mainstream agent clients default to a ten-minute request
+timeout — Claude Code and the Anthropic SDKs, the OpenAI Python and Node SDKs —
+which puts the bound at 2 × 600s, plus 30s of `preStop`.
+
+Raising the value costs nothing while nothing runs that long: a pod exits as soon
+as its last request finishes, so this is a ceiling and not a duration. Lower it
+if your callers use a shorter timeout — the same arithmetic with a five-minute
+client timeout gives 630 — or if you would rather bound how long a rolling update
+may take, and accept that the longest streaming responses are cut.
+
 ## Configuration examples
 
 The full list of values is in the [Parameters](#parameters) table below. Put these
@@ -108,12 +142,8 @@ a TCP check cannot see readiness at all, so the only signal it ever gets is the
 listener closing, which is the very event the drain exists to avoid.
 
 Only then does the gateway stop accepting, and only once nothing is left in
-flight. In-flight requests drain with no deadline of the gateway's own, so
-`terminationGracePeriodSeconds` is the real cap on the whole sequence — the
-`preStop` sleep counts against it too. It defaults to 180: 30s of `preStop`, 30s
-of drain window, and 120s left for in-flight requests, which matters because a
-streaming response can run for minutes. Raise it if your workloads stream for
-longer.
+flight. What caps the whole sequence is `terminationGracePeriodSeconds`, covered
+in [Termination and draining](#termination-and-draining) above.
 
 ### Autoscale on request load with KEDA
 
@@ -301,7 +331,7 @@ extraEnvVars:
 | startupProbe.enabled | bool | `true` | Gate liveness and readiness until the proxy listener is bound. The budget here (period x threshold) must stay longer than the gateway's own boot retries — it connects to the control plane before it binds, retrying for about 25s — or a recoverable boot race becomes a crash loop. |
 | startupProbe.failureThreshold | int | `30` |  |
 | startupProbe.periodSeconds | int | `2` |  |
-| terminationGracePeriodSeconds | int | `180` | Seconds the whole termination sequence may take, from the pod being marked for deletion to SIGKILL. It covers the `preStop` sleep, the gateway's own drain window, and the in-flight drain that follows — the gateway drains without a deadline of its own, so this value is the real cap, and a streaming LLM response can run for minutes. The Kubernetes default of 30s would cut those connections during a scale-down or a rolling update. |
+| terminationGracePeriodSeconds | int | `1230` | Seconds the whole termination sequence may take, from the pod being marked for deletion to SIGKILL. It covers the `preStop` sleep, the gateway's own drain window, and the in-flight drain that follows — the gateway drains without a deadline of its own, so this value is the real cap. The default is sized to protect request success rate across a rolling update, and the trade-off is that a rolling update can take longer: it allows two chained requests at the ten-minute timeout mainstream agent clients default to, plus the `preStop` sleep. See "Termination and draining" in the README. |
 | tolerations | list | `[]` | Tolerations for the gateway pods |
 | topologySpreadConstraints | list | `[]` | Topology spread constraints, e.g. to spread replicas across zones |
 | updateStrategy | object | `{}` | Deployment update strategy |
