@@ -43,10 +43,12 @@ dashboard:
   livenessProbe:
     initialDelaySeconds: 180
     periodSeconds: 10
+    timeoutSeconds: 1
     failureThreshold: 30
   readinessProbe:
     initialDelaySeconds: 10
     periodSeconds: 3
+    timeoutSeconds: 1
     failureThreshold: 3
 
 dp_manager:
@@ -80,10 +82,12 @@ dp_manager:
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 3
+    timeoutSeconds: 1
     failureThreshold: 10
   readinessProbe:
     initialDelaySeconds: 10
     periodSeconds: 3
+    timeoutSeconds: 1
     failureThreshold: 3
 
 file_server:
@@ -98,10 +102,12 @@ file_server:
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 3
+    timeoutSeconds: 1
     failureThreshold: 10
   readinessProbe:
     initialDelaySeconds: 10
     periodSeconds: 3
+    timeoutSeconds: 1
     failureThreshold: 3
 
 developer_portal:
@@ -126,10 +132,12 @@ developer_portal:
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 3
+    timeoutSeconds: 1
     failureThreshold: 10
   readinessProbe:
     initialDelaySeconds: 10
     periodSeconds: 3
+    timeoutSeconds: 1
     failureThreshold: 3
 
 imagePullSecret: ""

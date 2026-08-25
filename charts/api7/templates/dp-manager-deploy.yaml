@@ -73,6 +73,7 @@ spec:
               port: http
             initialDelaySeconds: {{ .Values.dp_manager.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.dp_manager.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.dp_manager.livenessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.dp_manager.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
@@ -80,6 +81,7 @@ spec:
               port: http
             initialDelaySeconds: {{ .Values.dp_manager.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.dp_manager.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.dp_manager.readinessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.dp_manager.readinessProbe.failureThreshold }}
           volumeMounts:
             - name: config
