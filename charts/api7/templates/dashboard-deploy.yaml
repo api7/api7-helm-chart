@@ -75,6 +75,7 @@ spec:
               scheme: {{ if not .Values.dashboard_configuration.server.listen.disable }}HTTP{{ else }}HTTPS{{ end }}
             initialDelaySeconds: {{ .Values.dashboard.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.dashboard.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.dashboard.livenessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.dashboard.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
@@ -83,6 +84,7 @@ spec:
               scheme: {{ if not .Values.dashboard_configuration.server.listen.disable }}HTTP{{ else }}HTTPS{{ end }}
             initialDelaySeconds: {{ .Values.dashboard.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.dashboard.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.dashboard.readinessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.dashboard.readinessProbe.failureThreshold }}
           volumeMounts:
             - name: config
