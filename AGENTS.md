@@ -42,6 +42,8 @@ For **independently-versioned sub-charts** (`ingress-controller`, `developer-por
 
 The **AISIX charts (`aisix-cp`, `aisix`) release as a pair**, on the AISIX OP version axis rather than the EE one: at each OP release both get `version` **and** `appVersion` set to that release. `appVersion` pins the image tag on both sides, so the two charts must never carry different `appVersion`s — a control plane and a data plane from different releases is not a combination we ship.
 
+A fix that is **chart-only** — no new image — publishes by bumping that chart's `version` alone and leaving `appVersion` on the release it deploys, so the two charts may carry different `version`s while their `appVersion`s stay equal (which is the invariant that actually matters). `version` can therefore run **ahead** of `appVersion`, exactly as it may on the EE charts. Consequence for the next release: take a `version` **above the highest already published for that chart**, not simply equal to the app version — `CR_SKIP_EXISTING` skips an already-released number and the workflow still reports success, so a collision publishes nothing and says nothing. `charts/aisix` went to `0.10.1` on `appVersion 0.10.0` this way (#354).
+
 ## Release decision
 
 When releasing the chart for EE `X.Y.Z`:
