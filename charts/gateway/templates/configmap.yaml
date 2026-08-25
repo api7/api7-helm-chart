@@ -172,6 +172,11 @@ data:
 
       tracing: {{ .Values.apisix.tracing }}
 
+    {{- with .Values.apisix.streamPlugins }}
+    stream_plugins:
+      {{- toYaml . | nindent 6 }}
+    {{- end }}
+
     nginx_config:    # config for render the template to genarate nginx.conf
       error_log: "{{ .Values.logs.errorLog }}"
       error_log_level: "{{ .Values.logs.errorLogLevel }}"    # warn,error

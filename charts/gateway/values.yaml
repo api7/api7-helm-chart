@@ -192,6 +192,14 @@ apisix:
   # - radixtree_uri_with_parameter: match route by uri with parameters
   httpRouter: radixtree_host_uri
 
+  # -- Stream (L4) plugin list, rendered as `stream_plugins` in `config.yaml`.
+  # Leave it empty to keep the gateway image's own default, which does not
+  # enable `prometheus`. Set it to enable the L4 Prometheus metrics: the
+  # `apisix_stream_active_connections` and `apisix_stream_bandwidth` metrics
+  # need the shared memory zone that `apisix init` only renders when
+  # `prometheus` is in this list.
+  streamPlugins: []
+
   # -- Enable full customized config.yaml
   enableCustomizedConfig: false
   # -- If apisix.enableCustomizedConfig is true, full customized config.yaml.
@@ -205,7 +213,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.10.5
+    tag: 3.10.6
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
