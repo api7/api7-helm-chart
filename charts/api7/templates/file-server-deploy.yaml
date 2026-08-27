@@ -34,6 +34,9 @@ spec:
         - name: config
           configMap:
             name: {{ include "api7ee3.fullname" . }}-file-server-config
+      {{- if .Values.file_server.extraVolumes }}
+      {{- include "api7ee3.tplvalues.render" (dict "value" .Values.file_server.extraVolumes "context" $) | nindent 8 }}
+      {{- end }}
       containers:
         - name: file-server
           securityContext:
@@ -72,6 +75,9 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /usr/local/api7/conf
+          {{- if .Values.file_server.extraVolumeMounts }}
+          {{- include "api7ee3.tplvalues.render" (dict "value" .Values.file_server.extraVolumeMounts "context" $) | nindent 12 }}
+          {{- end }}
           resources:
             {{- if .Values.file_server.resources }}
             {{- toYaml .Values.file_server.resources | nindent 12 }}
