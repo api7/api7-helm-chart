@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 3.10.7](https://img.shields.io/badge/Version-3.10.7-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.10.6](https://img.shields.io/badge/AppVersion-3.10.6-informational?style=flat-square)
+![Version: 3.10.8](https://img.shields.io/badge/Version-3.10.8-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.10.6](https://img.shields.io/badge/AppVersion-3.10.6-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -245,6 +245,8 @@ A Helm chart for Kubernetes
 | dp_manager_service.type | string | `"ClusterIP"` |  |
 | file_server.enabled | bool | `false` |  |
 | file_server.extraEnvVars | list | `[]` |  |
+| file_server.extraVolumeMounts | list | `[]` |  |
+| file_server.extraVolumes | list | `[]` |  |
 | file_server.image.pullPolicy | string | `"Always"` |  |
 | file_server.image.repository | string | `"api7/api7-ee-file-server"` |  |
 | file_server.image.tag | string | `"v3.10.6"` |  |
