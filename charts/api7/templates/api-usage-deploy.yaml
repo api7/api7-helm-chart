@@ -64,6 +64,7 @@ spec:
               scheme: {{ if not .Values.api_usage.configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
             initialDelaySeconds: {{ (.Values.api_usage.livenessProbe | default dict).initialDelaySeconds | default 180 }}
             periodSeconds: {{ (.Values.api_usage.livenessProbe | default dict).periodSeconds | default 10 }}
+            timeoutSeconds: {{ (.Values.api_usage.livenessProbe | default dict).timeoutSeconds | default 1 }}
             failureThreshold: {{ (.Values.api_usage.livenessProbe | default dict).failureThreshold | default 30 }}
           readinessProbe:
             httpGet:
@@ -72,6 +73,7 @@ spec:
               scheme: {{ if not .Values.api_usage.configuration.server.listen.tls.enabled }}HTTP{{ else }}HTTPS{{ end }}
             initialDelaySeconds: {{ (.Values.api_usage.readinessProbe | default dict).initialDelaySeconds | default 10  }}
             periodSeconds: {{ (.Values.api_usage.readinessProbe | default dict).periodSeconds | default 3 }}
+            timeoutSeconds: {{ (.Values.api_usage.readinessProbe | default dict).timeoutSeconds | default 1 }}
             failureThreshold: {{ (.Values.api_usage.readinessProbe | default dict).failureThreshold | default 3 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

@@ -55,6 +55,7 @@ spec:
               port: http
             initialDelaySeconds: {{ .Values.file_server.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.file_server.livenessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.file_server.livenessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.file_server.livenessProbe.failureThreshold }}
           readinessProbe:
             httpGet:
@@ -62,6 +63,7 @@ spec:
               port: http
             initialDelaySeconds: {{ .Values.file_server.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.file_server.readinessProbe.periodSeconds }}
+            timeoutSeconds: {{ .Values.file_server.readinessProbe.timeoutSeconds }}
             failureThreshold: {{ .Values.file_server.readinessProbe.failureThreshold }}
           {{- if .Values.file_server.extraEnvVars }}
           env:
