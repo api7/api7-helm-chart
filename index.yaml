@@ -1041,6 +1041,33 @@ entries:
   api7ee3:
   - apiVersion: v2
     appVersion: 3.10.6
+    created: "2026-08-28T00:58:48.157647196Z"
+    dependencies:
+    - condition: prometheus.builtin
+      name: prometheus
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.5.1
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - condition: jaeger.builtin
+      name: jaeger
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 4.4.7
+    description: A Helm chart for Kubernetes
+    digest: 78085cb417dce4beb4ddf9d10b4ed05b4b8b5f3873b040f2c337c4e8a95fc2d0
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: api7ee3
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-3.10.8/api7ee3-3.10.8.tgz
+    version: 3.10.8
+  - apiVersion: v2
+    appVersion: 3.10.6
     created: "2026-08-27T03:05:50.624652187Z"
     dependencies:
     - condition: prometheus.builtin
@@ -6000,4 +6027,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-27T03:05:50.625164199Z"
+generated: "2026-08-28T00:58:48.158174117Z"
