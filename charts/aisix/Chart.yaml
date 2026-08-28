@@ -2,8 +2,8 @@ apiVersion: v2
 name: aisix
 description: Helm chart for the AISIX AI gateway data plane
 type: application
-version: 0.10.1
-appVersion: "0.10.0"
+version: 0.11.0
+appVersion: "0.11.0"
 
 keywords:
   - ai-gateway
