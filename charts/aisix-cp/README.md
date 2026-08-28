@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 0.10.0](https://img.shields.io/badge/Version-0.10.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.10.0](https://img.shields.io/badge/AppVersion-0.10.0-informational?style=flat-square)
+![Version: 0.11.0](https://img.shields.io/badge/Version-0.11.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.11.0](https://img.shields.io/badge/AppVersion-0.11.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -127,4 +127,3 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | ui.service.port | int | `3000` |  |
 | ui.service.type | string | `"ClusterIP"` |  |
 | ui.tolerations | list | `[]` |  |
-
