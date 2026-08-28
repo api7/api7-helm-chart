@@ -99,6 +99,8 @@ file_server:
     tag: "v3.10.6"
 
   extraEnvVars: []
+  extraVolumes: []
+  extraVolumeMounts: []
   livenessProbe:
     initialDelaySeconds: 60
     periodSeconds: 3
