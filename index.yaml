@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   aisix:
   - apiVersion: v2
+    appVersion: 0.11.0
+    created: "2026-08-28T11:26:54.811228894Z"
+    description: Helm chart for the AISIX AI gateway data plane
+    digest: 222c2f112c3ab6e938e3bf62d9c6717eb14f711f911e4adcff38c55b795dde56
+    home: https://api7.ai
+    keywords:
+    - ai-gateway
+    - llm
+    - gateway
+    - proxy
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: aisix
+    sources:
+    - https://github.com/api7/api7-helm-chart
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/aisix-0.11.0/aisix-0.11.0.tgz
+    version: 0.11.0
+  - apiVersion: v2
     appVersion: 0.10.0
     created: "2026-08-25T01:16:59.839747858Z"
     description: Helm chart for the AISIX AI gateway data plane
@@ -220,6 +242,25 @@ entries:
     - https://github.com/api7/api7-helm-chart/releases/download/aisix-cloud-0.1.0/aisix-cloud-0.1.0.tgz
     version: 0.1.0
   aisix-cp:
+  - apiVersion: v2
+    appVersion: 0.11.0
+    created: "2026-08-28T11:26:54.989228315Z"
+    dependencies:
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    description: Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
+    digest: 2ede17a3c4760e72028c2cccf74cdb249e14ef86673a709777421c759a05a5eb
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: aisix-cp
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/aisix-cp-0.11.0/aisix-cp-0.11.0.tgz
+    version: 0.11.0
   - apiVersion: v2
     appVersion: 0.10.0
     created: "2026-08-20T11:52:42.985117643Z"
@@ -6054,4 +6095,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-08-28T00:59:23.096138613Z"
+generated: "2026-08-28T11:26:54.990277876Z"
