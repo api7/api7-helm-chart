@@ -8,21 +8,34 @@ Components:
 
 Access the dashboard via cp-api (reverse proxy):
   kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-api {{ .Values.api.service.port }}:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
-{{- if eq .Values.api.publicBaseURL (printf "http://localhost:%v" .Values.api.service.port) }}
-  Then open {{ .Values.api.publicBaseURL }}
+{{- $base := trimSuffix "/" (lower .Values.api.publicBaseURL) }}
+{{- if or (eq $base (printf "http://localhost:%v" .Values.api.service.port)) (eq $base (printf "http://127.0.0.1:%v" .Values.api.service.port)) }}
+  Then open {{ .Values.api.publicBaseURL }}  (localhost and 127.0.0.1 both work)
 
-  Reaching it at any OTHER address — an Ingress, a LoadBalancer, a different
-  port — makes sign-in fail with "Sign-in isn't allowed from this address":
-  cp-api trusts only the origin it is configured to serve on. Set
-  api.publicBaseURL to that address and upgrade the release.
+  Sign-in is checked against the trusted origins: the api.publicBaseURL origin,
+  its loopback twin — localhost and 127.0.0.1 are interchangeable — and anything
+  in AISIX_TRUSTED_ORIGINS. Reaching the dashboard at some OTHER address (an
+  Ingress, a LoadBalancer, a different port) is refused at sign-in with an
+  "address not allowed" error. To allow one, either point api.publicBaseURL at it and
+  upgrade the release, or add it to AISIX_TRUSTED_ORIGINS via ui.extraEnvVars —
+  that one is additive, so use it when the console is reached through more than
+  one hostname.
 {{- else }}
   Then open {{ .Values.api.publicBaseURL }}
 
-  cp-api trusts only that origin for sign-in, so that is the address to use.
-  The port-forward above listens on port {{ .Values.api.service.port }}.
-  If the two disagree, forward the port api.publicBaseURL names instead, or set
-  api.publicBaseURL to the address you actually reach the dashboard at and
-  upgrade the release.
+  Sign-in is checked against the trusted origins: the api.publicBaseURL origin,
+  its loopback twin, and anything in AISIX_TRUSTED_ORIGINS. The port-forward
+  above publishes the dashboard on http://localhost:{{ .Values.api.service.port }},
+  which is not that origin — so unless you have already listed it in
+  AISIX_TRUSTED_ORIGINS, the page loads and sign-in is refused. To allow it,
+  add http://localhost:{{ .Values.api.service.port }} to AISIX_TRUSTED_ORIGINS
+  via ui.extraEnvVars.
+{{- if or (hasPrefix "http://localhost:" $base) (hasPrefix "http://127.0.0.1:" $base) }}
+  Or forward the port api.publicBaseURL names instead — local port first,
+  Service port second:
+
+    kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-api <its-port>:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
+{{- end }}
 {{- end }}
 
 Connect a data-plane (managed mode):
@@ -35,7 +48,11 @@ Connect a data-plane (managed mode):
     kubectl get svc/{{ include "aisix-cp.fullname" . }}-dpm -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}'
   {{- end }}
 
-  Run the DP container (replace <node-ip> and <node-port> with actual values):
+  First set api.dpmgrBaseURL=https://<node-ip>:<node-port> and upgrade the
+  release: dp-manager puts it in its server certificate, and without it the
+  certificate covers only localhost, so the gateway rejects the connection.
+
+  Then run the DP container (replace <node-ip> and <node-port>):
 
     docker run --rm \
       -e AISIX_CONFIG_PATH=/etc/aisix/config.managed.yaml \
