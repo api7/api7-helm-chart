@@ -8,7 +8,16 @@ Components:
 
 Access the dashboard via cp-api (reverse proxy):
   kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-api {{ .Values.api.service.port }}:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
-  Then open http://localhost:{{ .Values.api.service.port }}
+  Then open {{ .Values.api.publicBaseURL }}
+{{ if ne .Values.api.publicBaseURL (printf "http://localhost:%v" .Values.api.service.port) }}
+  api.publicBaseURL is set to {{ .Values.api.publicBaseURL }}, so reach the
+  dashboard at that address rather than through the port-forward above.
+{{- else }}
+  Reaching it at any OTHER address — an Ingress, a LoadBalancer, a different
+  port — makes sign-in fail with "Sign-in isn't allowed from this address":
+  cp-api trusts only the origin it is configured to serve on. Set
+  api.publicBaseURL to that address and upgrade the release.
+{{- end }}
 
 Connect a data-plane (managed mode):
 {{- if eq .Values.dpm.service.type "NodePort" }}
