@@ -9,20 +9,31 @@ Components:
 Access the dashboard via cp-api (reverse proxy):
   kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-api {{ .Values.api.service.port }}:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
 {{- if eq .Values.api.publicBaseURL (printf "http://localhost:%v" .Values.api.service.port) }}
-  Then open {{ .Values.api.publicBaseURL }}
+  Then open {{ .Values.api.publicBaseURL }}  (127.0.0.1 works too)
 
-  Reaching it at any OTHER address — an Ingress, a LoadBalancer, a different
-  port — makes sign-in fail with "Sign-in isn't allowed from this address":
-  cp-api trusts only the origin it is configured to serve on. Set
-  api.publicBaseURL to that address and upgrade the release.
+  Sign-in is checked against the trusted origins: the api.publicBaseURL origin,
+  its loopback twin — localhost and 127.0.0.1 are interchangeable — and anything
+  in AISIX_TRUSTED_ORIGINS. Reaching the dashboard at some OTHER address (an
+  Ingress, a LoadBalancer, a different port) fails with "Sign-in isn't allowed
+  from this address". To allow one, either point api.publicBaseURL at it and
+  upgrade the release, or add it to AISIX_TRUSTED_ORIGINS via ui.extraEnvVars —
+  that one is additive, so use it when the console is reached through more than
+  one hostname.
 {{- else }}
   Then open {{ .Values.api.publicBaseURL }}
 
-  cp-api trusts only that origin for sign-in, so that is the address to use.
-  The port-forward above listens on port {{ .Values.api.service.port }}.
-  If the two disagree, forward the port api.publicBaseURL names instead, or set
-  api.publicBaseURL to the address you actually reach the dashboard at and
-  upgrade the release.
+  Sign-in is checked against the trusted origins: the api.publicBaseURL origin,
+  its loopback twin, and anything in AISIX_TRUSTED_ORIGINS. The port-forward
+  above publishes the dashboard on http://localhost:{{ .Values.api.service.port }},
+  which is not that origin — the page loads, sign-in is refused. To sign in
+  through it, add http://localhost:{{ .Values.api.service.port }} to
+  AISIX_TRUSTED_ORIGINS via ui.extraEnvVars.
+{{- if or (hasPrefix "http://localhost:" .Values.api.publicBaseURL) (hasPrefix "http://127.0.0.1:" .Values.api.publicBaseURL) }}
+  Or forward the port api.publicBaseURL names instead — local port first,
+  Service port second:
+
+    kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-api <its-port>:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
+{{- end }}
 {{- end }}
 
 Connect a data-plane (managed mode):
