@@ -8,8 +8,8 @@ Components:
 
 Access the dashboard via cp-api (reverse proxy):
   kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-api {{ .Values.api.service.port }}:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
-{{- if eq .Values.api.publicBaseURL (printf "http://localhost:%v" .Values.api.service.port) }}
-  Then open {{ .Values.api.publicBaseURL }}  (127.0.0.1 works too)
+{{- if or (eq .Values.api.publicBaseURL (printf "http://localhost:%v" .Values.api.service.port)) (eq .Values.api.publicBaseURL (printf "http://127.0.0.1:%v" .Values.api.service.port)) }}
+  Then open {{ .Values.api.publicBaseURL }}  (localhost and 127.0.0.1 both work)
 
   Sign-in is checked against the trusted origins: the api.publicBaseURL origin,
   its loopback twin — localhost and 127.0.0.1 are interchangeable — and anything
