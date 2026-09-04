@@ -228,7 +228,8 @@ securityContext:
 ## All three probes target the proxy listener: `/livez` and `/readyz` are
 ## served on it, so none of them gets an answer until it is bound. In etcd
 ## mode the gateway binds it only after its first configuration apply has
-## succeeded, so a replica joins the Service only once it can actually serve.
+## succeeded, so a replica joins the Service only once it has a configuration
+## to serve from.
 startupProbe:
   # -- Gate liveness and readiness until the proxy listener is bound. In etcd
   # mode that happens only after the gateway's first configuration apply
@@ -236,8 +237,10 @@ startupProbe:
   # the configuration source and applying what it holds — not merely starting
   # the process. A cold boot whose configuration source stays unreachable
   # therefore has its pod restarted by the platform once this budget expires,
-  # which is the intended outcome: such an instance has no configuration to
-  # serve and will not acquire one by waiting longer. Boots that bind
+  # which is the intended outcome: an instance that has never applied a
+  # configuration has nothing to serve. The gateway itself keeps retrying the
+  # read for as long as it is up, and binds the moment one succeeds, so the
+  # restarted container simply resumes the same wait. Boots that bind
   # immediately — file mode, and an etcd-mode boot that restores a usable
   # snapshot cache — are unaffected.
   enabled: true

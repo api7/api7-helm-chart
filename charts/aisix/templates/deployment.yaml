@@ -126,14 +126,14 @@ spec:
             failureThreshold: {{ .Values.startupProbe.failureThreshold }}
           {{- end }}
           {{- if .Values.readinessProbe.enabled }}
-          # /readyz answers 503 while the instance is draining and 200 once
-          # it can serve. In etcd mode nothing answers before the gateway's
-          # first configuration apply: the proxy listener this probe uses is
-          # not bound until then, so the probe sees a refused connection
-          # rather than a 503. Either way a replica the autoscaler adds joins
-          # the Service only once it can actually serve, and leaves it as soon
-          # as it starts draining — both measured on the listener that carries
-          # the traffic.
+          # /readyz answers 503 while the instance is draining and 200 once it
+          # can serve. In etcd mode this port answers nothing at all before
+          # the gateway's first configuration apply: the proxy listener the
+          # probe targets is not bound until then, so the probe sees a refused
+          # connection rather than a 503. Either way a replica the autoscaler
+          # adds joins the Service only once it has a configuration to serve
+          # from, and leaves it as soon as it starts draining — both measured
+          # on the listener that carries the traffic.
           #
           # It no longer withdraws an instance whose configuration watch has
           # merely gone quiet, which an idle environment does routinely and
