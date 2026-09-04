@@ -235,17 +235,31 @@ startupProbe:
   # mode that happens only after the gateway's first configuration apply
   # succeeds, so the budget here (period x threshold) has to cover reaching
   # the configuration source and applying what it holds — not merely starting
-  # the process. A cold boot whose configuration source stays unreachable
-  # therefore has its container killed and restarted by the kubelet once this
-  # budget expires — the Pod is not recreated — which is the intended outcome:
-  # an instance that has never applied a configuration has nothing to serve.
-  # The gateway itself keeps retrying the read for as long as it is up, and
-  # binds the moment one succeeds, so the restarted container simply resumes
-  # the same wait. Boots that bind immediately — file mode, and an etcd-mode
-  # boot that restores a usable snapshot cache — are unaffected.
+  # the process. How long that apply takes scales with how much configuration
+  # the environment holds, so the 300s default (2s x 150) is deliberately
+  # generous headroom for a large one rather than a bound tuned to a measured
+  # boot. The period stays short so an ordinary boot still passes within a
+  # couple of seconds and rollouts are not slowed by the headroom; only the
+  # pathological case waits.
+  #
+  # The budget is also wide enough to contain the gateway's own retry
+  # schedule. It keeps retrying the configuration read on an exponential
+  # backoff — capped at a minute between attempts — for as long as it is up,
+  # and binds the moment one attempt succeeds. A configuration source that
+  # comes back inside the budget is therefore retried while the budget still
+  # has room, and the instance binds on its own, with no restart. A budget
+  # much shorter than the backoff's cap truncates that schedule instead, and
+  # kills the container in the gap before the retry that would have worked.
+  #
+  # Once the budget does expire the kubelet kills and restarts the container
+  # — the Pod is not recreated — which remains the intended outcome for a
+  # source that stays unreachable: an instance that has never applied a
+  # configuration has nothing to serve, and the restarted container simply
+  # resumes the same wait. Boots that bind immediately — file mode, and an
+  # etcd-mode boot that restores a usable snapshot cache — are unaffected.
   enabled: true
   periodSeconds: 2
-  failureThreshold: 30
+  failureThreshold: 150
 readinessProbe:
   enabled: true
   periodSeconds: 3
