@@ -236,13 +236,13 @@ startupProbe:
   # succeeds, so the budget here (period x threshold) has to cover reaching
   # the configuration source and applying what it holds — not merely starting
   # the process. A cold boot whose configuration source stays unreachable
-  # therefore has its pod restarted by the platform once this budget expires,
-  # which is the intended outcome: an instance that has never applied a
-  # configuration has nothing to serve. The gateway itself keeps retrying the
-  # read for as long as it is up, and binds the moment one succeeds, so the
-  # restarted container simply resumes the same wait. Boots that bind
-  # immediately — file mode, and an etcd-mode boot that restores a usable
-  # snapshot cache — are unaffected.
+  # therefore has its container killed and restarted by the kubelet once this
+  # budget expires — the Pod is not recreated — which is the intended outcome:
+  # an instance that has never applied a configuration has nothing to serve.
+  # The gateway itself keeps retrying the read for as long as it is up, and
+  # binds the moment one succeeds, so the restarted container simply resumes
+  # the same wait. Boots that bind immediately — file mode, and an etcd-mode
+  # boot that restores a usable snapshot cache — are unaffected.
   enabled: true
   periodSeconds: 2
   failureThreshold: 30
