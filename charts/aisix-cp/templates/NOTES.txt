@@ -66,4 +66,18 @@ Connect a data-plane (managed mode):
 {{- else }}
   DPM is a ClusterIP service. Expose it via Ingress, LoadBalancer, or port-forward:
     kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-dpm {{ .Values.dpm.service.port }}:{{ .Values.dpm.service.port }} -n {{ .Release.Namespace }}
+
+  Then set api.dpmgrBaseURL to the address you exposed and upgrade the
+  release: it is both the address the console's install snippet hands out and
+  the host dp-manager puts in its server certificate. Left empty it sets
+  neither — the install snippet keeps its <your-dp-manager> placeholder, and
+  the certificate is seeded with nothing but localhost.
+
+  An IP address is the case that needs it. A gateway dialing a hostname
+  offers that name in the TLS handshake and dp-manager issues a certificate
+  covering it on the spot, so port-forward and a DNS-named Ingress or
+  LoadBalancer each connect without this set. A gateway dialing an IP literal
+  offers no name at all, so a LoadBalancer's external IP is covered only by
+  naming it here — until it is, the handshake fails with nothing logged to
+  say why.
 {{- end }}
