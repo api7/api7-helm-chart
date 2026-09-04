@@ -225,15 +225,21 @@ securityContext:
     add:
       - NET_BIND_SERVICE
 
-## Liveness and startup probe the proxy listener's `/livez`; readiness probes
-## `/status/ready` on the metrics listener, which reports 503 until the
-## gateway has applied configuration from the control plane. A scaled-up
-## replica therefore joins the Service only once it can actually serve.
+## All three probes target the proxy listener: `/livez` and `/readyz` are
+## served on it, so none of them gets an answer until it is bound. In etcd
+## mode the gateway binds it only after its first configuration apply has
+## succeeded, so a replica joins the Service only once it can actually serve.
 startupProbe:
-  # -- Gate liveness and readiness until the proxy listener is bound. The
-  # budget here (period x threshold) must stay longer than the gateway's own
-  # boot retries — it connects to the control plane before it binds, retrying
-  # for about 25s — or a recoverable boot race becomes a crash loop.
+  # -- Gate liveness and readiness until the proxy listener is bound. In etcd
+  # mode that happens only after the gateway's first configuration apply
+  # succeeds, so the budget here (period x threshold) has to cover reaching
+  # the configuration source and applying what it holds — not merely starting
+  # the process. A cold boot whose configuration source stays unreachable
+  # therefore has its pod restarted by the platform once this budget expires,
+  # which is the intended outcome: such an instance has no configuration to
+  # serve and will not acquire one by waiting longer. Boots that bind
+  # immediately — file mode, and an etcd-mode boot that restores a usable
+  # snapshot cache — are unaffected.
   enabled: true
   periodSeconds: 2
   failureThreshold: 30

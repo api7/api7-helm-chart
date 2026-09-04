@@ -113,8 +113,11 @@ spec:
             {{- toYaml . | nindent 12 }}
             {{- end }}
           {{- if .Values.startupProbe.enabled }}
-          # /livez answers as soon as the proxy listener is bound. Gating on
-          # it keeps liveness and readiness quiet during boot.
+          # /livez answers as soon as the proxy listener is bound, which in
+          # etcd mode is once the first configuration apply has succeeded.
+          # Gating on it keeps liveness and readiness quiet for the whole of
+          # boot, that wait included; `startupProbe` in values.yaml explains
+          # the budget it needs.
           startupProbe:
             httpGet:
               path: /livez
@@ -123,11 +126,14 @@ spec:
             failureThreshold: {{ .Values.startupProbe.failureThreshold }}
           {{- end }}
           {{- if .Values.readinessProbe.enabled }}
-          # /readyz answers 503 while the instance is draining or before the
-          # control plane's configuration has been applied, 200 from then on.
-          # A replica the autoscaler adds therefore joins the Service only
-          # once it can actually serve, and leaves it as soon as it starts
-          # draining — both measured on the listener that carries the traffic.
+          # /readyz answers 503 while the instance is draining and 200 once
+          # it can serve. In etcd mode nothing answers before the gateway's
+          # first configuration apply: the proxy listener this probe uses is
+          # not bound until then, so the probe sees a refused connection
+          # rather than a 503. Either way a replica the autoscaler adds joins
+          # the Service only once it can actually serve, and leaves it as soon
+          # as it starts draining — both measured on the listener that carries
+          # the traffic.
           #
           # It no longer withdraws an instance whose configuration watch has
           # merely gone quiet, which an idle environment does routinely and
