@@ -302,6 +302,14 @@ prometheus:
     persistence:
       enabled: true
       size: 120Gi
+    # Prometheus runs as a single replica on a ReadWriteOnce PVC. With the
+    # Deployment default (RollingUpdate) every rollout that changes the pod
+    # template deadlocks: the new pod cannot attach the volume the old pod still
+    # holds (FailedAttachVolume), and the old pod is only removed once the new
+    # one is Ready. Recreate stops the old pod first. The Bitnami sub-chart
+    # documents this requirement for persistence-enabled installs.
+    updateStrategy:
+      type: Recreate
     service:
       type: ClusterIP
       ports:

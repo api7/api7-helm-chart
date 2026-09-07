@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 3.9.9](https://img.shields.io/badge/Version-3.9.9-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.20](https://img.shields.io/badge/AppVersion-3.9.20-informational?style=flat-square)
+![Version: 3.9.10](https://img.shields.io/badge/Version-3.9.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.9.20](https://img.shields.io/badge/AppVersion-3.9.20-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -305,6 +305,7 @@ A Helm chart for Kubernetes
 | prometheus.server.service.ports.http | int | `9090` |  |
 | prometheus.server.service.type | string | `"ClusterIP"` |  |
 | prometheus.server.serviceAccount.create | bool | `false` |  |
+| prometheus.server.updateStrategy.type | string | `"Recreate"` |  |
 | resources | object | `{}` |  |
 | securityContext | object | `{}` |  |
 | serviceAccount.annotations | object | `{}` |  |
