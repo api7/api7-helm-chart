@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 1.0.0](https://img.shields.io/badge/Version-1.0.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
+![Version: 1.0.1](https://img.shields.io/badge/Version-1.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.0.0](https://img.shields.io/badge/AppVersion-1.0.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -45,6 +45,7 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | api.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | api.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | api.securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| api.service.nodePort | string | `""` |  |
 | api.service.port | int | `8080` |  |
 | api.service.type | string | `"ClusterIP"` |  |
 | api.tolerations | list | `[]` |  |
@@ -124,6 +125,7 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | ui.securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | ui.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
 | ui.securityContext.readOnlyRootFilesystem | bool | `true` |  |
+| ui.service.nodePort | string | `""` |  |
 | ui.service.port | int | `3000` |  |
 | ui.service.type | string | `"ClusterIP"` |  |
 | ui.tolerations | list | `[]` |  |
