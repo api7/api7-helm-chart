@@ -13,6 +13,10 @@ api:
   service:
     type: ClusterIP
     port: 8080
+    ## Optional fixed NodePort. Used only when type is NodePort; leave empty
+    ## to let Kubernetes allocate a port dynamically. Direct NodePort access
+    ## is plain HTTP, so use a trusted private network or a TLS reverse proxy.
+    nodePort: ""
   resources:
     requests:
       cpu: 100m
@@ -37,11 +41,14 @@ api:
   tolerations: []
   affinity: {}
   extraEnvVars: []
+  ## Publicly reachable cp-api URL. When api.service.type is NodePort, this
+  ## must name the API NodePort endpoint (or the TLS reverse proxy in front).
   publicBaseURL: "http://localhost:8080"
   ## dp-manager /dp/* mTLS endpoint that data-plane hosts dial, as baked
   ## into the generated install snippets. Also passed to the dpm
   ## deployment, which seeds this host into the TLS server certificate it
-  ## presents — so an IP address works here, not only a DNS name.
+  ## presents — so an IP address works here, not only a DNS name. When
+  ## dpm.service.type is NodePort, use https://<node-ip>:<dpm-node-port>.
   dpmgrBaseURL: ""
   oauthEnabled: false
   dpImage: ""  # empty -> docker.io/api7/aisix:<appVersion>
@@ -111,6 +118,12 @@ ui:
   service:
     type: ClusterIP
     port: 3000
+    ## Optional fixed NodePort. Used only when type is NodePort; leave empty
+    ## to let Kubernetes allocate a port dynamically. This plain-HTTP endpoint
+    ## is not a standalone Dashboard entry point: use it only behind a
+    ## same-origin reverse proxy that sends Dashboard pages here and /api/* to
+    ## cp-api. The proxy should terminate TLS unless it is on a trusted network.
+    nodePort: ""
   resources:
     requests:
       cpu: 50m
@@ -158,6 +171,8 @@ secrets:
 ## @section PostgreSQL
 ## Set builtin=true to deploy Bitnami PostgreSQL subchart.
 ## Set builtin=false and configure externalDatabase to use an existing PostgreSQL instance.
+## API/DPM wait for PostgreSQL only in builtin mode.
+## An external database must be ready before starting the control plane.
 postgresql:
   builtin: true
   fullnameOverride: ""

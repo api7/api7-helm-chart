@@ -22,8 +22,10 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      {{- if .Values.postgresql.builtin }}
       initContainers:
         {{- include "aisix-cp.pgWaitInitContainer" . | nindent 8 }}
+      {{- end }}
       containers:
         - name: dpm
           image: "{{ .Values.dpm.image.repository }}:{{ .Values.dpm.image.tag | default .Chart.AppVersion }}"
