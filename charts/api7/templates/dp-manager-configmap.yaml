@@ -1,3 +1,23 @@
+{{- /*
+  Every replica reads this one ConfigMap, so a fixed advertised address makes
+  them all name the same instance. The diagnostic agent console is then routed
+  to whichever one that is, and every request for an agent held by a different
+  replica answers 404 with nothing in any log to say why. Leave it unset: the
+  address is derived per instance from the connection the agent arrived on,
+  which is the pod IP.
+*/ -}}
+{{- /*
+  Only the host has to differ per replica. A port set here is the same for all
+  of them and is correct, which is why advertiseFromPodIP covers the host
+  alone: host from the downward API, port from this file, is a supported
+  multi-replica shape.
+*/ -}}
+{{- $advertise := (.Values.dp_manager_configuration.server).advertise -}}
+{{- if and $advertise $advertise.host -}}
+{{- if and (gt (int .Values.dp_manager.replicaCount) 1) (not .Values.dp_manager.advertiseFromPodIP) -}}
+{{- fail "dp_manager_configuration.server.advertise.host cannot be used with dp_manager.replicaCount > 1: this ConfigMap is shared, so every replica would advertise the same host. Leave it unset (each instance derives its own address), or set dp_manager.advertiseFromPodIP=true to take the host per pod from the downward API." -}}
+{{- end -}}
+{{- end -}}
 kind: ConfigMap
 apiVersion: v1
 metadata:
