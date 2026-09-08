@@ -62,12 +62,16 @@ spec:
           image: "{{ .Values.dashboard.image.repository }}:{{ .Values.dashboard.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.dashboard.image.pullPolicy }}
           ports:
+            {{- if not .Values.dashboard_configuration.server.listen.disable }}
             - name: http
               containerPort: {{ .Values.dashboard_configuration.server.listen.port }}
               protocol: TCP
+            {{- end }}
+            {{- if not .Values.dashboard_configuration.server.tls.disable }}
             - name: https
               containerPort: {{ .Values.dashboard_configuration.server.tls.port }}
               protocol: TCP
+            {{- end }}
           livenessProbe:
             httpGet:
               path: /healthz

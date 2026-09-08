@@ -359,10 +359,12 @@ postgresql:
 dashboard_configuration:
   server:
     listen:
+      # -- Disable HTTP and omit its Service and container ports. At least one of HTTP or TLS must remain enabled.
       disable: true
       host: "0.0.0.0"
       port: 7080
     tls:
+      # -- Disable HTTPS and omit its Service and container ports. At least one of HTTP or TLS must remain enabled.
       disable: false
       host: "0.0.0.0"
       port: 7443

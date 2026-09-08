@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 3.10.10](https://img.shields.io/badge/Version-3.10.10-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.10.7](https://img.shields.io/badge/AppVersion-3.10.7-informational?style=flat-square)
+![Version: 3.10.11](https://img.shields.io/badge/Version-3.10.11-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.10.7](https://img.shields.io/badge/AppVersion-3.10.7-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -85,7 +85,7 @@ A Helm chart for Kubernetes
 | dashboard_configuration.security.ip_restriction.message | string | `"Access denied"` |  |
 | dashboard_configuration.security.ip_restriction.response_code | int | `403` |  |
 | dashboard_configuration.security.trusted_proxies | list | `["0.0.0.0/0","::/0"]` | A list of network origins (IPv4 addresses, IPv4 CIDRs, IPv6 addresses or IPv6 CIDRs) from which to trust request's headers("X-Forwarded-For", "X-Real-IP") that contain alternative client IP. |
-| dashboard_configuration.server.listen.disable | bool | `true` |  |
+| dashboard_configuration.server.listen.disable | bool | `true` | Disable HTTP and omit its Service and container ports. At least one of HTTP or TLS must remain enabled. |
 | dashboard_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | dashboard_configuration.server.listen.port | int | `7080` |  |
 | dashboard_configuration.server.pprof.enable | bool | `true` |  |
@@ -95,7 +95,7 @@ A Helm chart for Kubernetes
 | dashboard_configuration.server.status.host | string | `"127.0.0.1"` |  |
 | dashboard_configuration.server.status.port | int | `7081` |  |
 | dashboard_configuration.server.tls.cert_file | string | `""` |  |
-| dashboard_configuration.server.tls.disable | bool | `false` |  |
+| dashboard_configuration.server.tls.disable | bool | `false` | Disable HTTPS and omit its Service and container ports. At least one of HTTP or TLS must remain enabled. |
 | dashboard_configuration.server.tls.host | string | `"0.0.0.0"` |  |
 | dashboard_configuration.server.tls.key_file | string | `""` |  |
 | dashboard_configuration.server.tls.port | int | `7443` |  |
