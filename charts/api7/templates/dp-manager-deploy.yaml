@@ -101,6 +101,15 @@ spec:
             {{- toYaml .Values.resources | nindent 12 }}
             {{- end }}
           env:
+          {{- if .Values.dp_manager.advertiseFromPodIP }}
+          # Each replica advertises its own address for diagnostic agent
+          # sessions. The ConfigMap cannot do this -- every replica reads the
+          # same one -- so it comes from the downward API.
+            - name: API7_DP_MANAGER_ADVERTISE_HOST
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+          {{- end }}
           {{- if .Values.dp_manager.extraEnvVars }}
           {{- include "api7ee3.tplvalues.render" (dict "value" .Values.dp_manager.extraEnvVars "context" $) | nindent 12 }}
           {{- end }}

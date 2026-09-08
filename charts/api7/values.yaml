@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.10.6"
+    tag: "v3.10.7"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -57,7 +57,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.10.6"
+    tag: "v3.10.7"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -75,6 +75,13 @@ dp_manager:
   extraVolumeMounts: []
   extraInitContainers: []
   podLabels: {}
+  # -- Advertise each replica's own pod IP for diagnostic agent sessions,
+  # injected from the downward API. Not needed in the ordinary case: the
+  # address is already derived from the connection the agent arrived on. Turn
+  # it on where that derivation is wrong -- notably a service mesh whose
+  # sidecar re-originates the inbound connection, which leaves the derived
+  # address a loopback one.
+  advertiseFromPodIP: false
   # -- Topology Spread Constraints for pod assignment
   # https://kubernetes.io/docs/concepts/workloads/pods/pod-topology-spread-constraints/
   # The value is evaluated as a template
@@ -96,7 +103,7 @@ file_server:
   image:
     repository: api7/api7-ee-file-server
     pullPolicy: Always
-    tag: "v3.10.6"
+    tag: "v3.10.7"
 
   extraEnvVars: []
   extraVolumes: []
@@ -120,7 +127,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.10.6"
+    tag: "v3.10.7"
 
   extraEnvVars: []
   extraVolumes: []
@@ -427,7 +434,6 @@ dashboard_configuration:
       - "/api/v1/series"
       - "/api/v1/labels"
   console:
-    addr: "http://127.0.0.1:3000"
     # -- hybrid_mode hides the license and core-quota UI, for deployments where
     # the license is operated for the user rather than by them.
     hybrid_mode: false
@@ -519,6 +525,18 @@ dp_manager_configuration:
       enable: true
       host: "127.0.0.1"
       port: 6060
+    # -- How this dp-manager instance names itself to the other instances, for
+    # diagnostic agent sessions. Leave unset: the address is derived per
+    # instance from the connection the agent arrived on, which is the pod IP.
+    # This ConfigMap is shared by every replica, so a fixed value would make
+    # them all advertise the same address -- setting it with replicaCount > 1
+    # is refused at render time. The dashboard reaches that address directly,
+    # bypassing the Service, so a cluster with default-deny egress needs a
+    # NetworkPolicy allowing dashboard pods to reach dp-manager pods on the
+    # TLS port.
+    # advertise:
+    #   host: ""
+    #   port: ""
   log:
     # -- Allowed values: `debug`, `info`, `warn`, `error`
     level: warn

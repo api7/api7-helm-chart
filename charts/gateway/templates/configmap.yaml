@@ -90,6 +90,9 @@ data:
           {{- if hasKey . "tls" }}
             tls: {{ .tls }}
           {{- end }}
+          {{- if hasKey . "tls_passthrough" }}
+            tls_passthrough: {{ .tls_passthrough }}
+          {{- end }}
           {{- if hasKey . "proxy_protocol" }}
             proxy_protocol: {{ .proxy_protocol }}
           {{- end }}
