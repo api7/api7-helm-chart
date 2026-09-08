@@ -148,6 +148,10 @@ ui:
   tolerations: []
   affinity: {}
   extraEnvVars: []
+  # -- Additional volumes for the dashboard Pod (for example, a private database CA).
+  extraVolumes: []
+  # -- Additional mounts for the dashboard container. Use readOnly for CA certificates.
+  extraVolumeMounts: []
 
 ## @section ServiceAccount
 serviceAccount:

@@ -78,9 +78,15 @@ spec:
             # for a variant (requests then hang until the LB times out).
             - name: next-cache
               mountPath: /app/.next/cache
+            {{- with .Values.ui.extraVolumeMounts }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
       volumes:
         - name: next-cache
           emptyDir: {}
+        {{- with .Values.ui.extraVolumes }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
       {{- with .Values.ui.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
