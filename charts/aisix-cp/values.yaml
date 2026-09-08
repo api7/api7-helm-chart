@@ -149,6 +149,11 @@ ui:
   affinity: {}
   extraEnvVars: []
 
+  # -- Additional dashboard volumes, for example a PostgreSQL CA ConfigMap.
+  extraVolumes: []
+  # -- Additional dashboard volume mounts. Use readOnly for certificate bundles.
+  extraVolumeMounts: []
+
 ## @section ServiceAccount
 serviceAccount:
   create: true

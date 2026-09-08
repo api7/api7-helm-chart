@@ -108,6 +108,8 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | ui.affinity | object | `{}` |  |
 | ui.defaultLocale | string | `"en"` |  |
 | ui.extraEnvVars | list | `[]` |  |
+| ui.extraVolumeMounts | list | `[]` | Additional dashboard volume mounts. Use readOnly for certificate bundles. |
+| ui.extraVolumes | list | `[]` | Additional dashboard volumes, for example a PostgreSQL CA ConfigMap. |
 | ui.image.pullPolicy | string | `"IfNotPresent"` |  |
 | ui.image.repository | string | `"docker.io/api7/aisix-cp-ui"` |  |
 | ui.image.tag | string | `""` |  |
