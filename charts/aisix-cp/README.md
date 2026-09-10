@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
+![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -15,6 +15,49 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | Repository | Name | Version |
 |------------|------|---------|
 | https://charts.bitnami.com/bitnami | postgresql | 12.12.10 |
+
+## Private PostgreSQL CA trust for the dashboard
+
+When external PostgreSQL uses a private CA, the dashboard's Node.js PostgreSQL
+client needs to trust that CA. Otherwise database-backed authentication can fail
+with `SELF_SIGNED_CERT_IN_CHAIN` even while the dashboard page is reachable.
+
+Provision a ConfigMap named `aisix-postgres-ca` in the **dashboard namespace**,
+containing the public PEM CA certificate under the key `ca.crt`. Then add these
+values to your existing external-database configuration:
+
+```yaml
+ui:
+  extraEnvVars:
+    - name: NODE_EXTRA_CA_CERTS
+      value: /etc/aisix/postgres-ca/ca.crt
+  extraVolumes:
+    - name: postgres-ca
+      configMap:
+        name: aisix-postgres-ca
+        items:
+          - key: ca.crt
+            path: ca.crt
+  extraVolumeMounts:
+    - name: postgres-ca
+      mountPath: /etc/aisix/postgres-ca
+      readOnly: true
+```
+
+For a Secret-backed volume, replace `configMap.name` with `secret.secretName`
+and keep the same `items` mapping. Only the public CA certificate is needed;
+do not distribute the CA private key. Kubernetes cannot mount a ConfigMap or
+Secret from another namespace, so CA distribution is the operator's responsibility.
+
+These lists append to the built-in Next.js cache volume and mount. Choose unique
+volume names and mount paths; do not reuse `next-cache` or `/app/.next/cache`.
+The defaults are empty and preserve the existing deployment behavior.
+
+Keep PostgreSQL TLS certificate verification enabled. After updating or rotating
+the CA, roll out the dashboard again: Node.js loads `NODE_EXTRA_CA_CERTS` when
+the process starts, and this chart does not automatically restart Pods when an
+externally managed certificate changes. Manage the CA resource and these values
+in your deployment source so subsequent GitOps syncs preserve the configuration.
 
 ## Values
 
@@ -108,6 +151,8 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | ui.affinity | object | `{}` |  |
 | ui.defaultLocale | string | `"en"` |  |
 | ui.extraEnvVars | list | `[]` |  |
+| ui.extraVolumeMounts | list | `[]` | Additional mounts for the dashboard container. Use readOnly for CA certificates. |
+| ui.extraVolumes | list | `[]` | Additional volumes for the dashboard Pod (for example, a private database CA). |
 | ui.image.pullPolicy | string | `"IfNotPresent"` |  |
 | ui.image.repository | string | `"docker.io/api7/aisix-cp-ui"` |  |
 | ui.image.tag | string | `""` |  |
@@ -129,4 +174,3 @@ Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 | ui.service.port | int | `3000` |  |
 | ui.service.type | string | `"ClusterIP"` |  |
 | ui.tolerations | list | `[]` |  |
-
