@@ -1,6 +1,6 @@
 # api7-ingress-controller
 
-![Version: 0.1.27](https://img.shields.io/badge/Version-0.1.27-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.0](https://img.shields.io/badge/AppVersion-2.2.0-informational?style=flat-square)
+![Version: 0.1.28](https://img.shields.io/badge/Version-0.1.28-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Ingress Controller for API7
 
@@ -42,7 +42,7 @@ the controller recommends 1.31+ and only warns below it.
 |-----|------|---------|-------------|
 | adc.image.pullPolicy | string | `"IfNotPresent"` |  |
 | adc.image.repository | string | `"ghcr.io/api7/adc"` |  |
-| adc.image.tag | string | `"0.27.1"` |  |
+| adc.image.tag | string | `"0.30.2"` |  |
 | adc.logLevel | string | `"info"` |  |
 | adc.resources | object | `{}` |  |
 | adc.securityContext | object | `{}` |  |
@@ -71,7 +71,7 @@ the controller recommends 1.31+ and only warns below it.
 | deployment.annotations | object | `{}` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"api7/api7-ingress-controller"` |  |
-| deployment.image.tag | string | `"2.2.0"` |  |
+| deployment.image.tag | string | `"2.2.1"` |  |
 | deployment.nodeSelector | object | `{}` |  |
 | deployment.podAnnotations | object | `{}` |  |
 | deployment.podSecurityContext.fsGroup | int | `2000` |  |
