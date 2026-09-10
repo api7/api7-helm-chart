@@ -40,6 +40,10 @@ api:
   nodeSelector: {}
   tolerations: []
   affinity: {}
+  ## Extra environment for cp-api. This is also where
+  ## AISIX_ALLOW_UNSUPPORTED_UPGRADE=1 goes when an upgrade has to proceed
+  ## from a release older than this one supports upgrading from — cp-api
+  ## refuses that upgrade at startup and names the version it needs.
   extraEnvVars: []
   ## Publicly reachable cp-api URL. When api.service.type is NodePort, this
   ## must name the API NodePort endpoint (or the TLS reverse proxy in front).

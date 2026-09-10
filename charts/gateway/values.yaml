@@ -205,7 +205,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.10.6
+    tag: 3.10.7
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
@@ -477,6 +477,18 @@ gateway:
       #   proxy_protocol: true              # accept the PROXY protocol on this port only
       #   proxy_protocol_to_upstream: true  # send the PROXY protocol to the upstream on this port only;
       #                                     # both override the global apisix.proxyProtocol.enableTcpPP* defaults
+      # - addr: 9500
+      #   tls_passthrough: true   # forward the TLS stream untouched, picking the upstream from the SNI in the
+      #                           # prereaded ClientHello. The backend terminates the handshake, so
+      #                           # payload-inspecting stream plugins (mqtt-proxy, xrpc, redis) and client
+      #                           # certificate verification do not apply. Every connection on this port is
+      #                           # passed through, whatever the stream_route says.
+      # - addr: 9501
+      #   tls: true               # both flags open a mixed port: the listen only prereads, and each connection
+      #   tls_passthrough: true   # follows `tls_passthrough` on the stream_route it matches (default false).
+      #                           # Costs one internal hop, so prefer a dedicated tls_passthrough port when the
+      #                           # whole port passes through. proxy_protocol_to_upstream is rejected on a mixed
+      #                           # port -- use a dedicated listen instead.
     udp: []
       # - addr: 192.168.31.10:53
       # - addr: 5353
