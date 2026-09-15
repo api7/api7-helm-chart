@@ -1,8 +1,8 @@
 apiVersion: v2
 name: aisix
-description: Helm chart for the AISIX AI gateway data plane
+description: Helm chart for an AISIX AI Gateway data plane managed by an AISIX control plane
 type: application
-version: 1.2.0
+version: 1.2.1
 appVersion: "1.2.0"
 
 keywords:
@@ -11,9 +11,26 @@ keywords:
   - gateway
   - proxy
 
-home: https://api7.ai
+home: https://api7.ai/ai-gateway
 sources:
-  - https://github.com/api7/api7-helm-chart
+  - https://github.com/api7/aisix
+  - https://github.com/api7/api7-helm-chart/tree/main/charts/aisix
+
+annotations:
+  artifacthub.io/alternativeName: AISIX AI Gateway
+  artifacthub.io/category: ai-machine-learning
+  artifacthub.io/changes: |
+    - Added Artifact Hub category, image, documentation, source, and support metadata
+  artifacthub.io/images: |
+    - name: aisix
+      image: docker.io/api7/aisix:1.2.0
+  artifacthub.io/links: |
+    - name: AISIX source code
+      url: https://github.com/api7/aisix
+    - name: Documentation
+      url: https://docs.api7.ai/ai-gateway
+    - name: support
+      url: https://github.com/api7/api7-helm-chart/issues
 
 maintainers:
   - name: API7

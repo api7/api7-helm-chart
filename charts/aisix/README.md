@@ -1,8 +1,8 @@
 # aisix
 
-![Version: 1.2.0](https://img.shields.io/badge/Version-1.2.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
+![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
 
-Helm chart for the AISIX AI gateway data plane
+Helm chart for an AISIX AI Gateway data plane managed by an AISIX control plane
 
 AISIX is an AI gateway: it fronts LLM providers with routing, rate limiting, budgets,
 caching, guardrails, and observability behind an OpenAI-compatible API. This chart
@@ -15,7 +15,7 @@ keys, and policies from there. Install the control plane first — with the
 [`aisix-cp`](../aisix-cp/README.md) chart, or any of the other options in the
 [on-premises installation guide](https://docs.api7.ai/ai-gateway/on-premises/deployment).
 
-**Homepage:** <https://api7.ai>
+**Homepage:** <https://api7.ai/ai-gateway>
 
 ## Maintainers
 
@@ -25,7 +25,8 @@ keys, and policies from there. Install the control plane first — with the
 
 ## Source Code
 
-* <https://github.com/api7/api7-helm-chart>
+* <https://github.com/api7/aisix>
+* <https://github.com/api7/api7-helm-chart/tree/main/charts/aisix>
 
 ## Prerequisites
 
