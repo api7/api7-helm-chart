@@ -93,6 +93,30 @@ jobs:
                && ct install \
                   --charts charts/gateway --helm-extra-set-args "--set etcd.enabled=true --set apisix.extraEnvVars[0].name=API7_SKIP_FIRST_HEARTBEAT_DEBUG --set-string apisix.extraEnvVars[0].value=true"'
 
+      - name: Test aisix chart in standalone mode
+        run: |
+          kubectl cluster-info
+          docker run --rm --interactive --network host \
+              --name ct-aisix-standalone \
+              --volume $HOME/.kube/config:/root/.kube/config \
+              --volume $PWD:/workdir \
+              --workdir /workdir \
+              quay.io/helmpack/chart-testing:v3.10.1 sh -c '
+                set -e
+                ns=aisix-standalone
+                kubectl create namespace "$ns"
+                if ! helm install aisix charts/aisix --namespace "$ns" \
+                     --values charts/aisix/ci/standalone-values.yaml \
+                     --wait --timeout 5m; then
+                  kubectl -n "$ns" get pods -o wide || true
+                  kubectl -n "$ns" describe pods || true
+                  kubectl -n "$ns" logs -l app.kubernetes.io/name=aisix --tail=200 || true
+                  exit 1
+                fi
+                helm uninstall aisix --namespace "$ns"
+                kubectl delete namespace "$ns"
+              '
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:

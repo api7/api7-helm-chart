@@ -8,12 +8,19 @@ AISIX is an AI gateway: it fronts LLM providers with routing, rate limiting, bud
 caching, guardrails, and observability behind an OpenAI-compatible API. This chart
 installs the **data plane** — the component that serves live AI traffic.
 
-The data plane is configured by the AISIX control plane, not by this chart. It
-connects out to the control plane's data-plane manager over mutual TLS, using a
-gateway certificate bundle issued from the console, and receives its models, API
-keys, and policies from there. Install the control plane first — with the
-[`aisix-cp`](../aisix-cp/README.md) chart, or any of the other options in the
+The chart installs it in either of two modes, chosen with `controlPlane.enabled`.
+
+By default the gateway is configured by the AISIX control plane, not by this
+chart. It connects out to the control plane's data-plane manager over mutual TLS,
+using a gateway certificate bundle issued from the console, and receives its
+models, API keys, and policies from there. Install the control plane first — with
+the [`aisix-cp`](../aisix-cp/README.md) chart, or any of the other options in the
 [on-premises installation guide](https://docs.api7.ai/ai-gateway/on-premises/deployment).
+
+With `controlPlane.enabled: false` the gateway runs standalone, as the
+open-source AI gateway with no control plane at all: every resource comes from
+one declarative `resources.yaml` you supply through the chart. See
+[Standalone mode](#standalone-mode-no-control-plane) below.
 
 {{ template "chart.homepageLine" . }}
 
@@ -25,8 +32,10 @@ keys, and policies from there. Install the control plane first — with the
 
 * Kubernetes v1.23+
 * Helm v3+
-* An AISIX control plane, reachable from the cluster
-* A gateway certificate bundle for the environment this gateway should serve
+* For the default mode: an AISIX control plane reachable from the cluster, and a
+  gateway certificate bundle for the environment this gateway should serve
+* For standalone mode: a `resources.yaml` declaring the provider keys, models and
+  caller API keys the gateway should serve
 
 ## Install
 
@@ -64,6 +73,116 @@ certificate.
 ```sh
 helm delete aisix --namespace aisix
 ```
+
+## Standalone mode (no control plane)
+
+Set `controlPlane.enabled: false` to run the open-source gateway on its own.
+Nothing under `controlPlane` is read, no certificate bundle is needed, and the
+gateway reads every resource — provider keys, models, caller API keys,
+guardrails, MCP servers, rate-limit policies — from one `resources.yaml`. The
+chart renders a startup configuration pointing at it, mounts it read-only at
+`/etc/aisix/resources/resources.yaml`, and leaves the admin API unbound, so the
+file is the only way resources are declared.
+
+Supply the file through exactly one of `standalone.resources`,
+`standalone.existingSecret`, or `standalone.existingConfigMap`; setting none or
+more than one fails the render.
+
+`standalone.resources` takes the file inline, as a map, and renders it into a
+chart-managed Secret — a Secret rather than a ConfigMap because provider keys are
+credentials. Credentials do not have to live in your values file even so: a
+`${VAR}` reference is resolved from the container's environment when the file
+loads, so the value itself can come from `extraEnvVars` or from a Secret you
+manage separately.
+
+```yaml
+controlPlane:
+  enabled: false
+
+standalone:
+  resources:
+    _format_version: "1"
+    provider_keys:
+      - display_name: openai-main
+        provider: openai
+        adapter: openai
+        api_key: ${OPENAI_API_KEY}
+        api_base: https://api.openai.com/v1
+    models:
+      - display_name: gpt-4o-mini
+        provider: openai
+        model_name: gpt-4o-mini
+        provider_key: openai-main
+    api_keys:
+      - display_name: my-caller
+        key_env: CALLER_API_KEY
+        allowed_models:
+          - gpt-4o-mini
+
+extraEnvVars:
+  - name: OPENAI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: openai-credentials
+        key: api-key
+  - name: CALLER_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: aisix-caller-keys
+        key: my-caller
+```
+
+`standalone.existingSecret` and `standalone.existingConfigMap` read the file from
+an object you already manage, under the key `resources.yaml`:
+
+```sh
+kubectl -n aisix create secret generic aisix-resources \
+  --from-file=resources.yaml=./resources.yaml
+```
+
+```yaml
+controlPlane:
+  enabled: false
+
+standalone:
+  existingSecret: aisix-resources
+```
+
+Validate a file before you install it, without starting a listener:
+
+```sh
+docker run --rm -v "$(pwd):/work:ro" \
+  --entrypoint /usr/local/bin/aisix api7/aisix:<appVersion> \
+  validate --resources /work/resources.yaml
+```
+
+The file's own schema — every resource kind and field — is documented in the
+[open-source gateway quickstart](https://docs.api7.ai/ai-gateway/getting-started/gateway-quickstart)
+and the reference pages it links.
+
+### Applying a change
+
+The gateway re-reads `resources.yaml` on `SIGHUP` only, and this chart never
+sends one, so a rollout is what applies a change.
+
+Editing `standalone.resources` and running `helm upgrade` does that on its own:
+the pod template carries a checksum of the rendered file, so the change rolls the
+pods. Editing the Secret or ConfigMap behind `standalone.existingSecret` /
+`standalone.existingConfigMap` does not — Kubernetes updates the mounted file in
+place and nothing tells the gateway. Apply it with:
+
+```sh
+kubectl rollout restart deploy/<release>-aisix -n <namespace>
+```
+
+### What is not available
+
+Standalone mode has no control plane, so there is no console, no usage or budget
+reporting, and no per-environment configuration distribution. The admin API is
+left unbound as well: it is read-only against a file source, and binding it would
+require admin keys the chart does not manage. Turn it on with
+`extraEnvVars` — `AISIX_ADMIN__ENABLED`, `AISIX_ADMIN__ADDR` and
+`AISIX_ADMIN__ADMIN_KEYS` — if you want it.
 
 ## Termination and draining
 

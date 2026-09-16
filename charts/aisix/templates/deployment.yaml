@@ -18,13 +18,25 @@ spec:
       {{- include "aisix.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- if or (not .Values.controlPlane.certificate.existingSecret) .Values.podAnnotations }}
+      {{- if or (not .Values.controlPlane.enabled) (not .Values.controlPlane.certificate.existingSecret) .Values.podAnnotations }}
       annotations:
+        {{- if .Values.controlPlane.enabled }}
         {{- if not .Values.controlPlane.certificate.existingSecret }}
         # Roll the pods when the chart-managed bundle changes, so a rotated
         # certificate takes effect without a manual restart. An existingSecret
         # has its own lifecycle — restart the Deployment after rotating it.
         checksum/mtls: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
+        {{- else }}
+        # Roll the pods when the rendered startup config or the chart-managed
+        # resources file changes. The gateway re-reads the resources file on
+        # SIGHUP only and the chart never sends one, so the rollout is what
+        # applies the change. An existingSecret / existingConfigMap has its own
+        # lifecycle — restart the Deployment after editing it.
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- if .Values.standalone.resources }}
+        checksum/resources: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+        {{- end }}
         {{- end }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
@@ -72,11 +84,16 @@ spec:
               protocol: TCP
           env:
             - name: AISIX_CONFIG_PATH
+              {{- if .Values.controlPlane.enabled }}
               value: /etc/aisix/config.managed.yaml
+              {{- else }}
+              value: {{ include "aisix.standaloneConfigPath" . }}
+              {{- end }}
             - name: AISIX_PROXY__ADDR
               value: "0.0.0.0:{{ .Values.containerPorts.proxy }}"
             - name: AISIX_OBSERVABILITY__METRICS__PROMETHEUS__ADDR
               value: "0.0.0.0:{{ .Values.containerPorts.metrics }}"
+            {{- if .Values.controlPlane.enabled }}
             - name: AISIX_MANAGED__CP_BASE_URL
               value: {{ .Values.controlPlane.baseURL | quote }}
             {{- with .Values.controlPlane.etcdEndpoint }}
@@ -100,6 +117,7 @@ spec:
                 secretKeyRef:
                   name: {{ include "aisix.certSecretName" . }}
                   key: {{ .Values.controlPlane.certificate.caKey }}
+            {{- end }}
             {{- if eq .Values.rateLimit.backend "redis" }}
             - name: AISIX_RATELIMIT__BACKEND
               value: "redis"
@@ -173,12 +191,35 @@ spec:
             # instances, and a restarted pod re-registers.
             - name: state
               mountPath: /var/lib/aisix
+            {{- if not .Values.controlPlane.enabled }}
+            # Each in its own directory, so neither mount shadows the
+            # /etc/aisix/config.managed.yaml the image ships.
+            - name: config
+              mountPath: {{ include "aisix.standaloneConfigDir" . }}
+              readOnly: true
+            - name: resources
+              mountPath: {{ include "aisix.standaloneResourcesDir" . }}
+              readOnly: true
+            {{- end }}
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
       volumes:
         - name: state
           emptyDir: {}
+        {{- if not .Values.controlPlane.enabled }}
+        - name: config
+          configMap:
+            name: {{ include "aisix.fullname" . }}-config
+        - name: resources
+          {{- if .Values.standalone.existingConfigMap }}
+          configMap:
+            name: {{ include "aisix.resourcesObjectName" . }}
+          {{- else }}
+          secret:
+            secretName: {{ include "aisix.resourcesObjectName" . }}
+          {{- end }}
+        {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

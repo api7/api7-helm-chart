@@ -24,7 +24,14 @@ image:
 ## control plane's data-plane manager with the mTLS bundle issued from
 ## **Data planes** in the console, then reads its configuration from the
 ## control plane. Everything in this section comes from that view.
+##
+## Set `controlPlane.enabled: false` to run the open-source gateway instead,
+## with no control plane at all: resources come from a `resources.yaml` file
+## supplied under `standalone` below, and nothing in this section is read.
 controlPlane:
+  # -- Read configuration from an AISIX control plane. Set to false to run
+  # standalone, from the `resources.yaml` file configured under `standalone`
+  enabled: true
   # -- Data-plane manager mTLS endpoint the gateway connects out to, e.g.
   # `https://dpm.example.com:7944`. Required.
   baseURL: ""
@@ -50,6 +57,32 @@ controlPlane:
     key: ""
     # -- CA bundle PEM. Used only when `existingSecret` is empty
     ca: ""
+
+## Standalone (open-source) mode, read only when `controlPlane.enabled` is
+## false. Every resource — provider keys, models, caller API keys, guardrails,
+## MCP servers, rate-limit policies — comes from one `resources.yaml`, supplied
+## through exactly one of the three keys below. The chart renders a startup
+## config pointing the gateway at it and mounts it read-only.
+##
+## The gateway re-reads the file on SIGHUP only, and the chart does not send
+## one. A change to `standalone.resources` rolls the pods on `helm upgrade`
+## (the pod template carries a checksum of the rendered content), so it takes
+## effect on its own. An out-of-band edit to `standalone.existingSecret` or
+## `standalone.existingConfigMap` does not — run
+## `kubectl rollout restart deploy/<release>-aisix` after it.
+standalone:
+  # -- Inline `resources.yaml` content, as a map. Rendered into a
+  # chart-managed Secret, because provider keys are credentials. Values may
+  # reference environment variables as `${VAR}` — supply them through
+  # `extraEnvVars` — so the credential itself need not live in this file
+  resources: {}
+  # -- Read `resources.yaml` from an existing Secret instead, under key
+  # `resources.yaml`. Recommended when the file carries literal credentials
+  existingSecret: ""
+  # -- Read `resources.yaml` from an existing ConfigMap instead, under key
+  # `resources.yaml`. Use only when every credential in it is a `${VAR}`
+  # reference resolved from `extraEnvVars`
+  existingConfigMap: ""
 
 containerPorts:
   # -- Port the proxy listener binds inside the container. The image carries
@@ -197,16 +230,12 @@ resources:
   limits:
     memory: 1Gi
 
-## The image already runs as uid 10001. `runAsUser` is repeated here because
-## the image declares its user by name, and the kubelet cannot verify a named
-## user against `runAsNonRoot`.
+## The image already runs as uid 10001 and declares it numerically, which is
+## what `runAsNonRoot` needs to verify without the uid being repeated here.
+## Add `runAsUser` and `fsGroup` back to pin a fixed uid/gid: nothing in the
+## chart depends on the numbers, since the one writable path is an emptyDir.
 podSecurityContext:
   runAsNonRoot: true
-  runAsUser: 10001
-  # fsGroup owns the state directory emptyDir so the gateway can write its
-  # mTLS material, gateway id, and configuration snapshot under a read-only
-  # root filesystem.
-  fsGroup: 10001
   seccompProfile:
     type: RuntimeDefault
 

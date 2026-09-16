@@ -1,0 +1,21 @@
+{{- if not .Values.controlPlane.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aisix.fullname" . }}-config
+  labels:
+    {{- include "aisix.labels" . | nindent 4 }}
+    {{- include "aisix.selectorLabels" . | nindent 4 }}
+data:
+  # Startup configuration for standalone mode. It carries only what an
+  # AISIX_-prefixed environment variable cannot express as a default the
+  # user can still override: the resources file to read, and the admin
+  # listener, which defaults to enabled and would refuse to boot without
+  # admin keys. Everything else — the proxy and metrics addresses, the
+  # rate-limit backend, and anything set through `extraEnvVars` — reaches
+  # the gateway as environment variables, which override this file.
+  config.yaml: |
+    resources_file: {{ include "aisix.standaloneResourcesPath" . }}
+    admin:
+      enabled: false
+{{- end }}

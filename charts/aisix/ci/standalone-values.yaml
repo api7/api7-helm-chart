@@ -1,0 +1,46 @@
+# Values used by chart-testing for the standalone (no control plane) mode.
+# Unlike ci/default-values.yaml this file drives `ct install` as well as
+# `ct lint`, so everything it references has to exist in the cluster.
+#
+# The chart's default image is the released appVersion, whose USER is a name
+# rather than a uid; `runAsNonRoot` cannot verify that, so the kubelet refuses
+# to start it now that podSecurityContext no longer pins `runAsUser`. Install
+# against the development image, which declares the uid numerically, until an
+# appVersion that does the same is released.
+image:
+  repository: ghcr.io/api7/aisix
+  tag: dev
+
+controlPlane:
+  enabled: false
+
+replicaCount: 1
+
+standalone:
+  resources:
+    _format_version: "1"
+    provider_keys:
+      - display_name: openai-main
+        provider: openai
+        adapter: openai
+        api_key: ${OPENAI_API_KEY}
+        api_base: https://api.openai.com/v1
+    models:
+      - display_name: gpt-4o-mini
+        provider: openai
+        model_name: gpt-4o-mini
+        provider_key: openai-main
+    api_keys:
+      - display_name: ci-caller
+        key_env: CALLER_API_KEY
+        allowed_models:
+          - gpt-4o-mini
+
+# Both variables are referenced by the resources file above, which fails to
+# load if either is unset. No request is sent upstream during the install
+# test, so the values only have to be non-empty.
+extraEnvVars:
+  - name: OPENAI_API_KEY
+    value: sk-ci-placeholder-not-a-real-key
+  - name: CALLER_API_KEY
+    value: ci-caller-placeholder
