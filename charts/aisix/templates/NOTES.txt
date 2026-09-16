@@ -1,7 +1,25 @@
 AISIX gateway {{ .Chart.AppVersion }} has been deployed as {{ include "aisix.fullname" . }}.
 
+{{ if .Values.controlPlane.enabled -}}
 It connects out to the control plane at {{ .Values.controlPlane.baseURL }} and
 appears in that environment's Data planes view once its first heartbeat lands.
+{{- else -}}
+It runs standalone, serving the resources declared in
+{{ include "aisix.standaloneResourcesPath" . }}
+{{- if .Values.standalone.existingSecret }} (from Secret {{ .Values.standalone.existingSecret }}){{ end }}
+{{- if .Values.standalone.existingConfigMap }} (from ConfigMap {{ .Values.standalone.existingConfigMap }}){{ end }}.
+The admin API is not exposed; resources are declarative.
+
+The gateway re-reads that file on SIGHUP only, which this chart never sends.
+{{- if .Values.standalone.resources }}
+Editing `standalone.resources` and running `helm upgrade` rolls the pods, so
+the change applies on its own.
+{{- else }}
+After editing the {{ if .Values.standalone.existingSecret }}Secret{{ else }}ConfigMap{{ end }} out of band, apply it with:
+
+  kubectl rollout restart deploy/{{ include "aisix.fullname" . }} -n {{ .Release.Namespace }}
+{{- end }}
+{{- end }}
 
 Watch it come up:
 

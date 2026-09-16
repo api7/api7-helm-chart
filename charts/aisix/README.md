@@ -8,12 +8,19 @@ AISIX is an AI gateway: it fronts LLM providers with routing, rate limiting, bud
 caching, guardrails, and observability behind an OpenAI-compatible API. This chart
 installs the **data plane** — the component that serves live AI traffic.
 
-The data plane is configured by the AISIX control plane, not by this chart. It
-connects out to the control plane's data-plane manager over mutual TLS, using a
-gateway certificate bundle issued from the console, and receives its models, API
-keys, and policies from there. Install the control plane first — with the
-[`aisix-cp`](../aisix-cp/README.md) chart, or any of the other options in the
+The chart installs it in either of two modes, chosen with `controlPlane.enabled`.
+
+By default the gateway is configured by the AISIX control plane, not by this
+chart. It connects out to the control plane's data-plane manager over mutual TLS,
+using a gateway certificate bundle issued from the console, and receives its
+models, API keys, and policies from there. Install the control plane first — with
+the [`aisix-cp`](../aisix-cp/README.md) chart, or any of the other options in the
 [on-premises installation guide](https://docs.api7.ai/ai-gateway/on-premises/deployment).
+
+With `controlPlane.enabled: false` the gateway runs standalone, as the
+open-source AI gateway with no control plane at all: every resource comes from
+one declarative `resources.yaml` you supply through the chart. See
+[Standalone mode](#standalone-mode-no-control-plane) below.
 
 **Homepage:** <https://api7.ai>
 
@@ -31,8 +38,10 @@ keys, and policies from there. Install the control plane first — with the
 
 * Kubernetes v1.23+
 * Helm v3+
-* An AISIX control plane, reachable from the cluster
-* A gateway certificate bundle for the environment this gateway should serve
+* For the default mode: an AISIX control plane reachable from the cluster, and a
+  gateway certificate bundle for the environment this gateway should serve
+* For standalone mode: a `resources.yaml` declaring the provider keys, models and
+  caller API keys the gateway should serve
 
 ## Install
 
@@ -70,6 +79,116 @@ certificate.
 ```sh
 helm delete aisix --namespace aisix
 ```
+
+## Standalone mode (no control plane)
+
+Set `controlPlane.enabled: false` to run the open-source gateway on its own.
+Nothing under `controlPlane` is read, no certificate bundle is needed, and the
+gateway reads every resource — provider keys, models, caller API keys,
+guardrails, MCP servers, rate-limit policies — from one `resources.yaml`. The
+chart renders a startup configuration pointing at it, mounts it read-only at
+`/etc/aisix/resources/resources.yaml`, and leaves the admin API unbound, so the
+file is the only way resources are declared.
+
+Supply the file through exactly one of `standalone.resources`,
+`standalone.existingSecret`, or `standalone.existingConfigMap`; setting none or
+more than one fails the render.
+
+`standalone.resources` takes the file inline, as a map, and renders it into a
+chart-managed Secret — a Secret rather than a ConfigMap because provider keys are
+credentials. Credentials do not have to live in your values file even so: a
+`${VAR}` reference is resolved from the container's environment when the file
+loads, so the value itself can come from `extraEnvVars` or from a Secret you
+manage separately.
+
+```yaml
+controlPlane:
+  enabled: false
+
+standalone:
+  resources:
+    _format_version: "1"
+    provider_keys:
+      - display_name: openai-main
+        provider: openai
+        adapter: openai
+        api_key: ${OPENAI_API_KEY}
+        api_base: https://api.openai.com/v1
+    models:
+      - display_name: gpt-4o-mini
+        provider: openai
+        model_name: gpt-4o-mini
+        provider_key: openai-main
+    api_keys:
+      - display_name: my-caller
+        key_env: CALLER_API_KEY
+        allowed_models:
+          - gpt-4o-mini
+
+extraEnvVars:
+  - name: OPENAI_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: openai-credentials
+        key: api-key
+  - name: CALLER_API_KEY
+    valueFrom:
+      secretKeyRef:
+        name: aisix-caller-keys
+        key: my-caller
+```
+
+`standalone.existingSecret` and `standalone.existingConfigMap` read the file from
+an object you already manage, under the key `resources.yaml`:
+
+```sh
+kubectl -n aisix create secret generic aisix-resources \
+  --from-file=resources.yaml=./resources.yaml
+```
+
+```yaml
+controlPlane:
+  enabled: false
+
+standalone:
+  existingSecret: aisix-resources
+```
+
+Validate a file before you install it, without starting a listener:
+
+```sh
+docker run --rm -v "$(pwd):/work:ro" \
+  --entrypoint /usr/local/bin/aisix api7/aisix:<appVersion> \
+  validate --resources /work/resources.yaml
+```
+
+The file's own schema — every resource kind and field — is documented in the
+[open-source gateway quickstart](https://docs.api7.ai/ai-gateway/getting-started/gateway-quickstart)
+and the reference pages it links.
+
+### Applying a change
+
+The gateway re-reads `resources.yaml` on `SIGHUP` only, and this chart never
+sends one, so a rollout is what applies a change.
+
+Editing `standalone.resources` and running `helm upgrade` does that on its own:
+the pod template carries a checksum of the rendered file, so the change rolls the
+pods. Editing the Secret or ConfigMap behind `standalone.existingSecret` /
+`standalone.existingConfigMap` does not — Kubernetes updates the mounted file in
+place and nothing tells the gateway. Apply it with:
+
+```sh
+kubectl rollout restart deploy/<release>-aisix -n <namespace>
+```
+
+### What is not available
+
+Standalone mode has no control plane, so there is no console, no usage or budget
+reporting, and no per-environment configuration distribution. The admin API is
+left unbound as well: it is read-only against a file source, and binding it would
+require admin keys the chart does not manage. Turn it on with
+`extraEnvVars` — `AISIX_ADMIN__ENABLED`, `AISIX_ADMIN__ADDR` and
+`AISIX_ADMIN__ADMIN_KEYS` — if you want it.
 
 ## Termination and draining
 
@@ -271,6 +390,7 @@ extraEnvVars:
 | controlPlane.certificate.existingSecret | string | `""` | Read the bundle from an existing Secret instead of the PEM values below. Recommended: it keeps the private key out of your values file |
 | controlPlane.certificate.key | string | `""` | Private key PEM. Used only when `existingSecret` is empty |
 | controlPlane.certificate.keyKey | string | `"key.pem"` | Secret key holding the private key PEM |
+| controlPlane.enabled | bool | `true` | Read configuration from an AISIX control plane. Set to false to run standalone, from the `resources.yaml` file configured under `standalone` |
 | controlPlane.etcdEndpoint | string | `""` | Control-plane etcd endpoint as bare `host:port`. Leave empty unless the control plane publishes an etcd endpoint distinct from `baseURL` |
 | controlPlane.heartbeatIntervalSeconds | int | `15` | Heartbeat interval in seconds. The control plane marks a gateway connected on its first heartbeat. Clamped to [5, 300] by the gateway |
 | extraEnvVars | list | `[]` | Extra environment variables for the gateway container. Every gateway configuration field is reachable as `AISIX_<SECTION>__<FIELD>` |
@@ -312,9 +432,7 @@ extraEnvVars:
 | podDisruptionBudget.maxUnavailable | int | `1` | Maximum unavailable pods |
 | podDisruptionBudget.minAvailable | string | `""` | Minimum available pods. Takes precedence over `maxUnavailable` |
 | podLabels | object | `{}` | Labels for the gateway pods |
-| podSecurityContext.fsGroup | int | `10001` |  |
 | podSecurityContext.runAsNonRoot | bool | `true` |  |
-| podSecurityContext.runAsUser | int | `10001` |  |
 | podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | preStopSleepSeconds | int | `30` | Seconds to sleep in a `preStop` hook before the gateway receives SIGTERM. Endpoint removal and SIGTERM are concurrent, so without this pause a terminating pod can still be handed new connections by a kube-proxy that has not caught up. Set to 0 to drop the hook.  This covers balancers that learn about the pod from the Kubernetes API. One that polls a health check instead learns nothing here — the pod is still fully ready throughout the sleep — and is covered by the gateway's own drain window (`shutdown.min_drain_secs`, 30s by default), which starts at SIGTERM with `/readyz` already answering 503. |
 | priorityClassName | string | `""` | Pod priority class |
@@ -341,6 +459,9 @@ extraEnvVars:
 | serviceAccount.annotations | object | `{}` | ServiceAccount annotations |
 | serviceAccount.create | bool | `true` | Create a ServiceAccount for the gateway |
 | serviceAccount.name | string | `""` | ServiceAccount name. Defaults to the release fullname |
+| standalone.existingConfigMap | string | `""` | Read `resources.yaml` from an existing ConfigMap instead, under key `resources.yaml`. Use only when every credential in it is a `${VAR}` reference resolved from `extraEnvVars` |
+| standalone.existingSecret | string | `""` | Read `resources.yaml` from an existing Secret instead, under key `resources.yaml`. Recommended when the file carries literal credentials |
+| standalone.resources | object | `{}` | Inline `resources.yaml` content, as a map. Rendered into a chart-managed Secret, because provider keys are credentials. Values may reference environment variables as `${VAR}` — supply them through `extraEnvVars` — so the credential itself need not live in this file |
 | startupProbe.enabled | bool | `true` | Gate liveness and readiness until the proxy listener is bound. In etcd mode that happens only after the gateway's first configuration apply succeeds, so the budget here (period x threshold) has to cover reaching the configuration source and applying what it holds — not merely starting the process. How long that apply takes scales with how much configuration the environment holds, so the 300s default (2s x 150) is deliberately generous headroom for a large one rather than a bound tuned to a measured boot. The period stays short so an ordinary boot still passes within a couple of seconds and rollouts are not slowed by the headroom; only the pathological case waits.  The budget is also wide enough to contain the gateway's own retry schedule. It keeps retrying the configuration read on an exponential backoff — capped at a minute between attempts — for as long as it is up, and binds the moment one attempt succeeds. A configuration source that comes back inside the budget is therefore retried while the budget still has room, and the instance binds on its own, with no restart. A budget much shorter than the backoff's cap truncates that schedule instead, and kills the container in the gap before the retry that would have worked.  Once the budget does expire the kubelet kills and restarts the container — the Pod is not recreated — which remains the intended outcome for a source that stays unreachable: an instance that has never applied a configuration has nothing to serve, and the restarted container simply resumes the same wait. Boots that bind immediately — file mode, and an etcd-mode boot that restores a usable snapshot cache — are unaffected. |
 | startupProbe.failureThreshold | int | `150` |  |
 | startupProbe.periodSeconds | int | `2` |  |

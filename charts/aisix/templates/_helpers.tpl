@@ -80,6 +80,30 @@ Name of the Secret holding the gateway certificate bundle.
 {{- end }}
 
 {{/*
+Standalone mode: the directory the startup config is mounted in, the file the
+gateway reads from it, and the resources file it points at. Both live under
+their own directory so neither mount shadows the image's own
+/etc/aisix/config.managed.yaml.
+*/}}
+{{- define "aisix.standaloneConfigDir" -}}/etc/aisix/standalone{{- end }}
+{{- define "aisix.standaloneConfigPath" -}}{{ include "aisix.standaloneConfigDir" . }}/config.yaml{{- end }}
+{{- define "aisix.standaloneResourcesDir" -}}/etc/aisix/resources{{- end }}
+{{- define "aisix.standaloneResourcesPath" -}}{{ include "aisix.standaloneResourcesDir" . }}/resources.yaml{{- end }}
+
+{{/*
+Name of the Secret or ConfigMap holding resources.yaml.
+*/}}
+{{- define "aisix.resourcesObjectName" -}}
+{{- if .Values.standalone.existingSecret }}
+{{- .Values.standalone.existingSecret }}
+{{- else if .Values.standalone.existingConfigMap }}
+{{- .Values.standalone.existingConfigMap }}
+{{- else }}
+{{- printf "%s-resources" (include "aisix.fullname" .) }}
+{{- end }}
+{{- end }}
+
+{{/*
 Name of the Secret holding the rate-limit Redis URL.
 */}}
 {{- define "aisix.redisSecretName" -}}
@@ -105,12 +129,22 @@ Secret key holding the rate-limit Redis URL.
 Reject value combinations that render successfully but cannot run.
 */}}
 {{- define "aisix.validateValues" -}}
+{{- if .Values.controlPlane.enabled }}
 {{- if not .Values.controlPlane.baseURL }}
-{{- fail "controlPlane.baseURL is required: set it to the data-plane manager endpoint shown in the control plane's Data planes view" }}
+{{- fail "controlPlane.baseURL is required: set it to the data-plane manager endpoint shown in the control plane's Data planes view (or set controlPlane.enabled=false to run standalone)" }}
 {{- end }}
 {{- if not .Values.controlPlane.certificate.existingSecret }}
 {{- if not (and .Values.controlPlane.certificate.cert .Values.controlPlane.certificate.key .Values.controlPlane.certificate.ca) }}
 {{- fail "a gateway certificate bundle is required: set controlPlane.certificate.existingSecret, or all three of controlPlane.certificate.{cert,key,ca}" }}
+{{- end }}
+{{- end }}
+{{- else }}
+{{- $sources := 0 }}
+{{- if .Values.standalone.resources }}{{ $sources = add1 $sources }}{{ end }}
+{{- if .Values.standalone.existingSecret }}{{ $sources = add1 $sources }}{{ end }}
+{{- if .Values.standalone.existingConfigMap }}{{ $sources = add1 $sources }}{{ end }}
+{{- if ne $sources 1 }}
+{{- fail "controlPlane.enabled=false requires exactly one resource source: standalone.resources, standalone.existingSecret, or standalone.existingConfigMap" }}
 {{- end }}
 {{- end }}
 {{- if and .Values.autoscaling.enabled .Values.keda.enabled }}
