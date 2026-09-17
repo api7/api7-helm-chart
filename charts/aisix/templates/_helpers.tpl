@@ -126,6 +126,50 @@ Secret key holding the rate-limit Redis URL.
 {{- end }}
 
 {{/*
+Multiple proxy listeners.
+
+`listeners` empty is the single-listener default and every one of these is
+inert, so a default render is unchanged.
+
+"aisix.proxyPortName" is the port the probes target: the first listener, or
+the built-in "proxy" port.
+
+"aisix.proxyListenerTLS" is non-empty when that first listener terminates TLS,
+so the probes know to speak HTTPS to it.
+
+"aisix.proxyListenersJson" builds the AISIX_PROXY__LISTENERS value. The gateway
+takes the whole list as one JSON document — indexed environment variables are
+not a form it accepts — and reads TLS material from files, so each TLS listener
+points at the directory its Secret is mounted in.
+*/}}
+{{- define "aisix.proxyPortName" -}}
+{{- if .Values.listeners }}{{ (first .Values.listeners).name }}{{ else }}proxy{{ end }}
+{{- end }}
+
+{{- define "aisix.proxyListenerTLSDir" -}}/etc/aisix/tls/{{ .name }}{{- end }}
+
+{{- define "aisix.proxyListenerTLS" -}}
+{{- if .Values.listeners }}
+{{- with (first .Values.listeners).tls }}{{ if .secretName }}true{{ end }}{{ end }}
+{{- end }}
+{{- end }}
+
+{{- define "aisix.proxyListenersJson" -}}
+{{- $listeners := list }}
+{{- range $listener := .Values.listeners }}
+{{- $entry := dict "addr" (printf "0.0.0.0:%d" (int $listener.containerPort)) }}
+{{- if $listener.tls }}
+{{- if $listener.tls.secretName }}
+{{- $dir := include "aisix.proxyListenerTLSDir" $listener }}
+{{- $_ := set $entry "tls" (dict "cert_file" (printf "%s/tls.crt" $dir) "key_file" (printf "%s/tls.key" $dir)) }}
+{{- end }}
+{{- end }}
+{{- $listeners = append $listeners $entry }}
+{{- end }}
+{{- toJson $listeners }}
+{{- end }}
+
+{{/*
 Reject value combinations that render successfully but cannot run.
 */}}
 {{- define "aisix.validateValues" -}}
@@ -157,5 +201,26 @@ Reject value combinations that render successfully but cannot run.
 {{- if not (or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret) }}
 {{- fail "rateLimit.backend=redis requires rateLimit.redis.url or rateLimit.redis.existingSecret" }}
 {{- end }}
+{{- end }}
+{{- $names := list }}
+{{- $ports := list }}
+{{- range $i, $listener := .Values.listeners }}
+{{- if not $listener.name }}
+{{- fail (printf "listeners[%d].name is required: it names both the container port and the Service port" $i) }}
+{{- end }}
+{{- if not $listener.containerPort }}
+{{- fail (printf "listeners[%d] (%s) requires containerPort" $i $listener.name) }}
+{{- end }}
+{{- if not $listener.servicePort }}
+{{- fail (printf "listeners[%d] (%s) requires servicePort" $i $listener.name) }}
+{{- end }}
+{{- if has $listener.name $names }}
+{{- fail (printf "listeners[%d]: duplicate name %s — listener names must be unique" $i $listener.name) }}
+{{- end }}
+{{- if has (int $listener.containerPort) $ports }}
+{{- fail (printf "listeners[%d] (%s): duplicate containerPort %d — the gateway rejects two listeners on one address" $i $listener.name (int $listener.containerPort)) }}
+{{- end }}
+{{- $names = append $names $listener.name }}
+{{- $ports = append $ports (int $listener.containerPort) }}
 {{- end }}
 {{- end }}

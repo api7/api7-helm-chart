@@ -1,3 +1,14 @@
+{{- $proxyPort := .Values.service.port -}}
+{{- $scheme := "http" -}}
+{{- $curl := "curl" -}}
+{{- if .Values.listeners -}}
+{{- $first := first .Values.listeners -}}
+{{- $proxyPort = $first.servicePort -}}
+{{- if include "aisix.proxyListenerTLS" . -}}
+{{- $scheme = "https" -}}
+{{- $curl = "curl -k" -}}
+{{- end -}}
+{{- end -}}
 AISIX gateway {{ .Chart.AppVersion }} has been deployed as {{ include "aisix.fullname" . }}.
 
 {{ if .Values.controlPlane.enabled -}}
@@ -24,21 +35,26 @@ After editing the {{ if .Values.standalone.existingSecret }}Secret{{ else }}Conf
 Watch it come up:
 
   kubectl rollout status deploy/{{ include "aisix.fullname" . }} -n {{ .Release.Namespace }}
-
-Send a request through it:
+{{ if .Values.listeners }}
+It serves these proxy listeners, all carrying the same routes:
+{{ range .Values.listeners }}
+  {{ .name }}: Service port {{ .servicePort }} -> container port {{ .containerPort }}{{ if .tls }}{{ if .tls.secretName }}, TLS from Secret {{ .tls.secretName }}{{ end }}{{ end }}
+{{- end }}
+{{ end }}
+Send a request through it{{ if .Values.listeners }} on the {{ (first .Values.listeners).name }} listener{{ end }}:
 {{- if eq .Values.service.type "ClusterIP" }}
 
-  kubectl port-forward svc/{{ include "aisix.fullname" . }} 8080:{{ .Values.service.port }} -n {{ .Release.Namespace }}
-  curl http://localhost:8080/v1/models -H "Authorization: Bearer <api-key>"
+  kubectl port-forward svc/{{ include "aisix.fullname" . }} 8080:{{ $proxyPort }} -n {{ .Release.Namespace }}
+  {{ $curl }} {{ $scheme }}://localhost:8080/v1/models -H "Authorization: Bearer <api-key>"
 {{- else if eq .Values.service.type "NodePort" }}
 
   export NODE_IP=$(kubectl get nodes -o jsonpath='{.items[0].status.addresses[0].address}')
   export NODE_PORT=$(kubectl get svc {{ include "aisix.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}')
-  curl http://$NODE_IP:$NODE_PORT/v1/models -H "Authorization: Bearer <api-key>"
+  {{ $curl }} {{ $scheme }}://$NODE_IP:$NODE_PORT/v1/models -H "Authorization: Bearer <api-key>"
 {{- else }}
 
   export LB_IP=$(kubectl get svc {{ include "aisix.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
-  curl http://$LB_IP:{{ .Values.service.port }}/v1/models -H "Authorization: Bearer <api-key>"
+  {{ $curl }} {{ $scheme }}://$LB_IP:{{ $proxyPort }}/v1/models -H "Authorization: Bearer <api-key>"
 {{- end }}
 
 {{ if .Values.autoscaling.enabled -}}

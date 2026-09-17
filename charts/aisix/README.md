@@ -327,6 +327,64 @@ service:
   externalTrafficPolicy: Local
 ```
 
+### Serve HTTPS and plain HTTP together
+
+By default the gateway serves one plain-HTTP proxy listener, on
+`containerPorts.proxy`, published as `service.port`. Set `listeners` to serve
+several at once — each on its own port, with its own TLS:
+
+```yaml
+listeners:
+  - name: https                 # port name, shared by the container port and the Service port
+    containerPort: 3443
+    servicePort: 443
+    nodePort: 0                 # optional; only for non-ClusterIP Service types
+    tls:
+      secretName: aisix-proxy-tls   # kubernetes.io/tls Secret (keys tls.crt / tls.key)
+  - name: http
+    containerPort: 3000
+    servicePort: 80
+```
+
+A non-empty `listeners` is the complete set of proxy listeners and replaces the
+single default one: nothing binds `containerPorts.proxy`, and `service.port` /
+`service.nodePort` are not read — each entry carries its own. There is still one
+proxy Service; it publishes a port per entry. Every listener serves the same
+routes, `/livez` and `/readyz` included, so the probes target the first entry
+(over HTTPS when that entry terminates TLS; the kubelet does not verify the
+certificate). This needs a gateway image that supports `proxy.listeners`.
+
+TLS material is read from files, so each TLS listener needs a
+`kubernetes.io/tls` Secret; the chart mounts it read-only at
+`/etc/aisix/tls/<name>`. Create it from a certificate and key you already have:
+
+```sh
+kubectl -n aisix create secret tls aisix-proxy-tls \
+  --cert=./tls.crt --key=./tls.key
+```
+
+Or have [cert-manager](https://cert-manager.io) issue and renew it into the same
+Secret:
+
+```yaml
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: aisix-proxy-tls
+  namespace: aisix
+spec:
+  secretName: aisix-proxy-tls
+  dnsNames:
+    - gateway.example.com
+  issuerRef:
+    name: letsencrypt
+    kind: ClusterIssuer
+```
+
+A rotated certificate reaches the gateway as a changed file in that mount; roll
+the pods to pick it up with
+`kubectl rollout restart deploy/<release>-aisix -n <namespace>`.
+
 ### Bind a privileged port
 
 The image carries the `CAP_NET_BIND_SERVICE` file capability, so the gateway binds
@@ -381,7 +439,7 @@ extraEnvVars:
 | autoscaling.targetCPUUtilizationPercentage | int | `70` | Target average CPU utilization, in percent of the CPU request. Set to null to drop the CPU metric |
 | autoscaling.targetMemoryUtilizationPercentage | string | `nil` | Target average memory utilization, in percent of the memory request. Null by default: gateway memory tracks in-flight streams more than load |
 | containerPorts.metrics | int | `9090` | Port the Prometheus metrics listener binds inside the container |
-| containerPorts.proxy | int | `3000` | Port the proxy listener binds inside the container. The image carries the `CAP_NET_BIND_SERVICE` file capability, so a privileged port works without running as root — see `securityContext` below |
+| containerPorts.proxy | int | `3000` | Port the proxy listener binds inside the container. Nothing binds it when `listeners` is set — that list then carries every proxy port, and the gateway keeps requiring this address only to ignore it. The image carries the `CAP_NET_BIND_SERVICE` file capability, so a privileged port works without running as root — see `securityContext` below |
 | controlPlane.baseURL | string | `""` | Data-plane manager mTLS endpoint the gateway connects out to, e.g. `https://dpm.example.com:7944`. Required. |
 | controlPlane.certificate.ca | string | `""` | CA bundle PEM. Used only when `existingSecret` is empty |
 | controlPlane.certificate.caKey | string | `"ca.pem"` | Secret key holding the CA bundle PEM |
@@ -411,6 +469,7 @@ extraEnvVars:
 | keda.pollingInterval | int | `15` | How often KEDA evaluates the triggers, in seconds |
 | keda.restoreToOriginalReplicaCount | bool | `false` | Restore the original replica count when the ScaledObject is deleted |
 | keda.triggers | list | `[]` | KEDA triggers. Required when `keda.enabled` is true. For example: `[{type: prometheus, metadata: {serverAddress: "http://prometheus:9090", query: "sum(rate(aisix_llm_requests_total[2m]))", threshold: "100"}}]` |
+| listeners | list | `[]` | Proxy listeners, one entry per port. Empty keeps the single plain-HTTP listener described by `containerPorts.proxy` and `service.port` — see "Serve HTTPS and plain HTTP together" above |
 | livenessProbe.enabled | bool | `true` |  |
 | livenessProbe.failureThreshold | int | `3` |  |
 | livenessProbe.initialDelaySeconds | int | `10` |  |
@@ -453,8 +512,8 @@ extraEnvVars:
 | securityContext.readOnlyRootFilesystem | bool | `true` |  |
 | service.annotations | object | `{}` | Extra annotations for the proxy Service, e.g. cloud load-balancer settings |
 | service.externalTrafficPolicy | string | `""` | `externalTrafficPolicy` for the proxy Service. `Local` preserves the client source IP on NodePort / LoadBalancer types |
-| service.nodePort | string | `""` | Proxy Service nodePort, when `service.type` is NodePort or LoadBalancer |
-| service.port | int | `80` | Proxy Service port |
+| service.nodePort | string | `""` | Proxy Service nodePort, when `service.type` is NodePort or LoadBalancer. Unused when `listeners` is set — each entry there carries its own `nodePort` |
+| service.port | int | `80` | Proxy Service port. Unused when `listeners` is set — each entry there carries its own `servicePort` |
 | service.type | string | `"ClusterIP"` | Proxy Service type |
 | serviceAccount.annotations | object | `{}` | ServiceAccount annotations |
 | serviceAccount.create | bool | `true` | Create a ServiceAccount for the gateway |

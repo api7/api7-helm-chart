@@ -117,6 +117,47 @@ jobs:
                 kubectl delete namespace "$ns"
               '
 
+      - name: Test aisix chart with several proxy listeners
+        run: |
+          kubectl cluster-info
+          ns=aisix-listeners
+          kubectl create namespace "$ns"
+          # Self-signed is enough: the only TLS clients here are the kubelet's
+          # probes and curl -k, and neither verifies the certificate.
+          openssl req -x509 -newkey rsa:2048 -nodes -days 1 \
+              -subj "/CN=aisix.$ns.svc" \
+              -keyout proxy-tls.key -out proxy-tls.crt
+          kubectl -n "$ns" create secret tls aisix-ci-proxy-tls \
+              --cert=proxy-tls.crt --key=proxy-tls.key
+          rm -f proxy-tls.key proxy-tls.crt
+          docker run --rm --interactive --network host \
+              --name ct-aisix-listeners \
+              --volume $HOME/.kube/config:/root/.kube/config \
+              --volume $PWD:/workdir \
+              --workdir /workdir \
+              quay.io/helmpack/chart-testing:v3.10.1 sh -c '
+                set -e
+                ns=aisix-listeners
+                if ! helm install aisix charts/aisix --namespace "$ns" \
+                     --values charts/aisix/ci/standalone-values.yaml \
+                     --values charts/aisix/ci/listeners-values.yaml \
+                     --wait --timeout 5m; then
+                  kubectl -n "$ns" get pods -o wide || true
+                  kubectl -n "$ns" describe pods || true
+                  kubectl -n "$ns" logs -l app.kubernetes.io/name=aisix --tail=200 || true
+                  exit 1
+                fi
+                # Both listeners answer /livez through the one proxy Service.
+                kubectl -n "$ns" run curl-https --rm --attach --restart=Never \
+                    --image=curlimages/curl:8.11.1 --command -- \
+                    curl -fsS -k https://aisix:443/livez
+                kubectl -n "$ns" run curl-http --rm --attach --restart=Never \
+                    --image=curlimages/curl:8.11.1 --command -- \
+                    curl -fsS http://aisix:80/livez
+                helm uninstall aisix --namespace "$ns"
+                kubectl delete namespace "$ns"
+              '
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:

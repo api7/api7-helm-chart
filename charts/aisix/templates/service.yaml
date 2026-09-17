@@ -15,6 +15,17 @@ spec:
   externalTrafficPolicy: {{ . }}
   {{- end }}
   ports:
+    {{- if .Values.listeners }}
+    {{- range .Values.listeners }}
+    - name: {{ .name }}
+      port: {{ .servicePort }}
+      targetPort: {{ .name }}
+      protocol: TCP
+      {{- if and .nodePort (ne (toString $.Values.service.type) "ClusterIP") }}
+      nodePort: {{ .nodePort }}
+      {{- end }}
+    {{- end }}
+    {{- else }}
     - name: proxy
       port: {{ .Values.service.port }}
       targetPort: proxy
@@ -22,5 +33,6 @@ spec:
       {{- if and .Values.service.nodePort (ne (toString .Values.service.type) "ClusterIP") }}
       nodePort: {{ .Values.service.nodePort }}
       {{- end }}
+    {{- end }}
   selector:
     {{- include "aisix.selectorLabels" . | nindent 4 }}

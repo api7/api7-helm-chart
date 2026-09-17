@@ -76,9 +76,17 @@ spec:
             {{- toYaml . | nindent 12 }}
           {{- end }}
           ports:
+            {{- if .Values.listeners }}
+            {{- range .Values.listeners }}
+            - name: {{ .name }}
+              containerPort: {{ .containerPort }}
+              protocol: TCP
+            {{- end }}
+            {{- else }}
             - name: proxy
               containerPort: {{ .Values.containerPorts.proxy }}
               protocol: TCP
+            {{- end }}
             - name: metrics
               containerPort: {{ .Values.containerPorts.metrics }}
               protocol: TCP
@@ -91,6 +99,14 @@ spec:
               {{- end }}
             - name: AISIX_PROXY__ADDR
               value: "0.0.0.0:{{ .Values.containerPorts.proxy }}"
+            {{- if .Values.listeners }}
+            # The complete set of proxy listeners, as one JSON document: the
+            # gateway takes no indexed environment variables. It replaces the
+            # single listener AISIX_PROXY__ADDR describes — that address is
+            # then required but ignored, and nothing binds it.
+            - name: AISIX_PROXY__LISTENERS
+              value: {{ include "aisix.proxyListenersJson" . | quote }}
+            {{- end }}
             - name: AISIX_OBSERVABILITY__METRICS__PROMETHEUS__ADDR
               value: "0.0.0.0:{{ .Values.containerPorts.metrics }}"
             {{- if .Values.controlPlane.enabled }}
@@ -139,7 +155,10 @@ spec:
           startupProbe:
             httpGet:
               path: /livez
-              port: proxy
+              port: {{ include "aisix.proxyPortName" . }}
+              {{- if include "aisix.proxyListenerTLS" . }}
+              scheme: HTTPS
+              {{- end }}
             periodSeconds: {{ .Values.startupProbe.periodSeconds }}
             failureThreshold: {{ .Values.startupProbe.failureThreshold }}
           {{- end }}
@@ -161,7 +180,10 @@ spec:
           readinessProbe:
             httpGet:
               path: /readyz
-              port: proxy
+              port: {{ include "aisix.proxyPortName" . }}
+              {{- if include "aisix.proxyListenerTLS" . }}
+              scheme: HTTPS
+              {{- end }}
             periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
             failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           {{- end }}
@@ -169,7 +191,10 @@ spec:
           livenessProbe:
             httpGet:
               path: /livez
-              port: proxy
+              port: {{ include "aisix.proxyPortName" . }}
+              {{- if include "aisix.proxyListenerTLS" . }}
+              scheme: HTTPS
+              {{- end }}
             initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
             failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
@@ -201,6 +226,15 @@ spec:
               mountPath: {{ include "aisix.standaloneResourcesDir" . }}
               readOnly: true
             {{- end }}
+            {{- range .Values.listeners }}
+            {{- if .tls }}
+            {{- if .tls.secretName }}
+            - name: tls-{{ .name }}
+              mountPath: {{ include "aisix.proxyListenerTLSDir" . }}
+              readOnly: true
+            {{- end }}
+            {{- end }}
+            {{- end }}
             {{- with .Values.extraVolumeMounts }}
             {{- toYaml . | nindent 12 }}
             {{- end }}
@@ -219,6 +253,15 @@ spec:
           secret:
             secretName: {{ include "aisix.resourcesObjectName" . }}
           {{- end }}
+        {{- end }}
+        {{- range .Values.listeners }}
+        {{- if .tls }}
+        {{- if .tls.secretName }}
+        - name: tls-{{ .name }}
+          secret:
+            secretName: {{ .tls.secretName }}
+        {{- end }}
+        {{- end }}
         {{- end }}
         {{- with .Values.extraVolumes }}
         {{- toYaml . | nindent 8 }}

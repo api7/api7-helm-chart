@@ -85,19 +85,52 @@ standalone:
   existingConfigMap: ""
 
 containerPorts:
-  # -- Port the proxy listener binds inside the container. The image carries
+  # -- Port the proxy listener binds inside the container. Nothing binds it
+  # when `listeners` is set — that list then carries every proxy port, and the
+  # gateway keeps requiring this address only to ignore it. The image carries
   # the `CAP_NET_BIND_SERVICE` file capability, so a privileged port works
   # without running as root — see `securityContext` below
   proxy: 3000
   # -- Port the Prometheus metrics listener binds inside the container
   metrics: 9090
 
+## Several proxy listeners at once — for example HTTPS and plain HTTP side by
+## side, each on its own port. Empty (the default) keeps the single plain-HTTP
+## listener described by `containerPorts.proxy` and `service.port`.
+##
+## A non-empty list is the complete set of proxy listeners and replaces that
+## single one: nothing binds `containerPorts.proxy` any more, `service.port`
+## and `service.nodePort` are not read, the one proxy Service publishes a port
+## per entry, and the probes target the first entry. Every listener serves the
+## same routes, including `/livez` and `/readyz`; TLS is per listener.
+##
+## Needs a gateway image that supports `proxy.listeners`. TLS material is read
+## from a `kubernetes.io/tls` Secret you supply (keys `tls.crt` / `tls.key`),
+## mounted read-only at `/etc/aisix/tls/<name>`.
+# -- Proxy listeners, one entry per port. Empty keeps the single plain-HTTP
+# listener described by `containerPorts.proxy` and `service.port` — see
+# "Serve HTTPS and plain HTTP together" above
+listeners: []
+# listeners:
+#   - name: https                 # port name, shared by the container port and the Service port
+#     containerPort: 3443
+#     servicePort: 443
+#     nodePort: 0                 # optional; only for non-ClusterIP Service types
+#     tls:
+#       secretName: aisix-proxy-tls   # kubernetes.io/tls Secret (keys tls.crt / tls.key), e.g. issued by cert-manager
+#   - name: http
+#     containerPort: 3000
+#     servicePort: 80
+
 service:
   # -- Proxy Service type
   type: ClusterIP
-  # -- Proxy Service port
+  # -- Proxy Service port. Unused when `listeners` is set — each entry there
+  # carries its own `servicePort`
   port: 80
-  # -- Proxy Service nodePort, when `service.type` is NodePort or LoadBalancer
+  # -- Proxy Service nodePort, when `service.type` is NodePort or
+  # LoadBalancer. Unused when `listeners` is set — each entry there carries its
+  # own `nodePort`
   nodePort: ""
   # -- Extra annotations for the proxy Service, e.g. cloud load-balancer settings
   annotations: {}
