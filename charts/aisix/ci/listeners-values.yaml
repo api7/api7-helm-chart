@@ -1,0 +1,25 @@
+# Values used by chart-testing for the multiple-proxy-listeners mode: HTTPS on
+# 3443 and plain HTTP on 3000, published on Service ports 443 and 80.
+#
+# `ct lint` renders every file in this directory on its own, so this one also
+# carries control-plane placeholders to render — the same ones as
+# ci/default-values.yaml, and equally never created in a cluster. The install
+# test layers this file over ci/standalone-values.yaml, which turns the control
+# plane off, so only the listeners below are read there.
+controlPlane:
+  baseURL: "https://dp-manager.example.com:7944"
+  certificate:
+    existingSecret: "aisix-gateway-certificate"
+
+# The referenced Secret is created by the CI step before it installs the chart:
+# a self-signed certificate is enough, since the probes run against the
+# listener from the kubelet, which does not verify it.
+listeners:
+  - name: https
+    containerPort: 3443
+    servicePort: 443
+    tls:
+      secretName: aisix-ci-proxy-tls
+  - name: http
+    containerPort: 3000
+    servicePort: 80
