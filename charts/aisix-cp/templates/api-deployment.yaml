@@ -140,9 +140,32 @@ spec:
             {{- if or (regexMatch "(^|:)0{1,4}(:|$)" $inner) (regexMatch "(^|:)0[0-9a-f]" $inner) }}
             {{- fail (printf "api.corsAllowedOrigins entry %q: an IPv6 origin must be written the way a browser sends it — compress the zero hextets and drop the leading zeros." .) }}
             {{- end }}
+            {{- /* Over this alphabet — the `$rest` pattern above admits only
+                   hex digits and colons between the brackets — an address is
+                   valid exactly when it carries at most one `::`, spells every
+                   group as one to four hex digits, and begins and ends on a
+                   group or on the `::` itself. Each rule below is one of those
+                   clauses, and together they are the whole of validity: a
+                   shape none of them refuses is one net.ParseIP accepts.
+                   Counting groups alone left `1::2::3`, `:::`, `12345::1`,
+                   `:1::2` and `1::2:` rendering, and cp-api then refused all
+                   five at startup. */ -}}
+            {{- $groups := without (splitList ":" $inner) "" }}
+            {{- if or (contains ":::" $inner) (gt (len (splitList "::" $inner)) 2) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — `::` may appear once, and stands for the omitted groups." .) }}
+            {{- end }}
+            {{- range $groups }}
+            {{- if not (regexMatch "^[0-9a-f]{1,4}$" .) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — %q is not a group of one to four hex digits." $entry .) }}
+            {{- end }}
+            {{- end }}
+            {{- /* A colon on either end belongs to a `::`. On its own it is an
+                   empty group, which `$groups` has already dropped. */ -}}
+            {{- if or (and (hasPrefix ":" $inner) (not (hasPrefix "::" $inner))) (and (hasSuffix ":" $inner) (not (hasSuffix "::" $inner))) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — a leading or trailing colon has no group in front of it." .) }}
+            {{- end }}
             {{- /* `::` stands for at least one omitted group, so a spelling
                    that also writes all eight is not an address at all. */ -}}
-            {{- $groups := without (splitList ":" $inner) "" }}
             {{- if contains "::" $inner }}
             {{- if gt (len $groups) 7 }}
             {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — `::` stands for at least one omitted group." .) }}
