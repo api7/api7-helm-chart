@@ -177,8 +177,8 @@ spec:
             {{- /* `::` stands for at least one omitted group, so a spelling
                    that also writes all eight is not an address at all. */ -}}
             {{- if contains "::" $inner }}
-            {{- if gt (len $groups) 7 }}
-            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — `::` stands for at least one omitted group." .) }}
+            {{- if gt (len $groups) 6 }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — `::` stands for at least two omitted groups — a single zero group is written out." .) }}
             {{- end }}
             {{- else if ne (len $groups) 8 }}
             {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — it needs eight groups, or `::` where they are omitted." .) }}
