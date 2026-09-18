@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 1.2.1](https://img.shields.io/badge/Version-1.2.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.2.0](https://img.shields.io/badge/AppVersion-1.2.0-informational?style=flat-square)
+![Version: 1.3.0](https://img.shields.io/badge/Version-1.3.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.3.0](https://img.shields.io/badge/AppVersion-1.3.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -64,20 +64,29 @@ in your deployment source so subsequent GitOps syncs preserve the configuration.
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | api.affinity | object | `{}` |  |
+| api.corsAllowedOrigins | list | `[]` |  |
 | api.dpImage | string | `""` |  |
 | api.dpmgrBaseURL | string | `""` |  |
 | api.extraEnvVars | list | `[]` |  |
 | api.image.pullPolicy | string | `"IfNotPresent"` |  |
 | api.image.repository | string | `"docker.io/api7/aisix-cp-api"` |  |
 | api.image.tag | string | `""` |  |
+| api.metrics.enabled | bool | `true` |  |
+| api.metrics.port | int | `9090` |  |
+| api.metrics.service.annotations | object | `{}` |  |
+| api.metrics.service.port | int | `9090` |  |
+| api.metrics.serviceMonitor.enabled | bool | `false` |  |
+| api.metrics.serviceMonitor.interval | string | `"30s"` |  |
+| api.metrics.serviceMonitor.labels | object | `{}` |  |
+| api.metrics.serviceMonitor.metricRelabelings | list | `[]` |  |
+| api.metrics.serviceMonitor.namespace | string | `""` |  |
+| api.metrics.serviceMonitor.relabelings | list | `[]` |  |
+| api.metrics.serviceMonitor.scrapeTimeout | string | `""` |  |
 | api.nodeSelector | object | `{}` |  |
 | api.notifyAllowPrivateURLs | bool | `false` |  |
 | api.oauthEnabled | bool | `false` |  |
 | api.playgroundAllowPrivateIPs | bool | `false` |  |
-| api.podSecurityContext.fsGroup | int | `101` |  |
-| api.podSecurityContext.runAsGroup | int | `101` |  |
 | api.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| api.podSecurityContext.runAsUser | int | `10001` |  |
 | api.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | api.publicBaseURL | string | `"http://localhost:8080"` |  |
 | api.replicaCount | int | `1` |  |
@@ -98,10 +107,7 @@ in your deployment source so subsequent GitOps syncs preserve the configuration.
 | dpm.image.repository | string | `"docker.io/api7/aisix-cp-dpm"` |  |
 | dpm.image.tag | string | `""` |  |
 | dpm.nodeSelector | object | `{}` |  |
-| dpm.podSecurityContext.fsGroup | int | `101` |  |
-| dpm.podSecurityContext.runAsGroup | int | `101` |  |
 | dpm.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| dpm.podSecurityContext.runAsUser | int | `10001` |  |
 | dpm.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | dpm.replicaCount | int | `1` |  |
 | dpm.resources.limits.cpu | string | `"1"` |  |
@@ -157,10 +163,7 @@ in your deployment source so subsequent GitOps syncs preserve the configuration.
 | ui.image.repository | string | `"docker.io/api7/aisix-cp-ui"` |  |
 | ui.image.tag | string | `""` |  |
 | ui.nodeSelector | object | `{}` |  |
-| ui.podSecurityContext.fsGroup | int | `65533` |  |
-| ui.podSecurityContext.runAsGroup | int | `65533` |  |
 | ui.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| ui.podSecurityContext.runAsUser | int | `1001` |  |
 | ui.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
 | ui.replicaCount | int | `1` |  |
 | ui.resources.limits.cpu | string | `"500m"` |  |
