@@ -42,25 +42,35 @@ to gateway hosts.
 * Kubernetes v1.23+
 * Helm v3+
 * OpenSSL, to generate the secrets below
-* Four secrets, which have no defaults you can deploy with. The chart **fails
-  the render** while any of them still holds its placeholder, so an install with
-  none of them set stops before anything reaches the cluster:
+* Secrets, which have no defaults you can deploy with. **The chart fails the
+  render** while one is missing or still holds its placeholder, so an install
+  that supplies none of them stops before anything reaches the cluster. Two are
+  needed in every mode:
 
   | Value | Generate with |
   | --- | --- |
   | `secrets.masterKey` | `openssl rand -base64 32` |
   | `secrets.betterAuthSecret` | `openssl rand -base64 48` |
+
+  The database credentials depend on which database you use. With the bundled
+  PostgreSQL — `postgresql.builtin: true`, the default — set both of these,
+  unless `postgresql.auth.existingSecret` supplies them instead:
+
+  | Value | Generate with |
+  | --- | --- |
   | `postgresql.auth.postgresPassword` | `openssl rand -hex 24` |
   | `postgresql.auth.password` | `openssl rand -hex 24` |
 
-  Use **URL-safe** database passwords — `openssl rand -hex 24`, not
-  `-base64`. The password of whichever role serves application connections is
-  embedded in a `postgres://` DSN, and `+`, `/` and `=` corrupt it. That role is
-  `postgres` by default, because `postgresql.auth.usePostgresUserForAppConnections`
-  defaults to `true`; set both passwords URL-safe and the question does not
-  arise. The two `postgresql.auth.*` values are read only when
-  `postgresql.builtin` is `true` (the default) and
-  `postgresql.auth.existingSecret` is empty.
+  With an [external database](#external-postgresql) neither is read; that mode
+  needs `externalDatabase.existingSecret` or `externalDatabase.password`
+  instead, and fails the render with neither.
+
+  Whichever mode, use a **URL-safe** database password — `openssl rand -hex 24`,
+  not `-base64`. The password of the role that serves application connections is
+  embedded in a `postgres://` DSN, and `+`, `/` and `=` corrupt it. On the
+  bundled database that role is `postgres` by default, because
+  `postgresql.auth.usePostgresUserForAppConnections` defaults to `true`; set
+  both passwords URL-safe and the question does not arise.
 
 **Keep `secrets.masterKey`.** It encrypts stored provider credentials and the
 private key of the certificate authority that issued your gateway
@@ -167,12 +177,12 @@ helm repo update
 helm upgrade aisix-cp api7/aisix-cp --namespace aisix -f cp-values.yaml
 ```
 
-Upgrade with your own values file rather than `--reuse-values`: the same four
+Upgrade with your own values file rather than `--reuse-values`: the same
 secrets must be supplied again, and `--reuse-values` replays the previous
 release's fully resolved values, chart defaults included, so a default this
 chart changed — the probe budgets among them — is not adopted. If you never
-kept a file, `helm get values aisix-cp` prints the overrides the release was
-installed with.
+kept a file, `helm get values aisix-cp --namespace aisix` prints the overrides
+the release was installed with.
 
 Wait for the `cp-api` pods to become ready before upgrading the gateways: the
 schema migration runs on first start under the new version.
@@ -234,6 +244,7 @@ kubectl -n aisix create secret generic aisix-cp-db \
 
 `externalDatabase.existingSecret` reads the password from a Secret you manage,
 under the key `password`; `externalDatabase.password` takes it inline instead.
+One of the two is required — with neither, the render fails.
 The external database must be reachable before the control plane starts — only
 the bundled mode gets a wait-for-database init container. The two
 `postgresql.auth.*` passwords are not read in this mode, and the placeholder
