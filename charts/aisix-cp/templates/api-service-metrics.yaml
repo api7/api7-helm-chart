@@ -1,0 +1,22 @@
+{{- if .Values.api.metrics.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aisix-cp.fullname" . }}-api-metrics
+  labels:
+    {{- include "aisix-cp.labels" . | nindent 4 }}
+    {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "api") | nindent 4 }}
+  {{- with .Values.api.metrics.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: metrics
+      port: {{ .Values.api.metrics.service.port }}
+      targetPort: metrics
+      protocol: TCP
+  selector:
+    {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "api") | nindent 4 }}
+{{- end }}

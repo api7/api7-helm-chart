@@ -38,6 +38,11 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+            {{- if .Values.api.metrics.enabled }}
+            - name: metrics
+              containerPort: {{ .Values.api.metrics.port }}
+              protocol: TCP
+            {{- end }}
           env:
             - name: PGPASSWORD
               valueFrom:
@@ -53,6 +58,10 @@ spec:
             {{- end }}
             - name: AISIX_CLOUD_LISTEN
               value: ":8080"
+            {{- if .Values.api.metrics.enabled }}
+            - name: AISIX_CLOUD_METRICS_LISTEN
+              value: {{ printf ":%v" .Values.api.metrics.port | quote }}
+            {{- end }}
             {{- if .Values.twoDSN.enabled }}
             - name: AISIX_CLOUD_ADMIN_DATABASE_URL
               value: {{ include "aisix-cp.databaseURL" . }}
@@ -64,6 +73,152 @@ spec:
             {{- end }}
             - name: AISIX_CLOUD_PUBLIC_BASE_URL
               value: {{ .Values.api.publicBaseURL | quote }}
+            {{- with .Values.api.corsAllowedOrigins }}
+            {{- /* cp-api refuses these at startup, which an operator meets as a
+                   CrashLoopBackOff and a log line rather than as a failed
+                   upgrade. Fail the render instead, where the message lands
+                   next to the value that caused it.
+
+                   These rules are cors.ValidateOrigin's, and they are only
+                   worth having if they are the SAME rules: a shape this
+                   template waves through and cp-api then refuses turns the
+                   crash loop it exists to prevent back on. Compared
+                   lowercased, because that is what cp-api normalizes to
+                   before deciding. */ -}}
+            {{- range . }}
+            {{- $entry := lower (trim .) }}
+            {{- if eq $entry "*" }}
+            {{- fail "api.corsAllowedOrigins must name explicit origins, not \"*\": it is a blanket grant, and cp-api refuses to start with one." }}
+            {{- end }}
+            {{- if hasPrefix "https://*" $entry }}
+            {{- /* A wildcard suffix has to begin at a label separator, or it
+                   also matches a longer label: https://*api7ai.vercel.app
+                   would admit evilapi7ai.vercel.app. */ -}}
+            {{- $suffix := trimPrefix "https://*" $entry }}
+            {{- if not (or (hasPrefix "-" $suffix) (hasPrefix "." $suffix)) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: a wildcard suffix must start with \"-\" or \".\" so it cannot match a longer label." .) }}
+            {{- end }}
+            {{- if or (not (regexMatch "^[a-z0-9._-]+$" $suffix)) (hasSuffix "." $suffix) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: a wildcard suffix must be a bare host suffix of ASCII letters, digits, dot, hyphen and underscore — a path, query, fragment, userinfo, port, trailing dot or non-ASCII name never matches a browser's Origin." .) }}
+            {{- end }}
+            {{- $body := trimPrefix "." (trimPrefix "-" $suffix) }}
+            {{- if lt (len (splitList "." $body)) 3 }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: a wildcard suffix must name at least three labels, or it covers a whole public suffix (https://*.vercel.app would admit every project on that host)." .) }}
+            {{- end }}
+            {{- else }}
+            {{- /* Exact origin. https is required, with the same loopback
+                   exception cp-api makes so a port-forwarded dev console can
+                   be listed. */ -}}
+            {{- $loopback := or (hasPrefix "http://localhost:" $entry) (hasPrefix "http://127.0.0.1:" $entry) (hasPrefix "http://[::1]:" $entry) (eq $entry "http://localhost") (eq $entry "http://127.0.0.1") (eq $entry "http://[::1]") }}
+            {{- if not (or (hasPrefix "https://" $entry) $loopback) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q must use https:// (loopback may use http)." .) }}
+            {{- end }}
+            {{- /* A positive shape check, not a blacklist of bad characters.
+                   Blacklisting let `https://host:abc`, `https://`, an
+                   unbalanced `[::1` and a percent-escape through — each of
+                   which cp-api then refuses at startup, which is the crash
+                   loop this whole block exists to convert into a message.
+
+                   Underscores and edge hyphens are admitted because a browser
+                   admits them: refusing one here blocked an upgrade over a
+                   value cp-api accepts. */ -}}
+            {{- $rest := trimPrefix "http://" (trimPrefix "https://" $entry) }}
+            {{- if not (regexMatch "^(\\[[0-9a-f:]+\\]|[a-z0-9_.-]+)(:[0-9]{1,5})?$" $rest) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q must be a bare origin like https://host[:port] — a path, query, fragment, userinfo, trailing dot, empty or non-numeric port, or a non-ASCII host (write its punycode form) never matches a browser's Origin header." .) }}
+            {{- end }}
+            {{- $hostOnly := regexReplaceAll ":[0-9]+$" $rest "" }}
+            {{- if hasSuffix "." $hostOnly }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q must be a bare origin like https://host[:port] — a trailing dot never matches a browser's Origin header." .) }}
+            {{- end }}
+            {{- if hasPrefix "[" $hostOnly }}
+            {{- /* An IPv6 address has many spellings and a browser sends one.
+                   This cannot canonicalize an address, but it can refuse the
+                   spellings that differ from the canonical one by a written-out
+                   or zero-padded hextet, which is every form anyone types by
+                   hand. cp-api makes the exact check. */ -}}
+            {{- $inner := trimSuffix "]" (trimPrefix "[" $hostOnly) }}
+            {{- if or (regexMatch "(^|:)0{1,4}(:|$)" $inner) (regexMatch "(^|:)0[0-9a-f]" $inner) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: an IPv6 origin must be written the way a browser sends it — compress the zero hextets and drop the leading zeros." .) }}
+            {{- end }}
+            {{- /* Counting groups alone is not enough to tell an address from
+                   a typo: `without … ""` drops the empty components a doubled
+                   or misplaced colon produces, so `1::2::3`, `:::`, `1:::2`,
+                   `12345::1`, `1:2:3:4:5:6:7:8:`, `:1:2:3:4:5:6:7:8`, `1::2:`
+                   and `:1::2` all reached the count as if well formed, and
+                   cp-api refused every one of them at startup.
+
+                   The three rules below refuse a spelling that is not an
+                   address at all: more than one `::`, a group that is not one
+                   to four hex digits, and a colon on either end that is not
+                   part of the `::`.
+
+                   They do NOT establish that what survives is a spelling
+                   cp-api takes. That test is `ip.String() == host` — the
+                   canonical form, which is stricter than parsing — and only
+                   the shared case list decides whether the two agree. Add a
+                   case to internal/cpapi/cors/testdata/origin-cases.txt; the
+                   parity step in .github/workflows/ci-helm.yml runs the whole
+                   list through this template and through cp-api and fails on
+                   any entry they answer differently. */ -}}
+            {{- $groups := without (splitList ":" $inner) "" }}
+            {{- if or (contains ":::" $inner) (gt (len (splitList "::" $inner)) 2) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — `::` may appear once, and stands for the omitted groups." .) }}
+            {{- end }}
+            {{- range $groups }}
+            {{- if not (regexMatch "^[0-9a-f]{1,4}$" .) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — %q is not a group of one to four hex digits." $entry .) }}
+            {{- end }}
+            {{- end }}
+            {{- /* A colon on either end belongs to a `::`. On its own it is an
+                   empty group, which `$groups` has already dropped. */ -}}
+            {{- if or (and (hasPrefix ":" $inner) (not (hasPrefix "::" $inner))) (and (hasSuffix ":" $inner) (not (hasSuffix "::" $inner))) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — a leading or trailing colon has no group in front of it." .) }}
+            {{- end }}
+            {{- /* `::` stands for at least one omitted group, so a spelling
+                   that also writes all eight is not an address at all. */ -}}
+            {{- if contains "::" $inner }}
+            {{- if gt (len $groups) 6 }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — `::` stands for at least two omitted groups — a single zero group is written out." .) }}
+            {{- end }}
+            {{- else if ne (len $groups) 8 }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — it needs eight groups, or `::` where they are omitted." .) }}
+            {{- end }}
+            {{- else }}
+            {{- /* A browser re-reads a host whose last label is numeric as an
+                   IPv4 address and rewrites it: `https://2130706433` is sent as
+                   `https://127.0.0.1`. Such an entry can only match if it
+                   already is a dotted quad. */ -}}
+            {{- $lastLabel := last (splitList "." $hostOnly) }}
+            {{- if regexMatch "^(0[xX][0-9a-fA-F]*|[0-9]+)$" $lastLabel }}
+            {{- if not (regexMatch "^([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\\.([1-9]?[0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])){3}$" $hostOnly) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: a host whose last label is numeric is read as an IPv4 address and rewritten — write the dotted-quad form a browser sends." .) }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- /* A port has one spelling. Five digits is a shape, not a port:
+                   a browser refuses a URL above 65535, strips leading zeros,
+                   and omits the scheme's default port when it serializes an
+                   origin — so `:0080` and `:443` on https parse fine here and
+                   then match nothing. Port 0 is legal and simply dead. */ -}}
+            {{- $port := regexFind ":[0-9]+$" $rest }}
+            {{- if $port }}
+            {{- $digits := trimPrefix ":" $port }}
+            {{- $n := atoi $digits }}
+            {{- if gt $n 65535 }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: %s is not a port — a browser refuses a URL above 65535." . $port) }}
+            {{- end }}
+            {{- if ne (printf "%d" $n) $digits }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: a browser writes the port as %q, not %q." . (printf "%d" $n) $digits) }}
+            {{- end }}
+            {{- if or (and (hasPrefix "https://" $entry) (eq $n 443)) (and (hasPrefix "http://" $entry) (eq $n 80)) }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: a browser omits the scheme's default port — drop the %q." . $port) }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            - name: AISIX_CLOUD_CORS_ALLOWED_ORIGINS
+              value: {{ join "," . | quote }}
+            {{- end }}
             - name: AISIX_CLOUD_MASTER_KEY
               valueFrom:
                 secretKeyRef:
@@ -101,12 +256,12 @@ spec:
           #
           # 30 minutes, because a migration that REWRITES a table is
           # bounded by table size, not by a fixed bootstrap cost. The
-          # 0.9.0 widening of dpmgr_usage_events.request_id (uuid ->
-          # text) measured 6m21s on 10M rows — roughly what 30 days of
-          # retention holds at a sustained 4 req/s — and it scales
-          # linearly from there. The previous 5-minute budget would have
-          # turned that upgrade into the exact crash loop this probe
-          # exists to prevent.
+          # AISIX-Cloud#1288 widening of dpmgr_usage_events.request_id
+          # (uuid -> text) measured 6m21s on 10M rows — roughly what 30
+          # days of retention holds at a sustained 4 req/s — and it
+          # scales linearly from there. The previous 5-minute budget
+          # would have turned that upgrade into the exact crash loop
+          # this probe exists to prevent.
           #
           # The cost is that a genuinely wedged cp-api goes unrestarted
           # for up to 30 minutes on FIRST start only; once the probe

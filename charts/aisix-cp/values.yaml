@@ -17,6 +17,44 @@ api:
     ## to let Kubernetes allocate a port dynamically. Direct NodePort access
     ## is plain HTTP, so use a trusted private network or a TLS reverse proxy.
     nodePort: ""
+  ## Operator telemetry. Served on its OWN listener, never on the API port:
+  ## that one carries the Admin API and proxies the Dashboard and is the
+  ## externally reachable entry point, while these are internal operational
+  ## numbers (write volumes, resource cardinality). Nothing the Dashboard
+  ## shows comes from here. Metric names are the `aisix_cp_` family, so one
+  ## Prometheus can hold both planes and tell them apart by prefix.
+  metrics:
+    ## Serve Prometheus metrics from cp-api. On by default, matching the
+    ## gateway chart so both planes are scraped the same way; the port is
+    ## reachable only inside the cluster (ClusterIP). cp-api binds nothing
+    ## unless this sets the address, so turning it off leaves the port
+    ## genuinely unbound inside the pod rather than merely unexposed by
+    ## the Service.
+    enabled: true
+    ## Port the metrics listener binds inside the container
+    port: 9090
+    service:
+      ## Metrics Service port, on a separate ClusterIP Service so scraping
+      ## never rides the API Service
+      port: 9090
+      ## Extra annotations for the metrics Service, e.g. scrape hints for a
+      ## Prometheus that discovers by annotation rather than ServiceMonitor
+      annotations: {}
+    serviceMonitor:
+      ## Create a Prometheus Operator ServiceMonitor for the metrics Service
+      enabled: false
+      ## Namespace to create the ServiceMonitor in. Empty uses the release namespace
+      namespace: ""
+      ## Scrape interval
+      interval: 30s
+      ## Scrape timeout. Empty leaves the Prometheus default
+      scrapeTimeout: ""
+      ## Extra labels, e.g. the `release` label your Prometheus selects on
+      labels: {}
+      ## Scrape-time relabeling rules
+      relabelings: []
+      ## Metric relabeling rules
+      metricRelabelings: []
   resources:
     requests:
       cpu: 100m
@@ -24,11 +62,12 @@ api:
     limits:
       cpu: "1"
       memory: 512Mi
+  ## No runAsUser / runAsGroup / fsGroup: the image runs under whatever UID
+  ## the platform assigns (OpenShift's restricted-v2 SCC picks a random one),
+  ## and nothing here is written to a volume that would need a matching owner.
+  ## Set those three keys to pin a fixed UID back.
   podSecurityContext:
     runAsNonRoot: true
-    runAsUser: 10001
-    runAsGroup: 101
-    fsGroup: 101
     seccompProfile:
       type: RuntimeDefault
   securityContext:
@@ -48,6 +87,48 @@ api:
   ## Publicly reachable cp-api URL. When api.service.type is NodePort, this
   ## must name the API NodePort endpoint (or the TLS reverse proxy in front).
   publicBaseURL: "http://localhost:8080"
+  ## Browser origins allowed to call cp-api cross-origin, as bare origins
+  ## (scheme://host[:port]). Empty — the default — writes no CORS headers
+  ## at all, which is what a normal install wants: cp-api serves the API
+  ## and proxies the dashboard, so the browser has only one origin and
+  ## nothing is ever cross-origin.
+  ##
+  ## Populate it only to let a dashboard served from somewhere else reach
+  ## this API directly, such as a frontend-only PR preview.
+  ##
+  ## An entry is a bare origin (https://host[:port]), or `https://*` plus a
+  ## suffix — a PR preview's host carries the branch name, so an exact list
+  ## would mean redeploying cp-api for every pull request:
+  ##
+  ##   corsAllowedOrigins:
+  ##     - https://*-api7ai.vercel.app
+  ##
+  ## Read the suffix as collision-resistance, NOT as a guarantee. It is a
+  ## byte suffix: "-" is legal inside a DNS label rather than a separator,
+  ## and a .vercel.app name is allocated first-come-first-served from a
+  ## project name its owner picks, so another account can claim one ending
+  ## the same way. A grant that needs a real boundary belongs on a domain
+  ## you control — point previews at one with Vercel's preview deployment
+  ## suffix and allowlist https://*.preview.<your-domain>.
+  ##
+  ## The governing rule: an entry must be spelled the way a BROWSER
+  ## serializes an origin. Anything that parses but serializes differently
+  ## could never equal an Origin header, so it is refused here with the
+  ## spelling to use rather than accepted as an entry that quietly matches
+  ## nothing. cp-api applies the same rules at startup, so a value this
+  ## chart accepts is one it will start with.
+  ##
+  ## Refused: bare "*", a suffix not starting with "-" or ".", a suffix
+  ## naming fewer than three labels (https://*.vercel.app would cover every
+  ## project on that host), anything carrying a path, query, fragment or
+  ## userinfo, a trailing dot, any non-https origin (loopback may use
+  ## http), an internationalized host given as anything but its punycode
+  ## form, a host whose last label is numeric without being a dotted quad
+  ## (a browser re-reads https://2130706433 as https://127.0.0.1), an IPv6
+  ## address written in any spelling but the one it is sent in, the
+  ## scheme's default port written out (":443" on https), a port carrying
+  ## a leading zero, and a port above 65535.
+  corsAllowedOrigins: []
   ## dp-manager /dp/* mTLS endpoint that data-plane hosts dial, as baked
   ## into the generated install snippets. Also passed to the dpm
   ## deployment, which seeds this host into the TLS server certificate it
@@ -90,11 +171,12 @@ dpm:
     limits:
       cpu: "1"
       memory: 512Mi
+  ## No runAsUser / runAsGroup / fsGroup: the image runs under whatever UID
+  ## the platform assigns (OpenShift's restricted-v2 SCC picks a random one),
+  ## and nothing here is written to a volume that would need a matching owner.
+  ## Set those three keys to pin a fixed UID back.
   podSecurityContext:
     runAsNonRoot: true
-    runAsUser: 10001
-    runAsGroup: 101
-    fsGroup: 101
     seccompProfile:
       type: RuntimeDefault
   securityContext:
@@ -135,11 +217,12 @@ ui:
     limits:
       cpu: 500m
       memory: 256Mi
+  ## No runAsUser / runAsGroup / fsGroup: the image runs under whatever UID
+  ## the platform assigns (OpenShift's restricted-v2 SCC picks a random one).
+  ## The .next/cache emptyDir needs no fsGroup to be writable — the kubelet
+  ## creates it world-writable. Set those three keys to pin a fixed UID back.
   podSecurityContext:
     runAsNonRoot: true
-    runAsUser: 1001
-    runAsGroup: 65533
-    fsGroup: 65533
     seccompProfile:
       type: RuntimeDefault
   securityContext:
@@ -181,9 +264,30 @@ secrets:
 ## Set builtin=false and configure externalDatabase to use an existing PostgreSQL instance.
 ## API/DPM wait for PostgreSQL only in builtin mode.
 ## An external database must be ready before starting the control plane.
+##
+## The bundled Bitnami subchart pins a UID of its own — fsGroup 1001 in
+## primary.podSecurityContext and runAsUser 1001 in
+## primary.containerSecurityContext, both behind `enabled: true`. A subchart's
+## values cannot be made conditional from here, so on a platform that assigns
+## the UID itself (OpenShift's restricted-v2 SCC) turn those two off at install
+## time:
+##
+##   --set postgresql.primary.podSecurityContext.enabled=false \
+##   --set postgresql.primary.containerSecurityContext.enabled=false
+##
+## Nothing else needs disabling. volumePermissions (the root chown init
+## container) is already off by default, and the /dev/shm emptyDir needs no
+## fsGroup — the kubelet mounts it world-writable. Turning shmVolume off would
+## drop PostgreSQL back to the runtime's 64Mi /dev/shm and break parallel
+## query with "could not resize shared memory segment".
+##
 postgresql:
   builtin: true
   fullnameOverride: ""
+  ## Also used by the wait-for-pg init container on the api and dpm pods, which
+  ## carries no securityContext of its own: since the chart supplies no
+  ## runAsUser, `runAsNonRoot: true` is checked against THIS image's USER, and a
+  ## replacement that runs as root (or names its user) is refused at admission.
   image:
     registry: docker.io
     repository: api7/postgresql
