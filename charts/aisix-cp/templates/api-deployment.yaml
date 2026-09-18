@@ -140,16 +140,26 @@ spec:
             {{- if or (regexMatch "(^|:)0{1,4}(:|$)" $inner) (regexMatch "(^|:)0[0-9a-f]" $inner) }}
             {{- fail (printf "api.corsAllowedOrigins entry %q: an IPv6 origin must be written the way a browser sends it — compress the zero hextets and drop the leading zeros." .) }}
             {{- end }}
-            {{- /* Over this alphabet — the `$rest` pattern above admits only
-                   hex digits and colons between the brackets — an address is
-                   valid exactly when it carries at most one `::`, spells every
-                   group as one to four hex digits, and begins and ends on a
-                   group or on the `::` itself. Each rule below is one of those
-                   clauses, and together they are the whole of validity: a
-                   shape none of them refuses is one net.ParseIP accepts.
-                   Counting groups alone left `1::2::3`, `:::`, `12345::1`,
-                   `:1::2` and `1::2:` rendering, and cp-api then refused all
-                   five at startup. */ -}}
+            {{- /* Counting groups alone is not enough to tell an address from
+                   a typo: `without … ""` drops the empty components a doubled
+                   or misplaced colon produces, so `1::2::3`, `:::`, `1:::2`,
+                   `12345::1`, `1:2:3:4:5:6:7:8:`, `:1:2:3:4:5:6:7:8`, `1::2:`
+                   and `:1::2` all reached the count as if well formed, and
+                   cp-api refused every one of them at startup.
+
+                   The three rules below refuse a spelling that is not an
+                   address at all: more than one `::`, a group that is not one
+                   to four hex digits, and a colon on either end that is not
+                   part of the `::`.
+
+                   They do NOT establish that what survives is a spelling
+                   cp-api takes. That test is `ip.String() == host` — the
+                   canonical form, which is stricter than parsing — and only
+                   the shared case list decides whether the two agree. Add a
+                   case to internal/cpapi/cors/testdata/origin-cases.txt; the
+                   parity step in .github/workflows/ci-helm.yml runs the whole
+                   list through this template and through cp-api and fails on
+                   any entry they answer differently. */ -}}
             {{- $groups := without (splitList ":" $inner) "" }}
             {{- if or (contains ":::" $inner) (gt (len (splitList "::" $inner)) 2) }}
             {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — `::` may appear once, and stands for the omitted groups." .) }}
