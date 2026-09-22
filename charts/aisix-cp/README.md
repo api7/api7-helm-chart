@@ -390,117 +390,117 @@ api:
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| api.affinity | object | `{}` |  |
-| api.corsAllowedOrigins | list | `[]` |  |
-| api.dpImage | string | `""` |  |
-| api.dpmgrBaseURL | string | `""` |  |
-| api.extraEnvVars | list | `[]` |  |
-| api.image.pullPolicy | string | `"IfNotPresent"` |  |
-| api.image.repository | string | `"docker.io/api7/aisix-cp-api"` |  |
-| api.image.tag | string | `""` |  |
-| api.metrics.enabled | bool | `true` |  |
-| api.metrics.port | int | `9090` |  |
-| api.metrics.service.annotations | object | `{}` |  |
-| api.metrics.service.port | int | `9090` |  |
-| api.metrics.serviceMonitor.enabled | bool | `false` |  |
-| api.metrics.serviceMonitor.interval | string | `"30s"` |  |
-| api.metrics.serviceMonitor.labels | object | `{}` |  |
-| api.metrics.serviceMonitor.metricRelabelings | list | `[]` |  |
-| api.metrics.serviceMonitor.namespace | string | `""` |  |
-| api.metrics.serviceMonitor.relabelings | list | `[]` |  |
-| api.metrics.serviceMonitor.scrapeTimeout | string | `""` |  |
-| api.nodeSelector | object | `{}` |  |
-| api.notifyAllowPrivateURLs | bool | `false` |  |
-| api.oauthEnabled | bool | `false` |  |
-| api.playgroundAllowPrivateIPs | bool | `false` |  |
-| api.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| api.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
-| api.publicBaseURL | string | `"http://localhost:8080"` |  |
-| api.replicaCount | int | `1` |  |
-| api.resources.limits.cpu | string | `"1"` |  |
-| api.resources.limits.memory | string | `"512Mi"` |  |
-| api.resources.requests.cpu | string | `"100m"` |  |
-| api.resources.requests.memory | string | `"128Mi"` |  |
-| api.securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| api.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| api.securityContext.readOnlyRootFilesystem | bool | `true` |  |
-| api.service.nodePort | string | `""` |  |
-| api.service.port | int | `8080` |  |
-| api.service.type | string | `"ClusterIP"` |  |
-| api.tolerations | list | `[]` |  |
-| dpm.affinity | object | `{}` |  |
-| dpm.extraEnvVars | list | `[]` |  |
-| dpm.image.pullPolicy | string | `"IfNotPresent"` |  |
-| dpm.image.repository | string | `"docker.io/api7/aisix-cp-dpm"` |  |
-| dpm.image.tag | string | `""` |  |
-| dpm.nodeSelector | object | `{}` |  |
-| dpm.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| dpm.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
-| dpm.replicaCount | int | `1` |  |
-| dpm.resources.limits.cpu | string | `"1"` |  |
-| dpm.resources.limits.memory | string | `"512Mi"` |  |
-| dpm.resources.requests.cpu | string | `"100m"` |  |
-| dpm.resources.requests.memory | string | `"128Mi"` |  |
-| dpm.securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| dpm.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| dpm.securityContext.readOnlyRootFilesystem | bool | `true` |  |
-| dpm.service.healthListen | string | `":7946"` |  |
-| dpm.service.nodePort | string | `""` |  |
-| dpm.service.port | int | `7944` |  |
-| dpm.service.type | string | `"ClusterIP"` |  |
-| dpm.tolerations | list | `[]` |  |
-| externalDatabase.database | string | `"aisix_cloud"` |  |
-| externalDatabase.existingSecret | string | `""` |  |
-| externalDatabase.host | string | `""` |  |
-| externalDatabase.password | string | `""` |  |
-| externalDatabase.port | int | `5432` |  |
-| externalDatabase.sslmode | string | `"disable"` |  |
-| externalDatabase.username | string | `"aisix"` |  |
-| global.imagePullSecrets | list | `[]` |  |
-| global.storageClass | string | `""` |  |
-| postgresql.auth.database | string | `"aisix_cloud"` |  |
-| postgresql.auth.existingSecret | string | `""` |  |
-| postgresql.auth.password | string | `"changeme"` |  |
-| postgresql.auth.postgresPassword | string | `"changeme"` |  |
-| postgresql.auth.usePostgresUserForAppConnections | bool | `true` |  |
-| postgresql.auth.username | string | `"aisix"` |  |
-| postgresql.builtin | bool | `true` |  |
-| postgresql.fullnameOverride | string | `""` |  |
-| postgresql.image.registry | string | `"docker.io"` |  |
-| postgresql.image.repository | string | `"api7/postgresql"` |  |
-| postgresql.image.tag | string | `"15.4.0-debian-11-r45"` |  |
-| postgresql.primary.persistence.size | string | `"8Gi"` |  |
-| postgresql.primary.service.ports.postgresql | int | `5432` |  |
-| secrets.betterAuthSecret | string | `"CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_48"` |  |
-| secrets.masterKey | string | `"CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_32"` |  |
-| secrets.masterKeyID | string | `"env:default"` |  |
-| serviceAccount.annotations | object | `{}` |  |
-| serviceAccount.create | bool | `true` |  |
-| serviceAccount.name | string | `""` |  |
-| twoDSN.enabled | bool | `false` |  |
-| twoDSN.existingSecret | string | `""` |  |
-| twoDSN.existingSecretKey | string | `"serving-password"` |  |
-| twoDSN.servingPassword | string | `""` |  |
-| ui.affinity | object | `{}` |  |
-| ui.defaultLocale | string | `"en"` |  |
-| ui.extraEnvVars | list | `[]` |  |
+| api.affinity | object | `{}` | Affinity rules for the cp-api pod |
+| api.corsAllowedOrigins | list | `[]` | Browser origins allowed to call cp-api cross-origin, as bare origins (scheme://host[:port]). Empty — the default — writes no CORS headers at all, which is what a normal install wants: cp-api serves the API and proxies the dashboard, so the browser has only one origin and nothing is ever cross-origin. Populate it only to let a dashboard served from somewhere else reach this API directly, such as a frontend-only PR preview. An entry is a bare origin (https://host[:port]), or `https://*` plus a suffix naming at least three labels (`https://*-api7ai.vercel.app`) — a PR preview's host carries the branch name, so an exact list would mean redeploying cp-api for every pull request. Read the suffix as collision-resistance, NOT as a guarantee: it is a byte suffix, and on a shared host like `.vercel.app` another account can claim a name ending the same way, so a grant that needs a real boundary belongs on a domain you control. Every entry must be spelled the way a BROWSER serializes an origin, and the chart refuses one that is not, naming the spelling to use — a bare `*`, a path, query, fragment or userinfo, a trailing dot, a non-https origin (loopback may use http), an internationalized host given as anything but punycode, a numeric last label that is not a dotted quad, an IPv6 address in any spelling but the one it is sent in, the scheme's default port written out, a port with a leading zero, and a port above 65535. cp-api applies the same rules at startup, so a value this chart accepts is one it will start with. |
+| api.dpImage | string | `""` | Gateway image the console hands out in the install snippets it generates for a new data plane |
+| api.dpmgrBaseURL | string | `""` | dp-manager /dp/* mTLS endpoint that data-plane hosts dial, as baked into the generated install snippets. Also passed to the dpm deployment, which seeds this host into the TLS server certificate it presents — so an IP address works here, not only a DNS name. When dpm.service.type is NodePort, use https://<node-ip>:<dpm-node-port>. |
+| api.extraEnvVars | list | `[]` | Extra environment for cp-api. This is also where AISIX_ALLOW_UNSUPPORTED_UPGRADE=1 goes when an upgrade has to proceed from a release older than this one supports upgrading from — cp-api refuses that upgrade at startup and names the version it needs. |
+| api.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| api.image.repository | string | `"docker.io/api7/aisix-cp-api"` | cp-api image repository |
+| api.image.tag | string | `""` | Image tag |
+| api.metrics.enabled | bool | `true` | Serve Prometheus metrics from cp-api. On by default, matching the gateway chart so both planes are scraped the same way; the port is reachable only inside the cluster (ClusterIP). cp-api binds nothing unless this sets the address, so turning it off leaves the port genuinely unbound inside the pod rather than merely unexposed by the Service. |
+| api.metrics.port | int | `9090` | Port the metrics listener binds inside the container |
+| api.metrics.service.annotations | object | `{}` | Extra annotations for the metrics Service, e.g. scrape hints for a Prometheus that discovers by annotation rather than ServiceMonitor |
+| api.metrics.service.port | int | `9090` | Metrics Service port, on a separate ClusterIP Service so scraping never rides the API Service |
+| api.metrics.serviceMonitor.enabled | bool | `false` | Create a Prometheus Operator ServiceMonitor for the metrics Service |
+| api.metrics.serviceMonitor.interval | string | `"30s"` | Scrape interval |
+| api.metrics.serviceMonitor.labels | object | `{}` | Extra labels, e.g. the `release` label your Prometheus selects on |
+| api.metrics.serviceMonitor.metricRelabelings | list | `[]` | Metric relabeling rules |
+| api.metrics.serviceMonitor.namespace | string | `""` | Namespace to create the ServiceMonitor in. Empty uses the release namespace |
+| api.metrics.serviceMonitor.relabelings | list | `[]` | Scrape-time relabeling rules |
+| api.metrics.serviceMonitor.scrapeTimeout | string | `""` | Scrape timeout. Empty leaves the Prometheus default |
+| api.nodeSelector | object | `{}` | Node selector for the cp-api pod |
+| api.notifyAllowPrivateURLs | bool | `false` | Allow notification channels (budget alert webhooks / Slack) to point at private / internal addresses. Blocked by default (SSRF guard); enable only for On-Premises deployments whose webhook receivers live on an intranet the cp-api pod can route to. |
+| api.oauthEnabled | bool | `false` | Offer Google / GitHub sign-in on the console's login page. Leave off unless the deployment carries OAuth client credentials |
+| api.playgroundAllowPrivateIPs | bool | `false` | Allow the dashboard playground to reach LLM endpoints on private / internal networks. cp-api blocks private IPs by default (SSRF guard); enable this only for On-Premises deployments whose models live on an internal network the cp-api pod can route to. |
+| api.podSecurityContext.runAsNonRoot | bool | `true` | Refuse to run the cp-api pod as root |
+| api.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` | Seccomp profile for the cp-api pod |
+| api.publicBaseURL | string | `"http://localhost:8080"` | Publicly reachable cp-api URL. Better Auth validates the session JWT issuer against it, so a value that does not match the address the browser uses breaks sign-in. When api.service.type is NodePort, this must name the API NodePort endpoint (or the TLS reverse proxy in front). |
+| api.replicaCount | int | `1` | Number of cp-api replicas |
+| api.resources.limits.cpu | string | `"1"` | cp-api CPU limit |
+| api.resources.limits.memory | string | `"512Mi"` | cp-api memory limit |
+| api.resources.requests.cpu | string | `"100m"` | cp-api CPU request |
+| api.resources.requests.memory | string | `"128Mi"` | cp-api memory request |
+| api.securityContext.allowPrivilegeEscalation | bool | `false` | Forbid privilege escalation in the cp-api container |
+| api.securityContext.capabilities.drop | list | `["ALL"]` | Linux capabilities dropped from the cp-api container |
+| api.securityContext.readOnlyRootFilesystem | bool | `true` | Mount the cp-api root filesystem read-only |
+| api.service.nodePort | string | `""` | Optional fixed NodePort. Used only when type is NodePort; leave empty to let Kubernetes allocate a port dynamically. Direct NodePort access is plain HTTP, so use a trusted private network or a TLS reverse proxy. |
+| api.service.port | int | `8080` | cp-api Service port. This port carries both the Admin API and the Dashboard |
+| api.service.type | string | `"ClusterIP"` | cp-api Service type. ClusterIP keeps it inside the cluster; use NodePort or an Ingress to reach the console from outside |
+| api.tolerations | list | `[]` | Tolerations for the cp-api pod |
+| dpm.affinity | object | `{}` | Affinity rules for the dp-manager pod |
+| dpm.extraEnvVars | list | `[]` | Extra environment for dp-manager |
+| dpm.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| dpm.image.repository | string | `"docker.io/api7/aisix-cp-dpm"` | dp-manager image repository |
+| dpm.image.tag | string | `""` | Image tag |
+| dpm.nodeSelector | object | `{}` | Node selector for the dp-manager pod |
+| dpm.podSecurityContext.runAsNonRoot | bool | `true` | Refuse to run the dp-manager pod as root |
+| dpm.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` | Seccomp profile for the dp-manager pod |
+| dpm.replicaCount | int | `1` | Number of dp-manager replicas |
+| dpm.resources.limits.cpu | string | `"1"` | dp-manager CPU limit |
+| dpm.resources.limits.memory | string | `"512Mi"` | dp-manager memory limit |
+| dpm.resources.requests.cpu | string | `"100m"` | dp-manager CPU request |
+| dpm.resources.requests.memory | string | `"128Mi"` | dp-manager memory request |
+| dpm.securityContext.allowPrivilegeEscalation | bool | `false` | Forbid privilege escalation in the dp-manager container |
+| dpm.securityContext.capabilities.drop | list | `["ALL"]` | Linux capabilities dropped from the dp-manager container |
+| dpm.securityContext.readOnlyRootFilesystem | bool | `true` | Mount the dp-manager root filesystem read-only |
+| dpm.service.healthListen | string | `":7946"` | Plain-HTTP listen address for /healthz (outbox-poller liveness), probed by the kubelet (the mTLS port 7944 cannot be probed). Set to "" to disable the health server + httpGet probes (the probes then fall back to a TCP check on the mTLS port). |
+| dpm.service.nodePort | string | `""` | Optional fixed NodePort for the mTLS port. Used only when type is NodePort; leave empty to let Kubernetes allocate one |
+| dpm.service.port | int | `7944` | dp-manager mTLS Service port, the one gateways dial |
+| dpm.service.type | string | `"ClusterIP"` | dp-manager Service type. Use NodePort or a LoadBalancer when the gateways run outside this cluster |
+| dpm.tolerations | list | `[]` | Tolerations for the dp-manager pod |
+| externalDatabase.database | string | `"aisix_cloud"` | Database name |
+| externalDatabase.existingSecret | string | `""` | Name of an existing Secret containing the database password (key: "password"). |
+| externalDatabase.host | string | `""` | PostgreSQL host |
+| externalDatabase.password | string | `""` | If existingSecret is empty, this password is used directly. Use a URL-safe value: it is embedded in a `postgres://` DSN |
+| externalDatabase.port | int | `5432` | PostgreSQL port |
+| externalDatabase.sslmode | string | `"disable"` | libpq sslmode for the connection, e.g. `require` or `verify-full` for a managed database reached over a network you do not control |
+| externalDatabase.username | string | `"aisix"` | Database role the control plane connects as. It has to be able to run the schema migrations cp-api applies at startup |
+| global.imagePullSecrets | list | `[]` | Image pull secrets applied to every pod created by this chart |
+| global.storageClass | string | `""` | StorageClass for the built-in PostgreSQL volume. Empty uses the cluster's default StorageClass |
+| postgresql.auth.database | string | `"aisix_cloud"` | Database name the control plane uses |
+| postgresql.auth.existingSecret | string | `""` | Inject DB credentials from a pre-created Secret instead of the values below (the secure path). When set, the password fields are ignored and the placeholder rejection is skipped. |
+| postgresql.auth.password | string | `"changeme"` | REQUIRED with builtin=true (unless existingSecret is set). Password for the application role. The chart REJECTS the default `changeme` at render time. Generate a URL-SAFE value with `openssl rand -hex 24`: the password is embedded in a `postgres://` DSN, so the `+`, `/` and `=` that `openssl rand -base64` produces corrupt URL parsing. PostgreSQL bakes it into the data volume on first init, so it has to stay the same across re-deploys |
+| postgresql.auth.postgresPassword | string | `"changeme"` | REQUIRED with builtin=true (unless existingSecret is set). Password for the PostgreSQL superuser, under the same URL-safe rule and the same placeholder rejection as `password` above |
+| postgresql.auth.usePostgresUserForAppConnections | bool | `true` | Use the built-in PostgreSQL superuser for application connections. cp-api currently runs schema and role migrations on startup, including ALTER ROLE statements that require superuser privileges. |
+| postgresql.auth.username | string | `"aisix"` | Application database role cp-api connects as when usePostgresUserForAppConnections is false |
+| postgresql.builtin | bool | `true` | Deploy the bundled PostgreSQL subchart. Set to false to point the control plane at the database configured under externalDatabase |
+| postgresql.fullnameOverride | string | `""` | Override the generated name of the PostgreSQL resources |
+| postgresql.image.registry | string | `"docker.io"` | PostgreSQL image registry |
+| postgresql.image.repository | string | `"api7/postgresql"` | PostgreSQL image repository |
+| postgresql.image.tag | string | `"15.4.0-debian-11-r45"` | PostgreSQL image tag |
+| postgresql.primary.persistence.size | string | `"8Gi"` | Size of the PostgreSQL data volume. It holds every configured resource plus the request telemetry the console reports on |
+| postgresql.primary.service.ports.postgresql | int | `5432` | PostgreSQL Service port |
+| secrets.betterAuthSecret | string | `"CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_48"` | REQUIRED. HMAC signing secret for Better Auth sessions. Generate with `openssl rand -base64 48`. Changing it signs every signed-in user out |
+| secrets.masterKey | string | `"CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_32"` | REQUIRED. Base64-encoded 32-byte AES-256 key that envelope-encrypts the stored upstream provider credentials. Generate with `openssl rand -base64 32`. It is the only thing that can decrypt what was stored under it, so a lost key means re-entering every provider key |
+| secrets.masterKeyID | string | `"env:default"` | Identifier recorded alongside every value encrypted with the current master key, so a future key rotation can tell the generations apart |
+| serviceAccount.annotations | object | `{}` | Annotations for the ServiceAccount, e.g. a cloud IAM role binding |
+| serviceAccount.create | bool | `true` | Create a ServiceAccount for the control-plane pods |
+| serviceAccount.name | string | `""` | Name of the ServiceAccount. Empty derives one from the release name; set it to use a ServiceAccount you manage yourself (create: false) |
+| twoDSN.enabled | bool | `false` | Open a second, Row-Level-Security-enforced pool for tenant queries. Leave off for an On-Premises deployment |
+| twoDSN.existingSecret | string | `""` | Optionally source the serving password from an existing Secret instead of servingPassword above. Key defaults to "serving-password". |
+| twoDSN.existingSecretKey | string | `"serving-password"` | Key inside twoDSN.existingSecret holding the serving password |
+| twoDSN.servingPassword | string | `""` | Password cp-api assigns to the cp_api_app serving role and uses in the serving DSN. Required when enabled unless existingSecret is set. Use a URL-safe value, from `openssl rand -hex 24`: it is embedded in a `postgres://` DSN, so `+`, `/` and `=` corrupt URL parsing |
+| ui.affinity | object | `{}` | Affinity rules for the dashboard pod |
+| ui.defaultLocale | string | `"en"` | Fixed dashboard UI language for this deployment. Supported: "en", "zh". There is no in-UI language switcher; the whole console renders in this locale (default English). Read server-side at request time. |
+| ui.extraEnvVars | list | `[]` | Extra environment for the dashboard |
 | ui.extraVolumeMounts | list | `[]` | Additional mounts for the dashboard container. Use readOnly for CA certificates. |
 | ui.extraVolumes | list | `[]` | Additional volumes for the dashboard Pod (for example, a private database CA). |
-| ui.image.pullPolicy | string | `"IfNotPresent"` |  |
-| ui.image.repository | string | `"docker.io/api7/aisix-cp-ui"` |  |
-| ui.image.tag | string | `""` |  |
-| ui.nodeSelector | object | `{}` |  |
-| ui.podSecurityContext.runAsNonRoot | bool | `true` |  |
-| ui.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` |  |
-| ui.replicaCount | int | `1` |  |
-| ui.resources.limits.cpu | string | `"500m"` |  |
-| ui.resources.limits.memory | string | `"256Mi"` |  |
-| ui.resources.requests.cpu | string | `"50m"` |  |
-| ui.resources.requests.memory | string | `"64Mi"` |  |
-| ui.securityContext.allowPrivilegeEscalation | bool | `false` |  |
-| ui.securityContext.capabilities.drop[0] | string | `"ALL"` |  |
-| ui.securityContext.readOnlyRootFilesystem | bool | `true` |  |
-| ui.service.nodePort | string | `""` |  |
-| ui.service.port | int | `3000` |  |
-| ui.service.type | string | `"ClusterIP"` |  |
-| ui.tolerations | list | `[]` |  |
+| ui.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
+| ui.image.repository | string | `"docker.io/api7/aisix-cp-ui"` | Dashboard image repository |
+| ui.image.tag | string | `""` | Image tag |
+| ui.nodeSelector | object | `{}` | Node selector for the dashboard pod |
+| ui.podSecurityContext.runAsNonRoot | bool | `true` | Refuse to run the dashboard pod as root |
+| ui.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` | Seccomp profile for the dashboard pod |
+| ui.replicaCount | int | `1` | Number of dashboard replicas |
+| ui.resources.limits.cpu | string | `"500m"` | Dashboard CPU limit |
+| ui.resources.limits.memory | string | `"256Mi"` | Dashboard memory limit |
+| ui.resources.requests.cpu | string | `"50m"` | Dashboard CPU request |
+| ui.resources.requests.memory | string | `"64Mi"` | Dashboard memory request |
+| ui.securityContext.allowPrivilegeEscalation | bool | `false` | Forbid privilege escalation in the dashboard container |
+| ui.securityContext.capabilities.drop | list | `["ALL"]` | Linux capabilities dropped from the dashboard container |
+| ui.securityContext.readOnlyRootFilesystem | bool | `true` | Mount the dashboard root filesystem read-only |
+| ui.service.nodePort | string | `""` | Optional fixed NodePort. Used only when type is NodePort; leave empty to let Kubernetes allocate a port dynamically. This plain-HTTP endpoint is not a standalone Dashboard entry point: use it only behind a same-origin reverse proxy that sends Dashboard pages here and /api/* to cp-api. The proxy should terminate TLS unless it is on a trusted network. |
+| ui.service.port | int | `3000` | Dashboard Service port, which cp-api proxies browser traffic to |
+| ui.service.type | string | `"ClusterIP"` | Dashboard Service type |
+| ui.tolerations | list | `[]` | Tolerations for the dashboard pod |
