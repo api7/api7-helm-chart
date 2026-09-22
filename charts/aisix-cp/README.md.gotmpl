@@ -378,4 +378,9 @@ api:
 
 ## Parameters
 
+An empty `api.image.tag`, `dpm.image.tag` or `ui.image.tag` resolves to the
+chart's `appVersion`, and an empty `api.dpImage` to
+`docker.io/api7/aisix:<appVersion>`, so a default install runs the control
+plane and hands out the gateway image from the same release as the chart.
+
 {{ template "chart.valuesSection" . }}

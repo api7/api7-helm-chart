@@ -1,21 +1,35 @@
 ## @section Global parameters
 global:
+  # -- StorageClass for the built-in PostgreSQL volume. Empty uses the
+  # cluster's default StorageClass
   storageClass: ""
+  # -- Image pull secrets applied to every pod created by this chart
   imagePullSecrets: []
 
 ## @section cp-api
+##
+## cp-api serves the Admin API and reverse-proxies the Dashboard, so it is the
+## one entry point a browser talks to.
 api:
+  # -- Number of cp-api replicas
   replicaCount: 1
   image:
+    # -- cp-api image repository
     repository: docker.io/api7/aisix-cp-api
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+    # -- Image tag
     tag: ""  # empty -> .Chart.AppVersion
   service:
+    # -- cp-api Service type. ClusterIP keeps it inside the cluster; use
+    # NodePort or an Ingress to reach the console from outside
     type: ClusterIP
+    # -- cp-api Service port. This port carries both the Admin API and the
+    # Dashboard
     port: 8080
-    ## Optional fixed NodePort. Used only when type is NodePort; leave empty
-    ## to let Kubernetes allocate a port dynamically. Direct NodePort access
-    ## is plain HTTP, so use a trusted private network or a TLS reverse proxy.
+    # -- Optional fixed NodePort. Used only when type is NodePort; leave empty
+    # to let Kubernetes allocate a port dynamically. Direct NodePort access
+    # is plain HTTP, so use a trusted private network or a TLS reverse proxy.
     nodePort: ""
   ## Operator telemetry. Served on its OWN listener, never on the API port:
   ## that one carries the Admin API and proxies the Dashboard and is the
@@ -24,216 +38,264 @@ api:
   ## shows comes from here. Metric names are the `aisix_cp_` family, so one
   ## Prometheus can hold both planes and tell them apart by prefix.
   metrics:
-    ## Serve Prometheus metrics from cp-api. On by default, matching the
-    ## gateway chart so both planes are scraped the same way; the port is
-    ## reachable only inside the cluster (ClusterIP). cp-api binds nothing
-    ## unless this sets the address, so turning it off leaves the port
-    ## genuinely unbound inside the pod rather than merely unexposed by
-    ## the Service.
+    # -- Serve Prometheus metrics from cp-api. On by default, matching the
+    # gateway chart so both planes are scraped the same way; the port is
+    # reachable only inside the cluster (ClusterIP). cp-api binds nothing
+    # unless this sets the address, so turning it off leaves the port
+    # genuinely unbound inside the pod rather than merely unexposed by
+    # the Service.
     enabled: true
-    ## Port the metrics listener binds inside the container
+    # -- Port the metrics listener binds inside the container
     port: 9090
     service:
-      ## Metrics Service port, on a separate ClusterIP Service so scraping
-      ## never rides the API Service
+      # -- Metrics Service port, on a separate ClusterIP Service so scraping
+      # never rides the API Service
       port: 9090
-      ## Extra annotations for the metrics Service, e.g. scrape hints for a
-      ## Prometheus that discovers by annotation rather than ServiceMonitor
+      # -- Extra annotations for the metrics Service, e.g. scrape hints for a
+      # Prometheus that discovers by annotation rather than ServiceMonitor
       annotations: {}
     serviceMonitor:
-      ## Create a Prometheus Operator ServiceMonitor for the metrics Service
+      # -- Create a Prometheus Operator ServiceMonitor for the metrics Service
       enabled: false
-      ## Namespace to create the ServiceMonitor in. Empty uses the release namespace
+      # -- Namespace to create the ServiceMonitor in. Empty uses the release
+      # namespace
       namespace: ""
-      ## Scrape interval
+      # -- Scrape interval
       interval: 30s
-      ## Scrape timeout. Empty leaves the Prometheus default
+      # -- Scrape timeout. Empty leaves the Prometheus default
       scrapeTimeout: ""
-      ## Extra labels, e.g. the `release` label your Prometheus selects on
+      # -- Extra labels, e.g. the `release` label your Prometheus selects on
       labels: {}
-      ## Scrape-time relabeling rules
+      # -- Scrape-time relabeling rules
       relabelings: []
-      ## Metric relabeling rules
+      # -- Metric relabeling rules
       metricRelabelings: []
   resources:
     requests:
+      # -- cp-api CPU request
       cpu: 100m
+      # -- cp-api memory request
       memory: 128Mi
     limits:
+      # -- cp-api CPU limit
       cpu: "1"
+      # -- cp-api memory limit
       memory: 512Mi
   ## No runAsUser / runAsGroup / fsGroup: the image runs under whatever UID
   ## the platform assigns (OpenShift's restricted-v2 SCC picks a random one),
   ## and nothing here is written to a volume that would need a matching owner.
   ## Set those three keys to pin a fixed UID back.
   podSecurityContext:
+    # -- Refuse to run the cp-api pod as root
     runAsNonRoot: true
     seccompProfile:
+      # -- Seccomp profile for the cp-api pod
       type: RuntimeDefault
   securityContext:
+    # -- Forbid privilege escalation in the cp-api container
     allowPrivilegeEscalation: false
+    # -- Mount the cp-api root filesystem read-only
     readOnlyRootFilesystem: true
     capabilities:
+      # -- Linux capabilities dropped from the cp-api container
       drop:
         - ALL
+  # -- Node selector for the cp-api pod
   nodeSelector: {}
+  # -- Tolerations for the cp-api pod
   tolerations: []
+  # -- Affinity rules for the cp-api pod
   affinity: {}
-  ## Extra environment for cp-api. This is also where
-  ## AISIX_ALLOW_UNSUPPORTED_UPGRADE=1 goes when an upgrade has to proceed
-  ## from a release older than this one supports upgrading from — cp-api
-  ## refuses that upgrade at startup and names the version it needs.
+  # -- Extra environment for cp-api. This is also where
+  # AISIX_ALLOW_UNSUPPORTED_UPGRADE=1 goes when an upgrade has to proceed
+  # from a release older than this one supports upgrading from — cp-api
+  # refuses that upgrade at startup and names the version it needs.
   extraEnvVars: []
-  ## Publicly reachable cp-api URL. When api.service.type is NodePort, this
-  ## must name the API NodePort endpoint (or the TLS reverse proxy in front).
+  # -- Publicly reachable cp-api URL. Better Auth validates the session JWT
+  # issuer against it, so a value that does not match the address the browser
+  # uses breaks sign-in. When api.service.type is NodePort, this must name the
+  # API NodePort endpoint (or the TLS reverse proxy in front).
   publicBaseURL: "http://localhost:8080"
-  ## Browser origins allowed to call cp-api cross-origin, as bare origins
-  ## (scheme://host[:port]). Empty — the default — writes no CORS headers
-  ## at all, which is what a normal install wants: cp-api serves the API
-  ## and proxies the dashboard, so the browser has only one origin and
-  ## nothing is ever cross-origin.
-  ##
-  ## Populate it only to let a dashboard served from somewhere else reach
-  ## this API directly, such as a frontend-only PR preview.
-  ##
-  ## An entry is a bare origin (https://host[:port]), or `https://*` plus a
-  ## suffix — a PR preview's host carries the branch name, so an exact list
-  ## would mean redeploying cp-api for every pull request:
-  ##
-  ##   corsAllowedOrigins:
-  ##     - https://*-api7ai.vercel.app
-  ##
-  ## Read the suffix as collision-resistance, NOT as a guarantee. It is a
-  ## byte suffix: "-" is legal inside a DNS label rather than a separator,
-  ## and a .vercel.app name is allocated first-come-first-served from a
-  ## project name its owner picks, so another account can claim one ending
-  ## the same way. A grant that needs a real boundary belongs on a domain
-  ## you control — point previews at one with Vercel's preview deployment
-  ## suffix and allowlist https://*.preview.<your-domain>.
-  ##
-  ## The governing rule: an entry must be spelled the way a BROWSER
-  ## serializes an origin. Anything that parses but serializes differently
-  ## could never equal an Origin header, so it is refused here with the
-  ## spelling to use rather than accepted as an entry that quietly matches
-  ## nothing. cp-api applies the same rules at startup, so a value this
-  ## chart accepts is one it will start with.
-  ##
-  ## Refused: bare "*", a suffix not starting with "-" or ".", a suffix
-  ## naming fewer than three labels (https://*.vercel.app would cover every
-  ## project on that host), anything carrying a path, query, fragment or
-  ## userinfo, a trailing dot, any non-https origin (loopback may use
-  ## http), an internationalized host given as anything but its punycode
-  ## form, a host whose last label is numeric without being a dotted quad
-  ## (a browser re-reads https://2130706433 as https://127.0.0.1), an IPv6
-  ## address written in any spelling but the one it is sent in, the
-  ## scheme's default port written out (":443" on https), a port carrying
-  ## a leading zero, and a port above 65535.
+  # -- Browser origins allowed to call cp-api cross-origin, as bare origins
+  # (scheme://host[:port]). Empty — the default — writes no CORS headers
+  # at all, which is what a normal install wants: cp-api serves the API
+  # and proxies the dashboard, so the browser has only one origin and
+  # nothing is ever cross-origin.
+  # Populate it only to let a dashboard served from somewhere else reach
+  # this API directly, such as a frontend-only PR preview. An entry is a bare
+  # origin (https://host[:port]), or `https://*` plus a suffix naming at least
+  # three labels (`https://*-api7ai.vercel.app`) — a PR preview's host carries
+  # the branch name, so an exact list would mean redeploying cp-api for every
+  # pull request. Read the suffix as collision-resistance, NOT as a guarantee:
+  # it is a byte suffix, and on a shared host like `.vercel.app` another
+  # account can claim a name ending the same way, so a grant that needs a real
+  # boundary belongs on a domain you control. Every entry must be spelled the
+  # way a BROWSER serializes an origin, and the chart refuses one that is not,
+  # naming the spelling to use — a bare `*`, a path, query, fragment or
+  # userinfo, a trailing dot, a non-https origin (loopback may use http), an
+  # internationalized host given as anything but punycode, a numeric last
+  # label that is not a dotted quad, an IPv6 address in any spelling but the
+  # one it is sent in, the scheme's default port written out, a port with a
+  # leading zero, and a port above 65535. cp-api applies the same rules at
+  # startup, so a value this chart accepts is one it will start with.
   corsAllowedOrigins: []
-  ## dp-manager /dp/* mTLS endpoint that data-plane hosts dial, as baked
-  ## into the generated install snippets. Also passed to the dpm
-  ## deployment, which seeds this host into the TLS server certificate it
-  ## presents — so an IP address works here, not only a DNS name. When
-  ## dpm.service.type is NodePort, use https://<node-ip>:<dpm-node-port>.
+  # -- dp-manager /dp/* mTLS endpoint that data-plane hosts dial, as baked
+  # into the generated install snippets. Also passed to the dpm
+  # deployment, which seeds this host into the TLS server certificate it
+  # presents — so an IP address works here, not only a DNS name. When
+  # dpm.service.type is NodePort, use https://<node-ip>:<dpm-node-port>.
   dpmgrBaseURL: ""
+  # -- Offer Google / GitHub sign-in on the console's login page. Leave off
+  # unless the deployment carries OAuth client credentials
   oauthEnabled: false
+  # -- Gateway image the console hands out in the install snippets it
+  # generates for a new data plane
   dpImage: ""  # empty -> docker.io/api7/aisix:<appVersion>
-  ## Allow the dashboard playground to reach LLM endpoints on private /
-  ## internal networks. cp-api blocks private IPs by default (SSRF guard);
-  ## enable this only for On-Premises deployments whose models live on an
-  ## internal network the cp-api pod can route to.
+  # -- Allow the dashboard playground to reach LLM endpoints on private /
+  # internal networks. cp-api blocks private IPs by default (SSRF guard);
+  # enable this only for On-Premises deployments whose models live on an
+  # internal network the cp-api pod can route to.
   playgroundAllowPrivateIPs: false
-  ## Allow notification channels (budget alert webhooks / Slack) to point
-  ## at private / internal addresses. Blocked by default (SSRF guard);
-  ## enable only for On-Premises deployments whose webhook receivers live
-  ## on an intranet the cp-api pod can route to.
+  # -- Allow notification channels (budget alert webhooks / Slack) to point
+  # at private / internal addresses. Blocked by default (SSRF guard);
+  # enable only for On-Premises deployments whose webhook receivers live
+  # on an intranet the cp-api pod can route to.
   notifyAllowPrivateURLs: false
 
 ## @section dp-manager
+##
+## dp-manager terminates the mTLS connection every gateway dials and serves it
+## the configuration cp-api projects. Gateways reach this endpoint directly, so
+## it is the one component that needs to be reachable from wherever they run.
 dpm:
+  # -- Number of dp-manager replicas
   replicaCount: 1
   image:
+    # -- dp-manager image repository
     repository: docker.io/api7/aisix-cp-dpm
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+    # -- Image tag
     tag: ""  # empty -> .Chart.AppVersion
   service:
+    # -- dp-manager Service type. Use NodePort or a LoadBalancer when the
+    # gateways run outside this cluster
     type: ClusterIP
+    # -- dp-manager mTLS Service port, the one gateways dial
     port: 7944
-    # Plain-HTTP listen address for /healthz (outbox-poller liveness),
+    # -- Plain-HTTP listen address for /healthz (outbox-poller liveness),
     # probed by the kubelet (the mTLS port 7944 cannot be probed). Set to
     # "" to disable the health server + httpGet probes (the probes then
     # fall back to a TCP check on the mTLS port).
     healthListen: ":7946"
+    # -- Optional fixed NodePort for the mTLS port. Used only when type is
+    # NodePort; leave empty to let Kubernetes allocate one
     nodePort: ""
   resources:
     requests:
+      # -- dp-manager CPU request
       cpu: 100m
+      # -- dp-manager memory request
       memory: 128Mi
     limits:
+      # -- dp-manager CPU limit
       cpu: "1"
+      # -- dp-manager memory limit
       memory: 512Mi
   ## No runAsUser / runAsGroup / fsGroup: the image runs under whatever UID
   ## the platform assigns (OpenShift's restricted-v2 SCC picks a random one),
   ## and nothing here is written to a volume that would need a matching owner.
   ## Set those three keys to pin a fixed UID back.
   podSecurityContext:
+    # -- Refuse to run the dp-manager pod as root
     runAsNonRoot: true
     seccompProfile:
+      # -- Seccomp profile for the dp-manager pod
       type: RuntimeDefault
   securityContext:
+    # -- Forbid privilege escalation in the dp-manager container
     allowPrivilegeEscalation: false
+    # -- Mount the dp-manager root filesystem read-only
     readOnlyRootFilesystem: true
     capabilities:
+      # -- Linux capabilities dropped from the dp-manager container
       drop:
         - ALL
+  # -- Node selector for the dp-manager pod
   nodeSelector: {}
+  # -- Tolerations for the dp-manager pod
   tolerations: []
+  # -- Affinity rules for the dp-manager pod
   affinity: {}
+  # -- Extra environment for dp-manager
   extraEnvVars: []
 
 ## @section dashboard (Next.js)
+##
+## The console's web tier. It is not a separate entry point: cp-api proxies
+## browser traffic to it, so it stays a ClusterIP Service in a normal install.
 ui:
+  # -- Number of dashboard replicas
   replicaCount: 1
-  # Fixed dashboard UI language for this deployment. Supported: "en", "zh".
+  # -- Fixed dashboard UI language for this deployment. Supported: "en", "zh".
   # There is no in-UI language switcher; the whole console renders in this
   # locale (default English). Read server-side at request time.
   defaultLocale: "en"
   image:
+    # -- Dashboard image repository
     repository: docker.io/api7/aisix-cp-ui
+    # -- Image pull policy
     pullPolicy: IfNotPresent
+    # -- Image tag
     tag: ""  # empty -> .Chart.AppVersion
   service:
+    # -- Dashboard Service type
     type: ClusterIP
+    # -- Dashboard Service port, which cp-api proxies browser traffic to
     port: 3000
-    ## Optional fixed NodePort. Used only when type is NodePort; leave empty
-    ## to let Kubernetes allocate a port dynamically. This plain-HTTP endpoint
-    ## is not a standalone Dashboard entry point: use it only behind a
-    ## same-origin reverse proxy that sends Dashboard pages here and /api/* to
-    ## cp-api. The proxy should terminate TLS unless it is on a trusted network.
+    # -- Optional fixed NodePort. Used only when type is NodePort; leave empty
+    # to let Kubernetes allocate a port dynamically. This plain-HTTP endpoint
+    # is not a standalone Dashboard entry point: use it only behind a
+    # same-origin reverse proxy that sends Dashboard pages here and /api/* to
+    # cp-api. The proxy should terminate TLS unless it is on a trusted network.
     nodePort: ""
   resources:
     requests:
+      # -- Dashboard CPU request
       cpu: 50m
+      # -- Dashboard memory request
       memory: 64Mi
     limits:
+      # -- Dashboard CPU limit
       cpu: 500m
+      # -- Dashboard memory limit
       memory: 256Mi
   ## No runAsUser / runAsGroup / fsGroup: the image runs under whatever UID
   ## the platform assigns (OpenShift's restricted-v2 SCC picks a random one).
   ## The .next/cache emptyDir needs no fsGroup to be writable — the kubelet
   ## creates it world-writable. Set those three keys to pin a fixed UID back.
   podSecurityContext:
+    # -- Refuse to run the dashboard pod as root
     runAsNonRoot: true
     seccompProfile:
+      # -- Seccomp profile for the dashboard pod
       type: RuntimeDefault
   securityContext:
+    # -- Forbid privilege escalation in the dashboard container
     allowPrivilegeEscalation: false
+    # -- Mount the dashboard root filesystem read-only
     readOnlyRootFilesystem: true
     capabilities:
+      # -- Linux capabilities dropped from the dashboard container
       drop:
         - ALL
+  # -- Node selector for the dashboard pod
   nodeSelector: {}
+  # -- Tolerations for the dashboard pod
   tolerations: []
+  # -- Affinity rules for the dashboard pod
   affinity: {}
+  # -- Extra environment for the dashboard
   extraEnvVars: []
   # -- Additional volumes for the dashboard Pod (for example, a private database CA).
   extraVolumes: []
@@ -242,30 +304,42 @@ ui:
 
 ## @section ServiceAccount
 serviceAccount:
+  # -- Create a ServiceAccount for the control-plane pods
   create: true
+  # -- Name of the ServiceAccount. Empty derives one from the release name;
+  # set it to use a ServiceAccount you manage yourself (create: false)
   name: ""
+  # -- Annotations for the ServiceAccount, e.g. a cloud IAM role binding
   annotations: {}
 
 ## @section Secrets
-## IMPORTANT: You MUST replace the placeholder values below before deploying.
-## Deploying with CHANGE_ME placeholders will fail at helm render/install time.
 ##
-## masterKey: base64-encoded 32-byte AES-256 key for envelope encryption.
-##   Generate with: openssl rand -base64 32
-## betterAuthSecret: random string used as HMAC signing secret for Better Auth sessions.
-##   Generate with: openssl rand -base64 48
+## REQUIRED. The chart refuses to render while these carry their CHANGE_ME
+## placeholders, so an install cannot come up with known secrets. Both values
+## have to stay the same for the life of the deployment: the master key is the
+## only thing that can decrypt the provider keys stored under it, and the Better
+## Auth secret signs every session. Keep them somewhere you can restore from.
 secrets:
+  # -- REQUIRED. Base64-encoded 32-byte AES-256 key that envelope-encrypts the
+  # stored upstream provider credentials. Generate with
+  # `openssl rand -base64 32`. It is the only thing that can decrypt what was
+  # stored under it, so a lost key means re-entering every provider key
   masterKey: "CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_32"
+  # -- Identifier recorded alongside every value encrypted with the current
+  # master key, so a future key rotation can tell the generations apart
   masterKeyID: "env:default"
+  # -- REQUIRED. HMAC signing secret for Better Auth sessions. Generate with
+  # `openssl rand -base64 48`. Changing it signs every signed-in user out
   betterAuthSecret: "CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_48"
 
 ## @section PostgreSQL
-## Set builtin=true to deploy Bitnami PostgreSQL subchart.
-## Set builtin=false and configure externalDatabase to use an existing PostgreSQL instance.
-## API/DPM wait for PostgreSQL only in builtin mode.
-## An external database must be ready before starting the control plane.
 ##
-## The bundled Bitnami subchart pins a UID of its own — fsGroup 1001 in
+## Set builtin=true to deploy the bundled PostgreSQL subchart. Set
+## builtin=false and configure externalDatabase to use a PostgreSQL instance
+## you run yourself. The api and dpm pods wait for PostgreSQL only in builtin
+## mode; an external database must be ready before the control plane starts.
+##
+## The bundled subchart pins a UID of its own — fsGroup 1001 in
 ## primary.podSecurityContext and runAsUser 1001 in
 ## primary.containerSecurityContext, both behind `enabled: true`. A subchart's
 ## values cannot be made conditional from here, so on a platform that assigns
@@ -282,58 +356,82 @@ secrets:
 ## query with "could not resize shared memory segment".
 ##
 postgresql:
+  # -- Deploy the bundled PostgreSQL subchart. Set to false to point the
+  # control plane at the database configured under externalDatabase
   builtin: true
+  # -- Override the generated name of the PostgreSQL resources
   fullnameOverride: ""
   ## Also used by the wait-for-pg init container on the api and dpm pods, which
   ## carries no securityContext of its own: since the chart supplies no
   ## runAsUser, `runAsNonRoot: true` is checked against THIS image's USER, and a
   ## replacement that runs as root (or names its user) is refused at admission.
   image:
+    # -- PostgreSQL image registry
     registry: docker.io
+    # -- PostgreSQL image repository
     repository: api7/postgresql
+    # -- PostgreSQL image tag
     tag: 15.4.0-debian-11-r45
   primary:
     persistence:
+      # -- Size of the PostgreSQL data volume. It holds every configured
+      # resource plus the request telemetry the console reports on
       size: 8Gi
     service:
       ports:
+        # -- PostgreSQL Service port
         postgresql: 5432
   auth:
-    ## Use the built-in PostgreSQL superuser for application connections.
-    ## cp-api currently runs schema and role migrations on startup, including
-    ## ALTER ROLE statements that require superuser privileges.
+    # -- Use the built-in PostgreSQL superuser for application connections.
+    # cp-api currently runs schema and role migrations on startup, including
+    # ALTER ROLE statements that require superuser privileges.
     usePostgresUserForAppConnections: true
+    # -- Application database role cp-api connects as when
+    # usePostgresUserForAppConnections is false
     username: aisix
-    ## Inject DB credentials from a pre-created Secret instead of the values
-    ## below (the secure path). When set, the password fields are ignored and
-    ## the placeholder rejection is skipped.
+    # -- Inject DB credentials from a pre-created Secret instead of the values
+    # below (the secure path). When set, the password fields are ignored and
+    # the placeholder rejection is skipped.
     existingSecret: ""
-    ## IMPORTANT: Set a stable password before deploying.
-    ## If left as default, the password is baked into the PG data volume on first init
-    ## and must remain unchanged across re-deploys.
-    ## The chart REJECTS the default 'changeme' at render/install time when
-    ## postgresql.builtin=true — set a real password (openssl rand -hex 24).
-    ## Use a URL-safe value: the password is embedded in a postgres:// DSN,
-    ## so + / = (as produced by `openssl rand -base64`) corrupt URL parsing.
-    ## Or use existingSecret above.
+    # -- REQUIRED with builtin=true (unless existingSecret is set). Password
+    # for the application role. The chart REJECTS the default `changeme` at
+    # render time. Generate a URL-SAFE value with `openssl rand -hex 24`: the
+    # password is embedded in a `postgres://` DSN, so the `+`, `/` and `=`
+    # that `openssl rand -base64` produces corrupt URL parsing. PostgreSQL
+    # bakes it into the data volume on first init, so it has to stay the same
+    # across re-deploys
     password: changeme
+    # -- REQUIRED with builtin=true (unless existingSecret is set). Password
+    # for the PostgreSQL superuser, under the same URL-safe rule and the same
+    # placeholder rejection as `password` above
     postgresPassword: changeme
+    # -- Database name the control plane uses
     database: aisix_cloud
 
 ## @section External Database
-## Only used when postgresql.builtin is false.
+##
+## Read only when postgresql.builtin is false.
 externalDatabase:
+  # -- PostgreSQL host
   host: ""
+  # -- PostgreSQL port
   port: 5432
+  # -- Database role the control plane connects as. It has to be able to run
+  # the schema migrations cp-api applies at startup
   username: aisix
+  # -- Database name
   database: aisix_cloud
-  ## Name of an existing Secret containing the database password (key: "password").
+  # -- Name of an existing Secret containing the database password (key: "password").
   existingSecret: ""
-  ## If existingSecret is empty, this password is used directly.
+  # -- If existingSecret is empty, this password is used directly. Use a
+  # URL-safe value: it is embedded in a `postgres://` DSN
   password: ""
+  # -- libpq sslmode for the connection, e.g. `require` or `verify-full` for a
+  # managed database reached over a network you do not control
   sslmode: disable
 
 ## @section Two-DSN tenant isolation (SaaS / multi-tenant only)
+##
 ## When enabled, cp-api opens TWO pools against the same database:
 ##   - an admin pool on the privileged DSN above (builtin postgres or the
 ##     externalDatabase user) that runs migrations + the cross-tenant paths;
@@ -343,17 +441,20 @@ externalDatabase:
 ## cp-api provisions cp_api_app's LOGIN + password (from servingPassword)
 ## on the admin pool at boot — you do NOT pre-create the role.
 ##
-## Leave DISABLED for single-tenant / private (OP) deployments: there every
-## org is one trust domain, RLS is inert, and the single privileged DSN
-## handles everything (the current default behavior). See the internal
-## docs/rls-architecture.md for the full model.
+## Leave DISABLED for single-tenant / private (On-Premises) deployments: there
+## every organization is one trust domain, RLS is inert, and the single
+## privileged DSN handles everything.
 twoDSN:
+  # -- Open a second, Row-Level-Security-enforced pool for tenant queries.
+  # Leave off for an On-Premises deployment
   enabled: false
-  ## Password cp-api assigns to the cp_api_app serving role and uses in the
-  ## serving DSN. Required when enabled unless existingSecret is set.
-  ## Use a URL-safe value (no + / =): it is embedded in a postgres:// DSN.
+  # -- Password cp-api assigns to the cp_api_app serving role and uses in the
+  # serving DSN. Required when enabled unless existingSecret is set.
+  # Use a URL-safe value, from `openssl rand -hex 24`: it is embedded in a
+  # `postgres://` DSN, so `+`, `/` and `=` corrupt URL parsing
   servingPassword: ""
-  ## Optionally source the serving password from an existing Secret instead
-  ## of servingPassword above. Key defaults to "serving-password".
+  # -- Optionally source the serving password from an existing Secret instead
+  # of servingPassword above. Key defaults to "serving-password".
   existingSecret: ""
+  # -- Key inside twoDSN.existingSecret holding the serving password
   existingSecretKey: "serving-password"

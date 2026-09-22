@@ -101,7 +101,12 @@ spec:
             {{- if or (not (regexMatch "^[a-z0-9._-]+$" $suffix)) (hasSuffix "." $suffix) }}
             {{- fail (printf "api.corsAllowedOrigins entry %q: a wildcard suffix must be a bare host suffix of ASCII letters, digits, dot, hyphen and underscore — a path, query, fragment, userinfo, port, trailing dot or non-ASCII name never matches a browser's Origin." .) }}
             {{- end }}
-            {{- $body := trimPrefix "." (trimPrefix "-" $suffix) }}
+            {{- /* Every leading separator goes, not one of each: cp-api
+                   trims the whole run (`strings.TrimLeft(suffix, "-.")`)
+                   before counting labels, so `https://*..a.b` counted three
+                   labels here and two there — rendered, then refused at
+                   startup. */ -}}
+            {{- $body := regexReplaceAll "^[-.]+" $suffix "" }}
             {{- if lt (len (splitList "." $body)) 3 }}
             {{- fail (printf "api.corsAllowedOrigins entry %q: a wildcard suffix must name at least three labels, or it covers a whole public suffix (https://*.vercel.app would admit every project on that host)." .) }}
             {{- end }}
@@ -131,14 +136,20 @@ spec:
             {{- fail (printf "api.corsAllowedOrigins entry %q must be a bare origin like https://host[:port] — a trailing dot never matches a browser's Origin header." .) }}
             {{- end }}
             {{- if hasPrefix "[" $hostOnly }}
-            {{- /* An IPv6 address has many spellings and a browser sends one.
-                   This cannot canonicalize an address, but it can refuse the
-                   spellings that differ from the canonical one by a written-out
-                   or zero-padded hextet, which is every form anyone types by
-                   hand. cp-api makes the exact check. */ -}}
+            {{- /* An IPv6 address has many spellings and a browser sends
+                   exactly one: the URL standard's serializer. This block
+                   reproduces it, so the render refuses precisely the entries
+                   cp-api refuses at startup.
+
+                   A zero hextet is NOT simply forbidden. The serializer
+                   compresses the first-longest run of at least TWO zero
+                   hextets and writes a lone one out, so `1:0:2:3:4:5:6:7` and
+                   `1::1:0` are the canonical spellings of their addresses —
+                   and the rule that refused every written-out `0` rejected
+                   1409 addresses a browser sends exactly as typed. */ -}}
             {{- $inner := trimSuffix "]" (trimPrefix "[" $hostOnly) }}
-            {{- if or (regexMatch "(^|:)0{1,4}(:|$)" $inner) (regexMatch "(^|:)0[0-9a-f]" $inner) }}
-            {{- fail (printf "api.corsAllowedOrigins entry %q: an IPv6 origin must be written the way a browser sends it — compress the zero hextets and drop the leading zeros." .) }}
+            {{- if regexMatch "(^|:)0[0-9a-f]" $inner }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: an IPv6 origin must be written the way a browser sends it — drop the leading zeros from each hextet." .) }}
             {{- end }}
             {{- /* Counting groups alone is not enough to tell an address from
                    a typo: `without … ""` drops the empty components a doubled
@@ -182,6 +193,64 @@ spec:
             {{- end }}
             {{- else if ne (len $groups) 8 }}
             {{- fail (printf "api.corsAllowedOrigins entry %q is not an IPv6 address — it needs eight groups, or `::` where they are omitted." .) }}
+            {{- end }}
+            {{- /* The address is well formed here, so expand it to its eight
+                   hextets and re-serialize it the way the URL standard does:
+                   the first-longest run of two or more zero hextets becomes
+                   `::`, everything else is written out. Any spelling other
+                   than that one is an entry no Origin header can equal.
+
+                   An IPv4-mapped address keeps its hex spelling through this,
+                   which is what a browser sends: `[::ffff:c0a8:1]`, never
+                   `[::ffff:192.168.0.1]`. */ -}}
+            {{- $halves := splitList "::" $inner }}
+            {{- $lead := without (splitList ":" (index $halves 0)) "" }}
+            {{- $tail := list }}
+            {{- if contains "::" $inner }}
+            {{- $tail = without (splitList ":" (index $halves 1)) "" }}
+            {{- end }}
+            {{- $hextets := $lead }}
+            {{- range until (int (sub 8 (add (len $lead) (len $tail)))) }}
+            {{- $hextets = append $hextets "0" }}
+            {{- end }}
+            {{- range $tail }}
+            {{- $hextets = append $hextets . }}
+            {{- end }}
+            {{- /* First-longest run of two or more zero hextets. */ -}}
+            {{- $compress := -1 }}
+            {{- $best := 1 }}
+            {{- $run := 0 }}
+            {{- $runStart := 0 }}
+            {{- range $i, $h := $hextets }}
+            {{- if eq $h "0" }}
+            {{- if eq $run 0 }}{{- $runStart = $i }}{{- end }}
+            {{- $run = add1 $run }}
+            {{- if gt $run $best }}{{- $best = $run }}{{- $compress = $runStart }}{{- end }}
+            {{- else }}
+            {{- $run = 0 }}
+            {{- end }}
+            {{- end }}
+            {{- $canonical := "" }}
+            {{- $skipZeros := false }}
+            {{- range $i, $h := $hextets }}
+            {{- if and $skipZeros (eq $h "0") }}
+            {{- else }}
+            {{- $skipZeros = false }}
+            {{- if eq $i $compress }}
+            {{- if eq $i 0 }}
+            {{- $canonical = printf "%s::" $canonical }}
+            {{- else }}
+            {{- $canonical = printf "%s:" $canonical }}
+            {{- end }}
+            {{- $skipZeros = true }}
+            {{- else }}
+            {{- $canonical = printf "%s%s" $canonical $h }}
+            {{- if ne $i 7 }}{{- $canonical = printf "%s:" $canonical }}{{- end }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
+            {{- if ne $canonical $inner }}
+            {{- fail (printf "api.corsAllowedOrigins entry %q: an IPv6 origin must be written the way a browser sends it, which for this address is `[%s]`." $entry $canonical) }}
             {{- end }}
             {{- else }}
             {{- /* A browser re-reads a host whose last label is numeric as an
