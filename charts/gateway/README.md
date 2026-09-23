@@ -178,7 +178,7 @@ apisix:
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.9.20"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.9.21"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
 | apisix.lru.secret.neg_ttl | int | `60` | in seconds |
@@ -315,7 +315,7 @@ apisix:
 | openapiToMcp.enabled | bool | `false` | Enable or disable the OpenAPI-to-MCP sidecar. Required when using the `openapi-to-mcp` or `mcp-tools-acl` plugins. The container runs alongside the gateway in the same pod and is reached on 127.0.0.1. |
 | openapiToMcp.image.pullPolicy | string | `"IfNotPresent"` | OpenAPI-to-MCP image pull policy |
 | openapiToMcp.image.repository | string | `"api7/openapi-to-mcp"` | OpenAPI-to-MCP image repository |
-| openapiToMcp.image.tag | string | `"1.0.5"` | OpenAPI-to-MCP image tag |
+| openapiToMcp.image.tag | string | `"1.0.6"` | OpenAPI-to-MCP image tag |
 | openapiToMcp.port | int | `3000` | Port that the sidecar listens on. Must match the `port` configured under `plugin_attr.openapi-to-mcp` in the gateway config (defaults to 3000). |
 | openapiToMcp.resources | object | `{}` | Resources for the OpenAPI-to-MCP sidecar container. |
 | pluginAttrs | object | `{}` | Set APISIX plugin attributes, see [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L376) for more details |

@@ -18,7 +18,7 @@ dashboard:
     repository: api7/api7-ee-3-integrated
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.20"
+    tag: "v3.9.21"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -57,7 +57,7 @@ dp_manager:
     repository: api7/api7-ee-dp-manager
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.20"
+    tag: "v3.9.21"
   # Resources of the deployment.
   # It has a higher priority than the common resources configuration:
   # when this field is configured, it is used first in the deployment,
@@ -96,7 +96,7 @@ file_server:
   image:
     repository: api7/api7-ee-file-server
     pullPolicy: Always
-    tag: "v3.9.20"
+    tag: "v3.9.21"
 
   extraEnvVars: []
   extraVolumes: []
@@ -120,7 +120,7 @@ developer_portal:
     repository: api7/api7-ee-developer-portal
     pullPolicy: Always
     # Overrides the image tag whose default is the chart appVersion.
-    tag: "v3.9.20"
+    tag: "v3.9.21"
 
   extraEnvVars: []
   extraVolumes: []
@@ -419,7 +419,6 @@ dashboard_configuration:
       - "/api/v1/series"
       - "/api/v1/labels"
   console:
-    addr: "http://127.0.0.1:3000"
     # -- hybrid_mode hides the license and core-quota UI, for deployments where
     # the license is operated for the user rather than by them.
     hybrid_mode: false
