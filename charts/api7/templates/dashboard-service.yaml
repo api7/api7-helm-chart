@@ -1,3 +1,6 @@
+{{- if and .Values.dashboard_configuration.server.listen.disable .Values.dashboard_configuration.server.tls.disable }}
+{{- fail "Dashboard requires at least one enabled listener: set dashboard_configuration.server.listen.disable or dashboard_configuration.server.tls.disable to false" }}
+{{- end }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -12,6 +15,7 @@ metadata:
 spec:
   type: {{ .Values.dashboard_service.type }}
   ports:
+    {{- if not .Values.dashboard_configuration.server.listen.disable }}
     - port: {{ .Values.dashboard_service.port }}
       targetPort: http
       protocol: TCP
@@ -19,7 +23,8 @@ spec:
       {{- if (and (eq .Values.dashboard_service.type "NodePort") (not (empty .Values.dashboard_service.nodePort))) }}
       nodePort: {{ .Values.dashboard_service.nodePort }}
       {{- end }}
-
+    {{- end }}
+    {{- if not .Values.dashboard_configuration.server.tls.disable }}
     - port: {{ .Values.dashboard_service.tlsPort }}
       targetPort: https
       protocol: TCP
@@ -27,6 +32,7 @@ spec:
       {{- if (and (eq .Values.dashboard_service.type "NodePort") (not (empty .Values.dashboard_service.tlsNodePort))) }}
       nodePort: {{ .Values.dashboard_service.tlsNodePort }}
       {{- end }}
+    {{- end }}
 
   selector:
     {{- include "api7ee3.selectorLabels" . | nindent 4 }}
