@@ -1,6 +1,6 @@
 # api7-ingress-controller
 
-![Version: 0.1.23](https://img.shields.io/badge/Version-0.1.23-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.16](https://img.shields.io/badge/AppVersion-2.0.16-informational?style=flat-square)
+![Version: 0.1.23-patch.1](https://img.shields.io/badge/Version-0.1.23--patch.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.0.16-patch.1](https://img.shields.io/badge/AppVersion-2.0.16--patch.1-informational?style=flat-square)
 
 Ingress Controller for API7
 
@@ -38,6 +38,7 @@ Ingress Controller for API7
 | config.leaderElection.retryPeriod | string | `"2s"` |  |
 | config.logLevel | string | `"info"` |  |
 | config.metricsAddr | string | `":8080"` |  |
+| config.namespaceSelector | list | `[]` | Label selectors of the namespaces whose Ingress and apisix.apache.org/v2 resources are synced. A namespace is selected when its labels match all entries, and the values given for the same key are ORed, so `["team=a", "team=b", "env=prod"]` selects the namespaces labeled `team in (a,b)` that are also labeled `env=prod`. Empty selects all namespaces. |
 | config.probeAddr | string | `":8081"` |  |
 | config.provider.initSyncDelay | string | `"20m"` |  |
 | config.provider.syncPeriod | string | `"1h"` |  |
@@ -48,7 +49,7 @@ Ingress Controller for API7
 | deployment.annotations | object | `{}` |  |
 | deployment.image.pullPolicy | string | `"IfNotPresent"` |  |
 | deployment.image.repository | string | `"api7/api7-ingress-controller"` |  |
-| deployment.image.tag | string | `"2.0.16"` |  |
+| deployment.image.tag | string | `"2.0.16-patch.1"` |  |
 | deployment.nodeSelector | object | `{}` |  |
 | deployment.podAnnotations | object | `{}` |  |
 | deployment.podSecurityContext.fsGroup | int | `2000` |  |

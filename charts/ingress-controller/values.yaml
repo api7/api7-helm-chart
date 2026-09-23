@@ -34,7 +34,7 @@ deployment:
   image:
     repository: api7/api7-ingress-controller
     pullPolicy: IfNotPresent
-    tag: "2.0.16"
+    tag: "2.0.16-patch.1"
   # -- Set pod resource requests & limits
   resources: {}
 
@@ -64,6 +64,11 @@ config:
   secureMetrics: false
   execADCTimeout: "15s"
   disableGatewayApi: false  # Whether to disable the Gateway API support. The default value is false.
+  # -- Label selectors of the namespaces whose Ingress and apisix.apache.org/v2 resources are
+  # synced. A namespace is selected when its labels match all entries, and the values given for
+  # the same key are ORed, so `["team=a", "team=b", "env=prod"]` selects the namespaces labeled
+  # `team in (a,b)` that are also labeled `env=prod`. Empty selects all namespaces.
+  namespaceSelector: []
   provider:
     type: "api7ee"
     syncPeriod: "1h"
