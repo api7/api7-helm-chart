@@ -1762,6 +1762,33 @@ entries:
     - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-3.10.0/api7ee3-3.10.0.tgz
     version: 3.10.0
   - apiVersion: v2
+    appVersion: 3.9.21
+    created: "2026-09-24T02:55:39.126033949Z"
+    dependencies:
+    - condition: prometheus.builtin
+      name: prometheus
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.5.1
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - condition: jaeger.builtin
+      name: jaeger
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 4.4.7
+    description: A Helm chart for Kubernetes
+    digest: d9ebe5005b3d956938e1b2512aed2271d52ffe8c1eb273856a56317c5660e45b
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: api7ee3
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-3.9.10/api7ee3-3.9.10.tgz
+    version: 3.9.10
+  - apiVersion: v2
     appVersion: 3.9.20
     created: "2026-09-03T09:11:50.857581299Z"
     dependencies:
@@ -4873,6 +4900,25 @@ entries:
     - https://github.com/api7/api7-helm-chart/releases/download/gateway-3.10.0/gateway-3.10.0.tgz
     version: 3.10.0
   - apiVersion: v2
+    appVersion: 3.9.21
+    created: "2026-09-24T02:55:39.330477257Z"
+    dependencies:
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.7.7
+    description: A Helm chart for API7 Gateway
+    digest: 937f01b9b89e85d5c012de33d13b3f92e3843541d97aeeece62fe67bbaa5e208
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/gateway-3.9.14/gateway-3.9.14.tgz
+    version: 3.9.14
+  - apiVersion: v2
     appVersion: 3.9.20
     created: "2026-09-15T09:47:45.691761711Z"
     dependencies:
@@ -6636,4 +6682,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-09-22T12:24:04.74708507Z"
+generated: "2026-09-24T02:55:39.33123469Z"
