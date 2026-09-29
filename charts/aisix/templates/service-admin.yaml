@@ -1,0 +1,22 @@
+{{- if include "aisix.adminEnabled" . }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "aisix.fullname" . }}-admin
+  labels:
+    {{- include "aisix.labels" . | nindent 4 }}
+    {{- include "aisix.selectorLabels" . | nindent 4 }}
+  {{- with .Values.admin.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: ClusterIP
+  ports:
+    - name: admin
+      port: {{ .Values.admin.service.port }}
+      targetPort: admin
+      protocol: TCP
+  selector:
+    {{- include "aisix.selectorLabels" . | nindent 4 }}
+{{- end }}

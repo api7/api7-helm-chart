@@ -82,6 +82,22 @@ check "config values land in the file, list-typed ones included" \
 check "standalone mode renders no etcd or managed section" \
   query '"etcd" not in cfg and "managed" not in cfg and cfg["admin"] == {"enabled": False} and cfg["resources_file"]' \
   -f "$chart/ci/standalone-values.yaml"
+admin_on=(-f "$chart/ci/standalone-values.yaml" --set admin.enabled=true --set 'admin.keys={k1,k2}')
+check "admin disabled by default: admin.enabled false in the file, no admin port, env, Service or Secret" \
+  query 'cfg["admin"] == {"enabled": False} and not any(p["name"] == "admin" for p in pod["containers"][0]["ports"]) and "AISIX_ADMIN__ADMIN_KEYS" not in env and not any(d["metadata"]["name"].endswith("-admin") for d in docs)' \
+  -f "$chart/ci/standalone-values.yaml"
+check "admin enabled: file binds the port, keys come from the chart Secret as env, ClusterIP Service on the admin port" \
+  query 'cfg["admin"] == {"enabled": True, "addr": "0.0.0.0:3001"} and {"name": "admin", "containerPort": 3001, "protocol": "TCP"} in pod["containers"][0]["ports"] and env["AISIX_ADMIN__ADMIN_KEYS"]["valueFrom"]["secretKeyRef"] == {"name": "ci-aisix-admin", "key": "admin-keys"} and next(d for d in docs if d["kind"] == "Secret" and d["metadata"]["name"] == "ci-aisix-admin")["stringData"] == {"admin-keys": "k1,k2"} and next(d for d in docs if d["kind"] == "Service" and d["metadata"]["name"] == "ci-aisix-admin")["spec"]["type"] == "ClusterIP" and "k1" not in cm["data"]["config.yaml"] and all(p["name"] != "admin" for d in docs if d["kind"] == "Service" and d["metadata"]["name"] == "ci-aisix" for p in d["spec"]["ports"])' \
+  "${admin_on[@]}"
+check "admin with existingSecret reads that Secret and renders none of its own" \
+  query 'env["AISIX_ADMIN__ADMIN_KEYS"]["valueFrom"]["secretKeyRef"] == {"name": "my-admin", "key": "keys"} and not any(d["kind"] == "Secret" and d["metadata"]["name"].endswith("-admin") for d in docs)' \
+  -f "$chart/ci/standalone-values.yaml" --set admin.enabled=true --set admin.existingSecret=my-admin --set admin.existingSecretKey=keys
+check "admin enabled without keys is refused" \
+  refuses "admin.enabled requires admin keys" -f "$chart/ci/standalone-values.yaml" --set admin.enabled=true
+check "admin enabled with a control plane is refused" \
+  refuses "has no Admin API" --set admin.enabled=true --set 'admin.keys={k1}'
+check "an admin key containing a comma is refused" \
+  refuses "cannot contain a comma" -f "$chart/ci/standalone-values.yaml" --set admin.enabled=true --set 'admin.keys[0]=a\,b'
 check "a chart-owned key under config is refused" \
   refuses "use containerPorts.proxy" --set config.proxy.addr=0.0.0.0:1
 check "a credential under config is refused" \

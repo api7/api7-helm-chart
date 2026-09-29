@@ -87,8 +87,9 @@ Nothing under `controlPlane` is read, no certificate bundle is needed, and the
 gateway reads every resource — provider keys, models, caller API keys,
 guardrails, MCP servers, rate-limit policies — from one `resources.yaml`. The
 chart renders a startup configuration pointing at it, mounts it read-only at
-`/etc/aisix/resources/resources.yaml`, and leaves the admin API unbound, so the
-file is the only way resources are declared.
+`/etc/aisix/resources/resources.yaml`. The file is the only way resources are
+declared: the Admin API, off by default, only reads them (see
+[Admin API](#admin-api)).
 
 Supply the file through exactly one of `standalone.resources`,
 `standalone.existingSecret`, or `standalone.existingConfigMap`; setting none or
@@ -184,9 +185,46 @@ kubectl rollout restart deploy/<release>-aisix -n <namespace>
 ### What is not available
 
 Standalone mode has no control plane, so there is no console, no usage or budget
-reporting, and no per-environment configuration distribution. The admin API is
-left unbound as well: it is read-only against a file source, and binding it would
-require admin keys the chart does not manage.
+reporting, and no per-environment configuration distribution.
+
+### Admin API
+
+The gateway's Admin API is off by default. With `admin.enabled: true` the chart
+binds it on `containerPorts.admin` (3001) and publishes it on its own ClusterIP
+Service, `<fullname>-admin` (`aisix-admin` for a release named `aisix`) — never
+on the proxy Service. Against the resources file it is read-only: `/admin/v1/*`
+lists and gets what the gateway loaded, including model status, and every
+request there needs one of the admin keys as `Authorization: Bearer <key>` or
+`x-api-key: <key>`. The same listener serves the Playground,
+`POST /playground/chat/completions`, which takes a caller API key exactly like
+the proxy.
+
+The admin keys come from `admin.keys`, rendered into a chart-managed Secret, or
+from a Secret you manage, named by `admin.existingSecret` (key
+`admin.existingSecretKey`, default `admin-keys`; several keys comma-separated).
+Either way they reach the gateway as the `AISIX_ADMIN__ADMIN_KEYS` environment
+variable from that Secret and are never written to the config ConfigMap.
+Enabling the API without keys fails the render, and so does enabling it with
+`controlPlane.enabled: true`: a gateway connected to a control plane has no
+Admin API.
+
+```yaml
+controlPlane:
+  enabled: false
+admin:
+  enabled: true
+  existingSecret: aisix-admin-keys
+```
+
+```sh
+kubectl create secret generic aisix-admin-keys -n aisix --from-literal=admin-keys="$(openssl rand -hex 24)"
+kubectl port-forward -n aisix svc/aisix-admin 3001:3001
+curl -H "Authorization: Bearer <key>" http://127.0.0.1:3001/admin/v1/models
+```
+
+A release that already binds the Admin API through `AISIX_ADMIN__*` variables in
+`extraEnvVars` keeps working unchanged, since the environment overrides the
+config file; moving those settings to `admin` also gives the API its Service.
 
 ## Termination and draining
 
@@ -482,6 +520,12 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| admin.enabled | bool | `false` | Bind the Admin API on `containerPorts.admin` and create the admin Service. Requires `controlPlane.enabled=false` and admin keys from `keys` or `existingSecret` |
+| admin.existingSecret | string | `""` | Read the admin keys from an existing Secret instead, so they stay out of your values file. The value is one key, or several separated by commas |
+| admin.existingSecretKey | string | `"admin-keys"` | Secret key holding the admin keys |
+| admin.keys | list | `[]` | Admin keys, rendered into a chart-managed Secret and passed to the gateway from it. A key cannot contain a comma |
+| admin.service.annotations | object | `{}` | Extra annotations for the admin Service |
+| admin.service.port | int | `3001` | Admin Service port |
 | affinity | object | `{}` | Affinity rules for the gateway pods |
 | autoscaling.behavior | object | `{}` | `spec.behavior` for the HPA. Empty uses the Kubernetes defaults (immediate scale-up, 5-minute scale-down stabilization). A gateway that carries long streaming responses usually wants a gentler scale-down, e.g. `scaleDown: {policies: [{type: Pods, value: 1, periodSeconds: 60}]}` |
 | autoscaling.enabled | bool | `false` | Create a HorizontalPodAutoscaler for the gateway Deployment |
@@ -541,6 +585,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.upstream.tls.client_key_file | string | `nil` | Client key for mutual TLS to upstreams |
 | config.upstream.tls.verify | bool | `true` | Verify upstream certificates. false accepts any certificate — test use only |
 | configSecrets | object | `{}` | Configuration keys that hold a credential, each read from a Secret you supply and handed to the gateway as an environment variable (which overrides the config file), never written to the ConfigMap. Keyed by the configuration path: `cache.redis.url`, `cache.redis.username`, `cache.redis.password`, `ratelimit.redis.username` or `ratelimit.redis.password`. For example `{cache.redis.password: {secretName: redis-auth, key: password}}` |
+| containerPorts.admin | int | `3001` | Port the Admin API listener binds inside the container. Bound only when `admin.enabled` is true |
 | containerPorts.metrics | int | `9090` | Port the Prometheus metrics listener binds inside the container |
 | containerPorts.proxy | int | `3000` | Port the proxy listener binds inside the container. Nothing binds it when `listeners` is set — that list then carries every proxy port, and the gateway keeps requiring this address only to ignore it. The image carries the `CAP_NET_BIND_SERVICE` file capability, so a privileged port works without running as root — see `securityContext` below |
 | controlPlane.baseURL | string | `""` | Data-plane manager mTLS endpoint the gateway connects out to, e.g. `https://dpm.example.com:7944`. Required. |

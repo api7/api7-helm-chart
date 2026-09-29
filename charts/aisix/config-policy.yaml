@@ -7,7 +7,7 @@
 # render with this message.
 owned:
   resources_file: "set by the chart in standalone mode: supply the file through standalone.resources, standalone.existingSecret or standalone.existingConfigMap"
-  admin: "the admin listener is not deployed by this chart"
+  admin: "use admin.enabled, admin.keys or admin.existingSecret, and containerPorts.admin"
   etcd.endpoints: "set by the chart from the control-plane connection"
   etcd.prefix: "set by the chart from the control-plane connection"
   etcd.env_id: "not configurable through this chart"

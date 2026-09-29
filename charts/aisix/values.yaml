@@ -93,6 +93,9 @@ containerPorts:
   proxy: 3000
   # -- Port the Prometheus metrics listener binds inside the container
   metrics: 9090
+  # -- Port the Admin API listener binds inside the container. Bound only when
+  # `admin.enabled` is true
+  admin: 3001
 
 ## Several proxy listeners at once — for example HTTPS and plain HTTP side by
 ## side, each on its own port. Empty (the default) keeps the single plain-HTTP
@@ -163,6 +166,33 @@ metrics:
     # -- Metric relabeling rules
     metricRelabelings: []
 
+## The gateway's Admin API, standalone mode only (a gateway connected to a
+## control plane never binds it). Against the resources file it is read-only:
+## `/admin/v1/*` lists and gets what the gateway loaded — resources, model
+## status — and needs one of the admin keys (`Authorization: Bearer <key>` or
+## `x-api-key: <key>`). The same listener serves the Playground
+## (`POST /playground/chat/completions`, authenticated with a caller API key
+## like the proxy). It is published on its own ClusterIP Service,
+## `<fullname>-admin`, never on the proxy Service.
+admin:
+  # -- Bind the Admin API on `containerPorts.admin` and create the admin
+  # Service. Requires `controlPlane.enabled=false` and admin keys from `keys`
+  # or `existingSecret`
+  enabled: false
+  # -- Admin keys, rendered into a chart-managed Secret and passed to the
+  # gateway from it. A key cannot contain a comma
+  keys: []
+  # -- Read the admin keys from an existing Secret instead, so they stay out of
+  # your values file. The value is one key, or several separated by commas
+  existingSecret: ""
+  # -- Secret key holding the admin keys
+  existingSecretKey: "admin-keys"
+  service:
+    # -- Admin Service port
+    port: 3001
+    # -- Extra annotations for the admin Service
+    annotations: {}
+
 ## Rate-limit counters are per-replica by default, so N replicas enforce N×
 ## every configured limit. Point the gateway at a shared Redis before running
 ## more than one replica — including any replica an autoscaler adds.
@@ -192,7 +222,7 @@ rateLimit:
 ## metrics addresses (`containerPorts`), `proxy.listeners` / `proxy.tls`
 ## (`listeners`), `ratelimit.backend` and `ratelimit.redis.url` (`rateLimit`),
 ## the control-plane connection under `managed` (`controlPlane`),
-## `resources_file` (`standalone`), and `admin` (not deployed by this chart).
+## `resources_file` (`standalone`), and `admin` (`admin` and `containerPorts.admin`).
 ## Keys that hold a credential are never written to the ConfigMap either: set
 ## them through `configSecrets` below.
 ##
