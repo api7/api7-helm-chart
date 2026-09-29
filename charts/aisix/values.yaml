@@ -540,7 +540,9 @@ preStopSleepSeconds: 30
 
 # -- Extra environment variables for the gateway container: system-level
 # environment variables (such as `TZ`) and variables referenced by the
-# resources file. Gateway settings belong in `config`
+# resources file. Gateway settings belong in `config`. A variable the chart
+# sets itself can still be overridden here for compatibility, but that setting
+# belongs in its own value
 extraEnvVars: []
 
 # -- Extra volumes for the gateway pod

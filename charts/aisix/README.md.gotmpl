@@ -459,7 +459,9 @@ configSecrets:
 
 `extraEnvVars` is for system-level environment variables such as `TZ`, and for
 the variables a standalone resources file references. An `AISIX_*` variable set
-there still overrides the file, as it always has.
+there still overrides the file, as it always has, and still wins over a variable
+the chart sets itself: that keeps working for compatibility, but the setting
+belongs in its own value.
 
 ## Parameters
 

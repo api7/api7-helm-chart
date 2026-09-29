@@ -78,36 +78,7 @@ spec:
               containerPort: {{ .Values.containerPorts.metrics }}
               protocol: TCP
           env:
-            - name: AISIX_CONFIG_PATH
-              value: {{ include "aisix.configPath" . }}
-            {{- if and .Values.controlPlane.enabled (include "aisix.cpPemFromEnv" .) }}
-            {{- range $slot, $key := dict "CERT" .Values.controlPlane.certificate.certKey "KEY" .Values.controlPlane.certificate.keyKey "CA" .Values.controlPlane.certificate.caKey }}
-            - name: AISIX_MANAGED__CP_{{ $slot }}_PEM
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "aisix.certSecretName" $ }}
-                  key: {{ $key }}
-            {{- end }}
-            {{- end }}
-            {{- if eq .Values.rateLimit.backend "redis" }}
-            {{- if or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret }}
-            - name: AISIX_RATELIMIT__REDIS__URL
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "aisix.redisSecretName" . }}
-                  key: {{ include "aisix.redisSecretKey" . }}
-            {{- end }}
-            {{- end }}
-            {{- range $path, $ref := (.Values.configSecrets | default dict) }}
-            - name: {{ include "aisix.configSecretEnvName" $path }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $ref.secretName }}
-                  key: {{ $ref.key }}
-            {{- end }}
-            {{- with .Values.extraEnvVars }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
+            {{- include "aisix.env" . | nindent 12 }}
           {{- if .Values.startupProbe.enabled }}
           # /livez answers as soon as the proxy listener is bound, which in
           # etcd mode is once the first configuration apply has succeeded.

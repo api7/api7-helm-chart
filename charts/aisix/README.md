@@ -465,7 +465,9 @@ configSecrets:
 
 `extraEnvVars` is for system-level environment variables such as `TZ`, and for
 the variables a standalone resources file references. An `AISIX_*` variable set
-there still overrides the file, as it always has.
+there still overrides the file, as it always has, and still wins over a variable
+the chart sets itself: that keeps working for compatibility, but the setting
+belongs in its own value.
 
 ## Parameters
 
@@ -545,7 +547,7 @@ there still overrides the file, as it always has.
 | controlPlane.enabled | bool | `true` | Read configuration from an AISIX control plane. Set to false to run standalone, from the `resources.yaml` file configured under `standalone` |
 | controlPlane.etcdEndpoint | string | `""` | Control-plane etcd endpoint as bare `host:port`. Leave empty unless the control plane publishes an etcd endpoint distinct from `baseURL` |
 | controlPlane.heartbeatIntervalSeconds | int | `15` | Heartbeat interval in seconds. The control plane marks a gateway connected on its first heartbeat. Clamped to [5, 300] by the gateway |
-| extraEnvVars | list | `[]` | Extra environment variables for the gateway container: system-level environment variables (such as `TZ`) and variables referenced by the resources file. Gateway settings belong in `config` |
+| extraEnvVars | list | `[]` | Extra environment variables for the gateway container: system-level environment variables (such as `TZ`) and variables referenced by the resources file. Gateway settings belong in `config`. A variable the chart sets itself can still be overridden here for compatibility, but that setting belongs in its own value |
 | extraVolumeMounts | list | `[]` | Extra volume mounts for the gateway container |
 | extraVolumes | list | `[]` | Extra volumes for the gateway pod |
 | fullnameOverride | string | `""` | Override the fully qualified resource name prefix |
