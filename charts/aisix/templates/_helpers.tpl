@@ -266,7 +266,12 @@ rejected by "aisix.validateValues" before this runs.
 {{- $_ := unset $cfg "etcd" }}
 {{- $_ := unset $cfg "managed" }}
 {{- $_ := set $cfg "resources_file" (include "aisix.standaloneResourcesPath" .) }}
+{{- if include "aisix.adminEnabled" . }}
+{{- /* The keys arrive as AISIX_ADMIN__ADMIN_KEYS from a Secret, never in this file. */}}
+{{- $_ := set $cfg "admin" (dict "enabled" true "addr" (printf "0.0.0.0:%d" (int .Values.containerPorts.admin))) }}
+{{- else }}
 {{- $_ := set $cfg "admin" (dict "enabled" false) }}
+{{- end }}
 {{- end }}
 {{- include "aisix.dropNulls" $cfg }}
 {{- toYaml $cfg }}
@@ -305,6 +310,9 @@ gave it where the chart no longer sets it.
 {{- end }}
 {{- if and (eq .Values.rateLimit.backend "redis") (or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret) }}
 {{- $chart = append $chart (dict "name" "AISIX_RATELIMIT__REDIS__URL" "valueFrom" (dict "secretKeyRef" (dict "name" (include "aisix.redisSecretName" .) "key" (include "aisix.redisSecretKey" .)))) }}
+{{- end }}
+{{- if include "aisix.adminEnabled" . }}
+{{- $chart = append $chart (dict "name" "AISIX_ADMIN__ADMIN_KEYS" "valueFrom" (dict "secretKeyRef" (dict "name" (include "aisix.adminSecretName" .) "key" (include "aisix.adminSecretKey" .)))) }}
 {{- end }}
 {{- range $path, $ref := (.Values.configSecrets | default dict) }}
 {{- $chart = append $chart (dict "name" (include "aisix.configSecretEnvName" $path) "valueFrom" (dict "secretKeyRef" (dict "name" $ref.secretName "key" $ref.key))) }}
@@ -374,6 +382,22 @@ AISIX_{{ . | upper | replace "." "__" }}
 {{- end }}
 
 {{/*
+"aisix.adminEnabled" is non-empty when the chart deploys the Admin API.
+`admin` may be absent under `helm upgrade --reuse-values` from an older chart.
+*/}}
+{{- define "aisix.adminEnabled" -}}
+{{- if (.Values.admin | default dict).enabled }}true{{ end }}
+{{- end }}
+
+{{- define "aisix.adminSecretName" -}}
+{{- .Values.admin.existingSecret | default (printf "%s-admin" (include "aisix.fullname" .)) }}
+{{- end }}
+
+{{- define "aisix.adminSecretKey" -}}
+{{- if .Values.admin.existingSecret }}{{ .Values.admin.existingSecretKey | default "admin-keys" }}{{ else }}admin-keys{{ end }}
+{{- end }}
+
+{{/*
 Reject value combinations that render successfully but cannot run.
 */}}
 {{- define "aisix.validateValues" -}}
@@ -393,6 +417,19 @@ Reject value combinations that render successfully but cannot run.
 {{- if .Values.standalone.existingConfigMap }}{{ $sources = add1 $sources }}{{ end }}
 {{- if ne $sources 1 }}
 {{- fail "controlPlane.enabled=false requires exactly one resource source: standalone.resources, standalone.existingSecret, or standalone.existingConfigMap" }}
+{{- end }}
+{{- end }}
+{{- if include "aisix.adminEnabled" . }}
+{{- if .Values.controlPlane.enabled }}
+{{- fail "admin.enabled requires controlPlane.enabled=false: a gateway connected to a control plane has no Admin API" }}
+{{- end }}
+{{- if not (or .Values.admin.existingSecret .Values.admin.keys) }}
+{{- fail "admin.enabled requires admin keys: set admin.keys, or admin.existingSecret holding them" }}
+{{- end }}
+{{- range .Values.admin.keys }}
+{{- if or (not .) (contains "," (toString .)) }}
+{{- fail "admin.keys entries must be non-empty and cannot contain a comma: the gateway reads the list comma-separated" }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- if and .Values.autoscaling.enabled .Values.keda.enabled }}

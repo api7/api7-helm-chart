@@ -81,8 +81,9 @@ Nothing under `controlPlane` is read, no certificate bundle is needed, and the
 gateway reads every resource — provider keys, models, caller API keys,
 guardrails, MCP servers, rate-limit policies — from one `resources.yaml`. The
 chart renders a startup configuration pointing at it, mounts it read-only at
-`/etc/aisix/resources/resources.yaml`, and leaves the admin API unbound, so the
-file is the only way resources are declared.
+`/etc/aisix/resources/resources.yaml`. The file is the only way resources are
+declared: the Admin API, off by default, only reads them (see
+[Admin API](#admin-api)).
 
 Supply the file through exactly one of `standalone.resources`,
 `standalone.existingSecret`, or `standalone.existingConfigMap`; setting none or
@@ -178,9 +179,46 @@ kubectl rollout restart deploy/<release>-aisix -n <namespace>
 ### What is not available
 
 Standalone mode has no control plane, so there is no console, no usage or budget
-reporting, and no per-environment configuration distribution. The admin API is
-left unbound as well: it is read-only against a file source, and binding it would
-require admin keys the chart does not manage.
+reporting, and no per-environment configuration distribution.
+
+### Admin API
+
+The gateway's Admin API is off by default. With `admin.enabled: true` the chart
+binds it on `containerPorts.admin` (3001) and publishes it on its own ClusterIP
+Service, `<fullname>-admin` (`aisix-admin` for a release named `aisix`) — never
+on the proxy Service. Against the resources file it is read-only: `/admin/v1/*`
+lists and gets what the gateway loaded, including model status, and every
+request there needs one of the admin keys as `Authorization: Bearer <key>` or
+`x-api-key: <key>`. The same listener serves the Playground,
+`POST /playground/chat/completions`, which takes a caller API key exactly like
+the proxy.
+
+The admin keys come from `admin.keys`, rendered into a chart-managed Secret, or
+from a Secret you manage, named by `admin.existingSecret` (key
+`admin.existingSecretKey`, default `admin-keys`; several keys comma-separated).
+Either way they reach the gateway as the `AISIX_ADMIN__ADMIN_KEYS` environment
+variable from that Secret and are never written to the config ConfigMap.
+Enabling the API without keys fails the render, and so does enabling it with
+`controlPlane.enabled: true`: a gateway connected to a control plane has no
+Admin API.
+
+```yaml
+controlPlane:
+  enabled: false
+admin:
+  enabled: true
+  existingSecret: aisix-admin-keys
+```
+
+```sh
+kubectl create secret generic aisix-admin-keys -n aisix --from-literal=admin-keys="$(openssl rand -hex 24)"
+kubectl port-forward -n aisix svc/aisix-admin 3001:3001
+curl -H "Authorization: Bearer <key>" http://127.0.0.1:3001/admin/v1/models
+```
+
+A release that already binds the Admin API through `AISIX_ADMIN__*` variables in
+`extraEnvVars` keeps working unchanged, since the environment overrides the
+config file; moving those settings to `admin` also gives the API its Service.
 
 ## Termination and draining
 

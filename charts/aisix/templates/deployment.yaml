@@ -77,6 +77,11 @@ spec:
             - name: metrics
               containerPort: {{ .Values.containerPorts.metrics }}
               protocol: TCP
+            {{- if include "aisix.adminEnabled" . }}
+            - name: admin
+              containerPort: {{ .Values.containerPorts.admin }}
+              protocol: TCP
+            {{- end }}
           env:
             {{- include "aisix.env" . | nindent 12 }}
           {{- if .Values.startupProbe.enabled }}

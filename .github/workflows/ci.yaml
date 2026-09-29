@@ -169,6 +169,39 @@ jobs:
                 kubectl delete namespace "$ns"
               '
 
+      - name: Test aisix chart with the Admin API
+        run: |
+          kubectl cluster-info
+          docker run --rm --interactive --network host \
+              --name ct-aisix-admin \
+              --volume $HOME/.kube/config:/root/.kube/config \
+              --volume $PWD:/workdir \
+              --workdir /workdir \
+              quay.io/helmpack/chart-testing:v3.10.1 sh -c '
+                set -e
+                ns=aisix-admin
+                kubectl create namespace "$ns"
+                if ! helm install aisix charts/aisix --namespace "$ns" \
+                     --values charts/aisix/ci/standalone-values.yaml \
+                     --set admin.enabled=true --set "admin.keys={ci-admin-key}" \
+                     --wait --timeout 5m; then
+                  kubectl -n "$ns" get pods -o wide || true
+                  kubectl -n "$ns" describe pods || true
+                  kubectl -n "$ns" logs -l app.kubernetes.io/name=aisix --tail=200 || true
+                  exit 1
+                fi
+                # Reached through the admin Service: 401 without a key, 200 with one.
+                kubectl -n "$ns" run curl-admin --rm --attach --restart=Never \
+                    --image=curlimages/curl:8.11.1 --command -- sh -c "
+                      code=\$(curl -s -o /dev/null -w %{http_code} http://aisix-admin:3001/admin/v1/models)
+                      echo without key: \$code
+                      test \$code = 401
+                      curl -fsS -o /dev/null -H \"Authorization: Bearer ci-admin-key\" http://aisix-admin:3001/admin/v1/models
+                      echo with key: 200"
+                helm uninstall aisix --namespace "$ns"
+                kubectl delete namespace "$ns"
+              '
+
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
