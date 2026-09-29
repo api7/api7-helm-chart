@@ -286,6 +286,86 @@ from the bundle Secret (which extraEnvVars then overrides), and no file keys.
 {{- end }}
 
 {{/*
+The gateway container's env: the chart's own variables, then `extraEnvVars`,
+whose entries win on a repeated name. The chart leaves out its own entry for a
+name `extraEnvVars` also sets — a repeated name breaks `helm upgrade` after a
+rollback ("order in patch list") and is refused by server-side apply — except
+for the names chart 1.5.0 rendered ("aisix.env150"). A 1.5.0 release that
+overrides one of those carries the name twice, and an upgrade whose manifest
+carries it once deletes both entries, the override included. For those names
+the chart keeps rendering its entry ahead of the override, with the value 1.5.0
+gave it where the chart no longer sets it.
+*/}}
+{{- define "aisix.env" -}}
+{{- $chart := list (dict "name" "AISIX_CONFIG_PATH" "value" (include "aisix.configPath" .)) }}
+{{- if and .Values.controlPlane.enabled (include "aisix.cpPemFromEnv" .) }}
+{{- range $slot, $key := dict "CERT" .Values.controlPlane.certificate.certKey "KEY" .Values.controlPlane.certificate.keyKey "CA" .Values.controlPlane.certificate.caKey }}
+{{- $chart = append $chart (dict "name" (printf "AISIX_MANAGED__CP_%s_PEM" $slot) "valueFrom" (dict "secretKeyRef" (dict "name" (include "aisix.certSecretName" $) "key" $key))) }}
+{{- end }}
+{{- end }}
+{{- if and (eq .Values.rateLimit.backend "redis") (or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret) }}
+{{- $chart = append $chart (dict "name" "AISIX_RATELIMIT__REDIS__URL" "valueFrom" (dict "secretKeyRef" (dict "name" (include "aisix.redisSecretName" .) "key" (include "aisix.redisSecretKey" .)))) }}
+{{- end }}
+{{- range $path, $ref := (.Values.configSecrets | default dict) }}
+{{- $chart = append $chart (dict "name" (include "aisix.configSecretEnvName" $path) "valueFrom" (dict "secretKeyRef" (dict "name" $ref.secretName "key" $ref.key))) }}
+{{- end }}
+{{- $extra := .Values.extraEnvVars | default list }}
+{{- $overridden := list }}
+{{- range $extra }}
+{{- $overridden = append $overridden .name }}
+{{- end }}
+{{- $legacy := include "aisix.env150" . | fromYamlArray }}
+{{- $legacyNames := list }}
+{{- range $legacy }}
+{{- $legacyNames = append $legacyNames .name }}
+{{- end }}
+{{- $env := list }}
+{{- $chartNames := list }}
+{{- range $chart }}
+{{- $chartNames = append $chartNames .name }}
+{{- if or (not (has .name $overridden)) (has .name $legacyNames) }}
+{{- $env = append $env . }}
+{{- end }}
+{{- end }}
+{{- range $legacy }}
+{{- if and (has .name $overridden) (not (has .name $chartNames)) }}
+{{- $env = append $env . }}
+{{- end }}
+{{- end }}
+{{- toYaml (concat $env $extra) }}
+{{- end }}
+
+{{/*
+"aisix.env150" is the env list chart 1.5.0 rendered for these values — the
+names "aisix.env" must not drop while an older release may still carry them
+twice. Only the entries the chart no longer renders use these values.
+*/}}
+{{- define "aisix.env150" -}}
+{{- $env := list (dict "name" "AISIX_CONFIG_PATH" "value" (ternary "/etc/aisix/config.managed.yaml" "/etc/aisix/standalone/config.yaml" .Values.controlPlane.enabled)) }}
+{{- $env = append $env (dict "name" "AISIX_PROXY__ADDR" "value" (printf "0.0.0.0:%d" (int .Values.containerPorts.proxy))) }}
+{{- if .Values.listeners }}
+{{- $env = append $env (dict "name" "AISIX_PROXY__LISTENERS" "value" (include "aisix.proxyListenersJson" .)) }}
+{{- end }}
+{{- $env = append $env (dict "name" "AISIX_OBSERVABILITY__METRICS__PROMETHEUS__ADDR" "value" (printf "0.0.0.0:%d" (int .Values.containerPorts.metrics))) }}
+{{- if .Values.controlPlane.enabled }}
+{{- $env = append $env (dict "name" "AISIX_MANAGED__CP_BASE_URL" "value" .Values.controlPlane.baseURL) }}
+{{- with .Values.controlPlane.etcdEndpoint }}
+{{- $env = append $env (dict "name" "AISIX_MANAGED__CP_ETCD_ENDPOINT" "value" .) }}
+{{- end }}
+{{- $env = append $env (dict "name" "AISIX_MANAGED__HEARTBEAT_INTERVAL_SECS" "value" (toString .Values.controlPlane.heartbeatIntervalSeconds)) }}
+{{- range $slot, $key := dict "CERT" .Values.controlPlane.certificate.certKey "KEY" .Values.controlPlane.certificate.keyKey "CA" .Values.controlPlane.certificate.caKey }}
+{{- $env = append $env (dict "name" (printf "AISIX_MANAGED__CP_%s_PEM" $slot) "valueFrom" (dict "secretKeyRef" (dict "name" (include "aisix.certSecretName" $) "key" $key))) }}
+{{- end }}
+{{- end }}
+{{- /* 1.5.0 refused a Redis backend without one of these. */}}
+{{- if and (eq .Values.rateLimit.backend "redis") (or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret) }}
+{{- $env = append $env (dict "name" "AISIX_RATELIMIT__BACKEND" "value" "redis") }}
+{{- $env = append $env (dict "name" "AISIX_RATELIMIT__REDIS__URL" "valueFrom" (dict "secretKeyRef" (dict "name" (include "aisix.redisSecretName" .) "key" (include "aisix.redisSecretKey" .)))) }}
+{{- end }}
+{{- toYaml $env }}
+{{- end }}
+
+{{/*
 The environment variable the gateway reads a `configSecrets` path from:
 AISIX_ plus the path upper-cased with `.` as `__`.
 */}}

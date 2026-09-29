@@ -461,6 +461,15 @@ configSecrets:
 the variables a standalone resources file references. An `AISIX_*` variable set
 there still overrides the file, as it always has.
 
+Overriding a variable the chart sets itself through `extraEnvVars` is only a
+compatibility path for existing deployments, and the `extraEnvVars` value still
+wins. For a name chart 1.5.0 set (such as `AISIX_MANAGED__CP_BASE_URL` or
+`AISIX_MANAGED__HEARTBEAT_INTERVAL_SECS`) the chart keeps rendering its own
+entry ahead of yours, so a Helm 3 upgrade from 1.5.0 does not drop the override;
+the container then lists the name twice, which Helm 4 server-side apply
+rejects. New installs set the value in its own key in `values.yaml` or under
+`config` instead.
+
 ## Parameters
 
 {{ template "chart.valuesSection" . }}

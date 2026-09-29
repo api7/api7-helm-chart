@@ -52,6 +52,27 @@ check "extraEnvVars PEMs keep the env wiring: no file keys, no mount, all three 
 check "extraEnvVars PEMs render after the chart's own, exactly as 1.5.0 did" \
   query '[e["name"] for e in pod["containers"][0]["env"] if e["name"] == "AISIX_MANAGED__CP_CERT_PEM"] == ["AISIX_MANAGED__CP_CERT_PEM"] * 2 and pod["containers"][0]["env"][[e["name"] for e in pod["containers"][0]["env"]].index("AISIX_MANAGED__CP_CERT_PEM")]["valueFrom"]["secretKeyRef"]["name"] == "aisix-gateway-certificate"' \
   --set 'extraEnvVars[0].name=AISIX_MANAGED__CP_CERT_PEM' --set 'extraEnvVars[0].value=pem'
+# extraEnvVars wins on a repeated name (Kubernetes takes the last entry), and
+# the chart drops its own entry for a name new since 1.5.0: a repeated name
+# breaks upgrades after a rollback and is refused by server-side apply.
+new_names=(--set 'configSecrets.cache\.redis\.password.secretName=redis-auth' --set 'configSecrets.cache\.redis\.password.key=password'
+  --set 'extraEnvVars[0].name=AISIX_CACHE__REDIS__PASSWORD' --set 'extraEnvVars[0].value=user' --set 'extraEnvVars[1].name=TZ' --set 'extraEnvVars[1].value=UTC')
+no_dups='all(len(names) == len(set(names)) for names in ([e["name"] for e in c.get("env", [])] for c in pod["containers"] + pod.get("initContainers", [])))'
+check "extraEnvVars overriding a name new since 1.5.0 leaves no repeated name (control plane)" \
+  query "$no_dups and env[\"AISIX_CACHE__REDIS__PASSWORD\"] == {\"name\": \"AISIX_CACHE__REDIS__PASSWORD\", \"value\": \"user\"}" "${new_names[@]}"
+check "extraEnvVars overriding a name new since 1.5.0 leaves no repeated name (standalone)" \
+  query "$no_dups and env[\"AISIX_CACHE__REDIS__PASSWORD\"][\"value\"] == \"user\"" -f "$chart/ci/standalone-values.yaml" "${new_names[@]}"
+# A 1.5.0 release that overrides a name 1.5.0 rendered carries it twice; an
+# upgrade whose manifest carries it once deletes both entries, the override
+# included. So for those names the chart's own entry stays ahead of the user's.
+old_names=(--set 'extraEnvVars[0].name=AISIX_MANAGED__CP_BASE_URL' --set 'extraEnvVars[0].value=https://cp.example.com'
+  --set 'extraEnvVars[1].name=AISIX_MANAGED__HEARTBEAT_INTERVAL_SECS' --set-string 'extraEnvVars[1].value=42'
+  --set 'extraEnvVars[2].name=AISIX_PROXY__ADDR' --set 'extraEnvVars[2].value=0.0.0.0:8080')
+check "extraEnvVars overriding a name 1.5.0 rendered keeps 1.5.0's pair, the user's entry last" \
+  query '[(e["name"], e["value"]) for e in pod["containers"][0]["env"] if e["name"] in ("AISIX_MANAGED__CP_BASE_URL", "AISIX_MANAGED__HEARTBEAT_INTERVAL_SECS", "AISIX_PROXY__ADDR")] == [("AISIX_PROXY__ADDR", "0.0.0.0:3000"), ("AISIX_MANAGED__CP_BASE_URL", "https://dp-manager.example.com:7944"), ("AISIX_MANAGED__HEARTBEAT_INTERVAL_SECS", "15"), ("AISIX_MANAGED__CP_BASE_URL", "https://cp.example.com"), ("AISIX_MANAGED__HEARTBEAT_INTERVAL_SECS", "42"), ("AISIX_PROXY__ADDR", "0.0.0.0:8080")]' \
+  "${old_names[@]}"
+check "1.5.0 never rendered control-plane names in standalone mode, so none repeats there" \
+  query "$no_dups" -f "$chart/ci/standalone-values.yaml" "${old_names[@]:0:8}"
 check "configSecrets becomes a secretKeyRef env var" \
   query 'env["AISIX_CACHE__REDIS__PASSWORD"]["valueFrom"]["secretKeyRef"] == {"name": "redis-auth", "key": "password"}' \
   --set 'configSecrets.cache\.redis\.password.secretName=redis-auth' --set 'configSecrets.cache\.redis\.password.key=password'

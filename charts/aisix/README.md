@@ -467,6 +467,15 @@ configSecrets:
 the variables a standalone resources file references. An `AISIX_*` variable set
 there still overrides the file, as it always has.
 
+Overriding a variable the chart sets itself through `extraEnvVars` is only a
+compatibility path for existing deployments, and the `extraEnvVars` value still
+wins. For a name chart 1.5.0 set (such as `AISIX_MANAGED__CP_BASE_URL` or
+`AISIX_MANAGED__HEARTBEAT_INTERVAL_SECS`) the chart keeps rendering its own
+entry ahead of yours, so a Helm 3 upgrade from 1.5.0 does not drop the override;
+the container then lists the name twice, which Helm 4 server-side apply
+rejects. New installs set the value in its own key in `values.yaml` or under
+`config` instead.
+
 ## Parameters
 
 ## Values
@@ -545,7 +554,7 @@ there still overrides the file, as it always has.
 | controlPlane.enabled | bool | `true` | Read configuration from an AISIX control plane. Set to false to run standalone, from the `resources.yaml` file configured under `standalone` |
 | controlPlane.etcdEndpoint | string | `""` | Control-plane etcd endpoint as bare `host:port`. Leave empty unless the control plane publishes an etcd endpoint distinct from `baseURL` |
 | controlPlane.heartbeatIntervalSeconds | int | `15` | Heartbeat interval in seconds. The control plane marks a gateway connected on its first heartbeat. Clamped to [5, 300] by the gateway |
-| extraEnvVars | list | `[]` | Extra environment variables for the gateway container: system-level environment variables (such as `TZ`) and variables referenced by the resources file. Gateway settings belong in `config` |
+| extraEnvVars | list | `[]` | Extra environment variables for the gateway container: system-level environment variables (such as `TZ`) and variables referenced by the resources file. Gateway settings belong in `config`. Overriding a variable the chart sets itself is only a compatibility path for existing deployments: for a name chart 1.5.0 set, the rendered container then lists it twice, which Helm 4 server-side apply rejects. New installs set the value in its own key or under `config` |
 | extraVolumeMounts | list | `[]` | Extra volume mounts for the gateway container |
 | extraVolumes | list | `[]` | Extra volumes for the gateway pod |
 | fullnameOverride | string | `""` | Override the fully qualified resource name prefix |
