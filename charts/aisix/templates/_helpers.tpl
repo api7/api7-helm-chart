@@ -80,13 +80,14 @@ Name of the Secret holding the gateway certificate bundle.
 {{- end }}
 
 {{/*
-Standalone mode: the directory the startup config is mounted in, the file the
-gateway reads from it, and the resources file it points at. Both live under
-their own directory so neither mount shadows the image's own
-/etc/aisix/config.managed.yaml.
+The directory the chart-rendered startup config is mounted in and the file the
+gateway reads from it; the standalone resources file; and the control-plane
+mTLS bundle. Each lives under its own directory so no mount shadows the image's
+own /etc/aisix/config.managed.yaml.
 */}}
-{{- define "aisix.standaloneConfigDir" -}}/etc/aisix/standalone{{- end }}
-{{- define "aisix.standaloneConfigPath" -}}{{ include "aisix.standaloneConfigDir" . }}/config.yaml{{- end }}
+{{- define "aisix.configDir" -}}/etc/aisix/chart{{- end }}
+{{- define "aisix.configPath" -}}{{ include "aisix.configDir" . }}/config.yaml{{- end }}
+{{- define "aisix.cpCertDir" -}}/etc/aisix/cp-mtls{{- end }}
 {{- define "aisix.standaloneResourcesDir" -}}/etc/aisix/resources{{- end }}
 {{- define "aisix.standaloneResourcesPath" -}}{{ include "aisix.standaloneResourcesDir" . }}/resources.yaml{{- end }}
 
@@ -137,10 +138,9 @@ the built-in "proxy" port.
 "aisix.proxyListenerTLS" is non-empty when that first listener terminates TLS,
 so the probes know to speak HTTPS to it.
 
-"aisix.proxyListenersJson" builds the AISIX_PROXY__LISTENERS value. The gateway
-takes the whole list as one JSON document — indexed environment variables are
-not a form it accepts — and reads TLS material from files, so each TLS listener
-points at the directory its Secret is mounted in.
+"aisix.proxyListenersJson" builds the `proxy.listeners` list of the rendered
+config file, as JSON. The gateway reads TLS material from files, so each TLS
+listener points at the directory its Secret is mounted in.
 */}}
 {{- define "aisix.proxyPortName" -}}
 {{- if .Values.listeners }}{{ (first .Values.listeners).name }}{{ else }}proxy{{ end }}
@@ -167,6 +167,102 @@ points at the directory its Secret is mounted in.
 {{- $listeners = append $listeners $entry }}
 {{- end }}
 {{- toJson $listeners }}
+{{- end }}
+
+{{/*
+"aisix.configPathSet" prints "true" when the dotted path .path is set to a
+non-null value in the map .cfg.
+*/}}
+{{- define "aisix.configPathSet" -}}
+{{- $cur := .cfg }}
+{{- $found := true }}
+{{- range (splitList "." .path) }}
+{{- if and $found (kindIs "map" $cur) (hasKey $cur .) }}
+{{- $cur = get $cur . }}
+{{- else }}
+{{- $found = false }}
+{{- end }}
+{{- end }}
+{{- if and $found (not (kindIs "invalid" $cur)) }}true{{ end }}
+{{- end }}
+
+{{/*
+"aisix.dropNulls" deletes every null-valued key from a map, recursively, so a
+null in `config` means "leave it to the gateway's default".
+*/}}
+{{- define "aisix.dropNulls" -}}
+{{- $m := . }}
+{{- range $k, $v := $m }}
+{{- if kindIs "invalid" $v }}
+{{- $_ := unset $m $k }}
+{{- else if kindIs "map" $v }}
+{{- include "aisix.dropNulls" $v }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+"aisix.ensureMap" makes .parent[.key] a map when it
+is absent or null, so a chart-owned key can be set beneath it.
+*/}}
+{{- define "aisix.ensureMap" -}}
+{{- if not (kindIs "map" (get .parent .key)) }}
+{{- $_ := set .parent .key dict }}
+{{- end }}
+{{- end }}
+
+{{/*
+The gateway startup config file: the user's `config` block with the chart-owned
+keys filled in for the mode. Keys the chart owns or that hold a credential are
+rejected by "aisix.validateValues" before this runs.
+*/}}
+{{- define "aisix.configFile" -}}
+{{- $cfg := deepCopy (.Values.config | default dict) }}
+{{- range $section := list "proxy" "observability" "ratelimit" }}
+{{- include "aisix.ensureMap" (dict "parent" $cfg "key" $section) }}
+{{- end }}
+{{- $_ := set $cfg.proxy "addr" (printf "0.0.0.0:%d" (int .Values.containerPorts.proxy)) }}
+{{- if .Values.listeners }}
+{{- $_ := set $cfg.proxy "listeners" (include "aisix.proxyListenersJson" . | fromJsonArray) }}
+{{- end }}
+{{- include "aisix.ensureMap" (dict "parent" $cfg.observability "key" "metrics") }}
+{{- include "aisix.ensureMap" (dict "parent" $cfg.observability.metrics "key" "prometheus") }}
+{{- $_ := set $cfg.observability.metrics.prometheus "addr" (printf "0.0.0.0:%d" (int .Values.containerPorts.metrics)) }}
+{{- $_ := set $cfg.ratelimit "backend" .Values.rateLimit.backend }}
+{{- if .Values.controlPlane.enabled }}
+{{- include "aisix.ensureMap" (dict "parent" $cfg "key" "etcd") }}
+{{- include "aisix.ensureMap" (dict "parent" $cfg "key" "managed") }}
+{{- /* Overwritten at boot from the control-plane connection, but required. */}}
+{{- $_ := set $cfg.etcd "endpoints" (list "https://placeholder-overridden-at-register:2379") }}
+{{- $_ := set $cfg.etcd "prefix" "/aisix" }}
+{{- /* Never bound in control-plane mode; validation requires the slot. */}}
+{{- $_ := set $cfg "admin" (dict "addr" "127.0.0.1:0" "admin_keys" (list "managed-mode-admin-disabled")) }}
+{{- $_ := set $cfg.managed "enabled" true }}
+{{- $_ := set $cfg.managed "cp_base_url" .Values.controlPlane.baseURL }}
+{{- with .Values.controlPlane.etcdEndpoint }}
+{{- $_ := set $cfg.managed "cp_etcd_endpoint" . }}
+{{- end }}
+{{- $_ := set $cfg.managed "heartbeat_interval_secs" (int .Values.controlPlane.heartbeatIntervalSeconds) }}
+{{- $dir := include "aisix.cpCertDir" . }}
+{{- $_ := set $cfg.managed "cp_cert_file" (printf "%s/cert.pem" $dir) }}
+{{- $_ := set $cfg.managed "cp_key_file" (printf "%s/key.pem" $dir) }}
+{{- $_ := set $cfg.managed "cp_ca_file" (printf "%s/ca.pem" $dir) }}
+{{- else }}
+{{- $_ := unset $cfg "etcd" }}
+{{- $_ := unset $cfg "managed" }}
+{{- $_ := set $cfg "resources_file" (include "aisix.standaloneResourcesPath" .) }}
+{{- $_ := set $cfg "admin" (dict "enabled" false) }}
+{{- end }}
+{{- include "aisix.dropNulls" $cfg }}
+{{- toYaml $cfg }}
+{{- end }}
+
+{{/*
+The environment variable the gateway reads a `configSecrets` path from:
+AISIX_ plus the path upper-cased with `.` as `__`.
+*/}}
+{{- define "aisix.configSecretEnvName" -}}
+AISIX_{{ . | upper | replace "." "__" }}
 {{- end }}
 
 {{/*
@@ -197,9 +293,31 @@ Reject value combinations that render successfully but cannot run.
 {{- if and .Values.keda.enabled (not .Values.keda.triggers) }}
 {{- fail "keda.enabled requires at least one entry in keda.triggers" }}
 {{- end }}
+{{- $config := .Values.config | default dict }}
 {{- if eq .Values.rateLimit.backend "redis" }}
-{{- if not (or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret) }}
+{{- $mode := "single" }}
+{{- if kindIs "map" $config.ratelimit }}{{ if kindIs "map" $config.ratelimit.redis }}{{ $mode = $config.ratelimit.redis.mode | default "single" }}{{ end }}{{ end }}
+{{- if and (eq $mode "single") (not (or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret)) }}
 {{- fail "rateLimit.backend=redis requires rateLimit.redis.url or rateLimit.redis.existingSecret" }}
+{{- end }}
+{{- end }}
+{{- $policy := .Files.Get "config-policy.yaml" | fromYaml }}
+{{- range $path, $use := $policy.owned }}
+{{- if include "aisix.configPathSet" (dict "cfg" $config "path" $path) }}
+{{- fail (printf "config.%s is set by the chart and cannot be written under config: %s" $path $use) }}
+{{- end }}
+{{- end }}
+{{- range $path := $policy.secrets }}
+{{- if include "aisix.configPathSet" (dict "cfg" $config "path" $path) }}
+{{- fail (printf "config.%s holds a credential and is never written to the ConfigMap: set it through configSecrets.%s with a secretName and key" $path $path) }}
+{{- end }}
+{{- end }}
+{{- range $path, $ref := (.Values.configSecrets | default dict) }}
+{{- if not (has $path $policy.secrets) }}
+{{- fail (printf "configSecrets.%s is not a credential-bearing setting; accepted keys: %s" $path (join ", " $policy.secrets)) }}
+{{- end }}
+{{- if not (and (kindIs "map" $ref) $ref.secretName $ref.key) }}
+{{- fail (printf "configSecrets.%s requires secretName and key" $path) }}
 {{- end }}
 {{- end }}
 {{- $names := list }}

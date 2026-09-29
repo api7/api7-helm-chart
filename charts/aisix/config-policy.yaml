@@ -1,0 +1,41 @@
+# Which gateway startup-config keys the chart does NOT take from `config:`.
+# Read by templates/_helpers.tpl (render-time validation) and by
+# scripts/check-aisix-config-drift.py (CI drift check), so the two cannot
+# disagree. Keys are dotted configuration paths.
+
+# Set by the chart from its own values. Writing one under `config:` fails the
+# render with this message.
+owned:
+  resources_file: "set by the chart in standalone mode: supply the file through standalone.resources, standalone.existingSecret or standalone.existingConfigMap"
+  admin: "the admin listener is not deployed by this chart"
+  etcd.endpoints: "set by the chart from the control-plane connection"
+  etcd.prefix: "set by the chart from the control-plane connection"
+  etcd.env_id: "not configurable through this chart"
+  etcd.user: "not configurable through this chart"
+  etcd.password_env: "not configurable through this chart"
+  etcd.tls: "not configurable through this chart"
+  proxy.addr: "use containerPorts.proxy"
+  proxy.listeners: "use listeners"
+  proxy.tls: "use listeners with a tls.secretName"
+  observability.metrics.prometheus.addr: "use containerPorts.metrics"
+  ratelimit.backend: "use rateLimit.backend"
+  ratelimit.redis.url: "use rateLimit.redis.url or rateLimit.redis.existingSecret"
+  managed.enabled: "use controlPlane.enabled"
+  managed.cp_base_url: "use controlPlane.baseURL"
+  managed.cp_etcd_endpoint: "use controlPlane.etcdEndpoint"
+  managed.heartbeat_interval_secs: "use controlPlane.heartbeatIntervalSeconds"
+  managed.cp_cert_pem: "use controlPlane.certificate"
+  managed.cp_key_pem: "use controlPlane.certificate"
+  managed.cp_ca_pem: "use controlPlane.certificate"
+  managed.cp_cert_file: "use controlPlane.certificate"
+  managed.cp_key_file: "use controlPlane.certificate"
+  managed.cp_ca_file: "use controlPlane.certificate"
+
+# Hold a credential. Set through `configSecrets` only; writing one under
+# `config:` fails the render.
+secrets:
+  - cache.redis.url
+  - cache.redis.username
+  - cache.redis.password
+  - ratelimit.redis.username
+  - ratelimit.redis.password

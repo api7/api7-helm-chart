@@ -180,9 +180,7 @@ kubectl rollout restart deploy/<release>-aisix -n <namespace>
 Standalone mode has no control plane, so there is no console, no usage or budget
 reporting, and no per-environment configuration distribution. The admin API is
 left unbound as well: it is read-only against a file source, and binding it would
-require admin keys the chart does not manage. Turn it on with
-`extraEnvVars` — `AISIX_ADMIN__ENABLED`, `AISIX_ADMIN__ADDR` and
-`AISIX_ADMIN__ADMIN_KEYS` — if you want it.
+require admin keys the chart does not manage.
 
 ## Termination and draining
 
@@ -407,16 +405,61 @@ topologySpreadConstraints:
 
 ### Set any other gateway configuration
 
-Every field of the gateway's configuration file is reachable as an environment
-variable named `AISIX_<SECTION>__<FIELD>`:
+The gateway reads its settings from a configuration file the chart renders into
+a ConfigMap, in both modes. `config` in `values.yaml` mirrors that file key for
+key — the same section and key names as the gateway's own `config.example.yaml`
+— and lists every setting with the gateway's default, so change only what you
+need:
 
 ```yaml
-extraEnvVars:
-  - name: AISIX_OBSERVABILITY__LOG_LEVEL
-    value: debug
-  - name: AISIX_CACHE__BACKEND
-    value: redis
+config:
+  observability:
+    log_level: debug
+  upstream:
+    pool_idle_timeout_secs: 15
+  proxy:
+    real_ip:
+      trusted_proxies: ["10.0.0.0/8"]
+      recursive: true
 ```
+
+A `null` leaves the key to the gateway's default. A change rolls the pods on
+`helm upgrade`.
+
+A few keys are set by the chart from its other values and are rejected under
+`config` with a message naming the value to use instead: the proxy and metrics
+addresses (`containerPorts`), `proxy.listeners` (`listeners`),
+`ratelimit.backend` and the rate-limit Redis URL (`rateLimit`), the
+control-plane connection (`controlPlane`), and the standalone resources file
+(`standalone`). The list is in the chart's `config-policy.yaml`.
+
+Settings that hold a credential never go into the ConfigMap. Put the value in a
+Secret and name it under `configSecrets`, keyed by the configuration path; the
+chart hands it to the gateway as an environment variable that overrides the
+file:
+
+```yaml
+config:
+  cache:
+    backend: redis
+    redis:
+      mode: single
+configSecrets:
+  cache.redis.url:
+    secretName: aisix-cache-redis
+    key: url
+  cache.redis.password:
+    secretName: aisix-cache-redis
+    key: password
+```
+
+`configSecrets` accepts `cache.redis.url`, `cache.redis.username`,
+`cache.redis.password`, `ratelimit.redis.username` and
+`ratelimit.redis.password`.
+
+`extraEnvVars` is for system-level environment variables such as `TZ`, and for
+the variables a standalone resources file references. An `AISIX_*` variable set
+there still overrides the file, as it always has.
 
 ## Parameters
 

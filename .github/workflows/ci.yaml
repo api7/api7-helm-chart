@@ -41,6 +41,14 @@ jobs:
                   --charts charts/developer-portal-fe \
                   --charts charts/ngxdig'
 
+      - name: Check aisix chart config against the gateway
+        run: |
+          python3 -c 'import yaml' 2>/dev/null || sudo apt-get install -y python3-yaml
+          python3 .github/scripts/check-aisix-config-drift.py
+
+      - name: Boot the aisix gateway on the chart-rendered config
+        run: bash .github/scripts/aisix-config-boot.sh
+
       - name: Verify Chart.lock files
         run: |
           docker run --rm --interactive --network host \
