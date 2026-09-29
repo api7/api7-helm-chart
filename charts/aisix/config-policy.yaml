@@ -40,8 +40,9 @@ secrets:
   - ratelimit.redis.username
   - ratelimit.redis.password
 
-# Sub-keys of the blocks that are off unless written (`null` in values.yaml),
-# other than the owned and secret ones above. `config` passes these blocks
+# Sub-keys of the blocks that are off unless written (`null` in values.yaml)
+# and of the elements of lists of structs (`<path>[]`), other than the owned
+# and secret ones above. `config` passes these blocks
 # through as written; the list is what the chart documents for them, and the
 # drift check fails on a gateway sub-key that is in none of the three lists.
 optional:
@@ -67,3 +68,11 @@ optional:
     - tls.client_cert_file
     - tls.client_key_file
     - tls.verify
+  proxy.url_rewrites[]:
+    - name
+    - hosts
+    - match
+    - rewrite
+  observability.metrics.client_type_rules[]:
+    - pattern
+    - client

@@ -45,7 +45,7 @@ def flatten(node, prefix=""):
 
 
 def excluded(path, prefixes):
-    return any(path == p or path.startswith(p + ".") for p in prefixes)
+    return any(path == p or path.startswith((p + ".", p + "[]")) for p in prefixes)
 
 
 def main():
