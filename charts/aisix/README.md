@@ -186,9 +186,7 @@ kubectl rollout restart deploy/<release>-aisix -n <namespace>
 Standalone mode has no control plane, so there is no console, no usage or budget
 reporting, and no per-environment configuration distribution. The admin API is
 left unbound as well: it is read-only against a file source, and binding it would
-require admin keys the chart does not manage. Turn it on with
-`extraEnvVars` — `AISIX_ADMIN__ENABLED`, `AISIX_ADMIN__ADDR` and
-`AISIX_ADMIN__ADMIN_KEYS` — if you want it.
+require admin keys the chart does not manage.
 
 ## Termination and draining
 
@@ -413,16 +411,61 @@ topologySpreadConstraints:
 
 ### Set any other gateway configuration
 
-Every field of the gateway's configuration file is reachable as an environment
-variable named `AISIX_<SECTION>__<FIELD>`:
+The gateway reads its settings from a configuration file the chart renders into
+a ConfigMap, in both modes. `config` in `values.yaml` mirrors that file key for
+key — the same section and key names as the gateway's own `config.example.yaml`
+— and lists every setting with the gateway's default, so change only what you
+need:
 
 ```yaml
-extraEnvVars:
-  - name: AISIX_OBSERVABILITY__LOG_LEVEL
-    value: debug
-  - name: AISIX_CACHE__BACKEND
-    value: redis
+config:
+  observability:
+    log_level: debug
+  upstream:
+    pool_idle_timeout_secs: 15
+  proxy:
+    real_ip:
+      trusted_proxies: ["10.0.0.0/8"]
+      recursive: true
 ```
+
+A `null` leaves the key to the gateway's default. A change rolls the pods on
+`helm upgrade`.
+
+A few keys are set by the chart from its other values and are rejected under
+`config` with a message naming the value to use instead: the proxy and metrics
+addresses (`containerPorts`), `proxy.listeners` (`listeners`),
+`ratelimit.backend` and the rate-limit Redis URL (`rateLimit`), the
+control-plane connection (`controlPlane`), and the standalone resources file
+(`standalone`). The list is in the chart's `config-policy.yaml`.
+
+Settings that hold a credential never go into the ConfigMap. Put the value in a
+Secret and name it under `configSecrets`, keyed by the configuration path; the
+chart hands it to the gateway as an environment variable that overrides the
+file:
+
+```yaml
+config:
+  cache:
+    backend: redis
+    redis:
+      mode: single
+configSecrets:
+  cache.redis.url:
+    secretName: aisix-cache-redis
+    key: url
+  cache.redis.password:
+    secretName: aisix-cache-redis
+    key: password
+```
+
+`configSecrets` accepts `cache.redis.url`, `cache.redis.username`,
+`cache.redis.password`, `ratelimit.redis.username` and
+`ratelimit.redis.password`.
+
+`extraEnvVars` is for system-level environment variables such as `TZ`, and for
+the variables a standalone resources file references. An `AISIX_*` variable set
+there still overrides the file, as it always has.
 
 ## Parameters
 
@@ -438,6 +481,57 @@ extraEnvVars:
 | autoscaling.minReplicas | int | `2` | Lower replica bound |
 | autoscaling.targetCPUUtilizationPercentage | int | `70` | Target average CPU utilization, in percent of the CPU request. Set to null to drop the CPU metric |
 | autoscaling.targetMemoryUtilizationPercentage | string | `nil` | Target average memory utilization, in percent of the memory request. Null by default: gateway memory tracks in-flight streams more than load |
+| config.bedrock_endpoint_url | string | `nil` | Deployment-wide AWS Bedrock endpoint override for bedrock guardrails, e.g. a LocalStack URL. Null uses the AWS SDK default |
+| config.cache.backend | string | `"memory"` | Legacy cache backend switch, `memory` or `redis`. `redis` requires `cache.redis`. Which cache serves a request is chosen per cache policy |
+| config.cache.redis | object | `nil` | Shared Redis for the response cache, e.g. `{mode: single}`; the redis cache is built only when this is set. Keys: `mode` (single, cluster, sentinel), `nodes`, `sentinels`, `master_name`, `database`, `tls`, `timeout_secs`. `url`, `username` and `password` go through `configSecrets` |
+| config.downstream.idle_timeout_secs | int | `0` | Seconds an idle client connection is held. 0 never closes it |
+| config.downstream.sse_keepalive_interval_secs | int | `15` | Seconds between SSE keepalive comments on a stalled stream |
+| config.etcd.dial_timeout_ms | int | `5000` | Bound on one dial to the control plane's etcd, in milliseconds. 0 means unbounded |
+| config.etcd.request_timeout_ms | int | `nil` | Bound on one etcd request, in milliseconds. Null means unbounded |
+| config.managed.cp_ca_cert_file | string | `nil` | Extra CA bundle trusted for the control-plane connection, when it serves a private-CA certificate. Mount the file through `extraVolumes` |
+| config.managed.dp_id_file | string | `"/var/lib/aisix/dp_id"` | File the gateway id is persisted in |
+| config.managed.mtls_dir | string | `"/var/lib/aisix/mtls"` | Directory the materialised mTLS bundle is written to |
+| config.managed.snapshot_cache_enabled | bool | `false` | Persist a configuration snapshot for recovery while etcd is unreachable. The snapshot holds unencrypted credentials |
+| config.managed.snapshot_cache_path | string | `nil` | Snapshot location. Null uses `/var/lib/aisix/config_cache.json` |
+| config.observability.access_log | bool | `true` | Write an access-log line per request |
+| config.observability.debug.addr | string | `"127.0.0.1:9091"` | Diagnostics listener address. Loopback keeps it off the network |
+| config.observability.debug.enabled | bool | `true` | Serve the unauthenticated heap-profile endpoint (`/debug/pprof/heap`) |
+| config.observability.heap_profiling.auto_dump.dir | string | `"/var/lib/aisix/heap"` | Directory the profiles are written to |
+| config.observability.heap_profiling.auto_dump.enabled | bool | `true` | Write a heap profile as resident memory nears the memory limit |
+| config.observability.heap_profiling.auto_dump.keep | int | `5` | Newest profiles kept |
+| config.observability.heap_profiling.auto_dump.thresholds | list | `[0.8,0.9]` | Fractions of the memory limit that each trigger one profile |
+| config.observability.log_level | string | `"info"` | Log level: trace, debug, info, warn or error |
+| config.observability.metrics.buckets | object | `{"a2a_ttfb":null,"guardrail_latency":null,"request_e2e_latency":null,"request_ttft":null}` | Per-metric histogram bucket edges in seconds. Null keeps that metric's default buckets |
+| config.observability.metrics.client_type_rules | list | `[]` | User-Agent to `client_type` mapping rules, first match wins, e.g. `[{pattern: "^py-billing-batcher/", client: billing-batcher}]` |
+| config.observability.metrics.labels | object | `{}` | Complete optional label list per metric, e.g. `{aisix_request_ttft_seconds: [model, provider]}`. Omitted metrics keep their default labels |
+| config.observability.metrics.prometheus.enabled | bool | `true` | Serve Prometheus metrics on the metrics listener (`containerPorts.metrics`) |
+| config.observability.metrics.prometheus.path | string | `"/metrics"` | Metrics path |
+| config.observability.service_name | string | `"aisix"` | Service name reported in telemetry |
+| config.proxy.real_ip.header | string | `"x-forwarded-for"` | Header carrying the client IP |
+| config.proxy.real_ip.recursive | bool | `false` | Walk the header right to left past every trusted proxy |
+| config.proxy.real_ip.trusted_proxies | list | `[]` | CIDRs (or bare IPs) of proxies trusted to set the client-IP header |
+| config.proxy.request_body_limit_bytes | int | `0` | Request-body size cap in bytes. 0 means no cap |
+| config.proxy.request_id.accept_headers | list | `["x-aisix-request-id"]` | Headers a caller may supply its own request id in. Add `x-request-id` only when no proxy in front stamps it |
+| config.proxy.thread_per_core | bool | `nil` | Thread-per-core serving topology. Null uses the gateway default (on for Linux) |
+| config.proxy.url_rewrites | list | `[]` | Entry-level URL rewrite rules, first match wins, e.g. `[{name: per-server-mcp, match: "^/mcp-servers/([^/]+)/mcp$", rewrite: "/mcp/$1"}]` |
+| config.proxy.workers | int | `nil` | Worker count. Null uses the gateway default |
+| config.ratelimit.concurrency_ttl_secs | int | `300` | Seconds a concurrency-limit slot is held at most |
+| config.ratelimit.redis | object | `nil` | Extra settings for the shared rate-limit Redis selected by `rateLimit.backend: redis`, e.g. `{timeout_secs: 2}` or `{mode: cluster, nodes: [...]}`. Same keys as `cache.redis`; the URL comes from `rateLimit.redis`, `username` and `password` go through `configSecrets` |
+| config.shutdown.min_drain_secs | int | `30` | Seconds the gateway keeps accepting after SIGTERM while `/readyz` reports 503. `terminationGracePeriodSeconds` must cover it |
+| config.upstream.connect_timeout_ms | int | `5000` | Connect timeout in milliseconds |
+| config.upstream.pool_idle_timeout_secs | int | `30` | Seconds an idle pooled connection is kept. Lower it when a load balancer or NAT between the gateway and the provider closes idle connections sooner |
+| config.upstream.pool_max_idle_per_host | int | `nil` | Idle pooled connections kept per host. Null means unbounded |
+| config.upstream.retries | int | `2` | Retry budget every dispatch starts from |
+| config.upstream.stream_timeout_ms | int | `0` | Streaming idle timeout in milliseconds. 0 means none |
+| config.upstream.tcp_keepalive_interval_secs | int | `30` | TCP keepalive probe interval in seconds |
+| config.upstream.tcp_keepalive_retries | int | `5` | TCP keepalive probes before the connection is dropped |
+| config.upstream.tcp_keepalive_secs | int | `60` | TCP keepalive idle time in seconds |
+| config.upstream.timeout_ms | int | `6000000` | Request timeout for calls to LLM providers, in milliseconds |
+| config.upstream.tls.ca_file | string | `nil` | Extra CA bundle, added to the platform trust store, for every upstream TLS handshake. Mount the file through `extraVolumes` |
+| config.upstream.tls.client_cert_file | string | `nil` | Client certificate for mutual TLS to upstreams |
+| config.upstream.tls.client_key_file | string | `nil` | Client key for mutual TLS to upstreams |
+| config.upstream.tls.verify | bool | `true` | Verify upstream certificates. false accepts any certificate — test use only |
+| configSecrets | object | `{}` | Configuration keys that hold a credential, each read from a Secret you supply and handed to the gateway as an environment variable (which overrides the config file), never written to the ConfigMap. Keyed by the configuration path: `cache.redis.url`, `cache.redis.username`, `cache.redis.password`, `ratelimit.redis.username` or `ratelimit.redis.password`. For example `{cache.redis.password: {secretName: redis-auth, key: password}}` |
 | containerPorts.metrics | int | `9090` | Port the Prometheus metrics listener binds inside the container |
 | containerPorts.proxy | int | `3000` | Port the proxy listener binds inside the container. Nothing binds it when `listeners` is set — that list then carries every proxy port, and the gateway keeps requiring this address only to ignore it. The image carries the `CAP_NET_BIND_SERVICE` file capability, so a privileged port works without running as root — see `securityContext` below |
 | controlPlane.baseURL | string | `""` | Data-plane manager mTLS endpoint the gateway connects out to, e.g. `https://dpm.example.com:7944`. Required. |
@@ -451,7 +545,7 @@ extraEnvVars:
 | controlPlane.enabled | bool | `true` | Read configuration from an AISIX control plane. Set to false to run standalone, from the `resources.yaml` file configured under `standalone` |
 | controlPlane.etcdEndpoint | string | `""` | Control-plane etcd endpoint as bare `host:port`. Leave empty unless the control plane publishes an etcd endpoint distinct from `baseURL` |
 | controlPlane.heartbeatIntervalSeconds | int | `15` | Heartbeat interval in seconds. The control plane marks a gateway connected on its first heartbeat. Clamped to [5, 300] by the gateway |
-| extraEnvVars | list | `[]` | Extra environment variables for the gateway container. Every gateway configuration field is reachable as `AISIX_<SECTION>__<FIELD>` |
+| extraEnvVars | list | `[]` | Extra environment variables for the gateway container: system-level environment variables (such as `TZ`) and variables referenced by the resources file. Gateway settings belong in `config` |
 | extraVolumeMounts | list | `[]` | Extra volume mounts for the gateway container |
 | extraVolumes | list | `[]` | Extra volumes for the gateway pod |
 | fullnameOverride | string | `""` | Override the fully qualified resource name prefix |

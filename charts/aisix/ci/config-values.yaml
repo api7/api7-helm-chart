@@ -1,0 +1,34 @@
+# Values that set gateway configuration through `config`, including
+# list-typed keys, so CI proves the rendered file loads. `ct lint` renders it
+# in control-plane mode with the placeholders below; the config-boot check in
+# ci.yaml renders it in both modes and boots the appVersion image on the file.
+controlPlane:
+  baseURL: "https://dp-manager.example.com:7944"
+  certificate:
+    existingSecret: "aisix-gateway-certificate"
+
+config:
+  observability:
+    log_level: debug
+    metrics:
+      labels:
+        aisix_request_ttft_seconds: [model, provider]
+      buckets:
+        request_ttft: [0.1, 0.5, 1, 5, 30, 300]
+    heap_profiling:
+      auto_dump:
+        thresholds: [0.7, 0.95]
+  proxy:
+    real_ip:
+      trusted_proxies: ["10.0.0.0/8", "127.0.0.1/32"]
+      recursive: true
+    request_id:
+      accept_headers: [x-aisix-request-id, x-request-id]
+    url_rewrites:
+      - name: per-server-mcp-compat
+        match: "^/mcp-servers/([^/]+)/mcp$"
+        rewrite: "/mcp/$1"
+  upstream:
+    pool_idle_timeout_secs: 15
+  etcd:
+    request_timeout_ms: 10000

@@ -179,6 +179,189 @@ rateLimit:
     # -- Secret key holding the connection URL
     existingSecretKey: "redis-url"
 
+## Gateway startup configuration, rendered into the config file the gateway
+## boots from (a ConfigMap mounted read-only, the same in both modes). It
+## mirrors that file one-to-one — the section and key names are the gateway's
+## own, as in its `config.example.yaml` — and every key is listed with the
+## gateway's own default, so an untouched block renders the configuration the
+## gateway would use anyway. A `null` key is left out of the file, which means
+## "the gateway's default".
+##
+## A few keys are set by the chart from its own values and must not be written
+## here — the render fails naming the value to use instead: the proxy and
+## metrics addresses (`containerPorts`), `proxy.listeners` / `proxy.tls`
+## (`listeners`), `ratelimit.backend` and `ratelimit.redis.url` (`rateLimit`),
+## the control-plane connection under `managed` (`controlPlane`),
+## `resources_file` (`standalone`), and `admin` (not deployed by this chart).
+## Keys that hold a credential are never written to the ConfigMap either: set
+## them through `configSecrets` below.
+##
+## A change here rolls the pods on `helm upgrade`.
+config:
+  # -- Deployment-wide AWS Bedrock endpoint override for bedrock guardrails,
+  # e.g. a LocalStack URL. Null uses the AWS SDK default
+  bedrock_endpoint_url: null
+  proxy:
+    # -- Request-body size cap in bytes. 0 means no cap
+    request_body_limit_bytes: 0
+    real_ip:
+      # -- CIDRs (or bare IPs) of proxies trusted to set the client-IP header
+      trusted_proxies: []
+      # -- Walk the header right to left past every trusted proxy
+      recursive: false
+      # -- Header carrying the client IP
+      header: x-forwarded-for
+    request_id:
+      # -- Headers a caller may supply its own request id in. Add
+      # `x-request-id` only when no proxy in front stamps it
+      accept_headers:
+        - x-aisix-request-id
+    # -- (bool) Thread-per-core serving topology. Null uses the gateway default (on
+    # for Linux)
+    thread_per_core: null
+    # -- (int) Worker count. Null uses the gateway default
+    workers: null
+    # -- Entry-level URL rewrite rules, first match wins, e.g.
+    # `[{name: per-server-mcp, match: "^/mcp-servers/([^/]+)/mcp$", rewrite: "/mcp/$1"}]`
+    url_rewrites: []
+  observability:
+    # -- Service name reported in telemetry
+    service_name: aisix
+    # -- Log level: trace, debug, info, warn or error
+    log_level: info
+    # -- Write an access-log line per request
+    access_log: true
+    metrics:
+      # -- Complete optional label list per metric, e.g.
+      # `{aisix_request_ttft_seconds: [model, provider]}`. Omitted metrics keep
+      # their default labels
+      labels: {}
+      # -- User-Agent to `client_type` mapping rules, first match wins, e.g.
+      # `[{pattern: "^py-billing-batcher/", client: billing-batcher}]`
+      client_type_rules: []
+      # -- Per-metric histogram bucket edges in seconds. Null keeps that
+      # metric's default buckets
+      buckets:
+        request_ttft: null
+        request_e2e_latency: null
+        guardrail_latency: null
+        a2a_ttfb: null
+      prometheus:
+        # -- Serve Prometheus metrics on the metrics listener
+        # (`containerPorts.metrics`)
+        enabled: true
+        # -- Metrics path
+        path: /metrics
+    debug:
+      # -- Serve the unauthenticated heap-profile endpoint
+      # (`/debug/pprof/heap`)
+      enabled: true
+      # -- Diagnostics listener address. Loopback keeps it off the network
+      addr: "127.0.0.1:9091"
+    heap_profiling:
+      auto_dump:
+        # -- Write a heap profile as resident memory nears the memory limit
+        enabled: true
+        # -- Fractions of the memory limit that each trigger one profile
+        thresholds:
+          - 0.8
+          - 0.9
+        # -- Directory the profiles are written to
+        dir: /var/lib/aisix/heap
+        # -- Newest profiles kept
+        keep: 5
+  cache:
+    # -- Legacy cache backend switch, `memory` or `redis`. `redis` requires
+    # `cache.redis`. Which cache serves a request is chosen per cache policy
+    backend: memory
+    # -- (object) Shared Redis for the response cache, e.g. `{mode: single}`; the redis
+    # cache is built only when this is set. Keys: `mode` (single, cluster,
+    # sentinel), `nodes`, `sentinels`, `master_name`, `database`, `tls`,
+    # `timeout_secs`. `url`, `username` and `password` go through
+    # `configSecrets`
+    redis: null
+  ratelimit:
+    # -- Seconds a concurrency-limit slot is held at most
+    concurrency_ttl_secs: 300
+    # -- (object) Extra settings for the shared rate-limit Redis selected by
+    # `rateLimit.backend: redis`, e.g. `{timeout_secs: 2}` or
+    # `{mode: cluster, nodes: [...]}`. Same keys as `cache.redis`; the URL
+    # comes from `rateLimit.redis`, `username` and `password` go through
+    # `configSecrets`
+    redis: null
+  upstream:
+    # -- Request timeout for calls to LLM providers, in milliseconds
+    timeout_ms: 6000000
+    # -- Streaming idle timeout in milliseconds. 0 means none
+    stream_timeout_ms: 0
+    # -- Connect timeout in milliseconds
+    connect_timeout_ms: 5000
+    # -- TCP keepalive idle time in seconds
+    tcp_keepalive_secs: 60
+    # -- TCP keepalive probe interval in seconds
+    tcp_keepalive_interval_secs: 30
+    # -- TCP keepalive probes before the connection is dropped
+    tcp_keepalive_retries: 5
+    # -- Seconds an idle pooled connection is kept. Lower it when a load
+    # balancer or NAT between the gateway and the provider closes idle
+    # connections sooner
+    pool_idle_timeout_secs: 30
+    # -- (int) Idle pooled connections kept per host. Null means unbounded
+    pool_max_idle_per_host: null
+    # -- Retry budget every dispatch starts from
+    retries: 2
+    tls:
+      # -- Extra CA bundle, added to the platform trust store, for every
+      # upstream TLS handshake. Mount the file through `extraVolumes`
+      ca_file: null
+      # -- Client certificate for mutual TLS to upstreams
+      client_cert_file: null
+      # -- Client key for mutual TLS to upstreams
+      client_key_file: null
+      # -- Verify upstream certificates. false accepts any certificate — test
+      # use only
+      verify: true
+  downstream:
+    # -- Seconds an idle client connection is held. 0 never closes it
+    idle_timeout_secs: 0
+    # -- Seconds between SSE keepalive comments on a stalled stream
+    sse_keepalive_interval_secs: 15
+  shutdown:
+    # -- Seconds the gateway keeps accepting after SIGTERM while `/readyz`
+    # reports 503. `terminationGracePeriodSeconds` must cover it
+    min_drain_secs: 30
+  ## Read in control-plane mode only.
+  etcd:
+    # -- Bound on one dial to the control plane's etcd, in milliseconds. 0
+    # means unbounded
+    dial_timeout_ms: 5000
+    # -- (int) Bound on one etcd request, in milliseconds. Null means unbounded
+    request_timeout_ms: null
+  ## Read in control-plane mode only. The connection itself comes from
+  ## `controlPlane`.
+  managed:
+    # -- Extra CA bundle trusted for the control-plane connection, when it
+    # serves a private-CA certificate. Mount the file through `extraVolumes`
+    cp_ca_cert_file: null
+    # -- Directory the materialised mTLS bundle is written to
+    mtls_dir: /var/lib/aisix/mtls
+    # -- File the gateway id is persisted in
+    dp_id_file: /var/lib/aisix/dp_id
+    # -- Persist a configuration snapshot for recovery while etcd is
+    # unreachable. The snapshot holds unencrypted credentials
+    snapshot_cache_enabled: false
+    # -- Snapshot location. Null uses `/var/lib/aisix/config_cache.json`
+    snapshot_cache_path: null
+
+# -- Configuration keys that hold a credential, each read from a Secret you
+# supply and handed to the gateway as an environment variable (which
+# overrides the config file), never written to the ConfigMap. Keyed by the
+# configuration path: `cache.redis.url`, `cache.redis.username`,
+# `cache.redis.password`, `ratelimit.redis.username` or
+# `ratelimit.redis.password`. For example
+# `{cache.redis.password: {secretName: redis-auth, key: password}}`
+configSecrets: {}
+
 ## HorizontalPodAutoscaler. Scaling is safe by construction: a new replica is
 ## kept out of the Service until its readiness probe passes, which happens
 ## only after it has loaded its configuration from the control plane.
@@ -355,8 +538,9 @@ terminationGracePeriodSeconds: 1230
 # with `/readyz` already answering 503.
 preStopSleepSeconds: 30
 
-# -- Extra environment variables for the gateway container. Every gateway
-# configuration field is reachable as `AISIX_<SECTION>__<FIELD>`
+# -- Extra environment variables for the gateway container: system-level
+# environment variables (such as `TZ`) and variables referenced by the
+# resources file. Gateway settings belong in `config`
 extraEnvVars: []
 
 # -- Extra volumes for the gateway pod

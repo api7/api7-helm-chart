@@ -18,30 +18,17 @@ spec:
       {{- include "aisix.selectorLabels" . | nindent 6 }}
   template:
     metadata:
-      {{- if or (not .Values.controlPlane.enabled) (not .Values.controlPlane.certificate.existingSecret) .Values.podAnnotations }}
       annotations:
-        {{- if .Values.controlPlane.enabled }}
-        {{- if not .Values.controlPlane.certificate.existingSecret }}
-        # Roll the pods when the chart-managed bundle changes, so a rotated
-        # certificate takes effect without a manual restart. An existingSecret
-        # has its own lifecycle — restart the Deployment after rotating it.
-        checksum/mtls: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-        {{- end }}
-        {{- else }}
-        # Roll the pods when the rendered startup config or the chart-managed
-        # resources file changes. The gateway re-reads the resources file on
-        # SIGHUP only and the chart never sends one, so the rollout is what
-        # applies the change. An existingSecret / existingConfigMap has its own
-        # lifecycle — restart the Deployment after editing it.
+        # Roll the pods when the rendered startup config or a chart-managed
+        # Secret (mTLS bundle, resources file, rate-limit Redis URL) changes:
+        # the gateway reads all of them at boot only. A Secret or ConfigMap
+        # supplied by name has its own lifecycle — restart the Deployment
+        # after editing it.
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        {{- if .Values.standalone.resources }}
-        checksum/resources: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
-        {{- end }}
-        {{- end }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
         {{- with .Values.podAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-      {{- end }}
       labels:
         {{- include "aisix.labels" . | nindent 8 }}
         {{- include "aisix.selectorLabels" . | nindent 8 }}
@@ -92,56 +79,31 @@ spec:
               protocol: TCP
           env:
             - name: AISIX_CONFIG_PATH
-              {{- if .Values.controlPlane.enabled }}
-              value: /etc/aisix/config.managed.yaml
-              {{- else }}
-              value: {{ include "aisix.standaloneConfigPath" . }}
-              {{- end }}
-            - name: AISIX_PROXY__ADDR
-              value: "0.0.0.0:{{ .Values.containerPorts.proxy }}"
-            {{- if .Values.listeners }}
-            # The complete set of proxy listeners, as one JSON document: the
-            # gateway takes no indexed environment variables. It replaces the
-            # single listener AISIX_PROXY__ADDR describes — that address is
-            # then required but ignored, and nothing binds it.
-            - name: AISIX_PROXY__LISTENERS
-              value: {{ include "aisix.proxyListenersJson" . | quote }}
+              value: {{ include "aisix.configPath" . }}
+            {{- if and .Values.controlPlane.enabled (include "aisix.cpPemFromEnv" .) }}
+            {{- range $slot, $key := dict "CERT" .Values.controlPlane.certificate.certKey "KEY" .Values.controlPlane.certificate.keyKey "CA" .Values.controlPlane.certificate.caKey }}
+            - name: AISIX_MANAGED__CP_{{ $slot }}_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix.certSecretName" $ }}
+                  key: {{ $key }}
             {{- end }}
-            - name: AISIX_OBSERVABILITY__METRICS__PROMETHEUS__ADDR
-              value: "0.0.0.0:{{ .Values.containerPorts.metrics }}"
-            {{- if .Values.controlPlane.enabled }}
-            - name: AISIX_MANAGED__CP_BASE_URL
-              value: {{ .Values.controlPlane.baseURL | quote }}
-            {{- with .Values.controlPlane.etcdEndpoint }}
-            - name: AISIX_MANAGED__CP_ETCD_ENDPOINT
-              value: {{ . | quote }}
-            {{- end }}
-            - name: AISIX_MANAGED__HEARTBEAT_INTERVAL_SECS
-              value: {{ .Values.controlPlane.heartbeatIntervalSeconds | quote }}
-            - name: AISIX_MANAGED__CP_CERT_PEM
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "aisix.certSecretName" . }}
-                  key: {{ .Values.controlPlane.certificate.certKey }}
-            - name: AISIX_MANAGED__CP_KEY_PEM
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "aisix.certSecretName" . }}
-                  key: {{ .Values.controlPlane.certificate.keyKey }}
-            - name: AISIX_MANAGED__CP_CA_PEM
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "aisix.certSecretName" . }}
-                  key: {{ .Values.controlPlane.certificate.caKey }}
             {{- end }}
             {{- if eq .Values.rateLimit.backend "redis" }}
-            - name: AISIX_RATELIMIT__BACKEND
-              value: "redis"
+            {{- if or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret }}
             - name: AISIX_RATELIMIT__REDIS__URL
               valueFrom:
                 secretKeyRef:
                   name: {{ include "aisix.redisSecretName" . }}
                   key: {{ include "aisix.redisSecretKey" . }}
+            {{- end }}
+            {{- end }}
+            {{- range $path, $ref := (.Values.configSecrets | default dict) }}
+            - name: {{ include "aisix.configSecretEnvName" $path }}
+              valueFrom:
+                secretKeyRef:
+                  name: {{ $ref.secretName }}
+                  key: {{ $ref.key }}
             {{- end }}
             {{- with .Values.extraEnvVars }}
             {{- toYaml . | nindent 12 }}
@@ -216,12 +178,18 @@ spec:
             # instances, and a restarted pod re-registers.
             - name: state
               mountPath: /var/lib/aisix
-            {{- if not .Values.controlPlane.enabled }}
-            # Each in its own directory, so neither mount shadows the
+            # Each in its own directory, so no mount shadows the
             # /etc/aisix/config.managed.yaml the image ships.
             - name: config
-              mountPath: {{ include "aisix.standaloneConfigDir" . }}
+              mountPath: {{ include "aisix.configDir" . }}
               readOnly: true
+            {{- if .Values.controlPlane.enabled }}
+            {{- if not (include "aisix.cpPemFromEnv" .) }}
+            - name: cp-mtls
+              mountPath: {{ include "aisix.cpCertDir" . }}
+              readOnly: true
+            {{- end }}
+            {{- else }}
             - name: resources
               mountPath: {{ include "aisix.standaloneResourcesDir" . }}
               readOnly: true
@@ -241,10 +209,23 @@ spec:
       volumes:
         - name: state
           emptyDir: {}
-        {{- if not .Values.controlPlane.enabled }}
         - name: config
           configMap:
             name: {{ include "aisix.fullname" . }}-config
+        {{- if .Values.controlPlane.enabled }}
+        {{- if not (include "aisix.cpPemFromEnv" .) }}
+        - name: cp-mtls
+          secret:
+            secretName: {{ include "aisix.certSecretName" . }}
+            items:
+              - key: {{ .Values.controlPlane.certificate.certKey }}
+                path: cert.pem
+              - key: {{ .Values.controlPlane.certificate.keyKey }}
+                path: key.pem
+              - key: {{ .Values.controlPlane.certificate.caKey }}
+                path: ca.pem
+        {{- end }}
+        {{- else }}
         - name: resources
           {{- if .Values.standalone.existingConfigMap }}
           configMap:
