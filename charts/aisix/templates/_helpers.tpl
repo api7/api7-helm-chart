@@ -187,6 +187,19 @@ non-null value in the map .cfg.
 {{- end }}
 
 {{/*
+"aisix.configDottedKey" prints the first key under .cfg (recursively, prefixed
+by .at) that contains a `.`. `config` is nested maps; a literal
+`cache.redis.password` key would slip past the path checks below.
+*/}}
+{{- define "aisix.configDottedKey" -}}
+{{- $at := .at }}
+{{- range $k, $v := .cfg }}
+{{- if contains "." $k }}{{ printf "%s%s" $at $k }}{{ end }}
+{{- if kindIs "map" $v }}{{ include "aisix.configDottedKey" (dict "cfg" $v "at" (printf "%s%s." $at $k)) }}{{ end }}
+{{- end }}
+{{- end }}
+
+{{/*
 "aisix.dropNulls" deletes every null-valued key from a map, recursively, so a
 null in `config` means "leave it to the gateway's default".
 */}}
@@ -300,6 +313,9 @@ Reject value combinations that render successfully but cannot run.
 {{- if and (eq $mode "single") (not (or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret)) }}
 {{- fail "rateLimit.backend=redis requires rateLimit.redis.url or rateLimit.redis.existingSecret" }}
 {{- end }}
+{{- end }}
+{{- with include "aisix.configDottedKey" (dict "cfg" $config "at" "") }}
+{{- fail (printf "config key %q contains a dot: write config as nested maps, e.g. cache: {redis: {mode: single}}" .) }}
 {{- end }}
 {{- $policy := .Files.Get "config-policy.yaml" | fromYaml }}
 {{- range $path, $use := $policy.owned }}
