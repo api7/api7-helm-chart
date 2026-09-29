@@ -256,10 +256,12 @@ rejected by "aisix.validateValues" before this runs.
 {{- $_ := set $cfg.managed "cp_etcd_endpoint" . }}
 {{- end }}
 {{- $_ := set $cfg.managed "heartbeat_interval_secs" (int .Values.controlPlane.heartbeatIntervalSeconds) }}
+{{- if not (include "aisix.cpPemFromEnv" .) }}
 {{- $dir := include "aisix.cpCertDir" . }}
 {{- $_ := set $cfg.managed "cp_cert_file" (printf "%s/cert.pem" $dir) }}
 {{- $_ := set $cfg.managed "cp_key_file" (printf "%s/key.pem" $dir) }}
 {{- $_ := set $cfg.managed "cp_ca_file" (printf "%s/ca.pem" $dir) }}
+{{- end }}
 {{- else }}
 {{- $_ := unset $cfg "etcd" }}
 {{- $_ := unset $cfg "managed" }}
@@ -268,6 +270,19 @@ rejected by "aisix.validateValues" before this runs.
 {{- end }}
 {{- include "aisix.dropNulls" $cfg }}
 {{- toYaml $cfg }}
+{{- end }}
+
+{{/*
+"aisix.cpPemFromEnv" is non-empty when `extraEnvVars` sets one of the
+AISIX_MANAGED__CP_*_PEM variables — a setup from before the chart mounted the
+bundle as files. The gateway rejects a PEM and a file for the same slot, so
+such a release keeps the 1.5.0 wiring: all three PEMs as environment variables
+from the bundle Secret (which extraEnvVars then overrides), and no file keys.
+*/}}
+{{- define "aisix.cpPemFromEnv" -}}
+{{- range .Values.extraEnvVars }}
+{{- if has .name (list "AISIX_MANAGED__CP_CERT_PEM" "AISIX_MANAGED__CP_KEY_PEM" "AISIX_MANAGED__CP_CA_PEM") }}true{{ end }}
+{{- end }}
 {{- end }}
 
 {{/*

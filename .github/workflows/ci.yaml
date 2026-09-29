@@ -46,6 +46,9 @@ jobs:
           python3 -c 'import yaml' 2>/dev/null || sudo apt-get install -y python3-yaml
           python3 .github/scripts/check-aisix-config-drift.py
 
+      - name: Check aisix chart renders
+        run: bash .github/scripts/aisix-render-checks.sh
+
       - name: Boot the aisix gateway on the chart-rendered config
         run: bash .github/scripts/aisix-config-boot.sh
 

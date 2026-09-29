@@ -80,6 +80,15 @@ spec:
           env:
             - name: AISIX_CONFIG_PATH
               value: {{ include "aisix.configPath" . }}
+            {{- if and .Values.controlPlane.enabled (include "aisix.cpPemFromEnv" .) }}
+            {{- range $slot, $key := dict "CERT" .Values.controlPlane.certificate.certKey "KEY" .Values.controlPlane.certificate.keyKey "CA" .Values.controlPlane.certificate.caKey }}
+            - name: AISIX_MANAGED__CP_{{ $slot }}_PEM
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "aisix.certSecretName" $ }}
+                  key: {{ $key }}
+            {{- end }}
+            {{- end }}
             {{- if eq .Values.rateLimit.backend "redis" }}
             {{- if or .Values.rateLimit.redis.url .Values.rateLimit.redis.existingSecret }}
             - name: AISIX_RATELIMIT__REDIS__URL
@@ -175,9 +184,11 @@ spec:
               mountPath: {{ include "aisix.configDir" . }}
               readOnly: true
             {{- if .Values.controlPlane.enabled }}
+            {{- if not (include "aisix.cpPemFromEnv" .) }}
             - name: cp-mtls
               mountPath: {{ include "aisix.cpCertDir" . }}
               readOnly: true
+            {{- end }}
             {{- else }}
             - name: resources
               mountPath: {{ include "aisix.standaloneResourcesDir" . }}
@@ -202,6 +213,7 @@ spec:
           configMap:
             name: {{ include "aisix.fullname" . }}-config
         {{- if .Values.controlPlane.enabled }}
+        {{- if not (include "aisix.cpPemFromEnv" .) }}
         - name: cp-mtls
           secret:
             secretName: {{ include "aisix.certSecretName" . }}
@@ -212,6 +224,7 @@ spec:
                 path: key.pem
               - key: {{ .Values.controlPlane.certificate.caKey }}
                 path: ca.pem
+        {{- end }}
         {{- else }}
         - name: resources
           {{- if .Values.standalone.existingConfigMap }}

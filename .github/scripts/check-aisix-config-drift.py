@@ -5,7 +5,8 @@ The gateway publishes config.reference.json — every startup-config key with
 its default — at the root of api7/aisix. This compares it, at the tag of the
 chart's appVersion, with the chart's `config:` block: the same keys, with the
 same defaults, except the keys charts/aisix/config-policy.yaml names as set by
-the chart or held in Secrets.
+the chart or held in Secrets; and, for each block that is off unless written,
+the same sub-keys as config-policy.yaml accounts for.
 
 A release that predates config.reference.json has no tag copy; the check then
 falls back to api7/aisix main and says so. CONFIG_REFERENCE_FILE points the
@@ -71,10 +72,26 @@ def main():
             sys.exit("api7/aisix main has no config.reference.json")
 
     skip = list(policy["owned"]) + list(policy["secrets"])
-    want = {k: v for k, v in flatten(reference).items() if not excluded(k, skip)}
+    want = {k: v for k, v in flatten(reference["defaults"]).items() if not excluded(k, skip)}
     have = flatten(chart_config)
 
     problems = []
+    # Blocks that are off unless written: every gateway sub-key must be one
+    # the chart documents, owns, or routes through configSecrets.
+    documented = policy.get("optional") or {}
+    for block, keys in sorted(reference["optional_blocks"].items()):
+        if excluded(block, skip):
+            continue
+        listed = {f"{block}.{k}" for k in documented.get(block, [])}
+        for path in sorted(f"{block}.{k}" for k in flatten(keys)):
+            if path not in listed and not excluded(path, skip):
+                problems.append(
+                    f"unaccounted sub-key: {path} — add it to config-policy.yaml "
+                    f"optional.{block}, or to secrets if it holds a credential"
+                )
+        for path in sorted(listed - {f"{block}.{k}" for k in flatten(keys)}):
+            problems.append(f"not a gateway setting at {ref}: {path} (config-policy.yaml optional)")
+
     for path in sorted(want.keys() - have.keys()):
         problems.append(f"missing from config: {path} (gateway default {json.dumps(want[path])})")
     for path in sorted(have.keys() - want.keys()):

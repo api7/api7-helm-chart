@@ -39,3 +39,31 @@ secrets:
   - cache.redis.password
   - ratelimit.redis.username
   - ratelimit.redis.password
+
+# Sub-keys of the blocks that are off unless written (`null` in values.yaml),
+# other than the owned and secret ones above. `config` passes these blocks
+# through as written; the list is what the chart documents for them, and the
+# drift check fails on a gateway sub-key that is in none of the three lists.
+optional:
+  cache.redis:
+    - mode
+    - nodes
+    - sentinels
+    - master_name
+    - database
+    - timeout_secs
+    - tls.ca_file
+    - tls.client_cert_file
+    - tls.client_key_file
+    - tls.verify
+  ratelimit.redis:
+    - mode
+    - nodes
+    - sentinels
+    - master_name
+    - database
+    - timeout_secs
+    - tls.ca_file
+    - tls.client_cert_file
+    - tls.client_key_file
+    - tls.verify
