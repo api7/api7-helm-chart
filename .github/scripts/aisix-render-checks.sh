@@ -46,6 +46,12 @@ check "control-plane mode mounts the mTLS bundle as files" \
 check "extraEnvVars PEMs keep the env wiring: no file keys, no mount, all three PEMs from the bundle Secret" \
   query '"cp-mtls" not in vols and not any(k.startswith("cp_") and k.endswith("_file") for k in cfg["managed"]) and all(env[f"AISIX_MANAGED__CP_{s}_PEM"].get("valueFrom") or env[f"AISIX_MANAGED__CP_{s}_PEM"].get("value") for s in ("CERT", "KEY", "CA"))' \
   --set 'extraEnvVars[0].name=AISIX_MANAGED__CP_CERT_PEM' --set 'extraEnvVars[0].value=pem'
+# 1.5.0 rendered the chart's own PEM variables and then the extraEnvVars ones,
+# duplicate names included. Rendering the same pair keeps an upgrade's
+# three-way merge from deleting both entries of a name that one side drops.
+check "extraEnvVars PEMs render after the chart's own, exactly as 1.5.0 did" \
+  query '[e["name"] for e in pod["containers"][0]["env"] if e["name"] == "AISIX_MANAGED__CP_CERT_PEM"] == ["AISIX_MANAGED__CP_CERT_PEM"] * 2 and pod["containers"][0]["env"][[e["name"] for e in pod["containers"][0]["env"]].index("AISIX_MANAGED__CP_CERT_PEM")]["valueFrom"]["secretKeyRef"]["name"] == "aisix-gateway-certificate"' \
+  --set 'extraEnvVars[0].name=AISIX_MANAGED__CP_CERT_PEM' --set 'extraEnvVars[0].value=pem'
 check "configSecrets becomes a secretKeyRef env var" \
   query 'env["AISIX_CACHE__REDIS__PASSWORD"]["valueFrom"]["secretKeyRef"] == {"name": "redis-auth", "key": "password"}' \
   --set 'configSecrets.cache\.redis\.password.secretName=redis-auth' --set 'configSecrets.cache\.redis\.password.key=password'
