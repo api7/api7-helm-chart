@@ -21,7 +21,9 @@ import urllib.request
 import yaml
 
 CHART = "charts/aisix"
-RAW = "https://raw.githubusercontent.com/api7/aisix/{ref}/config.reference.json"
+RAW = (
+    "https://raw.githubusercontent.com/api7/aisix/{ref}/config.reference.json"
+)
 
 
 def fetch(ref):
@@ -45,7 +47,9 @@ def flatten(node, prefix=""):
 
 
 def excluded(path, prefixes):
-    return any(path == p or path.startswith((p + ".", p + "[]")) for p in prefixes)
+    return any(
+        path == p or path.startswith((p + ".", p + "[]")) for p in prefixes
+    )
 
 
 def main():
@@ -65,14 +69,21 @@ def main():
     else:
         reference = fetch(ref)
     if reference is None:
-        print(f"note: api7/aisix {ref} has no config.reference.json; comparing against main")
+        print(
+            f"note: api7/aisix {ref} has no config.reference.json; "
+            "comparing against main"
+        )
         ref = "main"
         reference = fetch(ref)
         if reference is None:
             sys.exit("api7/aisix main has no config.reference.json")
 
     skip = list(policy["owned"]) + list(policy["secrets"])
-    want = {k: v for k, v in flatten(reference["defaults"]).items() if not excluded(k, skip)}
+    want = {
+        k: v
+        for k, v in flatten(reference["defaults"]).items()
+        if not excluded(k, skip)
+    }
     have = flatten(chart_config)
 
     problems = []
@@ -86,28 +97,42 @@ def main():
         for path in sorted(f"{block}.{k}" for k in flatten(keys)):
             if path not in listed and not excluded(path, skip):
                 problems.append(
-                    f"unaccounted sub-key: {path} — add it to config-policy.yaml "
-                    f"optional.{block}, or to secrets if it holds a credential"
+                    f"unaccounted sub-key: {path} — add it to "
+                    f"config-policy.yaml optional.{block}, or to secrets "
+                    "if it holds a credential"
                 )
         for path in sorted(listed - {f"{block}.{k}" for k in flatten(keys)}):
-            problems.append(f"not a gateway setting at {ref}: {path} (config-policy.yaml optional)")
+            problems.append(
+                f"not a gateway setting at {ref}: {path} "
+                "(config-policy.yaml optional)"
+            )
 
     for path in sorted(want.keys() - have.keys()):
-        problems.append(f"missing from config: {path} (gateway default {json.dumps(want[path])})")
+        problems.append(
+            f"missing from config: {path} "
+            f"(gateway default {json.dumps(want[path])})"
+        )
     for path in sorted(have.keys() - want.keys()):
         problems.append(f"not a gateway setting at {ref}: {path}")
     for path in sorted(want.keys() & have.keys()):
         if want[path] != have[path]:
             problems.append(
-                f"default differs: {path} is {json.dumps(have[path])} in values.yaml, "
+                f"default differs: {path} is {json.dumps(have[path])} "
+                "in values.yaml, "
                 f"{json.dumps(want[path])} in the gateway"
             )
 
     if problems:
-        print(f"charts/aisix config: drifted from api7/aisix {ref} config.reference.json:")
+        print(
+            "charts/aisix config: drifted from api7/aisix "
+            f"{ref} config.reference.json:"
+        )
         for line in problems:
             print(f"  {line}")
-        print("Mirror the gateway in values.yaml `config:`, or name the key in config-policy.yaml.")
+        print(
+            "Mirror the gateway in values.yaml `config:`, "
+            "or name the key in config-policy.yaml."
+        )
         sys.exit(1)
     print(f"charts/aisix config: matches api7/aisix {ref} ({len(want)} keys)")
 
