@@ -12,6 +12,26 @@ on:
 
 jobs:
 
+  python-lint:
+    name: Python lint
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # flake8 defaults with --isolated: downstream mirrors lint Python with flake8 defaults, so don't relax them.
+      - name: flake8
+        run: |
+          python -m pip install flake8==7.3.0
+          git ls-files -z '*.py' | xargs -0 -r flake8 --isolated
+
   helm:
     name: Helm chart
     runs-on: ubuntu-latest

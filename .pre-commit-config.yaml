@@ -3,3 +3,9 @@ repos:
     rev: v1.2.0
     hooks:
       - id: helm-docs
+  # flake8 defaults with --isolated: downstream mirrors lint Python with flake8 defaults, so don't relax them.
+  - repo: https://github.com/PyCQA/flake8
+    rev: 7.3.0
+    hooks:
+      - id: flake8
+        args: [--isolated]
