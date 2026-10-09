@@ -300,6 +300,9 @@ config:
         dir: /var/lib/aisix/heap
         # -- Newest profiles kept
         keep: 5
+    usage_event:
+      # -- Request headers whose values every usage event records (lowercase names; credential headers and duplicates are refused at startup)
+      request_headers: []
   cache:
     # -- Legacy cache backend switch, `memory` or `redis`. `redis` requires
     # `cache.redis`. Which cache serves a request is chosen per cache policy

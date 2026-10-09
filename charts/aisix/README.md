@@ -560,6 +560,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.observability.metrics.prometheus.enabled | bool | `true` | Serve Prometheus metrics on the metrics listener (`containerPorts.metrics`) |
 | config.observability.metrics.prometheus.path | string | `"/metrics"` | Metrics path |
 | config.observability.service_name | string | `"aisix"` | Service name reported in telemetry |
+| config.observability.usage_event.request_headers | list | `[]` | Request headers whose values every usage event records (lowercase names; credential headers and duplicates are refused at startup) |
 | config.proxy.real_ip.header | string | `"x-forwarded-for"` | Header carrying the client IP |
 | config.proxy.real_ip.recursive | bool | `false` | Walk the header right to left past every trusted proxy |
 | config.proxy.real_ip.trusted_proxies | list | `[]` | CIDRs (or bare IPs) of proxies trusted to set the client-IP header |
