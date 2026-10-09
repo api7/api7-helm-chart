@@ -444,7 +444,10 @@ keda:
   annotations: {}
   # -- KEDA triggers. Required when `keda.enabled` is true. For example:
   # `[{type: prometheus, metadata: {serverAddress: "http://prometheus:9090",
-  # query: "sum(rate(aisix_llm_requests_total[2m]))", threshold: "100"}}]`
+  # query: "sum(rate(aisix_llm_requests_total[2m]))", threshold: "100"}}]`.
+  # Streamed requests are counted when the stream ends, so during a burst of
+  # long streams this signal lags by roughly one stream length; the
+  # steady-state rate is unaffected
   triggers: []
   # -- `behavior` for the HPA KEDA creates. Empty uses the Kubernetes defaults
   behavior: {}

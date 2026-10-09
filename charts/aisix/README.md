@@ -335,6 +335,10 @@ keda:
         threshold: "100"
 ```
 
+A streamed request is counted in `aisix_llm_requests_total` when the stream
+ends, not when it starts, so during a burst of long streams this signal lags by
+roughly one stream length. The steady-state rate is unaffected.
+
 `autoscaling` and `keda` are mutually exclusive — enabling both fails the render
 rather than letting two controllers fight over the replica count.
 
@@ -616,7 +620,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | keda.minReplicas | int | `2` | Lower replica bound |
 | keda.pollingInterval | int | `15` | How often KEDA evaluates the triggers, in seconds |
 | keda.restoreToOriginalReplicaCount | bool | `false` | Restore the original replica count when the ScaledObject is deleted |
-| keda.triggers | list | `[]` | KEDA triggers. Required when `keda.enabled` is true. For example: `[{type: prometheus, metadata: {serverAddress: "http://prometheus:9090", query: "sum(rate(aisix_llm_requests_total[2m]))", threshold: "100"}}]` |
+| keda.triggers | list | `[]` | KEDA triggers. Required when `keda.enabled` is true. For example: `[{type: prometheus, metadata: {serverAddress: "http://prometheus:9090", query: "sum(rate(aisix_llm_requests_total[2m]))", threshold: "100"}}]`. Streamed requests are counted when the stream ends, so during a burst of long streams this signal lags by roughly one stream length; the steady-state rate is unaffected |
 | listeners | list | `[]` | Proxy listeners, one entry per port. Empty keeps the single plain-HTTP listener described by `containerPorts.proxy` and `service.port` — see "Serve HTTPS and plain HTTP together" above |
 | livenessProbe.enabled | bool | `true` |  |
 | livenessProbe.failureThreshold | int | `3` |  |
