@@ -329,6 +329,10 @@ keda:
         threshold: "100"
 ```
 
+A streamed request is counted in `aisix_llm_requests_total` when the stream
+ends, not when it starts, so during a burst of long streams this signal lags by
+roughly one stream length. The steady-state rate is unaffected.
+
 `autoscaling` and `keda` are mutually exclusive — enabling both fails the render
 rather than letting two controllers fight over the replica count.
 
