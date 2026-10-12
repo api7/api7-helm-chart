@@ -597,8 +597,20 @@ externalDatabase:
   # URL-safe value: it is embedded in a `postgres://` DSN
   password: ""
   # -- libpq sslmode for the connection, e.g. `require` or `verify-full` for a
-  # managed database reached over a network you do not control
+  # managed database reached over a network you do not control. `verify-ca` and
+  # `verify-full` check the server certificate against the image's system trust
+  # store unless `sslRootCert` supplies the CA, which a database whose
+  # certificate is issued by a private CA (most managed databases) needs. With
+  # `sslRootCert` set, `require` verifies the CA too (libpq semantics)
   sslmode: disable
+  sslRootCert:
+    # -- Name of an existing Secret holding the PEM CA bundle that issued the
+    # database server's certificate. Mounted read-only into cp-api and
+    # dp-manager and used as libpq `sslrootcert` for every database connection
+    # they open. Empty leaves verification to the system trust store
+    existingSecret: ""
+    # -- Key in that Secret holding the CA bundle
+    key: ca.crt
 
 ## @section Two-DSN tenant isolation (SaaS / multi-tenant only)
 ##

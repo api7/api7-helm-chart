@@ -110,10 +110,16 @@ spec:
             - name: config
               mountPath: {{ include "aisix-cp.configDir" . }}
               readOnly: true
+            {{- with include "aisix-cp.databaseCAVolumeMount" . | trim }}
+            {{- . | nindent 12 }}
+            {{- end }}
       volumes:
         - name: config
           configMap:
             name: {{ include "aisix-cp.fullname" . }}-dpm-config
+        {{- with include "aisix-cp.databaseCAVolume" . | trim }}
+        {{- . | nindent 8 }}
+        {{- end }}
       {{- with .Values.dpm.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

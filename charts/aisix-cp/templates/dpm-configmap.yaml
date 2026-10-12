@@ -22,5 +22,6 @@ data:
       base_url: {{ .Values.api.dpmgrBaseURL | quote }}
     database:
       url: {{ include "aisix-cp.databaseURL" . | quote }}
+      ssl_root_cert: {{ include "aisix-cp.databaseSSLRootCert" . | quote }}
     master_key:
       id: {{ .Values.secrets.masterKeyID | quote }}

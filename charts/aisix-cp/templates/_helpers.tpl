@@ -137,6 +137,47 @@ Where each component's rendered config file is mounted. Not under
 {{- end }}
 
 {{/*
+Where the external database's CA bundle (externalDatabase.sslRootCert) is
+mounted.
+*/}}
+{{- define "aisix-cp.databaseCADir" -}}
+/etc/aisix-cp-database-ca
+{{- end }}
+
+{{/*
+The CA bundle's path inside the pod, or empty when none is configured. `dig`
+because values from a chart that predates the key (`helm upgrade
+--reuse-values`) lack it.
+*/}}
+{{- define "aisix-cp.databaseSSLRootCert" -}}
+{{- if and (not .Values.postgresql.builtin) (dig "sslRootCert" "existingSecret" "" .Values.externalDatabase) -}}
+{{ include "aisix-cp.databaseCADir" . }}/ca.crt
+{{- end }}
+{{- end }}
+
+{{/*
+The CA bundle's volumeMount and volume, for the cp-api and dp-manager pods.
+*/}}
+{{- define "aisix-cp.databaseCAVolumeMount" -}}
+{{- if include "aisix-cp.databaseSSLRootCert" . }}
+- name: database-ca
+  mountPath: {{ include "aisix-cp.databaseCADir" . }}
+  readOnly: true
+{{- end }}
+{{- end }}
+
+{{- define "aisix-cp.databaseCAVolume" -}}
+{{- if include "aisix-cp.databaseSSLRootCert" . }}
+- name: database-ca
+  secret:
+    secretName: {{ .Values.externalDatabase.sslRootCert.existingSecret }}
+    items:
+      - key: {{ .Values.externalDatabase.sslRootCert.key | default "ca.crt" }}
+        path: ca.crt
+{{- end }}
+{{- end }}
+
+{{/*
 Validated secrets.retiredMasterKeys as a list of dicts:
 id (the MasterKeyID), envSuffix (the id as a RETIRED_* env-var suffix —
 ":" becomes "_", which the binaries translate back) and secretKey (the key

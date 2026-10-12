@@ -61,6 +61,7 @@ data:
       {{- else }}
       url: {{ include "aisix-cp.databaseURL" . | quote }}
       {{- end }}
+      ssl_root_cert: {{ include "aisix-cp.databaseSSLRootCert" . | quote }}
       allow_unsupported_upgrade: {{ .Values.api.allowUnsupportedUpgrade | default false }}
     master_key:
       id: {{ .Values.secrets.masterKeyID | quote }}

@@ -205,7 +205,8 @@ Upgrading from 1.5.0, three things change. The dashboard no longer runs as its
 own Deployment: `cp-api` serves it, and the `aisix-cp-ui` Service is kept,
 now selecting the `cp-api` pods, so a proxy still pointed at it keeps working.
 `secrets.betterAuthSecret` and the dashboard's image, resource and volume values
-are no longer read. And settings 1.5.0 took as environment variables through
+are no longer read; a private database CA that was mounted into the dashboard
+goes in `externalDatabase.sslRootCert` instead. And settings 1.5.0 took as environment variables through
 `extraEnvVars` now have values of their own — `api.trustedOrigins`,
 `api.allowUnsupportedUpgrade` and the rest in the [Parameters](#parameters)
 table. An existing override keeps working across the upgrade, but move it into
@@ -275,6 +276,23 @@ The external database must be reachable before the control plane starts — only
 the bundled mode gets a wait-for-database init container. The two
 `postgresql.auth.*` passwords are not read in this mode, and the placeholder
 rejection is skipped with them, but `secrets.masterKey` is still required.
+
+When the database's certificate is issued by a private CA, as with most managed
+databases, put the PEM CA bundle in a Secret and point
+`externalDatabase.sslRootCert` at it. `cp-api` and `dp-manager` mount it
+read-only and use it as libpq `sslrootcert`, so `verify-ca` and `verify-full`
+check the server against that CA instead of the image's system trust store:
+
+```yaml
+externalDatabase:
+  sslmode: verify-full
+  sslRootCert:
+    existingSecret: aisix-cp-db-ca     # key: ca.crt
+```
+
+```sh
+kubectl -n aisix create secret generic aisix-cp-db-ca --from-file=ca.crt=./ca.pem
+```
 
 ### A console served from another origin
 

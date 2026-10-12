@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.5.0](https://img.shields.io/badge/AppVersion-1.5.0-informational?style=flat-square)
+![Version: 1.6.0](https://img.shields.io/badge/Version-1.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.0](https://img.shields.io/badge/AppVersion-1.6.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -102,7 +102,7 @@ helm repo add api7 https://charts.api7.ai
 helm repo update
 
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.5.0 \
+  --version 1.6.0 \
   -f cp-values.yaml
 ```
 
@@ -111,7 +111,7 @@ same install, as long as you record what you generated:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.5.0 \
+  --version 1.6.0 \
   --set secrets.masterKey="$(openssl rand -base64 32)" \
   --set postgresql.auth.postgresPassword="$(openssl rand -hex 24)" \
   --set postgresql.auth.password="$(openssl rand -hex 24)"
@@ -181,7 +181,7 @@ fails the handshake with nothing logged to say why.
 
 The console's generated commands carry a gateway image, taken from
 `api.dpImage`. Left empty — the default — `cp-api` hands out the gateway of its
-own release, so this release hands out `docker.io/api7/aisix:1.5.0`.
+own release, so this release hands out `docker.io/api7/aisix:1.6.0`.
 Set it only to pin a different image, and remember that a value set explicitly
 carries forward across upgrades, so gateways added later come up on the old
 image.
@@ -213,7 +213,8 @@ Upgrading from 1.5.0, three things change. The dashboard no longer runs as its
 own Deployment: `cp-api` serves it, and the `aisix-cp-ui` Service is kept,
 now selecting the `cp-api` pods, so a proxy still pointed at it keeps working.
 `secrets.betterAuthSecret` and the dashboard's image, resource and volume values
-are no longer read. And settings 1.5.0 took as environment variables through
+are no longer read; a private database CA that was mounted into the dashboard
+goes in `externalDatabase.sslRootCert` instead. And settings 1.5.0 took as environment variables through
 `extraEnvVars` now have values of their own — `api.trustedOrigins`,
 `api.allowUnsupportedUpgrade` and the rest in the [Parameters](#parameters)
 table. An existing override keeps working across the upgrade, but move it into
@@ -284,6 +285,23 @@ the bundled mode gets a wait-for-database init container. The two
 `postgresql.auth.*` passwords are not read in this mode, and the placeholder
 rejection is skipped with them, but `secrets.masterKey` is still required.
 
+When the database's certificate is issued by a private CA, as with most managed
+databases, put the PEM CA bundle in a Secret and point
+`externalDatabase.sslRootCert` at it. `cp-api` and `dp-manager` mount it
+read-only and use it as libpq `sslrootcert`, so `verify-ca` and `verify-full`
+check the server against that CA instead of the image's system trust store:
+
+```yaml
+externalDatabase:
+  sslmode: verify-full
+  sslRootCert:
+    existingSecret: aisix-cp-db-ca     # key: ca.crt
+```
+
+```sh
+kubectl -n aisix create secret generic aisix-cp-db-ca --from-file=ca.crt=./ca.pem
+```
+
 ### A console served from another origin
 
 `cp-api` serves the dashboard, so a normal install has one origin and nothing
@@ -325,7 +343,7 @@ install time:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.5.0 \
+  --version 1.6.0 \
   -f cp-values.yaml \
   --set postgresql.primary.podSecurityContext.enabled=false \
   --set postgresql.primary.containerSecurityContext.enabled=false
@@ -466,7 +484,9 @@ plane and hands out the gateway image from the same release as the chart.
 | externalDatabase.host | string | `""` | PostgreSQL host |
 | externalDatabase.password | string | `""` | If existingSecret is empty, this password is used directly. Use a URL-safe value: it is embedded in a `postgres://` DSN |
 | externalDatabase.port | int | `5432` | PostgreSQL port |
-| externalDatabase.sslmode | string | `"disable"` | libpq sslmode for the connection, e.g. `require` or `verify-full` for a managed database reached over a network you do not control |
+| externalDatabase.sslRootCert.existingSecret | string | `""` | Name of an existing Secret holding the PEM CA bundle that issued the database server's certificate. Mounted read-only into cp-api and dp-manager and used as libpq `sslrootcert` for every database connection they open. Empty leaves verification to the system trust store |
+| externalDatabase.sslRootCert.key | string | `"ca.crt"` | Key in that Secret holding the CA bundle |
+| externalDatabase.sslmode | string | `"disable"` | libpq sslmode for the connection, e.g. `require` or `verify-full` for a managed database reached over a network you do not control. `verify-ca` and `verify-full` check the server certificate against the image's system trust store unless `sslRootCert` supplies the CA, which a database whose certificate is issued by a private CA (most managed databases) needs. With `sslRootCert` set, `require` verifies the CA too (libpq semantics) |
 | externalDatabase.username | string | `"aisix"` | Database role the control plane connects as. It has to be able to run the schema migrations cp-api applies at startup |
 | global.imagePullSecrets | list | `[]` | Image pull secrets applied to every pod created by this chart |
 | global.storageClass | string | `""` | StorageClass for the built-in PostgreSQL volume. Empty uses the cluster's default StorageClass |
