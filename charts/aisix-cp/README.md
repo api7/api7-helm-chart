@@ -209,13 +209,13 @@ the release was installed with.
 Wait for the `cp-api` pods to become ready before upgrading the gateways: the
 schema migration runs on first start under the new version.
 
-Upgrading from 1.5.0, three things change. The dashboard no longer runs as its
-own Deployment: `cp-api` serves it, and the `aisix-cp-ui` Service is kept,
+Upgrading from 1.5.0 changes the following. The dashboard no longer runs as
+its own Deployment: `cp-api` serves it, and the `aisix-cp-ui` Service is kept,
 now selecting the `cp-api` pods, so a proxy still pointed at it keeps working.
 `secrets.betterAuthSecret` and the dashboard's image, resource and volume values
 are no longer read; a private database CA that was mounted into the dashboard
-goes in `externalDatabase.sslRootCert` instead. And settings 1.5.0 took as environment variables through
-`extraEnvVars` now have values of their own — `api.trustedOrigins`,
+goes in `externalDatabase.sslRootCert` instead. Settings 1.5.0 took as
+environment variables through `extraEnvVars` now have values of their own — `api.trustedOrigins`,
 `api.allowUnsupportedUpgrade` and the rest in the [Parameters](#parameters)
 table. An existing override keeps working across the upgrade, but move it into
 the value; `extraEnvVars` is for system-level environment such as `TZ`.
