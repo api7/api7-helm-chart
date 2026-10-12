@@ -258,6 +258,7 @@ api:
   ## no billing, and the chart refuses to render with a provider other than
   ## `mock` or with usagePush on, as cp-api refuses to start. Every value
   ## here is left out of cp-api's config file while it is empty.
+  # @ignored
   billing:
     # -- Billing provider: `stripe`, or `mock` for a provider that accepts
     # every change without charging. Empty turns billing off
@@ -288,6 +289,7 @@ api:
       lagoAPIKey: "lago-api-key"
 
   ## Organization creation — SaaS only; on-premises creates no organizations.
+  # @ignored
   organization:
     # -- Every new organization needs a one-time invite code, including a
     # second one by an existing owner. An operator issues codes inside the
@@ -302,6 +304,7 @@ api:
   ## proves the organization controls a domain by publishing a DNS TXT
   ## record; cp-api looks it up when the owner verifies and about once a
   ## day after that.
+  # @ignored
   domainVerification:
     # -- DNS server (`host:port`) the TXT lookups are sent to. Empty uses
     # the resolver the cp-api pod is configured with

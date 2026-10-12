@@ -71,8 +71,7 @@ Connect a data-plane (managed mode):
   release: dp-manager puts it in its server certificate, and without it the
   certificate covers only localhost, so the gateway rejects the connection.
 
-  Then run the DP container (replace <node-ip> and <node-port>{{ if not .Values.api.dpImage }}; the
-  console's install snippet names <gateway-image>, the gateway of this release{{ end }}):
+  Then run the DP container (replace <node-ip> and <node-port>):
 
     docker run --rm \
       -e AISIX_CONFIG_PATH=/etc/aisix/config.managed.yaml \
@@ -82,7 +81,7 @@ Connect a data-plane (managed mode):
       -e AISIX_MANAGED__CP_KEY_PEM='<client-key-pem>' \
       -e AISIX_MANAGED__CP_CA_PEM='<ca-cert-pem>' \
       -v aisix-mtls:/var/lib/aisix \
-      {{ .Values.api.dpImage | default "<gateway-image>" }}
+      {{ .Values.api.dpImage | default (printf "docker.io/api7/aisix:%s" .Chart.AppVersion) }}
 {{- else }}
   DPM is a ClusterIP service. Expose it via Ingress, LoadBalancer, or port-forward:
     kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-dpm {{ .Values.dpm.service.port }}:{{ .Values.dpm.service.port }} -n {{ .Release.Namespace }}
