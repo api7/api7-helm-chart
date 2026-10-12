@@ -15,6 +15,8 @@ spec:
       labels:
         {{- include "aisix-cp.labels" . | nindent 8 }}
         {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "dpm") | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/dpm-configmap.yaml") . | sha256sum }}
     spec:
       {{- include "aisix-cp.imagePullSecrets" . | nindent 6 }}
       serviceAccountName: {{ include "aisix-cp.serviceAccountName" . }}
@@ -44,34 +46,7 @@ spec:
               protocol: TCP
             {{- end }}
           env:
-            - name: PGPASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "aisix-cp.pgSecretName" . }}
-                  key: {{ include "aisix-cp.pgPasswordSecretKey" . }}
-            - name: AISIX_DPMGR_LISTEN
-              value: ":7944"
-            - name: AISIX_DPMGR_HEALTH_LISTEN
-              value: {{ .Values.dpm.service.healthListen | quote }}
-            {{- if .Values.api.dpmgrBaseURL }}
-            # Same value cp-api bakes into the install snippet: dp-manager
-            # seeds its TLS server cert SANs from this host, so a DP that
-            # dials the CP by IP can complete the handshake (#1216).
-            - name: AISIX_DPMGR_BASE_URL
-              value: {{ .Values.api.dpmgrBaseURL | quote }}
-            {{- end }}
-            - name: AISIX_DPMGR_DATABASE_URL
-              value: {{ include "aisix-cp.databaseURL" . }}
-            - name: AISIX_DPMGR_MASTER_KEY
-              valueFrom:
-                secretKeyRef:
-                  name: {{ include "aisix-cp.secretName" . }}
-                  key: master-key
-            - name: AISIX_DPMGR_MASTER_KEY_ID
-              value: {{ .Values.secrets.masterKeyID | quote }}
-            {{- with .Values.dpm.extraEnvVars }}
-            {{- toYaml . | nindent 12 }}
-            {{- end }}
+            {{- include "aisix-cp.env" (dict "chart" (include "aisix-cp.dpmEnv" .) "legacy" (include "aisix-cp.legacyEnv.dpm" .) "extra" .Values.dpm.extraEnvVars) | nindent 12 }}
           # Probe the plain-HTTP /healthz (poller liveness), not the
           # mTLS port: a kubelet cannot present a client cert, and a
           # TCP check on 7944 stays green even if the outbox poller is
@@ -131,6 +106,14 @@ spec:
           resources:
             {{- toYaml . | nindent 12 }}
           {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: {{ include "aisix-cp.configDir" . }}
+              readOnly: true
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "aisix-cp.fullname" . }}-dpm-config
       {{- with .Values.dpm.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}
@@ -143,3 +126,32 @@ spec:
       affinity:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+
+{{- define "aisix-cp.dpmEnv" -}}
+- name: AISIX_DPMGR_CONFIG_FILE
+  value: {{ include "aisix-cp.configDir" . }}/config.yaml
+{{- /* Secrets: never in the ConfigMap. */}}
+- name: AISIX_DPMGR_DATABASE_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "aisix-cp.pgSecretName" . }}
+      key: {{ include "aisix-cp.pgPasswordSecretKey" . }}
+- name: AISIX_DPMGR_MASTER_KEY
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "aisix-cp.secretName" . }}
+      key: master-key
+{{- range (include "aisix-cp.retiredMasterKeys" . | fromJsonArray) }}
+- name: AISIX_DPMGR_MASTER_KEY_RETIRED_{{ .envSuffix }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "aisix-cp.secretName" $ }}
+      key: {{ .secretKey }}
+{{- end }}
+{{- /* Kept for extraEnvVars that reference $(PGPASSWORD). */}}
+- name: PGPASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ include "aisix-cp.pgSecretName" . }}
+      key: {{ include "aisix-cp.pgPasswordSecretKey" . }}
+{{- end }}

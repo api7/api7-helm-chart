@@ -1,0 +1,26 @@
+{{- /*
+dp-manager's application configuration, read through
+AISIX_DPMGR_CONFIG_FILE. Secrets are NOT here — see dpm-deployment.yaml.
+*/ -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aisix-cp.fullname" . }}-dpm-config
+  labels:
+    {{- include "aisix-cp.labels" . | nindent 4 }}
+    {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "dpm") | nindent 4 }}
+data:
+  config.yaml: |
+    server:
+      listen: ":7944"
+      {{- /* Omitted when empty, which leaves dp-manager's own :7946
+             default bound, exactly as the empty env var this replaced did;
+             the probes switch to TCP on the mTLS port either way. */}}
+      {{- with .Values.dpm.service.healthListen }}
+      health_listen: {{ . | quote }}
+      {{- end }}
+      base_url: {{ .Values.api.dpmgrBaseURL | quote }}
+    database:
+      url: {{ include "aisix-cp.databaseURL" . | quote }}
+    master_key:
+      id: {{ .Values.secrets.masterKeyID | quote }}

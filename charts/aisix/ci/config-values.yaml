@@ -18,6 +18,8 @@ config:
     heap_profiling:
       auto_dump:
         thresholds: [0.7, 0.95]
+    usage_event:
+      request_headers: [x-sub-user, x-department]
   proxy:
     real_ip:
       trusted_proxies: ["10.0.0.0/8", "127.0.0.1/32"]

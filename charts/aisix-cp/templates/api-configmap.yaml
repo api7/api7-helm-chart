@@ -1,0 +1,118 @@
+{{- /*
+cp-api's application configuration, read through AISIX_CLOUD_CONFIG_FILE.
+Every key comes from an explicit value. Keys added after 1.5.0 carry a
+`default` here because `helm upgrade --reuse-values` hands the templates the
+PREVIOUS chart's values, which do not have them. Secrets are NOT here — they reach
+the pod as secretKeyRef env (see api-deployment.yaml). An env var of the
+same setting still overrides this file, which is how a value set through
+api.extraEnvVars before this file existed keeps its effect.
+*/ -}}
+{{- include "aisix-cp.validateCorsOrigins" .Values.api.corsAllowedOrigins }}
+{{- $mode := .Values.api.deploymentMode | default "on-premises" }}
+{{- if not (has $mode (list "on-premises" "saas")) }}
+  {{- fail (printf "api.deploymentMode must be on-premises or saas, got %q" $mode) }}
+{{- end }}
+{{- if and (eq $mode "saas") (not .Values.twoDSN.enabled) }}
+  {{- fail "api.deploymentMode saas requires twoDSN.enabled: a SaaS control plane serves tenants through the non-privileged cp_api_app role" }}
+{{- end }}
+{{- /* A relay set through api.extraEnvVars (the pre-file way) still counts. */ -}}
+{{- $smtpHostEnv := false }}
+{{- range .Values.api.extraEnvVars }}
+  {{- if and (eq .name "AISIX_CLOUD_SMTP_HOST") (or .valueFrom (trim (toString (.value | default "")))) }}
+    {{- $smtpHostEnv = true }}
+  {{- end }}
+{{- end }}
+{{- if and (eq $mode "saas") (not (dig "smtp" "host" "" .Values.api | trim)) (not $smtpHostEnv) }}
+  {{- fail "api.deploymentMode saas requires api.smtp.host: a SaaS control plane emails every new account a verification link and needs an SMTP relay to send it" }}
+{{- end }}
+{{- $billing := .Values.api.billing | default dict }}
+{{- $billingProvider := $billing.provider | default "" | trim }}
+{{- if and (ne $mode "saas") (or $billing.usagePush (and $billingProvider (ne $billingProvider "mock"))) }}
+  {{- fail "api.billing.provider (other than mock) and api.billing.usagePush need api.deploymentMode saas: an on-premises control plane has no billing" }}
+{{- end }}
+{{- $bootstrap := .Values.api.bootstrapAdmin | default dict }}
+{{- if and (not $bootstrap.email) (or $bootstrap.password $bootstrap.existingSecret) }}
+  {{- fail "api.bootstrapAdmin.password and api.bootstrapAdmin.existingSecret need api.bootstrapAdmin.email: without it no first administrator is created" }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "aisix-cp.fullname" . }}-api-config
+  labels:
+    {{- include "aisix-cp.labels" . | nindent 4 }}
+    {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "api") | nindent 4 }}
+data:
+  config.yaml: |
+    deployment:
+      mode: {{ $mode | quote }}
+    bootstrap:
+      admin_email: {{ $bootstrap.email | default "" | quote }}
+    server:
+      listen: ":8080"
+      public_base_url: {{ .Values.api.publicBaseURL | quote }}
+      cors_allowed_origins: {{ .Values.api.corsAllowedOrigins | default list | toJson }}
+    metrics:
+      {{- /* Empty binds nothing: cp-api has no metrics listener unless this names one. */}}
+      listen: {{ ternary (printf ":%v" .Values.api.metrics.port) "" .Values.api.metrics.enabled | quote }}
+    database:
+      {{- if .Values.twoDSN.enabled }}
+      url: {{ include "aisix-cp.servingDatabaseURL" . | quote }}
+      admin_url: {{ include "aisix-cp.databaseURL" . | quote }}
+      {{- else }}
+      url: {{ include "aisix-cp.databaseURL" . | quote }}
+      {{- end }}
+      allow_unsupported_upgrade: {{ .Values.api.allowUnsupportedUpgrade | default false }}
+    master_key:
+      id: {{ .Values.secrets.masterKeyID | quote }}
+    auth:
+      trusted_origins: {{ .Values.api.trustedOrigins | default list | toJson }}
+      bearer_sessions: {{ .Values.api.bearerSessions | default false }}
+      trusted_proxies: {{ .Values.api.trustedProxies | default list | toJson }}
+    smtp:
+      host: {{ dig "smtp" "host" "" .Values.api | quote }}
+      port: {{ dig "smtp" "port" 0 .Values.api | int }}
+      tls: {{ dig "smtp" "tls" "starttls" .Values.api | quote }}
+      from: {{ dig "smtp" "from" "" .Values.api | quote }}
+      username: {{ dig "smtp" "username" "" .Values.api | quote }}
+      invitation_limit_per_hour: {{ dig "smtp" "invitationLimitPerHour" 50 .Values.api | int }}
+    audit:
+      retention_days: {{ dig "audit" "retentionDays" 730 .Values.api | int }}
+    organization:
+      require_invite_code: {{ dig "organization" "requireInviteCode" true .Values.api }}
+    domain_verification:
+      dns_server: {{ dig "domainVerification" "dnsServer" "" .Values.api | quote }}
+    i18n:
+      {{- /* The console reads it from GET /api/config/public; emails use it too. */}}
+      default_locale: {{ .Values.ui.defaultLocale | default "en" | quote }}
+    data_plane:
+      manager_url: {{ .Values.api.dpmgrBaseURL | quote }}
+      {{- with .Values.api.dpImage }}
+      image: {{ . | quote }}
+      {{- end }}
+    pricesync:
+      url: {{ .Values.api.pricesyncURL | default "" | quote }}
+      snapshot_path: {{ .Values.api.pricesyncSnapshotPath | default "" | quote }}
+    {{- /* Unset values stay out of the file, which is what lets
+           deployment.mode decide them. */}}
+    {{- $outbound := dict
+          "notify_allow_private_urls" .Values.api.notifyAllowPrivateURLs
+          "playground_allow_private_ips" .Values.api.playgroundAllowPrivateIPs
+          "mcp_spec_allow_private_urls" .Values.api.mcpSpecAllowPrivateURLs
+          "guardrail_test_connection_allow_insecure" .Values.api.guardrailTestConnectionAllowInsecure }}
+    {{- $set := dict }}
+    {{- range $k, $v := $outbound }}
+    {{- if not (kindIs "invalid" $v) }}
+    {{- $_ := set $set $k $v }}
+    {{- end }}
+    {{- end }}
+    {{- if $set }}
+    outbound: {{ $set | toJson }}
+    {{- end }}
+    {{- $billingSet := dict }}
+    {{- with $billingProvider }}{{ $_ := set $billingSet "provider" . }}{{ end }}
+    {{- if $billing.usagePush }}{{ $_ := set $billingSet "usage_push" true }}{{ end }}
+    {{- with $billing.stripePortalConfigID }}{{ $_ := set $billingSet "stripe_portal_config_id" . }}{{ end }}
+    {{- with $billing.lagoEndpoint }}{{ $_ := set $billingSet "lago_endpoint" . }}{{ end }}
+    {{- if $billingSet }}
+    billing: {{ $billingSet | toJson }}
+    {{- end }}

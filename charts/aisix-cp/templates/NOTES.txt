@@ -1,12 +1,11 @@
-AISIX control plane has been deployed.
+{{ if eq (.Values.api.deploymentMode | default "on-premises") "saas" }}AISIX Cloud{{ else }}AISIX Enterprise{{ end }} control plane has been deployed.
 
 Components:
-  - cp-api:      {{ include "aisix-cp.fullname" . }}-api:{{ .Values.api.service.port }}
+  - cp-api:      {{ include "aisix-cp.fullname" . }}-api:{{ .Values.api.service.port }}  (API and dashboard)
   - dp-manager:  {{ include "aisix-cp.fullname" . }}-dpm:{{ .Values.dpm.service.port }}
-  - dashboard:   {{ include "aisix-cp.fullname" . }}-ui:{{ .Values.ui.service.port }}
   - PostgreSQL:  {{ include "aisix-cp.pgHost" . }}:{{ include "aisix-cp.pgPort" . }}
 
-Access the dashboard via cp-api (reverse proxy):
+cp-api serves the dashboard. Access it through the api Service:
   kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-api {{ .Values.api.service.port }}:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
 {{- $base := trimSuffix "/" (lower .Values.api.publicBaseURL) }}
 {{- if or (eq $base (printf "http://localhost:%v" .Values.api.service.port)) (eq $base (printf "http://127.0.0.1:%v" .Values.api.service.port)) }}
@@ -14,27 +13,47 @@ Access the dashboard via cp-api (reverse proxy):
 
   Sign-in is checked against the trusted origins: the api.publicBaseURL origin,
   its loopback twin — localhost and 127.0.0.1 are interchangeable — and anything
-  in AISIX_TRUSTED_ORIGINS. Reaching the dashboard at some OTHER address (an
+  in api.trustedOrigins. Reaching the dashboard at some OTHER address (an
   Ingress, a LoadBalancer, a different port) is refused at sign-in with an
   "address not allowed" error. To allow one, either point api.publicBaseURL at it and
-  upgrade the release, or add it to AISIX_TRUSTED_ORIGINS via ui.extraEnvVars —
+  upgrade the release, or add it to api.trustedOrigins —
   that one is additive, so use it when the console is reached through more than
   one hostname.
 {{- else }}
   Then open {{ .Values.api.publicBaseURL }}
 
   Sign-in is checked against the trusted origins: the api.publicBaseURL origin,
-  its loopback twin, and anything in AISIX_TRUSTED_ORIGINS. The port-forward
+  its loopback twin, and anything in api.trustedOrigins. The port-forward
   above publishes the dashboard on http://localhost:{{ .Values.api.service.port }},
   which is not that origin — so unless you have already listed it in
-  AISIX_TRUSTED_ORIGINS, the page loads and sign-in is refused. To allow it,
-  add http://localhost:{{ .Values.api.service.port }} to AISIX_TRUSTED_ORIGINS
-  via ui.extraEnvVars.
+  api.trustedOrigins, the page loads and sign-in is refused. To allow it,
+  add http://localhost:{{ .Values.api.service.port }} to api.trustedOrigins.
 {{- if or (hasPrefix "http://localhost:" $base) (hasPrefix "http://127.0.0.1:" $base) }}
   Or forward the port api.publicBaseURL names instead — local port first,
   Service port second:
 
     kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-api <its-port>:{{ .Values.api.service.port }} -n {{ .Release.Namespace }}
+{{- end }}
+{{- end }}
+
+{{- $bootstrap := .Values.api.bootstrapAdmin | default dict }}
+{{- if and (ne (.Values.api.deploymentMode | default "on-premises") "saas") (or $bootstrap.email .Release.IsInstall) }}
+
+First administrator:
+{{- if $bootstrap.email }}
+  On a database with no users yet, cp-api creates the organization Default
+  with {{ $bootstrap.email }} as its owner. The console asks for a new
+  password at the first sign-in, before anything else.
+{{- if $bootstrap.existingSecret }}
+  The initial password is in the Secret {{ $bootstrap.existingSecret }}, key {{ $bootstrap.existingSecretKey | default "bootstrap-admin-password" }}.
+{{- else }}
+  Read the initial password with:
+    kubectl get secret {{ include "aisix-cp.secretName" . }} -n {{ .Release.Namespace }} -o jsonpath='{.data.bootstrap-admin-password}' | base64 -d; echo
+{{- end }}
+{{- else }}
+  Nobody can sign in yet: accounts are created by invitation, and
+  api.bootstrapAdmin.email is empty. Set it and upgrade the release to
+  create the first administrator.
 {{- end }}
 {{- end }}
 
@@ -52,7 +71,8 @@ Connect a data-plane (managed mode):
   release: dp-manager puts it in its server certificate, and without it the
   certificate covers only localhost, so the gateway rejects the connection.
 
-  Then run the DP container (replace <node-ip> and <node-port>):
+  Then run the DP container (replace <node-ip> and <node-port>{{ if not .Values.api.dpImage }}; the
+  console's install snippet names <gateway-image>, the gateway of this release{{ end }}):
 
     docker run --rm \
       -e AISIX_CONFIG_PATH=/etc/aisix/config.managed.yaml \
@@ -62,7 +82,7 @@ Connect a data-plane (managed mode):
       -e AISIX_MANAGED__CP_KEY_PEM='<client-key-pem>' \
       -e AISIX_MANAGED__CP_CA_PEM='<ca-cert-pem>' \
       -v aisix-mtls:/var/lib/aisix \
-      {{ .Values.api.dpImage | default (printf "docker.io/api7/aisix:%s" .Chart.AppVersion) }}
+      {{ .Values.api.dpImage | default "<gateway-image>" }}
 {{- else }}
   DPM is a ClusterIP service. Expose it via Ingress, LoadBalancer, or port-forward:
     kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-dpm {{ .Values.dpm.service.port }}:{{ .Values.dpm.service.port }} -n {{ .Release.Namespace }}
