@@ -1,6 +1,6 @@
 # aisix
 
-![Version: 1.5.0](https://img.shields.io/badge/Version-1.5.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.5.0](https://img.shields.io/badge/AppVersion-1.5.0-informational?style=flat-square)
+![Version: 1.6.0](https://img.shields.io/badge/Version-1.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.0](https://img.shields.io/badge/AppVersion-1.6.0-informational?style=flat-square)
 
 Helm chart for the AISIX AI gateway data plane
 
@@ -335,6 +335,10 @@ keda:
         threshold: "100"
 ```
 
+A streamed request is counted in `aisix_llm_requests_total` when the stream
+ends, not when it starts, so during a burst of long streams this signal lags by
+roughly one stream length. The steady-state rate is unaffected.
+
 `autoscaling` and `keda` are mutually exclusive — enabling both fails the render
 rather than letting two controllers fight over the replica count.
 
@@ -560,6 +564,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.observability.metrics.prometheus.enabled | bool | `true` | Serve Prometheus metrics on the metrics listener (`containerPorts.metrics`) |
 | config.observability.metrics.prometheus.path | string | `"/metrics"` | Metrics path |
 | config.observability.service_name | string | `"aisix"` | Service name reported in telemetry |
+| config.observability.usage_event.request_headers | list | `[]` | Request headers whose values every usage event records (lowercase names; credential headers and duplicates are refused at startup) |
 | config.proxy.real_ip.header | string | `"x-forwarded-for"` | Header carrying the client IP |
 | config.proxy.real_ip.recursive | bool | `false` | Walk the header right to left past every trusted proxy |
 | config.proxy.real_ip.trusted_proxies | list | `[]` | CIDRs (or bare IPs) of proxies trusted to set the client-IP header |
@@ -616,7 +621,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | keda.minReplicas | int | `2` | Lower replica bound |
 | keda.pollingInterval | int | `15` | How often KEDA evaluates the triggers, in seconds |
 | keda.restoreToOriginalReplicaCount | bool | `false` | Restore the original replica count when the ScaledObject is deleted |
-| keda.triggers | list | `[]` | KEDA triggers. Required when `keda.enabled` is true. For example: `[{type: prometheus, metadata: {serverAddress: "http://prometheus:9090", query: "sum(rate(aisix_llm_requests_total[2m]))", threshold: "100"}}]` |
+| keda.triggers | list | `[]` | KEDA triggers. Required when `keda.enabled` is true. For example: `[{type: prometheus, metadata: {serverAddress: "http://prometheus:9090", query: "sum(rate(aisix_llm_requests_total[2m]))", threshold: "100"}}]`. Streamed requests are counted when the stream ends, so during a burst of long streams this signal lags by roughly one stream length; the steady-state rate is unaffected |
 | listeners | list | `[]` | Proxy listeners, one entry per port. Empty keeps the single plain-HTTP listener described by `containerPorts.proxy` and `service.port` — see "Serve HTTPS and plain HTTP together" above |
 | livenessProbe.enabled | bool | `true` |  |
 | livenessProbe.failureThreshold | int | `3` |  |

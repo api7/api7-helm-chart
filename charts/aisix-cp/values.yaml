@@ -10,6 +10,11 @@ global:
 ##
 ## cp-api serves the Admin API and reverse-proxies the Dashboard, so it is the
 ## one entry point a browser talks to.
+##
+## Every application setting of cp-api, dp-manager and the dashboard is a
+## value below. The chart renders them into one config file per component
+## (a ConfigMap, mounted read-only; a change rolls the pods), and secrets
+## reach the pods from Kubernetes Secrets, never through a ConfigMap.
 api:
   # -- Number of cp-api replicas
   replicaCount: 1
@@ -106,14 +111,20 @@ api:
   tolerations: []
   # -- Affinity rules for the cp-api pod
   affinity: {}
-  # -- Extra environment for cp-api. This is also where
-  # AISIX_ALLOW_UNSUPPORTED_UPGRADE=1 goes when an upgrade has to proceed
-  # from a release older than this one supports upgrading from — cp-api
-  # refuses that upgrade at startup and names the version it needs.
+  # -- Extra environment for cp-api: system-level settings only (for example
+  # TZ). Every cp-api setting has its own value in this section; an env var
+  # set here for one of them still overrides the rendered config file, which
+  # is how values set this way before those keys existed keep working.
+  # Overriding a name the chart itself sets is only a compatibility path for
+  # existing deployments. For a name chart 1.5.0 already set, the chart keeps
+  # its own entry ahead of yours, so the name appears twice and Helm 4's
+  # server-side apply rejects the install. New installs set the value in this
+  # file instead.
   extraEnvVars: []
-  # -- Publicly reachable cp-api URL. Better Auth validates the session JWT
-  # issuer against it, so a value that does not match the address the browser
-  # uses breaks sign-in. When api.service.type is NodePort, this must name the
+  # -- Publicly reachable cp-api URL. Console sign-in trusts this origin (and
+  # its localhost/127.0.0.1 twin), so a value that does not match the address
+  # the browser uses breaks sign-in unless that address is in
+  # api.trustedOrigins. When api.service.type is NodePort, this must name the
   # API NodePort endpoint (or the TLS reverse proxy in front).
   publicBaseURL: "http://localhost:8080"
   # -- Browser origins allowed to call cp-api cross-origin, as bare origins
@@ -145,22 +156,212 @@ api:
   # presents — so an IP address works here, not only a DNS name. When
   # dpm.service.type is NodePort, use https://<node-ip>:<dpm-node-port>.
   dpmgrBaseURL: ""
-  # -- Offer Google / GitHub sign-in on the console's login page. Leave off
-  # unless the deployment carries OAuth client credentials
-  oauthEnabled: false
   # -- Gateway image the console hands out in the install snippets it
-  # generates for a new data plane
-  dpImage: ""  # empty -> docker.io/api7/aisix:<appVersion>
-  # -- Allow the dashboard playground to reach LLM endpoints on private /
-  # internal networks. cp-api blocks private IPs by default (SSRF guard);
-  # enable this only for On-Premises deployments whose models live on an
-  # internal network the cp-api pod can route to.
-  playgroundAllowPrivateIPs: false
-  # -- Allow notification channels (budget alert webhooks / Slack) to point
-  # at private / internal addresses. Blocked by default (SSRF guard);
-  # enable only for On-Premises deployments whose webhook receivers live
-  # on an intranet the cp-api pod can route to.
-  notifyAllowPrivateURLs: false
+  # generates for a new data plane. Empty uses cp-api's own default: the
+  # gateway of the same release, docker.io/api7/aisix:<cp-api version>, or
+  # ghcr.io/api7/aisix:dev on a build that is not a release
+  dpImage: ""
+  # -- How this control plane is deployed: `on-premises` or `saas`.
+  # `on-premises` serves one company's organizations: nobody signs up on
+  # their own (accounts come from invitations), organizations cannot be
+  # created, billing is off, and cp-api's outbound calls may reach private
+  # addresses unless an outbound value below says otherwise. `saas` is the
+  # multi-tenant hosted service — open sign-up, organization creation and
+  # billing — and requires twoDSN.enabled
+  deploymentMode: "on-premises"
+  # -- (bool) Whether the dashboard playground may call LLM endpoints on
+  # private / internal addresses. Unset follows deploymentMode: allowed
+  # on-premises, blocked on saas (SSRF guard). Set true or false to override
+  playgroundAllowPrivateIPs: null
+  # -- (bool) Whether notification channels (budget alert webhooks / Slack)
+  # may deliver to private / internal addresses. Unset follows
+  # deploymentMode: allowed on-premises, blocked on saas
+  notifyAllowPrivateURLs: null
+  # -- (bool) Whether an MCP server's OpenAPI spec_url may be fetched from a
+  # private / internal address. Unset follows deploymentMode: allowed
+  # on-premises, blocked on saas, where pasting the spec content still works
+  mcpSpecAllowPrivateURLs: null
+  # -- (bool) Whether the guardrail "test connection" probe may reach plain
+  # http, private addresses and non-Azure hosts (an internal or Private Link
+  # endpoint). Unset follows deploymentMode: allowed on-premises, blocked on
+  # saas
+  guardrailTestConnectionAllowInsecure: null
+  # -- Let cp-api migrate a database last run by a release older than this one
+  # supports upgrading from. cp-api refuses such an upgrade at startup and
+  # names the release to pass through first; set this only after reading that
+  # message and taking a database backup, then set it back.
+  allowUnsupportedUpgrade: false
+  # -- Extra origins the console accepts sign-in from, as bare origins
+  # (https://host[:port]) or `https://*<suffix>` patterns. The
+  # api.publicBaseURL origin and its loopback twin are always trusted; add
+  # another hostname of this console here, or the local address of a
+  # port-forward that differs from api.publicBaseURL. An entry cp-api cannot
+  # read as an origin is logged and ignored.
+  trustedOrigins: []
+  # -- Reverse proxies (CIDRs, e.g. `10.0.0.0/8`) in front of cp-api whose
+  # X-Forwarded-For cp-api believes. Console sign-in and password reset
+  # rate limiting, and the client address recorded on a session,
+  # then use the first address from
+  # the right that is not one of these proxies. Empty — the default — uses
+  # the address of whatever connected to cp-api, so behind an ingress every
+  # client shares the ingress's rate-limit budget. List only proxies you
+  # run: a range listed here can name any client address it likes.
+  trustedProxies: []
+  # -- Hand the session token to a cross-site console client (a
+  # frontend-only PR preview) and accept it back in an Authorization header.
+  # Leave off for a normal install: it exposes the session token to page
+  # scripts.
+  bearerSessions: false
+  # -- Model-pricing catalog URL cp-api syncs from (the models.dev api.json
+  # format). Empty uses the public models.dev endpoint; point it at an
+  # internal mirror when cp-api has no internet access. Ignored when
+  # pricesyncSnapshotPath is set
+  pricesyncURL: ""
+  # -- Offline pricing: seed the catalog once at startup from this
+  # models.dev api.json capture (plain or .gz) and never fetch. The cp-api
+  # image ships one at /etc/aisix/models-dev-snapshot.json.gz. Empty selects
+  # online sync, which loads that bundled snapshot when a sync fails while
+  # the catalog is still empty (an install without internet access), keeps
+  # an existing catalog, and refreshes every model a later sync returns
+  pricesyncSnapshotPath: ""
+
+  ## The first administrator of an on-premises install. When cp-api starts
+  ## on a database with no users yet, it creates the organization `Default`
+  ## (rename it later in the organization settings) with this account as its
+  ## owner, who must change the password at the first sign-in. It happens
+  ## once: changing these afterwards changes nothing. Restoring an
+  ## organization bundle onto a fresh install is done by this administrator
+  ## too. Set email to "" to create no administrator. Ignored when
+  ## deploymentMode is saas.
+  ##
+  ## With neither password nor existingSecret, the chart generates a random
+  ## password into its own Secret (key bootstrap-admin-password) and keeps it
+  ## across `helm upgrade` by reading that Secret back with `lookup`; the
+  ## install notes print the command that reads it. `helm template` and
+  ## GitOps renderers such as Argo CD cannot `lookup`, so they would generate
+  ## a new password on every render: those deployments must set password or
+  ## existingSecret explicitly.
+  bootstrapAdmin:
+    # -- Email of the first administrator
+    email: "admin@example.com"
+    # -- Initial password (12 to 128 characters), stored in the chart's
+    # Secret. Ignored when existingSecret is set. Empty generates one (see
+    # above)
+    password: ""
+    # -- Name of an existing Secret holding the initial password instead of
+    # the password value above
+    existingSecret: ""
+    # -- Key inside bootstrapAdmin.existingSecret holding the password
+    existingSecretKey: "bootstrap-admin-password"
+
+  ## Billing — SaaS only. On-premises (api.deploymentMode: on-premises) has
+  ## no billing, and the chart refuses to render with a provider other than
+  ## `mock` or with usagePush on, as cp-api refuses to start. Every value
+  ## here is left out of cp-api's config file while it is empty.
+  # @ignored
+  billing:
+    # -- Billing provider: `stripe`, or `mock` for a provider that accepts
+    # every change without charging. Empty turns billing off
+    provider: ""
+    # -- Push metered usage to the Lago endpoint below
+    usagePush: false
+    # -- Stripe Billing customer-portal configuration id (`bpc_...`)
+    stripePortalConfigID: ""
+    # -- Lago API endpoint usage is pushed to
+    lagoEndpoint: ""
+    # -- Stripe secret API key, stored in the chart's Secret. Ignored when
+    # existingSecret is set
+    stripeSecretKey: ""
+    # -- Stripe webhook signing secret, stored in the chart's Secret.
+    # Ignored when existingSecret is set
+    stripeWebhookSecret: ""
+    # -- Lago API key, stored in the chart's Secret. Ignored when
+    # existingSecret is set
+    lagoAPIKey: ""
+    # -- Name of an existing Secret holding the three billing secrets
+    # instead of the values above
+    existingSecret: ""
+    # -- Keys inside billing.existingSecret. Set a key to "" when the
+    # Secret does not hold that value; every other key must exist
+    existingSecretKeys:
+      stripeSecretKey: "stripe-secret-key"
+      stripeWebhookSecret: "stripe-webhook-secret"
+      lagoAPIKey: "lago-api-key"
+
+  ## Organization creation — SaaS only; on-premises creates no organizations.
+  # @ignored
+  organization:
+    # -- Every new organization needs a one-time invite code, including a
+    # second one by an existing owner. An operator issues codes inside the
+    # cp-api pod: `kubectl exec deploy/<release>-aisix-cp-api -- cp-api
+    # invite-code create --note <who it is for>` (also `list`, `revoke`).
+    # Signing up and joining an organization through a member invitation
+    # need no code. Set false to let anyone who signs up create
+    # organizations
+    requireInviteCode: true
+
+  ## Organization domain verification — SaaS only. An organization owner
+  ## proves the organization controls a domain by publishing a DNS TXT
+  ## record; cp-api looks it up when the owner verifies and about once a
+  ## day after that.
+  # @ignored
+  domainVerification:
+    # -- DNS server (`host:port`) the TXT lookups are sent to. Empty uses
+    # the resolver the cp-api pod is configured with
+    dnsServer: ""
+
+  ## Outbound email. cp-api sends invitation emails, password reset emails
+  ## and sign-up verification emails through this relay. Email is off until
+  ## `host` is set; the console then shows invitation links to pass on by
+  ## hand and asks users who forgot their
+  ## password to contact an administrator. `deploymentMode: saas` requires
+  ## `host`: every new account confirms its address by email before it can
+  ## sign in, and the chart refuses to render without a relay.
+  ## Deployments with open public sign-up should keep invitationLimitPerHour
+  ## in place: it is what stops any sign-up from mailing arbitrary addresses
+  ## through the relay.
+  smtp:
+    # -- SMTP relay host name. Empty disables email
+    host: ""
+    # -- SMTP relay port. 0 uses the default for the TLS mode: 587 for
+    # starttls, 465 for smtps, 25 for none
+    port: 0
+    # -- How the connection is protected: `starttls` (plain connection
+    # upgraded with STARTTLS; refused if the relay does not offer it),
+    # `smtps` (TLS from the first byte) or `none` (never encrypted). The
+    # relay's certificate is always verified against the system roots
+    tls: "starttls"
+    # -- Sender address of every email, e.g. `AISIX <noreply@example.com>`.
+    # Required when host is set
+    from: ""
+    # -- Username for SMTP authentication. Set together with a password
+    # (password or existingSecret), or leave both empty to send without
+    # authenticating. With tls `none` the credentials cross the network
+    # unencrypted
+    username: ""
+    # -- SMTP password, stored in the chart's Secret. Ignored when
+    # existingSecret is set
+    password: ""
+    # -- Name of an existing Secret holding the SMTP password instead of
+    # the password value above
+    existingSecret: ""
+    # -- Key inside smtp.existingSecret holding the password
+    existingSecretKey: "smtp-password"
+    # -- Most invitation emails one inviter account may send per rolling
+    # hour, across every organization; creating and resending an invitation
+    # both count, and one over the limit is refused (HTTP 429) with nothing
+    # created. Counted only while email is on. Keep it in place on a
+    # deployment with open public sign-up: anyone can create an organization
+    # there, and would otherwise send unlimited mail through your relay
+    invitationLimitPerHour: 50
+
+  ## Audit log retention. Audit events older than this are deleted by a
+  ## daily job; the audit log in the console and the Admin API only ever
+  ## shows what is kept.
+  audit:
+    # -- Days an audit event is kept before it is deleted. 0 keeps audit
+    # events forever
+    retentionDays: 730
 
 ## @section dp-manager
 ##
@@ -227,80 +428,46 @@ dpm:
   tolerations: []
   # -- Affinity rules for the dp-manager pod
   affinity: {}
-  # -- Extra environment for dp-manager
+  # -- Extra environment for dp-manager: system-level settings only (for
+  # example TZ). An env var set here for a dp-manager setting still
+  # overrides the rendered config file.
+  # Overriding a name the chart itself sets is only a compatibility path for
+  # existing deployments. For a name chart 1.5.0 already set, the chart keeps
+  # its own entry ahead of yours, so the name appears twice and Helm 4's
+  # server-side apply rejects the install. New installs set the value in this
+  # file instead.
   extraEnvVars: []
 
-## @section dashboard (Next.js)
+## @section dashboard
 ##
-## The console's web tier. It is not a separate entry point: cp-api proxies
-## browser traffic to it, so it stays a ClusterIP Service in a normal install.
+## The console. cp-api serves it from its own image, so there is no separate
+## dashboard Deployment: the console is reached wherever the api Service is.
 ui:
-  # -- Number of dashboard replicas
-  replicaCount: 1
-  # -- Fixed dashboard UI language for this deployment. Supported: "en", "zh".
-  # There is no in-UI language switcher; the whole console renders in this
-  # locale (default English). Read server-side at request time.
+  # -- Fixed language for this deployment. Supported: "en", "zh". There is
+  # no in-UI language switcher; the whole console renders in this locale
+  # (default English), and the emails cp-api sends are written in it too.
   defaultLocale: "en"
-  image:
-    # -- Dashboard image repository
-    repository: docker.io/api7/aisix-cp-ui
-    # -- Image pull policy
-    pullPolicy: IfNotPresent
-    # -- Image tag
-    tag: ""  # empty -> .Chart.AppVersion
+  ## Chart 1.5.0 ran the dashboard behind its own Service, and a same-origin
+  ## proxy may still send pages to it. The Service stays, under the same
+  ## name, and now reaches cp-api, which serves the console at every path —
+  ## so pointing such a proxy (or anything else) at the api Service instead
+  ## is equivalent. New installs do not need it.
   service:
-    # -- Dashboard Service type
+    # -- Type of the dashboard Service kept from chart 1.5.0
     type: ClusterIP
-    # -- Dashboard Service port, which cp-api proxies browser traffic to
+    # -- Port of the dashboard Service kept from chart 1.5.0; it forwards to cp-api
     port: 3000
     # -- Optional fixed NodePort. Used only when type is NodePort; leave empty
     # to let Kubernetes allocate a port dynamically. This plain-HTTP endpoint
-    # is not a standalone Dashboard entry point: use it only behind a
-    # same-origin reverse proxy that sends Dashboard pages here and /api/* to
-    # cp-api. The proxy should terminate TLS unless it is on a trusted network.
+    # reaches cp-api exactly as the api Service does; terminate TLS in front
+    # of it unless it is on a trusted network.
     nodePort: ""
-  resources:
-    requests:
-      # -- Dashboard CPU request
-      cpu: 50m
-      # -- Dashboard memory request
-      memory: 64Mi
-    limits:
-      # -- Dashboard CPU limit
-      cpu: 500m
-      # -- Dashboard memory limit
-      memory: 256Mi
-  ## No runAsUser / runAsGroup / fsGroup: the image runs under whatever UID
-  ## the platform assigns (OpenShift's restricted-v2 SCC picks a random one).
-  ## The .next/cache emptyDir needs no fsGroup to be writable — the kubelet
-  ## creates it world-writable. Set those three keys to pin a fixed UID back.
-  podSecurityContext:
-    # -- Refuse to run the dashboard pod as root
-    runAsNonRoot: true
-    seccompProfile:
-      # -- Seccomp profile for the dashboard pod
-      type: RuntimeDefault
-  securityContext:
-    # -- Forbid privilege escalation in the dashboard container
-    allowPrivilegeEscalation: false
-    # -- Mount the dashboard root filesystem read-only
-    readOnlyRootFilesystem: true
-    capabilities:
-      # -- Linux capabilities dropped from the dashboard container
-      drop:
-        - ALL
-  # -- Node selector for the dashboard pod
-  nodeSelector: {}
-  # -- Tolerations for the dashboard pod
-  tolerations: []
-  # -- Affinity rules for the dashboard pod
-  affinity: {}
-  # -- Extra environment for the dashboard
+  # -- Kept for installs upgraded from chart 1.5.0, which ran a separate
+  # dashboard. Of what that release was told to set here, AISIX_TRUSTED_ORIGINS
+  # and AISIX_AUTH_BEARER_SESSIONS are carried to cp-api (unless
+  # api.extraEnvVars sets the same name); nothing else is read. Set
+  # api.extraEnvVars instead.
   extraEnvVars: []
-  # -- Additional volumes for the dashboard Pod (for example, a private database CA).
-  extraVolumes: []
-  # -- Additional mounts for the dashboard container. Use readOnly for CA certificates.
-  extraVolumeMounts: []
 
 ## @section ServiceAccount
 serviceAccount:
@@ -314,11 +481,11 @@ serviceAccount:
 
 ## @section Secrets
 ##
-## REQUIRED. The chart refuses to render while these carry their CHANGE_ME
-## placeholders, so an install cannot come up with known secrets. Both values
-## have to stay the same for the life of the deployment: the master key is the
-## only thing that can decrypt the provider keys stored under it, and the Better
-## Auth secret signs every session. Keep them somewhere you can restore from.
+## REQUIRED. The chart refuses to render while the master key carries its
+## CHANGE_ME placeholder, so an install cannot come up with a known secret. It
+## has to stay the same for the life of the deployment: the master key is the
+## only thing that can decrypt the provider keys stored under it. Keep it
+## somewhere you can restore from.
 secrets:
   # -- REQUIRED. Base64-encoded 32-byte AES-256 key that envelope-encrypts the
   # stored upstream provider credentials. Generate with
@@ -328,9 +495,12 @@ secrets:
   # -- Identifier recorded alongside every value encrypted with the current
   # master key, so a future key rotation can tell the generations apart
   masterKeyID: "env:default"
-  # -- REQUIRED. HMAC signing secret for Better Auth sessions. Generate with
-  # `openssl rand -base64 48`. Changing it signs every signed-in user out
-  betterAuthSecret: "CHANGE_ME_GENERATE_WITH_openssl_rand_-base64_48"
+  # -- Decrypt-only master keys during a master-key rotation, as
+  # `<masterKeyID>: <base64 key>` — the id the key was recorded under
+  # (lowercase letters, digits, ":" and "-") and the key itself. Rotate by
+  # moving the current masterKey / masterKeyID here and setting new ones;
+  # remove an entry once nothing is encrypted under it any more
+  retiredMasterKeys: {}
 
 ## @section PostgreSQL
 ##
@@ -427,8 +597,20 @@ externalDatabase:
   # URL-safe value: it is embedded in a `postgres://` DSN
   password: ""
   # -- libpq sslmode for the connection, e.g. `require` or `verify-full` for a
-  # managed database reached over a network you do not control
+  # managed database reached over a network you do not control. `verify-ca` and
+  # `verify-full` check the server certificate against the image's system trust
+  # store unless `sslRootCert` supplies the CA, which a database whose
+  # certificate is issued by a private CA (most managed databases) needs. With
+  # `sslRootCert` set, `require` verifies the CA too (libpq semantics)
   sslmode: disable
+  sslRootCert:
+    # -- Name of an existing Secret holding the PEM CA bundle that issued the
+    # database server's certificate. Mounted read-only into cp-api and
+    # dp-manager and used as libpq `sslrootcert` for every database connection
+    # they open. Empty leaves verification to the system trust store
+    existingSecret: ""
+    # -- Key in that Secret holding the CA bundle
+    key: ca.crt
 
 ## @section Two-DSN tenant isolation (SaaS / multi-tenant only)
 ##
