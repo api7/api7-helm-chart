@@ -336,9 +336,10 @@ apisix:
 | nginx.workerRlimitNofile | string | `"20480"` | The number of files a worker process can open, should be larger than nginx.workerConnections |
 | nginx.workerShutdownTimeout | string | `"240s"` | Timeout for a graceful shutdown of worker processes |
 | openapiToMcp.enabled | bool | `false` | Enable or disable the OpenAPI-to-MCP sidecar. Required when using the `openapi-to-mcp` or `mcp-tools-acl` plugins. The container runs alongside the gateway in the same pod and is reached on 127.0.0.1. |
+| openapiToMcp.extraEnvVars | list | `[]` | extraEnvVars An array of extra env vars for the OpenAPI-to-MCP sidecar container. The service is configured through environment variables, for example `TIMEOUT` (inactivity timeout in milliseconds for the requests the generated tools send to the backend API, default 30000), `CACHE_ENABLED` or `CACHE_TTL`. Do not set `SSE_PORT` here; it is managed by `openapiToMcp.port`. e.g: extraEnvVars:   - name: TIMEOUT     value: "60000" |
 | openapiToMcp.image.pullPolicy | string | `"IfNotPresent"` | OpenAPI-to-MCP image pull policy |
 | openapiToMcp.image.repository | string | `"api7/openapi-to-mcp"` | OpenAPI-to-MCP image repository |
-| openapiToMcp.image.tag | string | `"1.0.6"` | OpenAPI-to-MCP image tag |
+| openapiToMcp.image.tag | string | `"1.0.9"` | OpenAPI-to-MCP image tag |
 | openapiToMcp.port | int | `3000` | Port that the sidecar listens on. Must match the `port` configured under `plugin_attr.openapi-to-mcp` in the gateway config (defaults to 3000). |
 | openapiToMcp.resources | object | `{}` | Resources for the OpenAPI-to-MCP sidecar container. |
 | pluginAttrs | object | `{}` | Set APISIX plugin attributes, see [config-default.yaml](https://github.com/apache/apisix/blob/master/conf/config-default.yaml#L376) for more details |
