@@ -16,7 +16,12 @@ spec:
         {{- include "aisix-cp.labels" . | nindent 8 }}
         {{- include "aisix-cp.selectorLabels" (dict "root" . "component" "api") | nindent 8 }}
       annotations:
+        # Roll the pods when the rendered config file or a value in a Secret
+        # this chart renders changes: both are read at boot only. A Secret
+        # supplied by name (existingSecret) or rendered by the PostgreSQL
+        # subchart is not hashed — restart the Deployment after editing it.
         checksum/config: {{ include (print $.Template.BasePath "/api-configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include "aisix-cp.secretChecksum" . }}
     spec:
       {{- include "aisix-cp.imagePullSecrets" . | nindent 6 }}
       serviceAccountName: {{ include "aisix-cp.serviceAccountName" . }}

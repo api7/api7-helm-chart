@@ -159,7 +159,9 @@ api:
   # -- Gateway image the console hands out in the install snippets it
   # generates for a new data plane. Empty uses cp-api's own default: the
   # gateway of the same release, docker.io/api7/aisix:<cp-api version>, or
-  # ghcr.io/api7/aisix:dev on a build that is not a release
+  # ghcr.io/api7/aisix:dev on a build that is not a release. The Helm
+  # snippet takes only its repository; the gateway chart's appVersion
+  # picks the tag
   dpImage: ""
   # -- How this control plane is deployed: `on-premises` or `saas`.
   # `on-premises` serves one company's organizations: nobody signs up on
@@ -225,7 +227,7 @@ api:
   # an existing catalog, and refreshes every model a later sync returns
   pricesyncSnapshotPath: ""
 
-  ## The first administrator of an on-premises install. When cp-api starts
+  ## The first administrator of an AISIX Enterprise install. When cp-api starts
   ## on a database with no users yet, it creates the organization `Default`
   ## (rename it later in the organization settings) with this account as its
   ## owner, who must change the password at the first sign-in. It happens
@@ -254,7 +256,8 @@ api:
     # -- Key inside bootstrapAdmin.existingSecret holding the password
     existingSecretKey: "bootstrap-admin-password"
 
-  ## Billing — SaaS only. On-premises (api.deploymentMode: on-premises) has
+  ## Billing — AISIX Cloud only. AISIX Enterprise (`api.deploymentMode:
+  ## on-premises`) has
   ## no billing, and the chart refuses to render with a provider other than
   ## `mock` or with usagePush on, as cp-api refuses to start. Every value
   ## here is left out of cp-api's config file while it is empty.
@@ -288,7 +291,8 @@ api:
       stripeWebhookSecret: "stripe-webhook-secret"
       lagoAPIKey: "lago-api-key"
 
-  ## Organization creation — SaaS only; on-premises creates no organizations.
+  ## Self-service organization creation — AISIX Cloud only. AISIX Enterprise
+  ## bootstraps one `Default` organization and does not allow creating more.
   # @ignored
   organization:
     # -- Every new organization needs a one-time invite code, including a
@@ -300,7 +304,7 @@ api:
     # organizations
     requireInviteCode: true
 
-  ## Organization domain verification — SaaS only. An organization owner
+  ## Organization domain verification — AISIX Cloud only. An organization owner
   ## proves the organization controls a domain by publishing a DNS TXT
   ## record; cp-api looks it up when the owner verifies and about once a
   ## day after that.
@@ -443,9 +447,11 @@ dpm:
 ## The console. cp-api serves it from its own image, so there is no separate
 ## dashboard Deployment: the console is reached wherever the api Service is.
 ui:
-  # -- Fixed language for this deployment. Supported: "en", "zh". There is
-  # no in-UI language switcher; the whole console renders in this locale
-  # (default English), and the emails cp-api sends are written in it too.
+  # -- Default language for this deployment. Supported: "en", "zh". It is
+  # the fallback the console and the emails cp-api sends use when none of
+  # the console's language picker, the organization's language setting or
+  # the browser's own language names a supported language (default
+  # English).
   defaultLocale: "en"
   ## Chart 1.5.0 ran the dashboard behind its own Service, and a same-origin
   ## proxy may still send pages to it. The Service stays, under the same
@@ -623,12 +629,12 @@ externalDatabase:
 ## cp-api provisions cp_api_app's LOGIN + password (from servingPassword)
 ## on the admin pool at boot — you do NOT pre-create the role.
 ##
-## Leave DISABLED for single-tenant / private (On-Premises) deployments: there
+## Leave DISABLED for AISIX Enterprise deployments: there
 ## every organization is one trust domain, RLS is inert, and the single
 ## privileged DSN handles everything.
 twoDSN:
   # -- Open a second, Row-Level-Security-enforced pool for tenant queries.
-  # Leave off for an On-Premises deployment
+  # Leave off for AISIX Enterprise
   enabled: false
   # -- Password cp-api assigns to the cp_api_app serving role and uses in the
   # serving DSN. Required when enabled unless existingSecret is set.
