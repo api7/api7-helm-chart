@@ -343,6 +343,18 @@ config:
     pool_max_idle_per_host: null
     # -- Retry budget every dispatch starts from
     retries: 2
+    media_fetch:
+      # -- Download a chat request's media URL when the target upstream
+      # cannot read it (Bedrock, Claude on Vertex AI, http:// toward
+      # Anthropic or Gemini) and send the bytes inline. false refuses such
+      # parts with a 400
+      enabled: true
+      # -- Hosts the download may reach although they resolve to a
+      # non-public address, as `host` or `host:port` (IPv6 with a port as
+      # `[addr]:port`). Every other non-public address is refused
+      allowed_hosts: []
+      # -- Largest download accepted per media URL, in bytes
+      max_bytes: 52428800
     tls:
       # -- Extra CA bundle, added to the platform trust store, for every
       # upstream TLS handshake. Mount the file through `extraVolumes`

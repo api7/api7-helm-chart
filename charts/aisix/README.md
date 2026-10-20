@@ -577,6 +577,9 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.ratelimit.redis | object | `nil` | Extra settings for the shared rate-limit Redis selected by `rateLimit.backend: redis`, e.g. `{timeout_secs: 2}` or `{mode: cluster, nodes: [...]}`. Same keys as `cache.redis`; the URL comes from `rateLimit.redis`, `username` and `password` go through `configSecrets` |
 | config.shutdown.min_drain_secs | int | `30` | Seconds the gateway keeps accepting after SIGTERM while `/readyz` reports 503. `terminationGracePeriodSeconds` must cover it |
 | config.upstream.connect_timeout_ms | int | `5000` | Connect timeout in milliseconds |
+| config.upstream.media_fetch.allowed_hosts | list | `[]` | Hosts the download may reach although they resolve to a non-public address, as `host` or `host:port` (IPv6 with a port as `[addr]:port`). Every other non-public address is refused |
+| config.upstream.media_fetch.enabled | bool | `true` | Download a chat request's media URL when the target upstream cannot read it (Bedrock, Claude on Vertex AI, http:// toward Anthropic or Gemini) and send the bytes inline. false refuses such parts with a 400 |
+| config.upstream.media_fetch.max_bytes | int | `52428800` | Largest download accepted per media URL, in bytes |
 | config.upstream.pool_idle_timeout_secs | int | `30` | Seconds an idle pooled connection is kept. Lower it when a load balancer or NAT between the gateway and the provider closes idle connections sooner |
 | config.upstream.pool_max_idle_per_host | int | `nil` | Idle pooled connections kept per host. Null means unbounded |
 | config.upstream.retries | int | `2` | Retry budget every dispatch starts from |
