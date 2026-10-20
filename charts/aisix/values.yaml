@@ -355,6 +355,13 @@ config:
       allowed_hosts: []
       # -- Largest download accepted per media URL, in bytes
       max_bytes: 52428800
+    bedrock:
+      # -- (string) Bedrock Mantle base URL where `/v1/messages/count_tokens`
+      # for a Claude model is counted when bedrock-runtime's CountTokens
+      # refuses that model. Null derives the public regional host
+      # `https://bedrock-mantle.{region}.api.aws` from the provider key's
+      # region; set it for a VPC endpoint or GovCloud
+      mantle_endpoint: null
     tls:
       # -- Extra CA bundle, added to the platform trust store, for every
       # upstream TLS handshake. Mount the file through `extraVolumes`
