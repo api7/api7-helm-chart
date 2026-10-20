@@ -247,6 +247,9 @@ spec:
       env:
       - name: SSE_PORT
         value: {{ .Values.openapiToMcp.port | quote }}
+      {{- if .Values.openapiToMcp.extraEnvVars }}
+      {{- include "apisix.tplvalues.render" (dict "value" .Values.openapiToMcp.extraEnvVars "context" $) | nindent 6 }}
+      {{- end }}
       ports:
       - containerPort: {{ .Values.openapiToMcp.port }}
         name: http
