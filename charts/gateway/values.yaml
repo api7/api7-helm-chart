@@ -719,7 +719,7 @@ openapiToMcp:
     # -- OpenAPI-to-MCP image repository
     repository: api7/openapi-to-mcp
     # -- OpenAPI-to-MCP image tag
-    tag: 1.0.6
+    tag: 1.0.9
     # -- OpenAPI-to-MCP image pull policy
     pullPolicy: IfNotPresent
   # -- Port that the sidecar listens on. Must match the `port` configured under
@@ -727,6 +727,17 @@ openapiToMcp:
   port: 3000
   # -- Resources for the OpenAPI-to-MCP sidecar container.
   resources: {}
+  # -- extraEnvVars An array of extra env vars for the OpenAPI-to-MCP sidecar
+  # container. The service is configured through environment variables, for
+  # example `TIMEOUT` (inactivity timeout in milliseconds for the requests the
+  # generated tools send to the backend API, default 30000), `CACHE_ENABLED`
+  # or `CACHE_TTL`. Do not set `SSE_PORT` here; it is managed by
+  # `openapiToMcp.port`.
+  # e.g:
+  # extraEnvVars:
+  #   - name: TIMEOUT
+  #     value: "60000"
+  extraEnvVars: []
 
 control:
   # -- Enable Control API
