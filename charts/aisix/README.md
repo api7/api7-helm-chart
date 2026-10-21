@@ -531,6 +531,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | admin.service.annotations | object | `{}` | Extra annotations for the admin Service |
 | admin.service.port | int | `3001` | Admin Service port |
 | affinity | object | `{}` | Affinity rules for the gateway pods |
+| annotations | object | `{}` | Extra annotations for the Deployment |
 | autoscaling.behavior | object | `{}` | `spec.behavior` for the HPA. Empty uses the Kubernetes defaults (immediate scale-up, 5-minute scale-down stabilization). A gateway that carries long streaming responses usually wants a gentler scale-down, e.g. `scaleDown: {policies: [{type: Pods, value: 1, periodSeconds: 60}]}` |
 | autoscaling.enabled | bool | `false` | Create a HorizontalPodAutoscaler for the gateway Deployment |
 | autoscaling.extraMetrics | list | `[]` | Extra `spec.metrics` entries appended verbatim — Pods / Object / External metrics such as a Prometheus adapter series |
