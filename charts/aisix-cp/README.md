@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 1.6.0](https://img.shields.io/badge/Version-1.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.0](https://img.shields.io/badge/AppVersion-1.6.0-informational?style=flat-square)
+![Version: 1.7.0](https://img.shields.io/badge/Version-1.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.7.0](https://img.shields.io/badge/AppVersion-1.7.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -102,7 +102,7 @@ helm repo add api7 https://charts.api7.ai
 helm repo update
 
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.6.0 \
+  --version 1.7.0 \
   -f cp-values.yaml
 ```
 
@@ -111,7 +111,7 @@ same install, as long as you record what you generated:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.6.0 \
+  --version 1.7.0 \
   --set secrets.masterKey="$(openssl rand -base64 32)" \
   --set postgresql.auth.postgresPassword="$(openssl rand -hex 24)" \
   --set postgresql.auth.password="$(openssl rand -hex 24)"
@@ -181,7 +181,7 @@ fails the handshake with nothing logged to say why.
 
 The console's generated commands carry a gateway image, taken from
 `api.dpImage`. Left empty — the default — `cp-api` hands out the gateway of its
-own release, so this release hands out `docker.io/api7/aisix:1.6.0`.
+own release, so this release hands out `docker.io/api7/aisix:1.7.0`.
 Set it only to pin a different image, and remember that a value set explicitly
 carries forward across upgrades, so gateways added later come up on the old
 image.
@@ -343,7 +343,7 @@ install time:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.6.0 \
+  --version 1.7.0 \
   -f cp-values.yaml \
   --set postgresql.primary.podSecurityContext.enabled=false \
   --set postgresql.primary.containerSecurityContext.enabled=false
@@ -407,15 +407,13 @@ plane and hands out the gateway image from the same release as the chart.
 | api.bootstrapAdmin.existingSecretKey | string | `"bootstrap-admin-password"` | Key inside bootstrapAdmin.existingSecret holding the password |
 | api.bootstrapAdmin.password | string | `""` | Initial password (12 to 128 characters), stored in the chart's Secret. Ignored when existingSecret is set. Empty generates one (see above) |
 | api.corsAllowedOrigins | list | `[]` | Browser origins allowed to call cp-api cross-origin, as bare origins (scheme://host[:port]). Empty — the default — writes no CORS headers at all, which is what a normal install wants: cp-api serves the API and proxies the dashboard, so the browser has only one origin and nothing is ever cross-origin. Populate it only to let a dashboard served from somewhere else reach this API directly, such as a frontend-only PR preview. An entry is a bare origin (https://host[:port]), or `https://*` plus a suffix naming at least three labels (`https://*-api7ai.vercel.app`) — a PR preview's host carries the branch name, so an exact list would mean redeploying cp-api for every pull request. Read the suffix as collision-resistance, NOT as a guarantee: it is a byte suffix, and on a shared host like `.vercel.app` another account can claim a name ending the same way, so a grant that needs a real boundary belongs on a domain you control. Every entry must be spelled the way a BROWSER serializes an origin, and the chart refuses one that is not, naming the spelling to use — a bare `*`, a path, query, fragment or userinfo, a trailing dot, a non-https origin (loopback may use http), an internationalized host given as anything but punycode, a numeric last label that is not a dotted quad, an IPv6 address in any spelling but the one it is sent in, the scheme's default port written out, a port with a leading zero, and a port above 65535. cp-api applies the same rules at startup, so a value this chart accepts is one it will start with. |
-| api.deploymentMode | string | `"on-premises"` | How this control plane is deployed: `on-premises` or `saas`. `on-premises` serves one company's organizations: nobody signs up on their own (accounts come from invitations), organizations cannot be created, billing is off, and cp-api's outbound calls may reach private addresses unless an outbound value below says otherwise. `saas` is the multi-tenant hosted service — open sign-up, organization creation and billing — and requires twoDSN.enabled |
-| api.dpImage | string | `""` | Gateway image the console hands out in the install snippets it generates for a new data plane. Empty uses cp-api's own default: the gateway of the same release, docker.io/api7/aisix:<cp-api version>, or ghcr.io/api7/aisix:dev on a build that is not a release |
+| api.deploymentMode | string | `"on-premises"` | How this control plane is deployed: `on-premises` or `saas`. `on-premises` serves one company's organizations: nobody signs up on their own (accounts come from invitations), organizations cannot be created, billing is off, and cp-api's outbound calls may reach private addresses unless api.outbound.ssrfProtection says otherwise. `saas` is the multi-tenant hosted service — open sign-up, organization creation and billing — and requires twoDSN.enabled |
+| api.dpImage | string | `""` | Gateway image the console hands out in the install snippets it generates for a new data plane. Empty uses cp-api's own default: the gateway of the same release, docker.io/api7/aisix:<cp-api version>, or ghcr.io/api7/aisix:dev on a build that is not a release. The Helm snippet takes only its repository; the gateway chart's appVersion picks the tag |
 | api.dpmgrBaseURL | string | `""` | dp-manager /dp/* mTLS endpoint that data-plane hosts dial, as baked into the generated install snippets. Also passed to the dpm deployment, which seeds this host into the TLS server certificate it presents — so an IP address works here, not only a DNS name. When dpm.service.type is NodePort, use https://<node-ip>:<dpm-node-port>. |
 | api.extraEnvVars | list | `[]` | Extra environment for cp-api: system-level settings only (for example TZ). Every cp-api setting has its own value in this section; an env var set here for one of them still overrides the rendered config file, which is how values set this way before those keys existed keep working. Overriding a name the chart itself sets is only a compatibility path for existing deployments. For a name chart 1.5.0 already set, the chart keeps its own entry ahead of yours, so the name appears twice and Helm 4's server-side apply rejects the install. New installs set the value in this file instead. |
-| api.guardrailTestConnectionAllowInsecure | bool | `nil` | Whether the guardrail "test connection" probe may reach plain http, private addresses and non-Azure hosts (an internal or Private Link endpoint). Unset follows deploymentMode: allowed on-premises, blocked on saas |
 | api.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | api.image.repository | string | `"docker.io/api7/aisix-cp-api"` | cp-api image repository |
 | api.image.tag | string | `""` | Image tag |
-| api.mcpSpecAllowPrivateURLs | bool | `nil` | Whether an MCP server's OpenAPI spec_url may be fetched from a private / internal address. Unset follows deploymentMode: allowed on-premises, blocked on saas, where pasting the spec content still works |
 | api.metrics.enabled | bool | `true` | Serve Prometheus metrics from cp-api. On by default, matching the gateway chart so both planes are scraped the same way; the port is reachable only inside the cluster (ClusterIP). cp-api binds nothing unless this sets the address, so turning it off leaves the port genuinely unbound inside the pod rather than merely unexposed by the Service. |
 | api.metrics.port | int | `9090` | Port the metrics listener binds inside the container |
 | api.metrics.service.annotations | object | `{}` | Extra annotations for the metrics Service, e.g. scrape hints for a Prometheus that discovers by annotation rather than ServiceMonitor |
@@ -428,8 +426,8 @@ plane and hands out the gateway image from the same release as the chart.
 | api.metrics.serviceMonitor.relabelings | list | `[]` | Scrape-time relabeling rules |
 | api.metrics.serviceMonitor.scrapeTimeout | string | `""` | Scrape timeout. Empty leaves the Prometheus default |
 | api.nodeSelector | object | `{}` | Node selector for the cp-api pod |
-| api.notifyAllowPrivateURLs | bool | `nil` | Whether notification channels (budget alert webhooks / Slack) may deliver to private / internal addresses. Unset follows deploymentMode: allowed on-premises, blocked on saas |
-| api.playgroundAllowPrivateIPs | bool | `nil` | Whether the dashboard playground may call LLM endpoints on private / internal addresses. Unset follows deploymentMode: allowed on-premises, blocked on saas (SSRF guard). Set true or false to override |
+| api.outbound.ssrfProtection.allowedHosts | list | `[]` | Hosts exempt from SSRF protection, each `host`, `host:port` or `[v6addr]:port` (no port matches any port). cp-api refuses to start on an entry it cannot parse |
+| api.outbound.ssrfProtection.enabled | bool | `nil` | Whether SSRF protection is on. Unset follows deploymentMode: off on-premises, on for saas. Set true or false to override |
 | api.podSecurityContext.runAsNonRoot | bool | `true` | Refuse to run the cp-api pod as root |
 | api.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` | Seccomp profile for the cp-api pod |
 | api.pricesyncSnapshotPath | string | `""` | Offline pricing: seed the catalog once at startup from this models.dev api.json capture (plain or .gz) and never fetch. The cp-api image ships one at /etc/aisix/models-dev-snapshot.json.gz. Empty selects online sync, which loads that bundled snapshot when a sync fails while the catalog is still empty (an install without internet access), keeps an existing catalog, and refreshes every model a later sync returns |
@@ -509,11 +507,11 @@ plane and hands out the gateway image from the same release as the chart.
 | serviceAccount.annotations | object | `{}` | Annotations for the ServiceAccount, e.g. a cloud IAM role binding |
 | serviceAccount.create | bool | `true` | Create a ServiceAccount for the control-plane pods |
 | serviceAccount.name | string | `""` | Name of the ServiceAccount. Empty derives one from the release name; set it to use a ServiceAccount you manage yourself (create: false) |
-| twoDSN.enabled | bool | `false` | Open a second, Row-Level-Security-enforced pool for tenant queries. Leave off for an On-Premises deployment |
+| twoDSN.enabled | bool | `false` | Open a second, Row-Level-Security-enforced pool for tenant queries. Leave off for AISIX Enterprise |
 | twoDSN.existingSecret | string | `""` | Optionally source the serving password from an existing Secret instead of servingPassword above. Key defaults to "serving-password". |
 | twoDSN.existingSecretKey | string | `"serving-password"` | Key inside twoDSN.existingSecret holding the serving password |
 | twoDSN.servingPassword | string | `""` | Password cp-api assigns to the cp_api_app serving role and uses in the serving DSN. Required when enabled unless existingSecret is set. Use a URL-safe value, from `openssl rand -hex 24`: it is embedded in a `postgres://` DSN, so `+`, `/` and `=` corrupt URL parsing |
-| ui.defaultLocale | string | `"en"` | Fixed language for this deployment. Supported: "en", "zh". There is no in-UI language switcher; the whole console renders in this locale (default English), and the emails cp-api sends are written in it too. |
+| ui.defaultLocale | string | `"en"` | Default language for this deployment. Supported: "en", "zh". It is the fallback the console and the emails cp-api sends use when none of the console's language picker, the organization's language setting or the browser's own language names a supported language (default English). |
 | ui.extraEnvVars | list | `[]` | Kept for installs upgraded from chart 1.5.0, which ran a separate dashboard. Of what that release was told to set here, AISIX_TRUSTED_ORIGINS and AISIX_AUTH_BEARER_SESSIONS are carried to cp-api (unless api.extraEnvVars sets the same name); nothing else is read. Set api.extraEnvVars instead. |
 | ui.service.nodePort | string | `""` | Optional fixed NodePort. Used only when type is NodePort; leave empty to let Kubernetes allocate a port dynamically. This plain-HTTP endpoint reaches cp-api exactly as the api Service does; terminate TLS in front of it unless it is on a trusted network. |
 | ui.service.port | int | `3000` | Port of the dashboard Service kept from chart 1.5.0; it forwards to cp-api |

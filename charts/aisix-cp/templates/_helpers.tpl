@@ -336,3 +336,20 @@ those deployments set api.bootstrapAdmin.password or existingSecret.
 {{- end -}}
 {{- end -}}
 {{- end }}
+
+{{/*
+Hash of the values in the Secrets this chart renders and the pods read at
+boot (secret.yaml and external-db-secret.yaml), for the checksum/secret pod
+annotation. Only `data` is hashed, so a chart version bump alone rolls
+nothing. The
+first administrator's password is left out: it is read once, when no
+administrator exists yet, and a generated one differs on every render
+where lookup answers nothing (helm template, GitOps), which would roll the
+pods on every sync.
+*/}}
+{{- define "aisix-cp.secretChecksum" -}}
+{{- $data := (include (print $.Template.BasePath "/secret.yaml") . | fromYaml).data | default dict -}}
+{{- $_ := unset $data "bootstrap-admin-password" -}}
+{{- $db := (include (print $.Template.BasePath "/external-db-secret.yaml") . | fromYaml).data | default dict -}}
+{{- toYaml (list $data $db) | sha256sum -}}
+{{- end }}

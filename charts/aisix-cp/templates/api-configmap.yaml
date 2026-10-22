@@ -93,21 +93,27 @@ data:
     pricesync:
       url: {{ .Values.api.pricesyncURL | default "" | quote }}
       snapshot_path: {{ .Values.api.pricesyncSnapshotPath | default "" | quote }}
-    {{- /* Unset values stay out of the file, which is what lets
-           deployment.mode decide them. */}}
-    {{- $outbound := dict
+    {{- /* An unset enabled stays out of the file, which is what lets
+           deployment.mode decide it. dig: --reuse-values from an older
+           chart carries no api.outbound. */}}
+    {{- $ssrf := dig "outbound" "ssrfProtection" (dict) .Values.api }}
+    {{- $ssrfSet := dict }}
+    {{- if not (kindIs "invalid" $ssrf.enabled) }}{{ $_ := set $ssrfSet "enabled" $ssrf.enabled }}{{ end }}
+    {{- with $ssrf.allowedHosts }}{{ $_ := set $ssrfSet "allowed_hosts" . }}{{ end }}
+    {{- $outbound := dict }}
+    {{- if $ssrfSet }}{{ $_ := set $outbound "ssrf_protection" $ssrfSet }}{{ end }}
+    {{- /* The per-site switches ssrf_protection replaced. A release that still
+           carries one (--reuse-values from chart 1.5.0 carries two as false)
+           renders it, so cp-api warns that it is ignored. */}}
+    {{- range $key, $v := dict
           "notify_allow_private_urls" .Values.api.notifyAllowPrivateURLs
           "playground_allow_private_ips" .Values.api.playgroundAllowPrivateIPs
           "mcp_spec_allow_private_urls" .Values.api.mcpSpecAllowPrivateURLs
           "guardrail_test_connection_allow_insecure" .Values.api.guardrailTestConnectionAllowInsecure }}
-    {{- $set := dict }}
-    {{- range $k, $v := $outbound }}
-    {{- if not (kindIs "invalid" $v) }}
-    {{- $_ := set $set $k $v }}
+    {{- if not (kindIs "invalid" $v) }}{{ $_ := set $outbound $key $v }}{{ end }}
     {{- end }}
-    {{- end }}
-    {{- if $set }}
-    outbound: {{ $set | toJson }}
+    {{- if $outbound }}
+    outbound: {{ $outbound | toJson }}
     {{- end }}
     {{- $billingSet := dict }}
     {{- with $billingProvider }}{{ $_ := set $billingSet "provider" . }}{{ end }}
