@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 1.6.0](https://img.shields.io/badge/Version-1.6.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.6.0](https://img.shields.io/badge/AppVersion-1.6.0-informational?style=flat-square)
+![Version: 1.7.0](https://img.shields.io/badge/Version-1.7.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.7.0](https://img.shields.io/badge/AppVersion-1.7.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -102,7 +102,7 @@ helm repo add api7 https://charts.api7.ai
 helm repo update
 
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.6.0 \
+  --version 1.7.0 \
   -f cp-values.yaml
 ```
 
@@ -111,7 +111,7 @@ same install, as long as you record what you generated:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.6.0 \
+  --version 1.7.0 \
   --set secrets.masterKey="$(openssl rand -base64 32)" \
   --set postgresql.auth.postgresPassword="$(openssl rand -hex 24)" \
   --set postgresql.auth.password="$(openssl rand -hex 24)"
@@ -181,7 +181,7 @@ fails the handshake with nothing logged to say why.
 
 The console's generated commands carry a gateway image, taken from
 `api.dpImage`. Left empty — the default — `cp-api` hands out the gateway of its
-own release, so this release hands out `docker.io/api7/aisix:1.6.0`.
+own release, so this release hands out `docker.io/api7/aisix:1.7.0`.
 Set it only to pin a different image, and remember that a value set explicitly
 carries forward across upgrades, so gateways added later come up on the old
 image.
@@ -343,7 +343,7 @@ install time:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.6.0 \
+  --version 1.7.0 \
   -f cp-values.yaml \
   --set postgresql.primary.podSecurityContext.enabled=false \
   --set postgresql.primary.containerSecurityContext.enabled=false
