@@ -611,6 +611,8 @@ extraVolumes: []
 # -- Extra volume mounts for the gateway container
 extraVolumeMounts: []
 
+# -- Extra annotations for the Deployment
+annotations: {}
 # -- Annotations for the gateway pods
 podAnnotations: {}
 # -- Labels for the gateway pods
