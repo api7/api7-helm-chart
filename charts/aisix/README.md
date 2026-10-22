@@ -564,6 +564,8 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.observability.metrics.prometheus.enabled | bool | `true` | Serve Prometheus metrics on the metrics listener (`containerPorts.metrics`) |
 | config.observability.metrics.prometheus.path | string | `"/metrics"` | Metrics path |
 | config.observability.service_name | string | `"aisix"` | Service name reported in telemetry |
+| config.outbound.ssrf_protection.allowed_hosts | list | `[]` | Hosts such a fetch may reach although they resolve to a non-public address, as `host` or `host:port` (IPv6 with a port as `[addr]:port`). Behind a fake-ip DNS that maps public names into 198.18.0.0/15, list those hosts here |
+| config.outbound.ssrf_protection.enabled | bool | `true` | Only reach publicly routable addresses when fetching a URL an API caller supplied (today the media download). false turns the check off and ignores `allowed_hosts` |
 | config.proxy.real_ip.header | string | `"x-forwarded-for"` | Header carrying the client IP |
 | config.proxy.real_ip.recursive | bool | `false` | Walk the header right to left past every trusted proxy |
 | config.proxy.real_ip.trusted_proxies | list | `[]` | CIDRs (or bare IPs) of proxies trusted to set the client-IP header |
@@ -575,7 +577,10 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.ratelimit.concurrency_ttl_secs | int | `300` | Seconds a concurrency-limit slot is held at most |
 | config.ratelimit.redis | object | `nil` | Extra settings for the shared rate-limit Redis selected by `rateLimit.backend: redis`, e.g. `{timeout_secs: 2}` or `{mode: cluster, nodes: [...]}`. Same keys as `cache.redis`; the URL comes from `rateLimit.redis`, `username` and `password` go through `configSecrets` |
 | config.shutdown.min_drain_secs | int | `30` | Seconds the gateway keeps accepting after SIGTERM while `/readyz` reports 503. `terminationGracePeriodSeconds` must cover it |
+| config.upstream.bedrock.mantle_endpoint | string | `nil` | Bedrock Mantle base URL where `/v1/messages/count_tokens` for a Claude model is counted when bedrock-runtime's CountTokens refuses that model. Null derives the public regional host `https://bedrock-mantle.{region}.api.aws` from the provider key's region; set it for a VPC endpoint or GovCloud |
 | config.upstream.connect_timeout_ms | int | `5000` | Connect timeout in milliseconds |
+| config.upstream.media_fetch.enabled | bool | `true` | Download a chat request's media URL when the target upstream cannot read it (Bedrock, Claude on Vertex AI, http:// toward Anthropic or Gemini) and send the bytes inline. false refuses such parts with a 400 |
+| config.upstream.media_fetch.max_bytes | int | `52428800` | Largest download accepted per media URL, in bytes |
 | config.upstream.pool_idle_timeout_secs | int | `30` | Seconds an idle pooled connection is kept. Lower it when a load balancer or NAT between the gateway and the provider closes idle connections sooner |
 | config.upstream.pool_max_idle_per_host | int | `nil` | Idle pooled connections kept per host. Null means unbounded |
 | config.upstream.retries | int | `2` | Retry budget every dispatch starts from |
