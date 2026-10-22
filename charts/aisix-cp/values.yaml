@@ -167,27 +167,27 @@ api:
   # `on-premises` serves one company's organizations: nobody signs up on
   # their own (accounts come from invitations), organizations cannot be
   # created, billing is off, and cp-api's outbound calls may reach private
-  # addresses unless an outbound value below says otherwise. `saas` is the
+  # addresses unless api.outbound.ssrfProtection says otherwise. `saas` is the
   # multi-tenant hosted service — open sign-up, organization creation and
   # billing — and requires twoDSN.enabled
   deploymentMode: "on-premises"
-  # -- (bool) Whether the dashboard playground may call LLM endpoints on
-  # private / internal addresses. Unset follows deploymentMode: allowed
-  # on-premises, blocked on saas (SSRF guard). Set true or false to override
-  playgroundAllowPrivateIPs: null
-  # -- (bool) Whether notification channels (budget alert webhooks / Slack)
-  # may deliver to private / internal addresses. Unset follows
-  # deploymentMode: allowed on-premises, blocked on saas
-  notifyAllowPrivateURLs: null
-  # -- (bool) Whether an MCP server's OpenAPI spec_url may be fetched from a
-  # private / internal address. Unset follows deploymentMode: allowed
-  # on-premises, blocked on saas, where pasting the spec content still works
-  mcpSpecAllowPrivateURLs: null
-  # -- (bool) Whether the guardrail "test connection" probe may reach plain
-  # http, private addresses and non-Azure hosts (an internal or Private Link
-  # endpoint). Unset follows deploymentMode: allowed on-premises, blocked on
-  # saas
-  guardrailTestConnectionAllowInsecure: null
+  outbound:
+    # SSRF protection for cp-api's own outbound calls to operator- or
+    # tenant-supplied URLs: the dashboard playground and its semantic
+    # helpers, notification channel deliveries, an MCP server's OpenAPI
+    # spec_url fetch, and the guardrail "test connection" probe. On, they may
+    # not reach private / internal addresses, the connection goes to the
+    # addresses checked, and the test-connection probe also requires an https
+    # endpoint on an official Azure domain. These calls honour HTTPS_PROXY /
+    # HTTP_PROXY / NO_PROXY.
+    ssrfProtection:
+      # -- (bool) Whether SSRF protection is on. Unset follows deploymentMode:
+      # off on-premises, on for saas. Set true or false to override
+      enabled: null
+      # -- Hosts exempt from SSRF protection, each `host`, `host:port` or
+      # `[v6addr]:port` (no port matches any port). cp-api refuses to start on
+      # an entry it cannot parse
+      allowedHosts: []
   # -- Let cp-api migrate a database last run by a release older than this one
   # supports upgrading from. cp-api refuses such an upgrade at startup and
   # names the release to pass through first; set this only after reading that
