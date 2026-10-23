@@ -295,6 +295,8 @@ apisix:
 | global.imagePullSecrets | list | `[]` | Global Docker registry secret names as an array |
 | graphql.maxSize | int | `1048576` | The maximum size in bytes of GraphQL queries the gateway parses when matching routes by GraphQL attributes (default 1MiB) |
 | initContainer.image | string | `"busybox"` | Init container image |
+| initContainer.resources | object | `{}` | Resource requests and limits for the wait-etcd init container (only used when etcd.enabled is true) |
+| initContainer.securityContext | object | `{}` | Container security context for wait-etcd. Empty by default to inherit applicable apisix.podSecurityContext settings. |
 | initContainer.tag | float | `1.28` | Init container tag |
 | logs.accessLog | string | `"/dev/stdout"` | Access log path |
 | logs.accessLogFormat | string | `"$remote_addr - $remote_user [$time_local] $http_host \\\"$request\\\" $status $body_bytes_sent $request_time \\\"$http_referer\\\" \\\"$http_user_agent\\\" $upstream_addr $upstream_status $upstream_response_time \\\"$upstream_scheme://$upstream_host$upstream_uri\\\""` | Access log format |
@@ -376,3 +378,40 @@ apisix:
 Remove configuration items such as `plugins`, `stream_plugins`, and `custom_plugins` that are no longer needed in API7 EE.
 
 **This version of the helm chart needs to be used with API7 EE gateway version 3.2.16.3 or above.**
+
+## Configure the wait-etcd init container
+
+When `etcd.enabled` is true, `initContainer.resources` and
+`initContainer.securityContext` configure the built-in `wait-etcd` container for
+both Deployment and DaemonSet workloads. They are independent of the `apisix.resources` and `apisix.securityContext`, which configure the gateway container.
+
+Both options default to `{}` and are omitted from the rendered container when
+empty. Applicable `apisix.podSecurityContext` settings still apply to `wait-etcd`.
+For example:
+
+```yaml
+initContainer:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 100m
+      memory: 32Mi
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+```
+
+Adjust resource values for your environment. The default BusyBox image runs as
+root, so `runAsNonRoot: true` also requires a non-zero UID supplied through
+`runAsUser`, `apisix.podSecurityContext`, or an admission policy. On platforms such as
+OpenShift that assign a UID, omit the explicit `runAsUser` value.
+
+These options do not configure `extraInitContainers` and have no effect when
+`etcd.enabled` is false.
