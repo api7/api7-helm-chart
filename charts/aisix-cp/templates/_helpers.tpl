@@ -303,6 +303,27 @@ Reuses the same PG image shipped by the chart so no extra pull is needed.
 {{- end }}
 
 {{/*
+The deployment mode cp-api will run in, for choosing what the chart
+generates: an AISIX_CLOUD_DEPLOYMENT_MODE entry in api.extraEnvVars
+overrides api.deploymentMode, and an empty one means cp-api's default. A
+valueFrom entry cannot be read at render time, so api.deploymentMode
+stands. Nothing is refused here: cp-api checks the mode at startup.
+*/}}
+{{- define "aisix-cp.effectiveDeploymentMode" -}}
+{{- $mode := .Values.api.deploymentMode | default "on-premises" -}}
+{{- range .Values.api.extraEnvVars | default list -}}
+{{- if eq .name "AISIX_CLOUD_DEPLOYMENT_MODE" -}}
+{{- if .valueFrom -}}
+{{- $mode = $.Values.api.deploymentMode | default "on-premises" -}}
+{{- else -}}
+{{- $mode = trim (toString (.value | default "")) | default "on-premises" -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- $mode -}}
+{{- end }}
+
+{{/*
 Whether the chart's own Secret carries the first administrator's password
 (key bootstrap-admin-password): the bootstrap is on, it is not read from
 api.bootstrapAdmin.existingSecret, and either a password was given or the
@@ -311,7 +332,7 @@ bootstrap).
 */}}
 {{- define "aisix-cp.bootstrapAdminPasswordManaged" -}}
 {{- $b := .Values.api.bootstrapAdmin | default dict -}}
-{{- if and $b.email (not $b.existingSecret) (or $b.password (ne (.Values.api.deploymentMode | default "on-premises") "saas")) -}}
+{{- if and $b.email (not $b.existingSecret) (or $b.password (ne (include "aisix-cp.effectiveDeploymentMode" .) "saas")) -}}
 true
 {{- end -}}
 {{- end }}
