@@ -2,6 +2,28 @@ apiVersion: v1
 entries:
   aisix:
   - apiVersion: v2
+    appVersion: 1.7.1
+    created: "2026-10-27T11:46:57.153826654Z"
+    description: Helm chart for the AISIX AI gateway data plane
+    digest: 6ada53b4eec9a72b9ea001d25432ea7f4155fb235cbf485cd29b405bccf9a4f0
+    home: https://api7.ai
+    keywords:
+    - ai-gateway
+    - llm
+    - gateway
+    - proxy
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: aisix
+    sources:
+    - https://github.com/api7/api7-helm-chart
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/aisix-1.7.1/aisix-1.7.1.tgz
+    version: 1.7.1
+  - apiVersion: v2
     appVersion: 1.7.0
     created: "2026-10-22T04:39:43.481436184Z"
     description: Helm chart for the AISIX AI gateway data plane
@@ -462,6 +484,25 @@ entries:
     - https://github.com/api7/api7-helm-chart/releases/download/aisix-cloud-0.1.0/aisix-cloud-0.1.0.tgz
     version: 0.1.0
   aisix-cp:
+  - apiVersion: v2
+    appVersion: 1.7.1
+    created: "2026-10-27T11:46:57.535985677Z"
+    dependencies:
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    description: Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
+    digest: 4668edc5c069f6dc8c13b3570fffc3d22d5b358e9c0e2d43cb09c69c0e5e4294
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: aisix-cp
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/aisix-cp-1.7.1/aisix-cp-1.7.1.tgz
+    version: 1.7.1
   - apiVersion: v2
     appVersion: 1.7.0
     created: "2026-10-22T04:39:43.727782044Z"
@@ -6889,4 +6930,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-22T04:39:43.728456952Z"
+generated: "2026-10-27T11:46:57.536642645Z"
