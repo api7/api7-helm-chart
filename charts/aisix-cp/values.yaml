@@ -169,7 +169,7 @@ api:
   # created, billing is off, and cp-api's outbound calls may reach private
   # addresses unless api.outbound.ssrfProtection says otherwise. `saas` is the
   # multi-tenant hosted service — open sign-up, organization creation and
-  # billing — and requires twoDSN.enabled
+  # billing — and requires twoDSN.enabled, which `on-premises` refuses
   deploymentMode: "on-premises"
   outbound:
     # SSRF protection for cp-api's own outbound calls to operator- or
@@ -258,8 +258,8 @@ api:
 
   ## Billing — AISIX Cloud only. AISIX Enterprise (`api.deploymentMode:
   ## on-premises`) has
-  ## no billing, and the chart refuses to render with a provider other than
-  ## `mock` or with usagePush on, as cp-api refuses to start. Every value
+  ## no billing: cp-api refuses to start with a provider other than `mock`
+  ## or with usagePush on. Every value
   ## here is left out of cp-api's config file while it is empty.
   # @ignored
   billing:
@@ -320,7 +320,7 @@ api:
   ## hand and asks users who forgot their
   ## password to contact an administrator. `deploymentMode: saas` requires
   ## `host`: every new account confirms its address by email before it can
-  ## sign in, and the chart refuses to render without a relay.
+  ## sign in, and cp-api refuses to start without a relay.
   ## Deployments with open public sign-up should keep invitationLimitPerHour
   ## in place: it is what stops any sign-up from mailing arbitrary addresses
   ## through the relay.
@@ -593,7 +593,8 @@ externalDatabase:
   # -- PostgreSQL port
   port: 5432
   # -- Database role the control plane connects as. It has to be able to run
-  # the schema migrations cp-api applies at startup
+  # the schema migrations cp-api applies at startup: on-premises that means
+  # owning the database, with no SUPERUSER, CREATEROLE or BYPASSRLS needed
   username: aisix
   # -- Database name
   database: aisix_cloud
@@ -629,12 +630,12 @@ externalDatabase:
 ## cp-api provisions cp_api_app's LOGIN + password (from servingPassword)
 ## on the admin pool at boot — you do NOT pre-create the role.
 ##
-## Leave DISABLED for AISIX Enterprise deployments: there
-## every organization is one trust domain, RLS is inert, and the single
-## privileged DSN handles everything.
+## Only for api.deploymentMode saas, which requires it. An AISIX Enterprise
+## (on-premises) control plane refuses it: it uses no Row-Level Security, and
+## its one DSN handles everything with a role that owns the database.
 twoDSN:
   # -- Open a second, Row-Level-Security-enforced pool for tenant queries.
-  # Leave off for AISIX Enterprise
+  # Required by api.deploymentMode saas and refused on-premises
   enabled: false
   # -- Password cp-api assigns to the cp_api_app serving role and uses in the
   # serving DSN. Required when enabled unless existingSecret is set.

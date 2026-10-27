@@ -8,28 +8,11 @@ same setting still overrides this file, which is how a value set through
 api.extraEnvVars before this file existed keeps its effect.
 */ -}}
 {{- include "aisix-cp.validateCorsOrigins" .Values.api.corsAllowedOrigins }}
+{{- /* The deployment mode and the settings it requires or forbids are checked
+by cp-api at startup, the one place that sees the env overrides too. */ -}}
 {{- $mode := .Values.api.deploymentMode | default "on-premises" }}
-{{- if not (has $mode (list "on-premises" "saas")) }}
-  {{- fail (printf "api.deploymentMode must be on-premises or saas, got %q" $mode) }}
-{{- end }}
-{{- if and (eq $mode "saas") (not .Values.twoDSN.enabled) }}
-  {{- fail "api.deploymentMode saas requires twoDSN.enabled: a SaaS control plane serves tenants through the non-privileged cp_api_app role" }}
-{{- end }}
-{{- /* A relay set through api.extraEnvVars (the pre-file way) still counts. */ -}}
-{{- $smtpHostEnv := false }}
-{{- range .Values.api.extraEnvVars }}
-  {{- if and (eq .name "AISIX_CLOUD_SMTP_HOST") (or .valueFrom (trim (toString (.value | default "")))) }}
-    {{- $smtpHostEnv = true }}
-  {{- end }}
-{{- end }}
-{{- if and (eq $mode "saas") (not (dig "smtp" "host" "" .Values.api | trim)) (not $smtpHostEnv) }}
-  {{- fail "api.deploymentMode saas requires api.smtp.host: a SaaS control plane emails every new account a verification link and needs an SMTP relay to send it" }}
-{{- end }}
 {{- $billing := .Values.api.billing | default dict }}
 {{- $billingProvider := $billing.provider | default "" | trim }}
-{{- if and (ne $mode "saas") (or $billing.usagePush (and $billingProvider (ne $billingProvider "mock"))) }}
-  {{- fail "api.billing.provider (other than mock) and api.billing.usagePush need api.deploymentMode saas: an on-premises control plane has no billing" }}
-{{- end }}
 {{- $bootstrap := .Values.api.bootstrapAdmin | default dict }}
 {{- if and (not $bootstrap.email) (or $bootstrap.password $bootstrap.existingSecret) }}
   {{- fail "api.bootstrapAdmin.password and api.bootstrapAdmin.existingSecret need api.bootstrapAdmin.email: without it no first administrator is created" }}

@@ -1,4 +1,5 @@
-{{ if eq (.Values.api.deploymentMode | default "on-premises") "saas" }}AISIX Cloud{{ else }}AISIX Enterprise{{ end }} control plane has been deployed.
+{{- $mode := include "aisix-cp.effectiveDeploymentMode" . }}
+{{- if eq $mode "saas" }}AISIX Cloud{{ else }}AISIX Enterprise{{ end }} control plane has been deployed.
 
 Components:
   - cp-api:      {{ include "aisix-cp.fullname" . }}-api:{{ .Values.api.service.port }}  (API and dashboard)
@@ -37,7 +38,7 @@ cp-api serves the dashboard. Access it through the api Service:
 {{- end }}
 
 {{- $bootstrap := .Values.api.bootstrapAdmin | default dict }}
-{{- if and (ne (.Values.api.deploymentMode | default "on-premises") "saas") (or $bootstrap.email .Release.IsInstall) }}
+{{- if and (ne $mode "saas") (or $bootstrap.email .Release.IsInstall) }}
 
 First administrator:
 {{- if $bootstrap.email }}
