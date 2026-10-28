@@ -254,6 +254,10 @@ config:
     # -- Entry-level URL rewrite rules, first match wins, e.g.
     # `[{name: per-server-mcp, match: "^/mcp-servers/([^/]+)/mcp$", rewrite: "/mcp/$1"}]`
     url_rewrites: []
+    # -- Send the debug response headers on `/v1/chat/completions`
+    # (`x-aisix-call-id`, `x-aisix-served-by`, `x-aisix-route`, `x-aisix-cache*`).
+    # Off by default because they reveal which model behind a model group answered
+    expose_debug_headers: false
   observability:
     # -- Service name reported in telemetry
     service_name: aisix
