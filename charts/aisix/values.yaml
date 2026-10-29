@@ -235,7 +235,12 @@ config:
     # -- Request-body size cap in bytes. 0 means no cap
     request_body_limit_bytes: 0
     real_ip:
-      # -- CIDRs (or bare IPs) of proxies trusted to set the client-IP header
+      # -- CIDRs (or bare IPs) of proxies trusted to set the client-IP header.
+      # A peer in this list may also open the connection with a PROXY protocol
+      # v1/v2 header (an L4 load balancer that rewrites the source address); the
+      # header's source address then stands in for the TCP peer, including for
+      # the client-IP header trust check. Detection is automatic on every proxy
+      # listener; a header from any other peer closes the connection
       trusted_proxies: []
       # -- Walk the header right to left past every trusted proxy
       recursive: false
@@ -254,6 +259,10 @@ config:
     # -- Entry-level URL rewrite rules, first match wins, e.g.
     # `[{name: per-server-mcp, match: "^/mcp-servers/([^/]+)/mcp$", rewrite: "/mcp/$1"}]`
     url_rewrites: []
+    # -- Send the debug response headers on `/v1/chat/completions`
+    # (`x-aisix-call-id`, `x-aisix-served-by`, `x-aisix-route`, `x-aisix-cache*`).
+    # Off by default because they reveal which model behind a model group answered
+    expose_debug_headers: false
   observability:
     # -- Service name reported in telemetry
     service_name: aisix

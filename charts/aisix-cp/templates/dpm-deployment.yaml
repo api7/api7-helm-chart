@@ -51,7 +51,7 @@ spec:
               protocol: TCP
             {{- end }}
           env:
-            {{- include "aisix-cp.env" (dict "chart" (include "aisix-cp.dpmEnv" .) "legacy" (include "aisix-cp.legacyEnv.dpm" .) "extra" .Values.dpm.extraEnvVars) | nindent 12 }}
+            {{- include "aisix-cp.env" (dict "chart" (include "aisix-cp.dpmEnv" .) "extra" .Values.dpm.extraEnvVars) | nindent 12 }}
           # Probe the plain-HTTP /healthz (poller liveness), not the
           # mTLS port: a kubelet cannot present a client cert, and a
           # TCP check on 7944 stays green even if the outbox poller is

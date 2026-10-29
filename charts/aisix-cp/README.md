@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 1.7.1](https://img.shields.io/badge/Version-1.7.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.7.1](https://img.shields.io/badge/AppVersion-1.7.1-informational?style=flat-square)
+![Version: 1.8.0](https://img.shields.io/badge/Version-1.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.8.0](https://img.shields.io/badge/AppVersion-1.8.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -102,7 +102,7 @@ helm repo add api7 https://charts.api7.ai
 helm repo update
 
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.7.1 \
+  --version 1.8.0 \
   -f cp-values.yaml
 ```
 
@@ -111,7 +111,7 @@ same install, as long as you record what you generated:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.7.1 \
+  --version 1.8.0 \
   --set secrets.masterKey="$(openssl rand -base64 32)" \
   --set postgresql.auth.postgresPassword="$(openssl rand -hex 24)" \
   --set postgresql.auth.password="$(openssl rand -hex 24)"
@@ -181,7 +181,7 @@ fails the handshake with nothing logged to say why.
 
 The console's generated commands carry a gateway image, taken from
 `api.dpImage`. Left empty — the default — `cp-api` hands out the gateway of its
-own release, so this release hands out `docker.io/api7/aisix:1.7.1`.
+own release, so this release hands out `docker.io/api7/aisix:1.8.0`.
 Set it only to pin a different image, and remember that a value set explicitly
 carries forward across upgrades, so gateways added later come up on the old
 image.
@@ -209,25 +209,41 @@ the release was installed with.
 Wait for the `cp-api` pods to become ready before upgrading the gateways: the
 schema migration runs on first start under the new version.
 
-Upgrading from 1.5.0 changes the following. The dashboard no longer runs as
-its own Deployment: `cp-api` serves it, and the `aisix-cp-ui` Service is kept,
-now selecting the `cp-api` pods, so a proxy still pointed at it keeps working.
-`secrets.betterAuthSecret` and the dashboard's image, resource and volume values
-are no longer read; a private database CA that was mounted into the dashboard
-goes in `externalDatabase.sslRootCert` instead. Settings 1.5.0 took as
-environment variables through `extraEnvVars` now have values of their own — `api.trustedOrigins`,
-`api.allowUnsupportedUpgrade` and the rest in the [Parameters](#parameters)
-table. An existing override keeps working across the upgrade, but move it into
-the value; `extraEnvVars` is for system-level environment such as `TZ`.
-Self sign-up is off in a self-hosted install, so accounts added after the
-upgrade come from invitations.
-
 `cp-api` refuses to start when the database was last run by a release older
 than this one supports upgrading from, naming the version it found and the
 oldest it accepts. Upgrade to a supported version first; to proceed anyway,
 after taking a backup, set `api.allowUnsupportedUpgrade: true` for that one
 upgrade and set it back afterwards. See
 [Upgrade](https://docs.api7.ai/ai-gateway/on-premises/upgrade).
+
+### Upgrading to 1.8.0
+
+`cp-api` 1.8.0 refuses to start on a database last run by a control plane older
+than 1.6.0. Upgrade to 1.6.x or 1.7.x first; to proceed anyway, take a database
+backup, then set `api.allowUnsupportedUpgrade: true` for that one upgrade and
+set it back afterwards.
+
+An install that still carries chart 1.5.0 values moves `AISIX_TRUSTED_ORIGINS`
+and `AISIX_AUTH_BEARER_SESSIONS` from `ui.extraEnvVars` to `api.extraEnvVars`
+before upgrading — or better, sets `api.trustedOrigins` / `api.bearerSessions` —
+since the chart no longer copies them to `cp-api`. The `<release>-ui` Service is
+removed: point any NodePort, ingress or proxy that used it at the
+`<release>-api` Service, which serves the console at every path.
+
+Whenever the release was first installed: if `api.extraEnvVars` or
+`dpm.extraEnvVars` overrides an environment variable chart 1.5.0 itself
+rendered (for example `AISIX_CLOUD_PUBLIC_BASE_URL` or
+`AISIX_CLOUD_DATABASE_URL`), the first `helm upgrade` to 1.8.0 removes that
+variable from the Deployment, because the 1.6.x and 1.7.x charts rendered the
+name twice and this one renders it once, so until it is restored `cp-api` runs
+on the value the chart derives from `values.yaml` — for the database URL, that
+is the chart's database, which `cp-api` migrates on start. Move such a setting
+to its key in `values.yaml` before upgrading, and check that the rendered
+database is the one you mean. If an upgrade already dropped an override, run
+`helm upgrade` again with the same values to restore it.
+
+See [Upgrade](https://docs.api7.ai/ai-gateway/on-premises/upgrade) for the full
+procedure.
 
 ## Uninstall
 
@@ -343,7 +359,7 @@ install time:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.7.1 \
+  --version 1.8.0 \
   -f cp-values.yaml \
   --set postgresql.primary.podSecurityContext.enabled=false \
   --set postgresql.primary.containerSecurityContext.enabled=false
@@ -410,7 +426,7 @@ plane and hands out the gateway image from the same release as the chart.
 | api.deploymentMode | string | `"on-premises"` | How this control plane is deployed: `on-premises` or `saas`. `on-premises` serves one company's organizations: nobody signs up on their own (accounts come from invitations), organizations cannot be created, billing is off, and cp-api's outbound calls may reach private addresses unless api.outbound.ssrfProtection says otherwise. `saas` is the multi-tenant hosted service — open sign-up, organization creation and billing — and requires twoDSN.enabled, which `on-premises` refuses |
 | api.dpImage | string | `""` | Gateway image the console hands out in the install snippets it generates for a new data plane. Empty uses cp-api's own default: the gateway of the same release, docker.io/api7/aisix:<cp-api version>, or ghcr.io/api7/aisix:dev on a build that is not a release. The Helm snippet takes only its repository; the gateway chart's appVersion picks the tag |
 | api.dpmgrBaseURL | string | `""` | dp-manager /dp/* mTLS endpoint that data-plane hosts dial, as baked into the generated install snippets. Also passed to the dpm deployment, which seeds this host into the TLS server certificate it presents — so an IP address works here, not only a DNS name. When dpm.service.type is NodePort, use https://<node-ip>:<dpm-node-port>. |
-| api.extraEnvVars | list | `[]` | Extra environment for cp-api: system-level settings only (for example TZ). Every cp-api setting has its own value in this section; an env var set here for one of them still overrides the rendered config file, which is how values set this way before those keys existed keep working. Overriding a name the chart itself sets is only a compatibility path for existing deployments. For a name chart 1.5.0 already set, the chart keeps its own entry ahead of yours, so the name appears twice and Helm 4's server-side apply rejects the install. New installs set the value in this file instead. |
+| api.extraEnvVars | list | `[]` | Extra environment for cp-api: system-level settings only (for example TZ). Every cp-api setting has its own value in this section; an env var set here for one of them still overrides the rendered config file, which is how values set this way before those keys existed keep working. Overriding a name the chart itself sets is only a compatibility path for existing deployments: the chart then drops its own entry for that name. New installs set the value in this file instead. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | api.image.repository | string | `"docker.io/api7/aisix-cp-api"` | cp-api image repository |
 | api.image.tag | string | `""` | Image tag |
@@ -457,7 +473,7 @@ plane and hands out the gateway image from the same release as the chart.
 | api.trustedOrigins | list | `[]` | Extra origins the console accepts sign-in from, as bare origins (https://host[:port]) or `https://*<suffix>` patterns. The api.publicBaseURL origin and its loopback twin are always trusted; add another hostname of this console here, or the local address of a port-forward that differs from api.publicBaseURL. An entry cp-api cannot read as an origin is logged and ignored. |
 | api.trustedProxies | list | `[]` | Reverse proxies (CIDRs, e.g. `10.0.0.0/8`) in front of cp-api whose X-Forwarded-For cp-api believes. Console sign-in and password reset rate limiting, and the client address recorded on a session, then use the first address from the right that is not one of these proxies. Empty — the default — uses the address of whatever connected to cp-api, so behind an ingress every client shares the ingress's rate-limit budget. List only proxies you run: a range listed here can name any client address it likes. |
 | dpm.affinity | object | `{}` | Affinity rules for the dp-manager pod |
-| dpm.extraEnvVars | list | `[]` | Extra environment for dp-manager: system-level settings only (for example TZ). An env var set here for a dp-manager setting still overrides the rendered config file. Overriding a name the chart itself sets is only a compatibility path for existing deployments. For a name chart 1.5.0 already set, the chart keeps its own entry ahead of yours, so the name appears twice and Helm 4's server-side apply rejects the install. New installs set the value in this file instead. |
+| dpm.extraEnvVars | list | `[]` | Extra environment for dp-manager: system-level settings only (for example TZ). An env var set here for a dp-manager setting still overrides the rendered config file. Overriding a name the chart itself sets is only a compatibility path for existing deployments: the chart then drops its own entry for that name. New installs set the value in this file instead. |
 | dpm.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
 | dpm.image.repository | string | `"docker.io/api7/aisix-cp-dpm"` | dp-manager image repository |
 | dpm.image.tag | string | `""` | Image tag |
@@ -512,7 +528,3 @@ plane and hands out the gateway image from the same release as the chart.
 | twoDSN.existingSecretKey | string | `"serving-password"` | Key inside twoDSN.existingSecret holding the serving password |
 | twoDSN.servingPassword | string | `""` | Password cp-api assigns to the cp_api_app serving role and uses in the serving DSN. Required when enabled unless existingSecret is set. Use a URL-safe value, from `openssl rand -hex 24`: it is embedded in a `postgres://` DSN, so `+`, `/` and `=` corrupt URL parsing |
 | ui.defaultLocale | string | `"en"` | Default language for this deployment. Supported: "en", "zh". It is the fallback the console and the emails cp-api sends use when none of the console's language picker, the organization's language setting or the browser's own language names a supported language (default English). |
-| ui.extraEnvVars | list | `[]` | Kept for installs upgraded from chart 1.5.0, which ran a separate dashboard. Of what that release was told to set here, AISIX_TRUSTED_ORIGINS and AISIX_AUTH_BEARER_SESSIONS are carried to cp-api (unless api.extraEnvVars sets the same name); nothing else is read. Set api.extraEnvVars instead. |
-| ui.service.nodePort | string | `""` | Optional fixed NodePort. Used only when type is NodePort; leave empty to let Kubernetes allocate a port dynamically. This plain-HTTP endpoint reaches cp-api exactly as the api Service does; terminate TLS in front of it unless it is on a trusted network. |
-| ui.service.port | int | `3000` | Port of the dashboard Service kept from chart 1.5.0; it forwards to cp-api |
-| ui.service.type | string | `"ClusterIP"` | Type of the dashboard Service kept from chart 1.5.0 |

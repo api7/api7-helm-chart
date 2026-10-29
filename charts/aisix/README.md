@@ -1,6 +1,6 @@
 # aisix
 
-![Version: 1.7.1](https://img.shields.io/badge/Version-1.7.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.7.1](https://img.shields.io/badge/AppVersion-1.7.1-informational?style=flat-square)
+![Version: 1.8.0](https://img.shields.io/badge/Version-1.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.8.0](https://img.shields.io/badge/AppVersion-1.8.0-informational?style=flat-square)
 
 Helm chart for the AISIX AI gateway data plane
 
@@ -567,9 +567,10 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.observability.service_name | string | `"aisix"` | Service name reported in telemetry |
 | config.outbound.ssrf_protection.allowed_hosts | list | `[]` | Hosts such a fetch may reach although they resolve to a non-public address, as `host` or `host:port` (IPv6 with a port as `[addr]:port`). Behind a fake-ip DNS that maps public names into 198.18.0.0/15, list those hosts here |
 | config.outbound.ssrf_protection.enabled | bool | `true` | Only reach publicly routable addresses when fetching a URL an API caller supplied (today the media download). false turns the check off and ignores `allowed_hosts` |
+| config.proxy.expose_debug_headers | bool | `false` | Send the debug response headers on `/v1/chat/completions` (`x-aisix-call-id`, `x-aisix-served-by`, `x-aisix-route`, `x-aisix-cache*`). Off by default because they reveal which model behind a model group answered |
 | config.proxy.real_ip.header | string | `"x-forwarded-for"` | Header carrying the client IP |
 | config.proxy.real_ip.recursive | bool | `false` | Walk the header right to left past every trusted proxy |
-| config.proxy.real_ip.trusted_proxies | list | `[]` | CIDRs (or bare IPs) of proxies trusted to set the client-IP header |
+| config.proxy.real_ip.trusted_proxies | list | `[]` | CIDRs (or bare IPs) of proxies trusted to set the client-IP header. A peer in this list may also open the connection with a PROXY protocol v1/v2 header (an L4 load balancer that rewrites the source address); the header's source address then stands in for the TCP peer, including for the client-IP header trust check. Detection is automatic on every proxy listener; a header from any other peer closes the connection |
 | config.proxy.request_body_limit_bytes | int | `0` | Request-body size cap in bytes. 0 means no cap |
 | config.proxy.request_id.accept_headers | list | `["x-aisix-request-id"]` | Headers a caller may supply its own request id in. Add `x-request-id` only when no proxy in front stamps it |
 | config.proxy.thread_per_core | bool | `nil` | Thread-per-core serving topology. Null uses the gateway default (on for Linux) |
