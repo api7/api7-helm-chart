@@ -569,7 +569,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.outbound.ssrf_protection.enabled | bool | `true` | Only reach publicly routable addresses when fetching a URL an API caller supplied (today the media download). false turns the check off and ignores `allowed_hosts` |
 | config.proxy.real_ip.header | string | `"x-forwarded-for"` | Header carrying the client IP |
 | config.proxy.real_ip.recursive | bool | `false` | Walk the header right to left past every trusted proxy |
-| config.proxy.real_ip.trusted_proxies | list | `[]` | CIDRs (or bare IPs) of proxies trusted to set the client-IP header |
+| config.proxy.real_ip.trusted_proxies | list | `[]` | CIDRs (or bare IPs) of proxies trusted to set the client-IP header. A peer in this list may also open the connection with a PROXY protocol v1/v2 header (an L4 load balancer that rewrites the source address); the header's source address then stands in for the TCP peer, including for the client-IP header trust check. Detection is automatic on every proxy listener; a header from any other peer closes the connection |
 | config.proxy.request_body_limit_bytes | int | `0` | Request-body size cap in bytes. 0 means no cap |
 | config.proxy.request_id.accept_headers | list | `["x-aisix-request-id"]` | Headers a caller may supply its own request id in. Add `x-request-id` only when no proxy in front stamps it |
 | config.proxy.thread_per_core | bool | `nil` | Thread-per-core serving topology. Null uses the gateway default (on for Linux) |
