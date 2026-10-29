@@ -116,10 +116,8 @@ api:
   # set here for one of them still overrides the rendered config file, which
   # is how values set this way before those keys existed keep working.
   # Overriding a name the chart itself sets is only a compatibility path for
-  # existing deployments. For a name chart 1.5.0 already set, the chart keeps
-  # its own entry ahead of yours, so the name appears twice and Helm 4's
-  # server-side apply rejects the install. New installs set the value in this
-  # file instead.
+  # existing deployments: the chart then drops its own entry for that name.
+  # New installs set the value in this file instead.
   extraEnvVars: []
   # -- Publicly reachable cp-api URL. Console sign-in trusts this origin (and
   # its localhost/127.0.0.1 twin), so a value that does not match the address
@@ -436,10 +434,8 @@ dpm:
   # example TZ). An env var set here for a dp-manager setting still
   # overrides the rendered config file.
   # Overriding a name the chart itself sets is only a compatibility path for
-  # existing deployments. For a name chart 1.5.0 already set, the chart keeps
-  # its own entry ahead of yours, so the name appears twice and Helm 4's
-  # server-side apply rejects the install. New installs set the value in this
-  # file instead.
+  # existing deployments: the chart then drops its own entry for that name.
+  # New installs set the value in this file instead.
   extraEnvVars: []
 
 ## @section dashboard
@@ -453,27 +449,6 @@ ui:
   # the browser's own language names a supported language (default
   # English).
   defaultLocale: "en"
-  ## Chart 1.5.0 ran the dashboard behind its own Service, and a same-origin
-  ## proxy may still send pages to it. The Service stays, under the same
-  ## name, and now reaches cp-api, which serves the console at every path —
-  ## so pointing such a proxy (or anything else) at the api Service instead
-  ## is equivalent. New installs do not need it.
-  service:
-    # -- Type of the dashboard Service kept from chart 1.5.0
-    type: ClusterIP
-    # -- Port of the dashboard Service kept from chart 1.5.0; it forwards to cp-api
-    port: 3000
-    # -- Optional fixed NodePort. Used only when type is NodePort; leave empty
-    # to let Kubernetes allocate a port dynamically. This plain-HTTP endpoint
-    # reaches cp-api exactly as the api Service does; terminate TLS in front
-    # of it unless it is on a trusted network.
-    nodePort: ""
-  # -- Kept for installs upgraded from chart 1.5.0, which ran a separate
-  # dashboard. Of what that release was told to set here, AISIX_TRUSTED_ORIGINS
-  # and AISIX_AUTH_BEARER_SESSIONS are carried to cp-api (unless
-  # api.extraEnvVars sets the same name); nothing else is read. Set
-  # api.extraEnvVars instead.
-  extraEnvVars: []
 
 ## @section ServiceAccount
 serviceAccount:

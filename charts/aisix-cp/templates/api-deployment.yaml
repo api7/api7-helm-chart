@@ -51,7 +51,7 @@ spec:
               protocol: TCP
             {{- end }}
           env:
-            {{- include "aisix-cp.env" (dict "chart" (include "aisix-cp.apiEnv" .) "legacy" (include "aisix-cp.legacyEnv.api" .) "extra" (concat (include "aisix-cp.apiEnvFromUI" . | fromYamlArray) (.Values.api.extraEnvVars | default list))) | nindent 12 }}
+            {{- include "aisix-cp.env" (dict "chart" (include "aisix-cp.apiEnv" .) "extra" .Values.api.extraEnvVars) | nindent 12 }}
           # cp-api runs the schema migration (db.OpenAndMigrate) before
           # it binds :8080, so /healthz does not answer for the whole
           # migration. On an upgrade against a populated database that
@@ -217,21 +217,4 @@ spec:
       name: {{ include "aisix-cp.servingPasswordSecretName" . }}
       key: {{ include "aisix-cp.servingPasswordSecretKey" . }}
 {{- end }}
-{{- end }}
-
-{{- /*
-COMPAT-SINCE: 1.5.0 #1756 — console sign-in moved from the dashboard to cp-api, and a 1.5.0 install was told (NOTES.txt) to put AISIX_TRUSTED_ORIGINS in ui.extraEnvVars (a preview upstream AISIX_AUTH_BEARER_SESSIONS); carry those to cp-api, ahead of api.extraEnvVars and only when that does not set the same name, so an upgraded install keeps its extra sign-in origins. Remove once no supported install can still carry 1.5.0 values.
-*/}}
-{{- define "aisix-cp.apiEnvFromUI" -}}
-{{- $apiNames := list }}
-{{- range .Values.api.extraEnvVars }}
-{{- $apiNames = append $apiNames .name }}
-{{- end }}
-{{- $out := list }}
-{{- range .Values.ui.extraEnvVars }}
-{{- if and (has .name (list "AISIX_TRUSTED_ORIGINS" "AISIX_AUTH_BEARER_SESSIONS")) (not (has .name $apiNames)) }}
-{{- $out = append $out . }}
-{{- end }}
-{{- end }}
-{{- toYaml $out }}
 {{- end }}
