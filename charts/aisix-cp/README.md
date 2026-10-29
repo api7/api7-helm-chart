@@ -235,8 +235,12 @@ Whenever the release was first installed: if `api.extraEnvVars` or
 rendered (for example `AISIX_CLOUD_PUBLIC_BASE_URL` or
 `AISIX_CLOUD_DATABASE_URL`), the first `helm upgrade` to 1.8.0 removes that
 variable from the Deployment, because the 1.6.x and 1.7.x charts rendered the
-name twice and this one renders it once. Run `helm upgrade` again with the same
-values to restore it, or better, move the setting to its key in `values.yaml`.
+name twice and this one renders it once, so until it is restored `cp-api` runs
+on the value the chart derives from `values.yaml` — for the database URL, that
+is the chart's database, which `cp-api` migrates on start. Move such a setting
+to its key in `values.yaml` before upgrading, and check that the rendered
+database is the one you mean. If an upgrade already dropped an override, run
+`helm upgrade` again with the same values to restore it.
 
 See [Upgrade](https://docs.api7.ai/ai-gateway/on-premises/upgrade) for the full
 procedure.
