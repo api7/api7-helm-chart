@@ -209,25 +209,37 @@ the release was installed with.
 Wait for the `cp-api` pods to become ready before upgrading the gateways: the
 schema migration runs on first start under the new version.
 
-Upgrading from 1.5.0 changes the following. The dashboard no longer runs as
-its own Deployment: `cp-api` serves it, and the `aisix-cp-ui` Service is kept,
-now selecting the `cp-api` pods, so a proxy still pointed at it keeps working.
-`secrets.betterAuthSecret` and the dashboard's image, resource and volume values
-are no longer read; a private database CA that was mounted into the dashboard
-goes in `externalDatabase.sslRootCert` instead. Settings 1.5.0 took as
-environment variables through `extraEnvVars` now have values of their own — `api.trustedOrigins`,
-`api.allowUnsupportedUpgrade` and the rest in the [Parameters](#parameters)
-table. An existing override keeps working across the upgrade, but move it into
-the value; `extraEnvVars` is for system-level environment such as `TZ`.
-Self sign-up is off in a self-hosted install, so accounts added after the
-upgrade come from invitations.
-
 `cp-api` refuses to start when the database was last run by a release older
 than this one supports upgrading from, naming the version it found and the
 oldest it accepts. Upgrade to a supported version first; to proceed anyway,
 after taking a backup, set `api.allowUnsupportedUpgrade: true` for that one
 upgrade and set it back afterwards. See
 [Upgrade](https://docs.api7.ai/ai-gateway/on-premises/upgrade).
+
+### Upgrading to 1.8.0
+
+`cp-api` 1.8.0 refuses to start on a database last run by a control plane older
+than 1.6.0. Upgrade to 1.6.x or 1.7.x first; to proceed anyway, take a database
+backup, then set `api.allowUnsupportedUpgrade: true` for that one upgrade and
+set it back afterwards.
+
+An install that still carries chart 1.5.0 values moves `AISIX_TRUSTED_ORIGINS`
+and `AISIX_AUTH_BEARER_SESSIONS` from `ui.extraEnvVars` to `api.extraEnvVars`
+before upgrading — or better, sets `api.trustedOrigins` / `api.bearerSessions` —
+since the chart no longer copies them to `cp-api`. The `<release>-ui` Service is
+removed: point any NodePort, ingress or proxy that used it at the
+`<release>-api` Service, which serves the console at every path.
+
+Whenever the release was first installed: if `api.extraEnvVars` or
+`dpm.extraEnvVars` overrides an environment variable chart 1.5.0 itself
+rendered (for example `AISIX_CLOUD_PUBLIC_BASE_URL` or
+`AISIX_CLOUD_DATABASE_URL`), the first `helm upgrade` to 1.8.0 removes that
+variable from the Deployment, because the 1.6.x and 1.7.x charts rendered the
+name twice and this one renders it once. Run `helm upgrade` again with the same
+values to restore it, or better, move the setting to its key in `values.yaml`.
+
+See [Upgrade](https://docs.api7.ai/ai-gateway/on-premises/upgrade) for the full
+procedure.
 
 ## Uninstall
 
