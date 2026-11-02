@@ -1,6 +1,6 @@
 # api7-ingress-controller
 
-![Version: 0.1.28](https://img.shields.io/badge/Version-0.1.28-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
+![Version: 0.1.29](https://img.shields.io/badge/Version-0.1.29-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 2.2.1](https://img.shields.io/badge/AppVersion-2.2.1-informational?style=flat-square)
 
 Ingress Controller for API7
 
@@ -61,6 +61,7 @@ the controller recommends 1.31+ and only warns below it.
 | config.listenerPortMatchMode | string | `"off"` | How a Gateway API route is matched to a listener port: `off`, `auto` or `explicit`. |
 | config.logLevel | string | `"info"` |  |
 | config.metricsAddr | string | `":8080"` |  |
+| config.namespaceSelector | list | `[]` | Label selectors of the namespaces whose Ingress and apisix.apache.org/v2 resources are synced. A namespace is selected when its labels match all entries, and the values given for the same key are ORed, so `["team=a", "team=b", "env=prod"]` selects the namespaces labeled `team in (a,b)` that are also labeled `env=prod`. Empty selects all namespaces. |
 | config.probeAddr | string | `":8081"` |  |
 | config.provider.initSyncDelay | string | `"20m"` |  |
 | config.provider.syncPeriod | string | `"1h"` |  |
