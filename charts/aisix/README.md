@@ -565,8 +565,8 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.observability.metrics.prometheus.enabled | bool | `true` | Serve Prometheus metrics on the metrics listener (`containerPorts.metrics`) |
 | config.observability.metrics.prometheus.path | string | `"/metrics"` | Metrics path |
 | config.observability.service_name | string | `"aisix"` | Service name reported in telemetry |
-| config.outbound.ssrf_protection.allowed_hosts | list | `[]` | Hosts such a fetch may reach although they resolve to a non-public address, as `host` or `host:port` (IPv6 with a port as `[addr]:port`). Behind a fake-ip DNS that maps public names into 198.18.0.0/15, list those hosts here |
-| config.outbound.ssrf_protection.enabled | bool | `true` | Only reach publicly routable addresses when fetching a URL an API caller supplied (today the media download). false turns the check off and ignores `allowed_hosts` |
+| config.outbound.ssrf_protection.allowed_hosts | list | `[]` | Hosts such a request may reach although they resolve to a non-public address, as `host` or `host:port` (IPv6 with a port as `[addr]:port`). Behind a fake-ip DNS that maps public names into 198.18.0.0/15, list those hosts here |
+| config.outbound.ssrf_protection.enabled | bool | `true` | Only reach publicly routable addresses on a request to a URL the operator did not choose: a URL an API caller supplied (the media download), or an OAuth endpoint or document an MCP server's metadata names on another scheme, host or port than the server's `url`. false turns the check off and ignores `allowed_hosts` |
 | config.proxy.expose_debug_headers | bool | `false` | Send the debug response headers on `/v1/chat/completions` (`x-aisix-call-id`, `x-aisix-served-by`, `x-aisix-route`, `x-aisix-cache*`). Off by default because they reveal which model behind a model group answered |
 | config.proxy.real_ip.header | string | `"x-forwarded-for"` | Header carrying the client IP |
 | config.proxy.real_ip.recursive | bool | `false` | Walk the header right to left past every trusted proxy |
