@@ -276,7 +276,6 @@ spec:
       {{- toYaml .Values.openapiToMcp.resources | nindent 8 }}
     {{- end }}
   {{- if .Values.apisix.hostNetwork }}
-  hostNetwork: true
   dnsPolicy: ClusterFirstWithHostNet
   {{- end }}
   hostNetwork: {{ .Values.apisix.hostNetwork }}
@@ -288,6 +287,14 @@ spec:
     {{- if .Values.etcd.enabled }}
     - name: wait-etcd
       image: {{ .Values.initContainer.image }}:{{ .Values.initContainer.tag }}
+      {{- with .Values.initContainer.resources }}
+      resources:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.initContainer.securityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if .Values.etcd.fullnameOverride }}
       command: ['sh', '-c', "until nc -z {{ .Values.etcd.fullnameOverride }} {{ .Values.etcd.service.port }}; do echo waiting for etcd `date`; sleep 2; done;"]
       {{ else }}

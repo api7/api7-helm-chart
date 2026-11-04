@@ -75,6 +75,7 @@ the controller recommends 1.31+ and only warns below it.
 | deployment.nodeSelector | object | `{}` |  |
 | deployment.podAnnotations | object | `{}` |  |
 | deployment.podSecurityContext.fsGroup | int | `2000` |  |
+| deployment.priorityClassName | string | `""` | PriorityClass for ingress controller pods |
 | deployment.replicas | int | `1` |  |
 | deployment.resources | object | `{}` | Set pod resource requests & limits |
 | deployment.securityContext | object | `{}` |  |
@@ -87,6 +88,7 @@ the controller recommends 1.31+ and only warns below it.
 | podDisruptionBudget.enabled | bool | `false` | Enable or disable podDisruptionBudget |
 | podDisruptionBudget.maxUnavailable | int | `1` | Set the maxUnavailable of podDisruptionBudget |
 | podDisruptionBudget.minAvailable | string | `"90%"` | Set the `minAvailable` of podDisruptionBudget. You can specify only one of `maxUnavailable` and `minAvailable` in a single PodDisruptionBudget. See [Specifying a Disruption Budget for your Application](https://kubernetes.io/docs/tasks/run-application/configure-pdb/#specifying-a-poddisruptionbudget) for more details |
+| webhook.annotations | object | `{}` | Annotations for the ValidatingWebhookConfiguration. For cert-manager CA injection, use certificate.provided=true and leave certificate.caBundle unset. |
 | webhook.certificate.provided | bool | `false` | Set to true if you want to provide your own certificate |
 | webhook.enabled | bool | `true` | Enable or disable admission webhook |
 | webhook.failurePolicy | string | `"Ignore"` | Failure policy for the webhook (Fail or Ignore) |

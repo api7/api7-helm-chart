@@ -26,6 +26,9 @@ spec:
       labels:
         {{- include "api7-ingress-controller-manager.selectorLabels" . | nindent 8 }}
     spec:
+      {{- with .Values.deployment.priorityClassName }}
+      priorityClassName: {{ . | quote }}
+      {{- end }}
       containers:
       - env:
         - name: POD_NAMESPACE
