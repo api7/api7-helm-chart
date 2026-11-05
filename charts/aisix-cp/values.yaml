@@ -200,11 +200,12 @@ api:
   trustedOrigins: []
   # -- Reverse proxies (CIDRs, e.g. `10.0.0.0/8`) in front of cp-api whose
   # X-Forwarded-For cp-api believes. Console sign-in and password reset
-  # rate limiting, and the client address recorded on a session,
-  # then use the first address from
+  # rate limiting, and the client address recorded on a session, on an audit
+  # event and in the access log, then use the first address from
   # the right that is not one of these proxies. Empty — the default — uses
   # the address of whatever connected to cp-api, so behind an ingress every
-  # client shares the ingress's rate-limit budget. List only proxies you
+  # client shares the ingress's rate-limit budget and audit events and the
+  # access log record the ingress. List only proxies you
   # run: a range listed here can name any client address it likes.
   trustedProxies: []
   # -- Hand the session token to a cross-site console client (a
