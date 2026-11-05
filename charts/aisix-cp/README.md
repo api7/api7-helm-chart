@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 1.8.0](https://img.shields.io/badge/Version-1.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.8.0](https://img.shields.io/badge/AppVersion-1.8.0-informational?style=flat-square)
+![Version: 1.9.0](https://img.shields.io/badge/Version-1.9.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.9.0](https://img.shields.io/badge/AppVersion-1.9.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -102,7 +102,7 @@ helm repo add api7 https://charts.api7.ai
 helm repo update
 
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.8.0 \
+  --version 1.9.0 \
   -f cp-values.yaml
 ```
 
@@ -111,7 +111,7 @@ same install, as long as you record what you generated:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.8.0 \
+  --version 1.9.0 \
   --set secrets.masterKey="$(openssl rand -base64 32)" \
   --set postgresql.auth.postgresPassword="$(openssl rand -hex 24)" \
   --set postgresql.auth.password="$(openssl rand -hex 24)"
@@ -181,7 +181,7 @@ fails the handshake with nothing logged to say why.
 
 The console's generated commands carry a gateway image, taken from
 `api.dpImage`. Left empty — the default — `cp-api` hands out the gateway of its
-own release, so this release hands out `docker.io/api7/aisix:1.8.0`.
+own release, so this release hands out `docker.io/api7/aisix:1.9.0`.
 Set it only to pin a different image, and remember that a value set explicitly
 carries forward across upgrades, so gateways added later come up on the old
 image.
@@ -359,7 +359,7 @@ install time:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.8.0 \
+  --version 1.9.0 \
   -f cp-values.yaml \
   --set postgresql.primary.podSecurityContext.enabled=false \
   --set postgresql.primary.containerSecurityContext.enabled=false
@@ -471,7 +471,7 @@ plane and hands out the gateway image from the same release as the chart.
 | api.smtp.username | string | `""` | Username for SMTP authentication. Set together with a password (password or existingSecret), or leave both empty to send without authenticating. With tls `none` the credentials cross the network unencrypted |
 | api.tolerations | list | `[]` | Tolerations for the cp-api pod |
 | api.trustedOrigins | list | `[]` | Extra origins the console accepts sign-in from, as bare origins (https://host[:port]) or `https://*<suffix>` patterns. The api.publicBaseURL origin and its loopback twin are always trusted; add another hostname of this console here, or the local address of a port-forward that differs from api.publicBaseURL. An entry cp-api cannot read as an origin is logged and ignored. |
-| api.trustedProxies | list | `[]` | Reverse proxies (CIDRs, e.g. `10.0.0.0/8`) in front of cp-api whose X-Forwarded-For cp-api believes. Console sign-in and password reset rate limiting, and the client address recorded on a session, then use the first address from the right that is not one of these proxies. Empty — the default — uses the address of whatever connected to cp-api, so behind an ingress every client shares the ingress's rate-limit budget. List only proxies you run: a range listed here can name any client address it likes. |
+| api.trustedProxies | list | `[]` | Reverse proxies (CIDRs, e.g. `10.0.0.0/8`) in front of cp-api whose X-Forwarded-For cp-api believes. Console sign-in and password reset rate limiting, and the client address recorded on a session, on an audit event and in the access log, then use the first address from the right that is not one of these proxies. Empty — the default — uses the address of whatever connected to cp-api, so behind an ingress every client shares the ingress's rate-limit budget and audit events and the access log record the ingress. List only proxies you run: a range listed here can name any client address it likes. |
 | dpm.affinity | object | `{}` | Affinity rules for the dp-manager pod |
 | dpm.extraEnvVars | list | `[]` | Extra environment for dp-manager: system-level settings only (for example TZ). An env var set here for a dp-manager setting still overrides the rendered config file. Overriding a name the chart itself sets is only a compatibility path for existing deployments: the chart then drops its own entry for that name. New installs set the value in this file instead. |
 | dpm.image.pullPolicy | string | `"IfNotPresent"` | Image pull policy |
