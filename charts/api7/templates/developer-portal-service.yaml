@@ -12,6 +12,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.developer_portal_service.type }}
+  {{- with .Values.developer_portal_service.trafficDistribution }}
+  trafficDistribution: {{ . | quote }}
+  {{- end }}
   ports:
     - port: {{ .Values.developer_portal_service.port }}
       targetPort: http

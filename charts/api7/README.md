@@ -1,6 +1,6 @@
 # api7ee3
 
-![Version: 3.8.0](https://img.shields.io/badge/Version-3.8.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.24](https://img.shields.io/badge/AppVersion-3.8.24-informational?style=flat-square)
+![Version: 3.8.1](https://img.shields.io/badge/Version-3.8.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 3.8.24](https://img.shields.io/badge/AppVersion-3.8.24-informational?style=flat-square)
 
 A Helm chart for Kubernetes
 
@@ -104,6 +104,7 @@ A Helm chart for Kubernetes
 | dashboard_service.ingress.tls | list | `[]` |  |
 | dashboard_service.port | int | `7080` |  |
 | dashboard_service.tlsPort | int | `7443` |  |
+| dashboard_service.trafficDistribution | string | `""` | Service traffic distribution preference (e.g. PreferSameZone). Empty omits the field. Supported values depend on the Kubernetes version and feature gates. |
 | dashboard_service.type | string | `"ClusterIP"` |  |
 | developer_portal.extraEnvVars | list | `[]` |  |
 | developer_portal.extraVolumeMounts | list | `[]` |  |
@@ -144,6 +145,7 @@ A Helm chart for Kubernetes
 | developer_portal_service.ingress.hosts[0].paths[0].pathType | string | `"ImplementationSpecific"` |  |
 | developer_portal_service.ingress.tls | list | `[]` |  |
 | developer_portal_service.port | int | `4321` |  |
+| developer_portal_service.trafficDistribution | string | `""` | Service traffic distribution preference (e.g. PreferSameZone). Empty omits the field. Supported values depend on the Kubernetes version and feature gates. |
 | developer_portal_service.type | string | `"ClusterIP"` |  |
 | dp_manager.extraEnvVars | list | `[]` |  |
 | dp_manager.extraVolumeMounts | list | `[]` |  |
@@ -202,6 +204,7 @@ A Helm chart for Kubernetes
 | dp_manager_service.ingress.tls | list | `[]` |  |
 | dp_manager_service.port | int | `7900` |  |
 | dp_manager_service.tlsPort | int | `7943` |  |
+| dp_manager_service.trafficDistribution | string | `""` | Service traffic distribution preference (e.g. PreferSameZone). Empty omits the field. Supported values depend on the Kubernetes version and feature gates. |
 | dp_manager_service.type | string | `"ClusterIP"` |  |
 | fullnameOverride | string | `""` |  |
 | global.storageClass | string | `""` |  |

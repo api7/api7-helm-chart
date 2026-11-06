@@ -11,6 +11,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.dp_manager_service.type }}
+  {{- with .Values.dp_manager_service.trafficDistribution }}
+  trafficDistribution: {{ . | quote }}
+  {{- end }}
   {{- if .Values.dp_manager_service.loadBalancerClass }}
   loadBalancerClass: {{ .Values.dp_manager_service.loadBalancerClass }}
   {{- end }}
