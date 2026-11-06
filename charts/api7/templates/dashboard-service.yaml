@@ -11,6 +11,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.dashboard_service.type }}
+  {{- with .Values.dashboard_service.trafficDistribution }}
+  trafficDistribution: {{ . | quote }}
+  {{- end }}
   ports:
     - port: {{ .Values.dashboard_service.port }}
       targetPort: http

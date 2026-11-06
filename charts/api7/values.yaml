@@ -170,6 +170,8 @@ securityContext: {}
 
 dashboard_service:
   type: ClusterIP
+  # -- Service traffic distribution preference (e.g. PreferSameZone). Empty omits the field. Supported values depend on the Kubernetes version and feature gates.
+  trafficDistribution: ""
   annotations: {}
   port: 7080
   tlsPort: 7443
@@ -198,6 +200,8 @@ dashboard_service:
 
 dp_manager_service:
   type: ClusterIP
+  # -- Service traffic distribution preference (e.g. PreferSameZone). Empty omits the field. Supported values depend on the Kubernetes version and feature gates.
+  trafficDistribution: ""
   # loadBalancerClass: "my-loadbalancer-class"
   annotations: {}
   port: 7900
@@ -236,6 +240,8 @@ file_server_service:
 
 developer_portal_service:
   type: ClusterIP
+  # -- Service traffic distribution preference (e.g. PreferSameZone). Empty omits the field. Supported values depend on the Kubernetes version and feature gates.
+  trafficDistribution: ""
   annotations: {}
   port: 4321
   ingress:
