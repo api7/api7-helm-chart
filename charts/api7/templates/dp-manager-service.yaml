@@ -11,6 +11,9 @@ metadata:
   {{- end }}
 spec:
   type: {{ .Values.dp_manager_service.type }}
+  {{- with .Values.dp_manager_service.trafficDistribution }}
+  trafficDistribution: {{ . | quote }}
+  {{- end }}
   {{- if and (eq .Values.dp_manager_service.type "NodePort") .Values.dp_manager_service.autoAssignNodePort }}
   {{- if or (lt (int .Values.dp_manager_service.port) 30000) (gt (int .Values.dp_manager_service.port) 32767) }}
   {{- fail (printf "dp_manager_service.port (%d) must be between 30000 and 32767 when autoAssignNodePort is true" (int .Values.dp_manager_service.port)) }}
