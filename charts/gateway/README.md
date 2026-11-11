@@ -158,7 +158,7 @@ apisix:
 | apisix.httpRouter | string | `"radixtree_host_uri"` | Defines how apisix handles routing: - radixtree_uri: match route by uri(base on radixtree) - radixtree_host_uri: match route by host + uri(base on radixtree) - radixtree_uri_with_parameter: match route by uri with parameters |
 | apisix.image.pullPolicy | string | `"Always"` | API7 Gateway image pull policy |
 | apisix.image.repository | string | `"api7/api7-ee-3-gateway"` | API7 Gateway image repository |
-| apisix.image.tag | string | `"3.10.9"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
+| apisix.image.tag | string | `"3.10.10"` | API7 Gateway image tag Overrides the image tag whose default is the chart appVersion. |
 | apisix.kind | string | `"Deployment"` | Use a `DaemonSet` or `Deployment` |
 | apisix.lru | object | `{"secret":{"count":512,"neg_count":512,"neg_ttl":60,"ttl":300}}` | fine tune the parameters of LRU cache for some features like secret |
 | apisix.lru.secret.count | int | `512` | Maximum number of cached secret values |
@@ -166,6 +166,7 @@ apisix:
 | apisix.lru.secret.neg_ttl | int | `60` | TTL in seconds for cached negative (failed lookup) results |
 | apisix.lru.secret.ttl | int | `300` | TTL in seconds for cached secret values |
 | apisix.maxPostArgsReadableSize | int | `64` | Cap (in MB) on the request body read when matching `post_arg.*` route predicates for JSON and multipart requests. Set to 0 to disable the limit. |
+| apisix.maxRequestHeadersReadable | int | `100` | Maximum number of request headers plugins can read. Headers past this count are not visible to plugins but are still forwarded to the upstream. Set to 0 to disable the limit. |
 | apisix.meta.luaSharedDict | object | `{"prometheus-metrics":"128m"}` | Shared dict settings for the `meta` context (used by both HTTP and stream subsystems) |
 | apisix.nodeSelector | object | `{}` | Node labels for API7 Gateway pod assignment |
 | apisix.normalizeURILikeServlet | bool | `false` | The URI normalization in servlet is a little different from the RFC's. See https://github.com/jakartaee/servlet/blob/master/spec/src/main/asciidoc/servlet-spec-body.adoc#352-uri-path-canonicalization, which is used under Tomcat. Turn this option on if you want to be compatible with servlet when matching URI path. |
