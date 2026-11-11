@@ -1711,6 +1711,33 @@ entries:
     version: 0.0.1
   api7ee3:
   - apiVersion: v2
+    appVersion: 3.10.10
+    created: "2026-11-11T06:46:10.142203883Z"
+    dependencies:
+    - condition: prometheus.builtin
+      name: prometheus
+      repository: https://charts.bitnami.com/bitnami
+      version: 0.5.1
+    - condition: postgresql.builtin
+      name: postgresql
+      repository: https://charts.bitnami.com/bitnami
+      version: 12.12.10
+    - condition: jaeger.builtin
+      name: jaeger
+      repository: https://jaegertracing.github.io/helm-charts
+      version: 4.4.7
+    description: A Helm chart for Kubernetes
+    digest: 2a4a50ff95e4b9ba0456144dac0dacd8a946569964637dfb17694d28a4bb92a5
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: api7ee3
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/api7ee3-3.10.14/api7ee3-3.10.14.tgz
+    version: 3.10.14
+  - apiVersion: v2
     appVersion: 3.10.9
     created: "2026-11-06T03:21:51.75770952Z"
     dependencies:
@@ -5050,6 +5077,25 @@ entries:
     version: 0.1.0
   gateway:
   - apiVersion: v2
+    appVersion: 3.10.10
+    created: "2026-11-11T06:46:10.355350313Z"
+    dependencies:
+    - condition: etcd.enabled
+      name: etcd
+      repository: https://charts.bitnami.com/bitnami
+      version: 8.7.7
+    description: A Helm chart for API7 Gateway
+    digest: 5cd0210dc587566fb6a03e941e1416c7c6cde4b7375c8deca59557ba4c863ac5
+    maintainers:
+    - email: support@api7.ai
+      name: API7
+      url: https://api7.ai
+    name: gateway
+    type: application
+    urls:
+    - https://github.com/api7/api7-helm-chart/releases/download/gateway-3.10.19/gateway-3.10.19.tgz
+    version: 3.10.19
+  - apiVersion: v2
     appVersion: 3.10.9
     created: "2026-10-29T14:25:35.946432514Z"
     dependencies:
@@ -7269,4 +7315,4 @@ entries:
     urls:
     - https://github.com/api7/api7-helm-chart/releases/download/ngxdig-0.1.0/ngxdig-0.1.0.tgz
     version: 0.1.0
-generated: "2026-11-10T15:06:38.192796785Z"
+generated: "2026-11-11T06:46:10.355683878Z"
