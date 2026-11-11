@@ -49,6 +49,7 @@ data:
       {{- end }}
 
       max_post_args_readable_size: {{ .Values.apisix.maxPostArgsReadableSize }} # Cap (in MB) on the request body read when matching `post_arg.*` route predicates
+      max_request_headers_readable: {{ .Values.apisix.maxRequestHeadersReadable }} # Max number of request headers plugins can read; 0 disables the limit
 
       {{- if or .Values.apisix.proxyProtocol.enableTcpPP .Values.apisix.proxyProtocol.enableTcpPPToUpstream .Values.apisix.proxyProtocol.listenHttpPort .Values.apisix.proxyProtocol.listenHttpsPort }}
       proxy_protocol:

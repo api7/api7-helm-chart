@@ -54,6 +54,10 @@ apisix:
   # for JSON and multipart requests. Set to 0 to disable the limit.
   maxPostArgsReadableSize: 64
 
+  # -- Maximum number of request headers plugins can read. Headers past this count are
+  # not visible to plugins but are still forwarded to the upstream. Set to 0 to disable the limit.
+  maxRequestHeadersReadable: 100
+
   # -- PROXY Protocol configuration.
   proxyProtocol:
     # -- (int) The HTTP port that accepts the PROXY Protocol. It differs from `gateway.http` ports and `admin` port:
@@ -205,7 +209,7 @@ apisix:
     pullPolicy: Always
     # -- API7 Gateway image tag
     # Overrides the image tag whose default is the chart appVersion.
-    tag: 3.10.9
+    tag: 3.10.10
 
   # -- Use a `DaemonSet` or `Deployment`
   kind: Deployment
