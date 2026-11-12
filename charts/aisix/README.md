@@ -1,6 +1,6 @@
 # aisix
 
-![Version: 1.9.0](https://img.shields.io/badge/Version-1.9.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.9.0](https://img.shields.io/badge/AppVersion-1.9.0-informational?style=flat-square)
+![Version: 1.10.0](https://img.shields.io/badge/Version-1.10.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.10.0](https://img.shields.io/badge/AppVersion-1.10.0-informational?style=flat-square)
 
 Helm chart for the AISIX AI gateway data plane
 
@@ -551,14 +551,14 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.managed.mtls_dir | string | `"/var/lib/aisix/mtls"` | Directory the materialised mTLS bundle is written to |
 | config.managed.snapshot_cache_enabled | bool | `false` | Persist a configuration snapshot for recovery while etcd is unreachable. The snapshot holds unencrypted credentials |
 | config.managed.snapshot_cache_path | string | `nil` | Snapshot location. Null uses `/var/lib/aisix/config_cache.json` |
-| config.observability.access_log | bool | `true` | Write an access-log line per request |
+| config.observability.access_log | bool | `true` | Write an access-log line per request, whatever the log level |
 | config.observability.debug.addr | string | `"127.0.0.1:9091"` | Diagnostics listener address. Loopback keeps it off the network |
 | config.observability.debug.enabled | bool | `true` | Serve the unauthenticated heap-profile endpoint (`/debug/pprof/heap`) |
 | config.observability.heap_profiling.auto_dump.dir | string | `"/var/lib/aisix/heap"` | Directory the profiles are written to |
 | config.observability.heap_profiling.auto_dump.enabled | bool | `true` | Write a heap profile as resident memory nears the memory limit |
 | config.observability.heap_profiling.auto_dump.keep | int | `5` | Newest profiles kept |
 | config.observability.heap_profiling.auto_dump.thresholds | list | `[0.8,0.9]` | Fractions of the memory limit that each trigger one profile |
-| config.observability.log_level | string | `"info"` | Log level: trace, debug, info, warn or error |
+| config.observability.log_level | string | `"warn"` | Log level: trace, debug, info, warn or error. Set `info` while diagnosing |
 | config.observability.metrics.buckets | object | `{"a2a_ttfb":null,"guardrail_latency":null,"request_e2e_latency":null,"request_ttft":null}` | Per-metric histogram bucket edges in seconds. Null keeps that metric's default buckets |
 | config.observability.metrics.client_type_rules | list | `[]` | User-Agent to `client_type` mapping rules, first match wins, e.g. `[{pattern: "^py-billing-batcher/", client: billing-batcher}]` |
 | config.observability.metrics.labels | object | `{}` | Complete optional label list per metric, e.g. `{aisix_request_ttft_seconds: [model, provider]}`. Omitted metrics keep their default labels |

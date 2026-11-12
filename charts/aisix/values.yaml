@@ -266,9 +266,9 @@ config:
   observability:
     # -- Service name reported in telemetry
     service_name: aisix
-    # -- Log level: trace, debug, info, warn or error
-    log_level: info
-    # -- Write an access-log line per request
+    # -- Log level: trace, debug, info, warn or error. Set `info` while diagnosing
+    log_level: warn
+    # -- Write an access-log line per request, whatever the log level
     access_log: true
     metrics:
       # -- Complete optional label list per metric, e.g.

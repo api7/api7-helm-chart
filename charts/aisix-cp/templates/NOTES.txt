@@ -74,7 +74,7 @@ Connect a data-plane (managed mode):
 
   Then run the DP container (replace <node-ip> and <node-port>):
 
-    docker run --rm \
+    docker run -d --name aisix-dp --restart unless-stopped --stop-timeout 45 \
       -e AISIX_CONFIG_PATH=/etc/aisix/config.managed.yaml \
       -e AISIX_MANAGED__CP_BASE_URL=https://<node-ip>:<node-port> \
       -e AISIX_MANAGED__CP_ETCD_ENDPOINT=<node-ip>:<node-port> \
@@ -82,7 +82,14 @@ Connect a data-plane (managed mode):
       -e AISIX_MANAGED__CP_KEY_PEM='<client-key-pem>' \
       -e AISIX_MANAGED__CP_CA_PEM='<ca-cert-pem>' \
       -v aisix-mtls:/var/lib/aisix \
+      -p 3000:3000 \
       {{ .Values.api.dpImage | default (printf "docker.io/api7/aisix:%s" .Chart.AppVersion) }}
+
+  Check that it connected; this returns once it has loaded its configuration:
+
+    until curl -fs --noproxy 127.0.0.1 http://127.0.0.1:3000/readyz; do sleep 1; done; echo
+
+  If it keeps waiting, docker logs aisix-dp says why.
 {{- else }}
   DPM is a ClusterIP service. Expose it via Ingress, LoadBalancer, or port-forward:
     kubectl port-forward svc/{{ include "aisix-cp.fullname" . }}-dpm {{ .Values.dpm.service.port }}:{{ .Values.dpm.service.port }} -n {{ .Release.Namespace }}
