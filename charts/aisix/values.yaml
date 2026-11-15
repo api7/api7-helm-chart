@@ -254,7 +254,10 @@ config:
     # -- (bool) Thread-per-core serving topology. Null uses the gateway default (on
     # for Linux)
     thread_per_core: null
-    # -- (int) Worker count. Null uses the gateway default
+    # -- (int) Worker count. Null uses the gateway default (the available CPUs).
+    # Also sizes the token-estimate pool, whose threads each hold their own
+    # tokenizer copy per encoding they count with (about 40 MiB per thread when
+    # both cl100k and o200k are used)
     workers: null
     # -- Entry-level URL rewrite rules, first match wins, e.g.
     # `[{name: per-server-mcp, match: "^/mcp-servers/([^/]+)/mcp$", rewrite: "/mcp/$1"}]`

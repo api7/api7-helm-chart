@@ -575,7 +575,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.proxy.request_id.accept_headers | list | `["x-aisix-request-id"]` | Headers a caller may supply its own request id in. Add `x-request-id` only when no proxy in front stamps it |
 | config.proxy.thread_per_core | bool | `nil` | Thread-per-core serving topology. Null uses the gateway default (on for Linux) |
 | config.proxy.url_rewrites | list | `[]` | Entry-level URL rewrite rules, first match wins, e.g. `[{name: per-server-mcp, match: "^/mcp-servers/([^/]+)/mcp$", rewrite: "/mcp/$1"}]` |
-| config.proxy.workers | int | `nil` | Worker count. Null uses the gateway default |
+| config.proxy.workers | int | `nil` | Worker count. Null uses the gateway default (the available CPUs). Also sizes the token-estimate pool, whose threads each hold their own tokenizer copy per encoding they count with (about 40 MiB per thread when both cl100k and o200k are used) |
 | config.ratelimit.concurrency_ttl_secs | int | `300` | Seconds a concurrency-limit slot is held at most |
 | config.ratelimit.redis | object | `nil` | Extra settings for the shared rate-limit Redis selected by `rateLimit.backend: redis`, e.g. `{timeout_secs: 2}` or `{mode: cluster, nodes: [...]}`. Same keys as `cache.redis`; the URL comes from `rateLimit.redis`, `username` and `password` go through `configSecrets` |
 | config.shutdown.min_drain_secs | int | `30` | Seconds the gateway keeps accepting after SIGTERM while `/readyz` reports 503. `terminationGracePeriodSeconds` must cover it |
