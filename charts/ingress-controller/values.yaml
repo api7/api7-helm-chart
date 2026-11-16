@@ -20,6 +20,8 @@ autoscaling:
   minReplicas: 1
 
 deployment:
+  # -- PriorityClass for ingress controller pods
+  priorityClassName: ""
   annotations: {}
   podAnnotations: {}
   replicas: 1
@@ -73,6 +75,8 @@ config:
 
 # Admission webhook configuration
 webhook:
+  # -- Annotations for the ValidatingWebhookConfiguration. For cert-manager CA injection, use certificate.provided=true and leave certificate.caBundle unset.
+  annotations: {}
   # -- Enable or disable admission webhook
   enabled: true
   # -- The port for the webhook server to listen on
@@ -86,5 +90,5 @@ webhook:
     provided: false
     # -- Secret name containing the certificate (required if provided is true)
     # secretName: "my-webhook-cert"
-    # -- CA bundle in base64 format (required if provided is true)
+    # -- CA bundle in base64 format for a provided certificate; leave unset when a CA injector manages it
     # caBundle: ""

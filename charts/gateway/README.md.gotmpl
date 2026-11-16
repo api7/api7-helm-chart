@@ -123,3 +123,40 @@ apisix:
 Remove configuration items such as `plugins`, `stream_plugins`, and `custom_plugins` that are no longer needed in API7 EE.
 
 **This version of the helm chart needs to be used with API7 EE gateway version 3.2.16.3 or above.**
+
+## Configure the wait-etcd init container
+
+When `etcd.enabled` is true, `initContainer.resources` and
+`initContainer.securityContext` configure the built-in `wait-etcd` container for
+both Deployment and DaemonSet workloads. They are independent of the `apisix.resources` and `apisix.securityContext`, which configure the gateway container.
+
+Both options default to `{}` and are omitted from the rendered container when
+empty. Applicable `apisix.podSecurityContext` settings still apply to `wait-etcd`.
+For example:
+
+```yaml
+initContainer:
+  resources:
+    requests:
+      cpu: 10m
+      memory: 16Mi
+    limits:
+      cpu: 100m
+      memory: 32Mi
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+    runAsNonRoot: true
+    runAsUser: 1000
+```
+
+Adjust resource values for your environment. The default BusyBox image runs as
+root, so `runAsNonRoot: true` also requires a non-zero UID supplied through
+`runAsUser`, `apisix.podSecurityContext`, or an admission policy. On platforms such as
+OpenShift that assign a UID, omit the explicit `runAsUser` value.
+
+These options do not configure `extraInitContainers` and have no effect when
+`etcd.enabled` is false.
