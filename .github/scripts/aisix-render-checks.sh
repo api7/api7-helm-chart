@@ -33,6 +33,8 @@ check() {
   if "$@"; then echo "ok   $what"; else echo "FAIL $what"; fails=$((fails + 1)); fi
 }
 
+renders() { render "$@" >/dev/null; }
+
 refuses() {
   local want=$1
   shift
@@ -113,8 +115,20 @@ check "a CPU-utilization HPA without resources.requests.cpu is refused" \
 check "a memory-utilization HPA without resources.requests.memory is refused" \
   refuses "requires resources.requests.memory" --set autoscaling.enabled=true --set autoscaling.targetCPUUtilizationPercentage=null --set autoscaling.targetMemoryUtilizationPercentage=80 --set resources.requests.cpu=1
 check "an HPA renders once the matching requests are set" \
-  render --set autoscaling.enabled=true --set autoscaling.targetMemoryUtilizationPercentage=80 --set resources.requests.cpu=1 --set resources.requests.memory=1Gi >/dev/null
+  renders --set autoscaling.enabled=true --set autoscaling.targetMemoryUtilizationPercentage=80 --set resources.requests.cpu=1 --set resources.requests.memory=1Gi
 check "an HPA with only extraMetrics needs no requests" \
-  render --set autoscaling.enabled=true --set autoscaling.targetCPUUtilizationPercentage=null --set 'autoscaling.extraMetrics[0].type=Pods' >/dev/null
+  renders --set autoscaling.enabled=true --set autoscaling.targetCPUUtilizationPercentage=null --set 'autoscaling.extraMetrics[0].type=Pods'
+check "a KEDA cpu Utilization trigger without resources.requests.cpu is refused" \
+  refuses "requires resources.requests.cpu" --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=cpu' --set 'keda.triggers[0].metricType=Utilization' --set 'keda.triggers[0].metadata.value=60'
+check "a KEDA memory Utilization trigger without resources.requests.memory is refused" \
+  refuses "requires resources.requests.memory" --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=memory' --set 'keda.triggers[0].metricType=Utilization' --set 'keda.triggers[0].metadata.value=60' --set resources.requests.cpu=1
+check "a KEDA cpu trigger with metricType omitted counts as Utilization and is refused" \
+  refuses "requires resources.requests.cpu" --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=cpu' --set 'keda.triggers[0].metadata.value=60'
+check "a KEDA cpu AverageValue trigger needs no request" \
+  renders --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=cpu' --set 'keda.triggers[0].metricType=AverageValue' --set 'keda.triggers[0].metadata.value=500m'
+check "KEDA cpu and memory Utilization triggers render once the requests are set" \
+  renders --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=cpu' --set 'keda.triggers[0].metadata.value=60' --set 'keda.triggers[1].type=memory' --set 'keda.triggers[1].metadata.value=60' --set resources.requests.cpu=1 --set resources.requests.memory=1Gi
+check "a KEDA prometheus trigger needs no request" \
+  renders --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=prometheus' --set 'keda.triggers[0].metadata.serverAddress=http://p:9090' --set 'keda.triggers[0].metadata.query=up' --set 'keda.triggers[0].metadata.threshold=1'
 
 [ "$fails" -eq 0 ] || { echo "$fails render check(s) failed"; exit 1; }

@@ -447,6 +447,18 @@ Reject value combinations that render successfully but cannot run.
 {{- if and .Values.keda.enabled (not .Values.keda.triggers) }}
 {{- fail "keda.enabled requires at least one entry in keda.triggers" }}
 {{- end }}
+{{- if .Values.keda.enabled }}
+{{- $requests := dig "requests" dict (.Values.resources | default dict) }}
+{{- range .Values.keda.triggers }}
+{{- if has (toString .type) (list "cpu" "memory") }}
+{{- /* KEDA defaults a resource trigger to Utilization; metadata.type is its deprecated spelling of metricType */}}
+{{- $metricType := .metricType | default (dig "type" "" (.metadata | default dict)) | default "Utilization" }}
+{{- if and (eq (toString $metricType) "Utilization") (not (get $requests (toString .type))) }}
+{{- fail (printf "a keda.triggers %s trigger with metricType Utilization requires resources.requests.%s: utilization is measured against the request, so without one KEDA's HorizontalPodAutoscaler never scales. Set resources.requests.%s, or use metricType: AverageValue" .type .type .type) }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- $config := .Values.config | default dict }}
 {{- if eq .Values.rateLimit.backend "redis" }}
 {{- $mode := "single" }}
