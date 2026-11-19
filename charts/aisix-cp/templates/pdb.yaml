@@ -1,0 +1,23 @@
+{{- range $component := list "api" "dpm" }}
+{{- $pdb := (index $.Values $component).podDisruptionBudget }}
+{{- if $pdb.enabled }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ include "aisix-cp.fullname" $ }}-{{ $component }}
+  labels:
+    {{- include "aisix-cp.labels" $ | nindent 4 }}
+    {{- include "aisix-cp.selectorLabels" (dict "root" $ "component" $component) | nindent 4 }}
+spec:
+  {{- if $pdb.minAvailable }}
+  minAvailable: {{ $pdb.minAvailable }}
+  {{- else }}
+  {{- /* not `default`: it would turn an explicit 0 into 1 */}}
+  maxUnavailable: {{ if kindIs "invalid" $pdb.maxUnavailable }}1{{ else }}{{ $pdb.maxUnavailable }}{{ end }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "aisix-cp.selectorLabels" (dict "root" $ "component" $component) | nindent 6 }}
+{{- end }}
+{{- end }}

@@ -83,9 +83,13 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
+          # /readyz, not /healthz: it fails once a newer cp-api has
+          # migrated the database during a rolling upgrade, so this pod
+          # leaves the Service while liveness keeps it from restarting
+          # (a restart would boot the old release on the new schema).
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: /readyz
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -117,6 +121,10 @@ spec:
       {{- end }}
       {{- with .Values.api.affinity }}
       affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.topologySpreadConstraints }}
+      topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 
