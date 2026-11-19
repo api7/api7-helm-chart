@@ -382,6 +382,7 @@ dashboard_configuration:
       enable: true
       host: "127.0.0.1"
       port: 6060
+    max_request_body_size: 33554432  # bytes; a larger request body is answered with 413
   session_options_config:
     same_site: "lax"  # means the value SameSiteNoneMode
     secure: false
@@ -624,6 +625,7 @@ developer_portal_configuration:
       enable: true
       host: "127.0.0.1"
       port: 6060
+    max_request_body_size: 33554432  # bytes; a larger request body is answered with 413
   log:
     # -- Allowed values: `debug`, `info`, `warn`, `error`
     level: warn
