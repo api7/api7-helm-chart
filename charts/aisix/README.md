@@ -673,7 +673,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | readinessProbe.failureThreshold | int | `3` |  |
 | readinessProbe.periodSeconds | int | `3` |  |
 | replicaCount | int | `2` | Number of gateway replicas. Ignored once `autoscaling.enabled` or `keda.enabled` is true — the autoscaler owns the replica count from then on and the Deployment omits `spec.replicas` so `helm upgrade` cannot reset it. |
-| resources | object | `{}` |  |
+| resources | object | `{}` | Gateway container resources. No default requests or limits: neither CPU nor memory has a value that fits every deployment — both depend on the cluster and the traffic, and memory grows with `config.proxy.workers` (each worker's token-estimate thread holds its own tokenizer, see that key). Set `requests` from your own load, and `config.proxy.workers` to the CPUs you allocate. A CPU limit throttles the proxy under CFS, adding tail latency. Autoscaling on a CPU or memory utilization target needs the matching request: the render fails without it. |
 | securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | securityContext.capabilities.add[0] | string | `"NET_BIND_SERVICE"` |  |
 | securityContext.capabilities.drop[0] | string | `"ALL"` |  |
