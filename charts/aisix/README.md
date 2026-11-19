@@ -286,9 +286,20 @@ autoscaling:
   minReplicas: 2
   maxReplicas: 20
   targetCPUUtilizationPercentage: 70
+resources:
+  requests:
+    cpu: "2"
+    memory: 1Gi
+config:
+  proxy:
+    workers: 2
 ```
 
-Requires `metrics-server` in the cluster. A replica the autoscaler adds is kept out
+Requires `metrics-server` in the cluster. The utilization target is measured
+against `resources.requests.cpu`, which the chart does not default, so the render
+fails without it (likewise `resources.requests.memory` for a memory target). The
+numbers above are placeholders — size them from your own traffic, and keep
+`config.proxy.workers` equal to the CPUs you request. A replica the autoscaler adds is kept out
 of the Service until its readiness probe passes, which happens only after it has
 loaded its configuration from the control plane — so a scaling event never routes
 traffic to a gateway that cannot serve it.
@@ -575,7 +586,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | config.proxy.request_id.accept_headers | list | `["x-aisix-request-id"]` | Headers a caller may supply its own request id in. Add `x-request-id` only when no proxy in front stamps it |
 | config.proxy.thread_per_core | bool | `nil` | Thread-per-core serving topology. Null uses the gateway default (on for Linux) |
 | config.proxy.url_rewrites | list | `[]` | Entry-level URL rewrite rules, first match wins, e.g. `[{name: per-server-mcp, match: "^/mcp-servers/([^/]+)/mcp$", rewrite: "/mcp/$1"}]` |
-| config.proxy.workers | int | `nil` | Worker count. Null uses the gateway default (the available CPUs). Also sizes the token-estimate pool: one thread per worker, each holding one tokenizer instance per encoding it has counted with (about 17 MiB cl100k, 27 MiB o200k, 39 MiB o200k_harmony) |
+| config.proxy.workers | int | `nil` | Worker count. No default: null uses the gateway default, every CPU the process sees — the node's, unless a CPU limit caps it. Also sizes the token-estimate pool: one thread per worker, each holding one tokenizer instance per encoding it has counted with (about 17 MiB cl100k, 27 MiB o200k, 39 MiB o200k_harmony resident). Set it to the CPUs allocated to the pod, and size `resources` memory for it |
 | config.ratelimit.concurrency_ttl_secs | int | `300` | Seconds a concurrency-limit slot is held at most |
 | config.ratelimit.redis | object | `nil` | Extra settings for the shared rate-limit Redis selected by `rateLimit.backend: redis`, e.g. `{timeout_secs: 2}` or `{mode: cluster, nodes: [...]}`. Same keys as `cache.redis`; the URL comes from `rateLimit.redis`, `username` and `password` go through `configSecrets` |
 | config.shutdown.min_drain_secs | int | `30` | Seconds the gateway keeps accepting after SIGTERM while `/readyz` reports 503. `terminationGracePeriodSeconds` must cover it |
@@ -662,9 +673,7 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | readinessProbe.failureThreshold | int | `3` |  |
 | readinessProbe.periodSeconds | int | `3` |  |
 | replicaCount | int | `2` | Number of gateway replicas. Ignored once `autoscaling.enabled` or `keda.enabled` is true — the autoscaler owns the replica count from then on and the Deployment omits `spec.replicas` so `helm upgrade` cannot reset it. |
-| resources.limits.memory | string | `"1Gi"` |  |
-| resources.requests.cpu | string | `"500m"` |  |
-| resources.requests.memory | string | `"256Mi"` |  |
+| resources | object | `{}` |  |
 | securityContext.allowPrivilegeEscalation | bool | `false` |  |
 | securityContext.capabilities.add[0] | string | `"NET_BIND_SERVICE"` |  |
 | securityContext.capabilities.drop[0] | string | `"ALL"` |  |

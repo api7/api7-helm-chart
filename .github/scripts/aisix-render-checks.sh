@@ -106,5 +106,15 @@ check "a dotted key under config is refused" \
   refuses "contains a dot" --set 'config.cache\.redis\.password=x'
 check "configSecrets outside the allow-list is refused" \
   refuses "not a credential-bearing setting" --set 'configSecrets.upstream\.timeout_ms.secretName=a' --set 'configSecrets.upstream\.timeout_ms.key=b'
+check "the default render sets no resources" \
+  query '"resources" not in pod["containers"][0]'
+check "a CPU-utilization HPA without resources.requests.cpu is refused" \
+  refuses "requires resources.requests.cpu" --set autoscaling.enabled=true
+check "a memory-utilization HPA without resources.requests.memory is refused" \
+  refuses "requires resources.requests.memory" --set autoscaling.enabled=true --set autoscaling.targetCPUUtilizationPercentage=null --set autoscaling.targetMemoryUtilizationPercentage=80 --set resources.requests.cpu=1
+check "an HPA renders once the matching requests are set" \
+  render --set autoscaling.enabled=true --set autoscaling.targetMemoryUtilizationPercentage=80 --set resources.requests.cpu=1 --set resources.requests.memory=1Gi >/dev/null
+check "an HPA with only extraMetrics needs no requests" \
+  render --set autoscaling.enabled=true --set autoscaling.targetCPUUtilizationPercentage=null --set 'autoscaling.extraMetrics[0].type=Pods' >/dev/null
 
 [ "$fails" -eq 0 ] || { echo "$fails render check(s) failed"; exit 1; }

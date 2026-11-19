@@ -280,9 +280,20 @@ autoscaling:
   minReplicas: 2
   maxReplicas: 20
   targetCPUUtilizationPercentage: 70
+resources:
+  requests:
+    cpu: "2"
+    memory: 1Gi
+config:
+  proxy:
+    workers: 2
 ```
 
-Requires `metrics-server` in the cluster. A replica the autoscaler adds is kept out
+Requires `metrics-server` in the cluster. The utilization target is measured
+against `resources.requests.cpu`, which the chart does not default, so the render
+fails without it (likewise `resources.requests.memory` for a memory target). The
+numbers above are placeholders — size them from your own traffic, and keep
+`config.proxy.workers` equal to the CPUs you request. A replica the autoscaler adds is kept out
 of the Service until its readiness probe passes, which happens only after it has
 loaded its configuration from the control plane — so a scaling event never routes
 traffic to a gateway that cannot serve it.

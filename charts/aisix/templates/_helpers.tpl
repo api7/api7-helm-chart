@@ -435,6 +435,15 @@ Reject value combinations that render successfully but cannot run.
 {{- if and .Values.autoscaling.enabled .Values.keda.enabled }}
 {{- fail "autoscaling.enabled and keda.enabled are mutually exclusive: two controllers writing spec.replicas fight over the replica count" }}
 {{- end }}
+{{- if .Values.autoscaling.enabled }}
+{{- $requests := dig "requests" dict (.Values.resources | default dict) }}
+{{- if and .Values.autoscaling.targetCPUUtilizationPercentage (not $requests.cpu) }}
+{{- fail "autoscaling.targetCPUUtilizationPercentage requires resources.requests.cpu: utilization is measured against the request, so without one the HorizontalPodAutoscaler never scales. Set resources.requests.cpu, or set autoscaling.targetCPUUtilizationPercentage=null" }}
+{{- end }}
+{{- if and .Values.autoscaling.targetMemoryUtilizationPercentage (not $requests.memory) }}
+{{- fail "autoscaling.targetMemoryUtilizationPercentage requires resources.requests.memory: utilization is measured against the request, so without one the HorizontalPodAutoscaler never scales. Set resources.requests.memory, or set autoscaling.targetMemoryUtilizationPercentage=null" }}
+{{- end }}
+{{- end }}
 {{- if and .Values.keda.enabled (not .Values.keda.triggers) }}
 {{- fail "keda.enabled requires at least one entry in keda.triggers" }}
 {{- end }}
