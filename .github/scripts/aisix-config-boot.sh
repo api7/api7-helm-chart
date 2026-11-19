@@ -46,7 +46,7 @@ cat "$work/standalone/config.yaml"
 name=aisix-cfgboot-standalone-$run_id
 docker run -d --name "$name" -p 127.0.0.1::3000 \
   -e AISIX_CONFIG_PATH=/etc/aisix/chart/config.yaml \
-  -e OPENAI_API_KEY=sk-ci-placeholder -e CALLER_API_KEY=ci-caller-placeholder \
+  -e OPENAI_API_KEY=sk-ci-placeholder \
   -v "$work/standalone/config.yaml:/etc/aisix/chart/config.yaml:ro" \
   -v "$work/standalone/resources.yaml:/etc/aisix/resources/resources.yaml:ro" \
   "$image" >/dev/null

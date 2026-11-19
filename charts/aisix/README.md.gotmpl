@@ -102,23 +102,26 @@ controlPlane:
 
 standalone:
   resources:
-    _format_version: "1"
+    _format_version: "2"
     provider_keys:
-      - display_name: openai-main
+      - id: 0b6f3c1e-2f0a-4c5e-9d55-7d1a8b0c2e11
+        display_name: openai-main
         provider: openai
         adapter: openai
         api_key: ${OPENAI_API_KEY}
         api_base: https://api.openai.com/v1
     models:
-      - display_name: gpt-4o-mini
+      - id: 6efd592d-a73b-573d-8e2c-e9e103692f92
+        display_name: gpt-4o-mini
         provider: openai
         model_name: gpt-4o-mini
-        provider_key: openai-main
+        provider_key_id: 0b6f3c1e-2f0a-4c5e-9d55-7d1a8b0c2e11
     api_keys:
-      - display_name: my-caller
-        key_env: CALLER_API_KEY
-        allowed_models:
-          - gpt-4o-mini
+      - id: 4a1c9e2b-7d3f-4b6a-8c5e-1f2a3b4c5d6e
+        display_name: my-caller
+        key_hash: ${CALLER_API_KEY_SHA256}
+        allowed_model_ids:
+          - 6efd592d-a73b-573d-8e2c-e9e103692f92
 
 extraEnvVars:
   - name: OPENAI_API_KEY
@@ -126,11 +129,20 @@ extraEnvVars:
       secretKeyRef:
         name: openai-credentials
         key: api-key
-  - name: CALLER_API_KEY
+  - name: CALLER_API_KEY_SHA256
     valueFrom:
       secretKeyRef:
         name: aisix-caller-keys
-        key: my-caller
+        key: my-caller-sha256
+```
+
+Every entry carries an `id`, a lowercase UUID you choose, and resources refer
+to each other by it (`provider_key_id`, `allowed_model_ids`). An API key is
+stored as `key_hash`, the SHA-256 hex digest of the key callers send, so the
+key itself never appears in the file:
+
+```sh
+printf %s "$CALLER_API_KEY" | sha256sum | cut -d' ' -f1
 ```
 
 `standalone.existingSecret` and `standalone.existingConfigMap` read the file from
