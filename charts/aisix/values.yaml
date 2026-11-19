@@ -254,7 +254,12 @@ config:
     # -- (bool) Thread-per-core serving topology. Null uses the gateway default (on
     # for Linux)
     thread_per_core: null
-    # -- (int) Worker count. Null uses the gateway default
+    # -- (int) Worker count. No default: null uses the gateway default, every CPU
+    # the process sees — the node's, unless a CPU limit caps it. Also sizes the
+    # token-estimate pool: one thread per worker, each holding one tokenizer
+    # instance per encoding it has counted with (about 17 MiB cl100k, 27 MiB
+    # o200k, 39 MiB o200k_harmony resident). Set it to the CPUs allocated to the
+    # pod, and size `resources` memory for it
     workers: null
     # -- Entry-level URL rewrite rules, first match wins, e.g.
     # `[{name: per-server-mcp, match: "^/mcp-servers/([^/]+)/mcp$", rewrite: "/mcp/$1"}]`
@@ -506,15 +511,15 @@ serviceAccount:
   # -- ServiceAccount annotations
   annotations: {}
 
-## No CPU limit by default: CFS throttling adds tail latency on a proxy and
-## suppresses the very CPU signal the HorizontalPodAutoscaler scales on. The
-## CPU *request* is mandatory for CPU-target autoscaling and is set below.
-resources:
-  requests:
-    cpu: 500m
-    memory: 256Mi
-  limits:
-    memory: 1Gi
+# -- Gateway container resources. No default requests or limits: neither CPU
+# nor memory has a value that fits every deployment — both depend on the
+# cluster and the traffic, and memory
+# grows with `config.proxy.workers` (each worker's token-estimate thread holds
+# its own tokenizer, see that key). Set `requests` from your own load, and
+# `config.proxy.workers` to the CPUs you allocate. A CPU limit throttles the
+# proxy under CFS, adding tail latency. Autoscaling on a CPU or memory
+# utilization target needs the matching request: the render fails without it.
+resources: {}
 
 ## The image already runs as uid 10001 and declares it numerically, which is
 ## what `runAsNonRoot` needs to verify without the uid being repeated here.
