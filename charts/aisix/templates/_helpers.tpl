@@ -443,6 +443,12 @@ Reject value combinations that render successfully but cannot run.
 {{- if and .Values.autoscaling.targetMemoryUtilizationPercentage (not $requests.memory) }}
 {{- fail "autoscaling.targetMemoryUtilizationPercentage requires resources.requests.memory: utilization is measured against the request, so without one the HorizontalPodAutoscaler never scales. Set resources.requests.memory, or set autoscaling.targetMemoryUtilizationPercentage=null" }}
 {{- end }}
+{{- range .Values.autoscaling.extraMetrics }}
+{{- $source := get . (index (dict "Resource" "resource" "ContainerResource" "containerResource") (toString .type) | default "") | default dict }}
+{{- if and (eq (toString (dig "target" "type" "" $source)) "Utilization") (not (get $requests (toString $source.name))) }}
+{{- fail (printf "an autoscaling.extraMetrics %s %s metric with target type Utilization requires resources.requests.%s: utilization is measured against the request, so without one the HorizontalPodAutoscaler never scales. Set resources.requests.%s, or use target type AverageValue" .type $source.name $source.name $source.name) }}
+{{- end }}
+{{- end }}
 {{- end }}
 {{- if and .Values.keda.enabled (not .Values.keda.triggers) }}
 {{- fail "keda.enabled requires at least one entry in keda.triggers" }}
