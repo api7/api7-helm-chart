@@ -364,7 +364,8 @@ roughly one stream length. The steady-state rate is unaffected.
 
 KEDA has no default `metricType` for a `cpu` or `memory` trigger, so when a
 trigger omits it the chart writes `metricType: Utilization` into the
-ScaledObject. A `Utilization` trigger is measured against the matching
+ScaledObject (or the value of the legacy `metadata.type`, when the trigger still
+sets one). A `Utilization` trigger is measured against the matching
 `resources.requests` entry, which the chart does not default, so the render fails
 without it. Whatever the `metricType`, KEDA admits a `cpu` or `memory` trigger only
 when the container has a matching request or limit, or the namespace has a
