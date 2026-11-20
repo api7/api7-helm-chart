@@ -457,7 +457,7 @@ Reject value combinations that render successfully but cannot run.
 {{- $requests := dig "requests" dict (.Values.resources | default dict) }}
 {{- range .Values.keda.triggers }}
 {{- if has (toString .type) (list "cpu" "memory") }}
-{{- /* KEDA defaults a resource trigger to Utilization; metadata.type is its deprecated spelling of metricType */}}
+{{- /* the ScaledObject fills an omitted metricType the same way; metadata.type is KEDA's removed spelling of it */}}
 {{- $metricType := .metricType | default (dig "type" "" (.metadata | default dict)) | default "Utilization" }}
 {{- if and (eq (toString $metricType) "Utilization") (not (get $requests (toString .type))) }}
 {{- fail (printf "a keda.triggers %s trigger with metricType Utilization requires resources.requests.%s: utilization is measured against the request, so without one KEDA's HorizontalPodAutoscaler never scales. Set resources.requests.%s, or use metricType: AverageValue" .type .type .type) }}

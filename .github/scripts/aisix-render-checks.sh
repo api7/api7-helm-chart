@@ -132,6 +132,10 @@ check "a KEDA cpu AverageValue trigger needs no request" \
   renders --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=cpu' --set 'keda.triggers[0].metricType=AverageValue' --set-string 'keda.triggers[0].metadata.value=500m'
 check "KEDA cpu and memory Utilization triggers render once the requests are set" \
   renders --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=cpu' --set-string 'keda.triggers[0].metadata.value=60' --set 'keda.triggers[1].type=memory' --set-string 'keda.triggers[1].metadata.value=60' --set resources.requests.cpu=1 --set resources.requests.memory=1Gi
+check "a KEDA cpu trigger with metricType omitted renders metricType Utilization" \
+  query 'next(d for d in docs if d["kind"] == "ScaledObject")["spec"]["triggers"][0]["metricType"] == "Utilization"' --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=cpu' --set-string 'keda.triggers[0].metadata.value=60' --set resources.requests.cpu=1
+check "a KEDA cpu trigger keeps an explicit metricType" \
+  query 'next(d for d in docs if d["kind"] == "ScaledObject")["spec"]["triggers"][0]["metricType"] == "AverageValue"' --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=cpu' --set 'keda.triggers[0].metricType=AverageValue' --set-string 'keda.triggers[0].metadata.value=500m'
 check "a KEDA prometheus trigger needs no request" \
   renders --set keda.enabled=true --set autoscaling.enabled=false --set 'keda.triggers[0].type=prometheus' --set 'keda.triggers[0].metadata.serverAddress=http://p:9090' --set 'keda.triggers[0].metadata.query=up' --set-string 'keda.triggers[0].metadata.threshold=1'
 

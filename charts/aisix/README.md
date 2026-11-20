@@ -362,10 +362,15 @@ A streamed request is counted in `aisix_llm_requests_total` when the stream
 ends, not when it starts, so during a burst of long streams this signal lags by
 roughly one stream length. The steady-state rate is unaffected.
 
-A KEDA `cpu` or `memory` trigger with `metricType: Utilization` — KEDA's default
-when `metricType` is omitted — is measured against the matching
+KEDA has no default `metricType` for a `cpu` or `memory` trigger, so when a
+trigger omits it the chart writes `metricType: Utilization` into the
+ScaledObject. A `Utilization` trigger is measured against the matching
 `resources.requests` entry, which the chart does not default, so the render fails
-without it. `metricType: AverageValue` needs no request.
+without it. Whatever the `metricType`, KEDA admits a `cpu` or `memory` trigger only
+when the container has a matching request or limit, or the namespace has a
+LimitRange that supplies a default. The chart cannot see a LimitRange, so it does
+not check this for `metricType: AverageValue`: set `resources` or have such a
+LimitRange in place.
 
 `autoscaling` and `keda` are mutually exclusive — enabling both fails the render
 rather than letting two controllers fight over the replica count.
