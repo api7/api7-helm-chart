@@ -111,6 +111,31 @@ api:
   tolerations: []
   # -- Affinity rules for the cp-api pod
   affinity: {}
+  # -- Topology spread constraints for the cp-api pods, e.g. to spread replicas
+  # across nodes or zones. Together with `podDisruptionBudget`, this keeps a
+  # node drain from taking every replica down at once. Passed through as
+  # written, so each constraint needs a `labelSelector` naming these pods
+  # (one without it counts no pods and spreads nothing), and
+  # `matchLabelKeys: [pod-template-hash]` keeps a rolling update from counting
+  # old and new pods together. For example:
+  # `[{maxSkew: 1, topologyKey: kubernetes.io/hostname, whenUnsatisfiable: ScheduleAnyway,
+  # matchLabelKeys: [pod-template-hash], labelSelector: {matchLabels:
+  # {app.kubernetes.io/name: aisix-cp, app.kubernetes.io/instance: <release>,
+  # app.kubernetes.io/component: api}}}]`. Empty applies none
+  topologySpreadConstraints: []
+  podDisruptionBudget:
+    # -- Create a PodDisruptionBudget for the cp-api pods so voluntary
+    # disruptions (node drains, cluster upgrades) cannot evict every replica
+    # at once. Needs more than one replica: on a single replica a budget that
+    # keeps it available (`minAvailable: 1`, `maxUnavailable: 0`) blocks every
+    # drain. Pair it with `topologySpreadConstraints` so the replicas do not
+    # share one node
+    enabled: false
+    # -- Minimum available pods. Takes precedence over `maxUnavailable` unless
+    # empty or 0, which leave `maxUnavailable` in effect
+    minAvailable: ""
+    # -- Maximum unavailable pods
+    maxUnavailable: 1
   # -- Extra environment for cp-api: system-level settings only (for example
   # TZ). Every cp-api setting has its own value in this section; an env var
   # set here for one of them still overrides the rendered config file, which
@@ -387,8 +412,8 @@ dpm:
     type: ClusterIP
     # -- dp-manager mTLS Service port, the one gateways dial
     port: 7944
-    # -- Plain-HTTP listen address for /healthz (outbox-poller liveness),
-    # probed by the kubelet (the mTLS port 7944 cannot be probed). Set to
+    # -- Plain-HTTP listen address for /healthz (outbox-poller liveness) and
+    # /readyz (readiness), probed by the kubelet (the mTLS port 7944 cannot be probed). Set to
     # "" to disable the health server + httpGet probes (the probes then
     # fall back to a TCP check on the mTLS port).
     healthListen: ":7946"
@@ -431,6 +456,31 @@ dpm:
   tolerations: []
   # -- Affinity rules for the dp-manager pod
   affinity: {}
+  # -- Topology spread constraints for the dp-manager pods, e.g. to spread replicas
+  # across nodes or zones. Together with `podDisruptionBudget`, this keeps a
+  # node drain from taking every replica down at once. Passed through as
+  # written, so each constraint needs a `labelSelector` naming these pods
+  # (one without it counts no pods and spreads nothing), and
+  # `matchLabelKeys: [pod-template-hash]` keeps a rolling update from counting
+  # old and new pods together. For example:
+  # `[{maxSkew: 1, topologyKey: kubernetes.io/hostname, whenUnsatisfiable: ScheduleAnyway,
+  # matchLabelKeys: [pod-template-hash], labelSelector: {matchLabels:
+  # {app.kubernetes.io/name: aisix-cp, app.kubernetes.io/instance: <release>,
+  # app.kubernetes.io/component: dpm}}}]`. Empty applies none
+  topologySpreadConstraints: []
+  podDisruptionBudget:
+    # -- Create a PodDisruptionBudget for the dp-manager pods so voluntary
+    # disruptions (node drains, cluster upgrades) cannot evict every replica
+    # at once. Needs more than one replica: on a single replica a budget that
+    # keeps it available (`minAvailable: 1`, `maxUnavailable: 0`) blocks every
+    # drain. Pair it with `topologySpreadConstraints` so the replicas do not
+    # share one node
+    enabled: false
+    # -- Minimum available pods. Takes precedence over `maxUnavailable` unless
+    # empty or 0, which leave `maxUnavailable` in effect
+    minAvailable: ""
+    # -- Maximum unavailable pods
+    maxUnavailable: 1
   # -- Extra environment for dp-manager: system-level settings only (for
   # example TZ). An env var set here for a dp-manager setting still
   # overrides the rendered config file.

@@ -1,6 +1,6 @@
 # aisix-cp
 
-![Version: 1.10.0](https://img.shields.io/badge/Version-1.10.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.10.0](https://img.shields.io/badge/AppVersion-1.10.0-informational?style=flat-square)
+![Version: 1.11.0](https://img.shields.io/badge/Version-1.11.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 1.11.0](https://img.shields.io/badge/AppVersion-1.11.0-informational?style=flat-square)
 
 Helm chart for AISIX control plane (cp-api, dp-manager, dashboard)
 
@@ -102,7 +102,7 @@ helm repo add api7 https://charts.api7.ai
 helm repo update
 
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.10.0 \
+  --version 1.11.0 \
   -f cp-values.yaml
 ```
 
@@ -111,7 +111,7 @@ same install, as long as you record what you generated:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.10.0 \
+  --version 1.11.0 \
   --set secrets.masterKey="$(openssl rand -base64 32)" \
   --set postgresql.auth.postgresPassword="$(openssl rand -hex 24)" \
   --set postgresql.auth.password="$(openssl rand -hex 24)"
@@ -181,7 +181,7 @@ fails the handshake with nothing logged to say why.
 
 The console's generated commands carry a gateway image, taken from
 `api.dpImage`. Left empty — the default — `cp-api` hands out the gateway of its
-own release, so this release hands out `docker.io/api7/aisix:1.10.0`.
+own release, so this release hands out `docker.io/api7/aisix:1.11.0`.
 Set it only to pin a different image, and remember that a value set explicitly
 carries forward across upgrades, so gateways added later come up on the old
 image.
@@ -215,35 +215,6 @@ oldest it accepts. Upgrade to a supported version first; to proceed anyway,
 after taking a backup, set `api.allowUnsupportedUpgrade: true` for that one
 upgrade and set it back afterwards. See
 [Upgrade](https://docs.api7.ai/ai-gateway/on-premises/upgrade).
-
-### Upgrading to 1.8.0
-
-`cp-api` 1.8.0 refuses to start on a database last run by a control plane older
-than 1.6.0. Upgrade to 1.6.x or 1.7.x first; to proceed anyway, take a database
-backup, then set `api.allowUnsupportedUpgrade: true` for that one upgrade and
-set it back afterwards.
-
-An install that still carries chart 1.5.0 values moves `AISIX_TRUSTED_ORIGINS`
-and `AISIX_AUTH_BEARER_SESSIONS` from `ui.extraEnvVars` to `api.extraEnvVars`
-before upgrading — or better, sets `api.trustedOrigins` / `api.bearerSessions` —
-since the chart no longer copies them to `cp-api`. The `<release>-ui` Service is
-removed: point any NodePort, ingress or proxy that used it at the
-`<release>-api` Service, which serves the console at every path.
-
-Whenever the release was first installed: if `api.extraEnvVars` or
-`dpm.extraEnvVars` overrides an environment variable chart 1.5.0 itself
-rendered (for example `AISIX_CLOUD_PUBLIC_BASE_URL` or
-`AISIX_CLOUD_DATABASE_URL`), the first `helm upgrade` to 1.8.0 removes that
-variable from the Deployment, because the 1.6.x and 1.7.x charts rendered the
-name twice and this one renders it once, so until it is restored `cp-api` runs
-on the value the chart derives from `values.yaml` — for the database URL, that
-is the chart's database, which `cp-api` migrates on start. Move such a setting
-to its key in `values.yaml` before upgrading, and check that the rendered
-database is the one you mean. If an upgrade already dropped an override, run
-`helm upgrade` again with the same values to restore it.
-
-See [Upgrade](https://docs.api7.ai/ai-gateway/on-premises/upgrade) for the full
-procedure.
 
 ## Uninstall
 
@@ -359,7 +330,7 @@ install time:
 
 ```sh
 helm install aisix-cp api7/aisix-cp --namespace aisix --create-namespace \
-  --version 1.10.0 \
+  --version 1.11.0 \
   -f cp-values.yaml \
   --set postgresql.primary.podSecurityContext.enabled=false \
   --set postgresql.primary.containerSecurityContext.enabled=false
@@ -444,6 +415,9 @@ plane and hands out the gateway image from the same release as the chart.
 | api.nodeSelector | object | `{}` | Node selector for the cp-api pod |
 | api.outbound.ssrfProtection.allowedHosts | list | `[]` | Hosts exempt from SSRF protection, each `host`, `host:port` or `[v6addr]:port` (no port matches any port). cp-api refuses to start on an entry it cannot parse |
 | api.outbound.ssrfProtection.enabled | bool | `nil` | Whether SSRF protection is on. Unset follows deploymentMode: off on-premises, on for saas. Set true or false to override |
+| api.podDisruptionBudget.enabled | bool | `false` | Create a PodDisruptionBudget for the cp-api pods so voluntary disruptions (node drains, cluster upgrades) cannot evict every replica at once. Needs more than one replica: on a single replica a budget that keeps it available (`minAvailable: 1`, `maxUnavailable: 0`) blocks every drain. Pair it with `topologySpreadConstraints` so the replicas do not share one node |
+| api.podDisruptionBudget.maxUnavailable | int | `1` | Maximum unavailable pods |
+| api.podDisruptionBudget.minAvailable | string | `""` | Minimum available pods. Takes precedence over `maxUnavailable` unless empty or 0, which leave `maxUnavailable` in effect |
 | api.podSecurityContext.runAsNonRoot | bool | `true` | Refuse to run the cp-api pod as root |
 | api.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` | Seccomp profile for the cp-api pod |
 | api.pricesyncSnapshotPath | string | `""` | Offline pricing: seed the catalog once at startup from this models.dev api.json capture (plain or .gz) and never fetch. The cp-api image ships one at /etc/aisix/models-dev-snapshot.json.gz. Empty selects online sync, which loads that bundled snapshot when a sync fails while the catalog is still empty (an install without internet access), keeps an existing catalog, and refreshes every model a later sync returns |
@@ -470,6 +444,7 @@ plane and hands out the gateway image from the same release as the chart.
 | api.smtp.tls | string | `"starttls"` | How the connection is protected: `starttls` (plain connection upgraded with STARTTLS; refused if the relay does not offer it), `smtps` (TLS from the first byte) or `none` (never encrypted). The relay's certificate is always verified against the system roots |
 | api.smtp.username | string | `""` | Username for SMTP authentication. Set together with a password (password or existingSecret), or leave both empty to send without authenticating. With tls `none` the credentials cross the network unencrypted |
 | api.tolerations | list | `[]` | Tolerations for the cp-api pod |
+| api.topologySpreadConstraints | list | `[]` | Topology spread constraints for the cp-api pods, e.g. to spread replicas across nodes or zones. Together with `podDisruptionBudget`, this keeps a node drain from taking every replica down at once. Passed through as written, so each constraint needs a `labelSelector` naming these pods (one without it counts no pods and spreads nothing), and `matchLabelKeys: [pod-template-hash]` keeps a rolling update from counting old and new pods together. For example: `[{maxSkew: 1, topologyKey: kubernetes.io/hostname, whenUnsatisfiable: ScheduleAnyway, matchLabelKeys: [pod-template-hash], labelSelector: {matchLabels: {app.kubernetes.io/name: aisix-cp, app.kubernetes.io/instance: <release>, app.kubernetes.io/component: api}}}]`. Empty applies none |
 | api.trustedOrigins | list | `[]` | Extra origins the console accepts sign-in from, as bare origins (https://host[:port]) or `https://*<suffix>` patterns. The api.publicBaseURL origin and its loopback twin are always trusted; add another hostname of this console here, or the local address of a port-forward that differs from api.publicBaseURL. An entry cp-api cannot read as an origin is logged and ignored. |
 | api.trustedProxies | list | `[]` | Reverse proxies (CIDRs, e.g. `10.0.0.0/8`) in front of cp-api whose X-Forwarded-For cp-api believes. Console sign-in and password reset rate limiting, and the client address recorded on a session, on an audit event and in the access log, then use the first address from the right that is not one of these proxies. Empty — the default — uses the address of whatever connected to cp-api, so behind an ingress every client shares the ingress's rate-limit budget and audit events and the access log record the ingress. List only proxies you run: a range listed here can name any client address it likes. |
 | dpm.affinity | object | `{}` | Affinity rules for the dp-manager pod |
@@ -478,6 +453,9 @@ plane and hands out the gateway image from the same release as the chart.
 | dpm.image.repository | string | `"docker.io/api7/aisix-cp-dpm"` | dp-manager image repository |
 | dpm.image.tag | string | `""` | Image tag |
 | dpm.nodeSelector | object | `{}` | Node selector for the dp-manager pod |
+| dpm.podDisruptionBudget.enabled | bool | `false` | Create a PodDisruptionBudget for the dp-manager pods so voluntary disruptions (node drains, cluster upgrades) cannot evict every replica at once. Needs more than one replica: on a single replica a budget that keeps it available (`minAvailable: 1`, `maxUnavailable: 0`) blocks every drain. Pair it with `topologySpreadConstraints` so the replicas do not share one node |
+| dpm.podDisruptionBudget.maxUnavailable | int | `1` | Maximum unavailable pods |
+| dpm.podDisruptionBudget.minAvailable | string | `""` | Minimum available pods. Takes precedence over `maxUnavailable` unless empty or 0, which leave `maxUnavailable` in effect |
 | dpm.podSecurityContext.runAsNonRoot | bool | `true` | Refuse to run the dp-manager pod as root |
 | dpm.podSecurityContext.seccompProfile.type | string | `"RuntimeDefault"` | Seccomp profile for the dp-manager pod |
 | dpm.replicaCount | int | `1` | Number of dp-manager replicas |
@@ -488,11 +466,12 @@ plane and hands out the gateway image from the same release as the chart.
 | dpm.securityContext.allowPrivilegeEscalation | bool | `false` | Forbid privilege escalation in the dp-manager container |
 | dpm.securityContext.capabilities.drop | list | `["ALL"]` | Linux capabilities dropped from the dp-manager container |
 | dpm.securityContext.readOnlyRootFilesystem | bool | `true` | Mount the dp-manager root filesystem read-only |
-| dpm.service.healthListen | string | `":7946"` | Plain-HTTP listen address for /healthz (outbox-poller liveness), probed by the kubelet (the mTLS port 7944 cannot be probed). Set to "" to disable the health server + httpGet probes (the probes then fall back to a TCP check on the mTLS port). |
+| dpm.service.healthListen | string | `":7946"` | Plain-HTTP listen address for /healthz (outbox-poller liveness) and /readyz (readiness), probed by the kubelet (the mTLS port 7944 cannot be probed). Set to "" to disable the health server + httpGet probes (the probes then fall back to a TCP check on the mTLS port). |
 | dpm.service.nodePort | string | `""` | Optional fixed NodePort for the mTLS port. Used only when type is NodePort; leave empty to let Kubernetes allocate one |
 | dpm.service.port | int | `7944` | dp-manager mTLS Service port, the one gateways dial |
 | dpm.service.type | string | `"ClusterIP"` | dp-manager Service type. Use NodePort or a LoadBalancer when the gateways run outside this cluster |
 | dpm.tolerations | list | `[]` | Tolerations for the dp-manager pod |
+| dpm.topologySpreadConstraints | list | `[]` | Topology spread constraints for the dp-manager pods, e.g. to spread replicas across nodes or zones. Together with `podDisruptionBudget`, this keeps a node drain from taking every replica down at once. Passed through as written, so each constraint needs a `labelSelector` naming these pods (one without it counts no pods and spreads nothing), and `matchLabelKeys: [pod-template-hash]` keeps a rolling update from counting old and new pods together. For example: `[{maxSkew: 1, topologyKey: kubernetes.io/hostname, whenUnsatisfiable: ScheduleAnyway, matchLabelKeys: [pod-template-hash], labelSelector: {matchLabels: {app.kubernetes.io/name: aisix-cp, app.kubernetes.io/instance: <release>, app.kubernetes.io/component: dpm}}}]`. Empty applies none |
 | externalDatabase.database | string | `"aisix_cloud"` | Database name |
 | externalDatabase.existingSecret | string | `""` | Name of an existing Secret containing the database password (key: "password"). |
 | externalDatabase.host | string | `""` | PostgreSQL host |

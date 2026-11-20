@@ -83,9 +83,13 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
+          # Once a newer cp-api has migrated the database during a rolling
+          # upgrade, this pod stays ready and answers /api 503 CP_UPGRADING
+          # until the rollout replaces it; neither probe fails, so it is not
+          # restarted into the old release on the new schema.
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: /readyz
               port: http
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -117,6 +121,10 @@ spec:
       {{- end }}
       {{- with .Values.api.affinity }}
       affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.api.topologySpreadConstraints }}
+      topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 

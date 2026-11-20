@@ -22,7 +22,16 @@ spec:
     {{- toYaml . | nindent 4 }}
   {{- end }}
   triggers:
-    {{- toYaml .Values.keda.triggers | nindent 4 }}
+    {{- $triggers := list }}
+    {{- range .Values.keda.triggers }}
+    {{- $trigger := deepCopy . }}
+    {{- /* KEDA has no default metricType for a resource trigger and refuses one without it */}}
+    {{- if and (has (toString .type) (list "cpu" "memory")) (not .metricType) }}
+    {{- $_ := set $trigger "metricType" (dig "type" "" (.metadata | default dict) | default "Utilization") }}
+    {{- end }}
+    {{- $triggers = append $triggers $trigger }}
+    {{- end }}
+    {{- toYaml $triggers | nindent 4 }}
   advanced:
     restoreToOriginalReplicaCount: {{ .Values.keda.restoreToOriginalReplicaCount }}
     {{- with .Values.keda.behavior }}

@@ -435,8 +435,35 @@ Reject value combinations that render successfully but cannot run.
 {{- if and .Values.autoscaling.enabled .Values.keda.enabled }}
 {{- fail "autoscaling.enabled and keda.enabled are mutually exclusive: two controllers writing spec.replicas fight over the replica count" }}
 {{- end }}
+{{- if .Values.autoscaling.enabled }}
+{{- $requests := dig "requests" dict (.Values.resources | default dict) }}
+{{- if and .Values.autoscaling.targetCPUUtilizationPercentage (not $requests.cpu) }}
+{{- fail "autoscaling.targetCPUUtilizationPercentage requires resources.requests.cpu: utilization is measured against the request, so without one the HorizontalPodAutoscaler never scales. Set resources.requests.cpu, or set autoscaling.targetCPUUtilizationPercentage=null" }}
+{{- end }}
+{{- if and .Values.autoscaling.targetMemoryUtilizationPercentage (not $requests.memory) }}
+{{- fail "autoscaling.targetMemoryUtilizationPercentage requires resources.requests.memory: utilization is measured against the request, so without one the HorizontalPodAutoscaler never scales. Set resources.requests.memory, or set autoscaling.targetMemoryUtilizationPercentage=null" }}
+{{- end }}
+{{- range .Values.autoscaling.extraMetrics }}
+{{- $source := get . (index (dict "Resource" "resource" "ContainerResource" "containerResource") (toString .type) | default "") | default dict }}
+{{- if and (eq (toString (dig "target" "type" "" $source)) "Utilization") (not (get $requests (toString $source.name))) }}
+{{- fail (printf "an autoscaling.extraMetrics %s %s metric with target type Utilization requires resources.requests.%s: utilization is measured against the request, so without one the HorizontalPodAutoscaler never scales. Set resources.requests.%s, or use target type AverageValue" .type $source.name $source.name $source.name) }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- if and .Values.keda.enabled (not .Values.keda.triggers) }}
 {{- fail "keda.enabled requires at least one entry in keda.triggers" }}
+{{- end }}
+{{- if .Values.keda.enabled }}
+{{- $requests := dig "requests" dict (.Values.resources | default dict) }}
+{{- range .Values.keda.triggers }}
+{{- if has (toString .type) (list "cpu" "memory") }}
+{{- /* the ScaledObject fills an omitted metricType the same way; metadata.type is KEDA's removed spelling of it */}}
+{{- $metricType := .metricType | default (dig "type" "" (.metadata | default dict)) | default "Utilization" }}
+{{- if and (eq (toString $metricType) "Utilization") (not (get $requests (toString .type))) }}
+{{- fail (printf "a keda.triggers %s trigger with metricType Utilization requires resources.requests.%s: utilization is measured against the request, so without one KEDA's HorizontalPodAutoscaler never scales. Set resources.requests.%s, or use metricType: AverageValue" .type .type .type) }}
+{{- end }}
+{{- end }}
+{{- end }}
 {{- end }}
 {{- $config := .Values.config | default dict }}
 {{- if eq .Values.rateLimit.backend "redis" }}

@@ -79,7 +79,7 @@ spec:
             failureThreshold: 36
           readinessProbe:
             httpGet:
-              path: /healthz
+              path: /readyz
               port: health
             initialDelaySeconds: 5
             periodSeconds: 5
@@ -135,6 +135,10 @@ spec:
       {{- end }}
       {{- with .Values.dpm.affinity }}
       affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.dpm.topologySpreadConstraints }}
+      topologySpreadConstraints:
         {{- toYaml . | nindent 8 }}
       {{- end }}
 

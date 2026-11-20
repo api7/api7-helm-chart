@@ -102,23 +102,26 @@ controlPlane:
 
 standalone:
   resources:
-    _format_version: "1"
+    _format_version: "2"
     provider_keys:
-      - display_name: openai-main
+      - id: 0b6f3c1e-2f0a-4c5e-9d55-7d1a8b0c2e11
+        display_name: openai-main
         provider: openai
         adapter: openai
         api_key: ${OPENAI_API_KEY}
         api_base: https://api.openai.com/v1
     models:
-      - display_name: gpt-4o-mini
+      - id: 6efd592d-a73b-573d-8e2c-e9e103692f92
+        display_name: gpt-4o-mini
         provider: openai
         model_name: gpt-4o-mini
-        provider_key: openai-main
+        provider_key_id: 0b6f3c1e-2f0a-4c5e-9d55-7d1a8b0c2e11
     api_keys:
-      - display_name: my-caller
-        key_env: CALLER_API_KEY
-        allowed_models:
-          - gpt-4o-mini
+      - id: 4a1c9e2b-7d3f-4b6a-8c5e-1f2a3b4c5d6e
+        display_name: my-caller
+        key_hash: ${CALLER_API_KEY_SHA256}
+        allowed_model_ids:
+          - 6efd592d-a73b-573d-8e2c-e9e103692f92
 
 extraEnvVars:
   - name: OPENAI_API_KEY
@@ -126,11 +129,20 @@ extraEnvVars:
       secretKeyRef:
         name: openai-credentials
         key: api-key
-  - name: CALLER_API_KEY
+  - name: CALLER_API_KEY_SHA256
     valueFrom:
       secretKeyRef:
         name: aisix-caller-keys
-        key: my-caller
+        key: my-caller-sha256
+```
+
+Every entry carries an `id`, a lowercase UUID you choose, and resources refer
+to each other by it (`provider_key_id`, `allowed_model_ids`). An API key is
+stored as `key_hash`, the SHA-256 hex digest of the key callers send, so the
+key itself never appears in the file:
+
+```sh
+printf %s "$CALLER_API_KEY" | sha256sum | cut -d' ' -f1
 ```
 
 `standalone.existingSecret` and `standalone.existingConfigMap` read the file from
@@ -280,9 +292,20 @@ autoscaling:
   minReplicas: 2
   maxReplicas: 20
   targetCPUUtilizationPercentage: 70
+resources:
+  requests:
+    cpu: "2"
+    memory: 1Gi
+config:
+  proxy:
+    workers: 2
 ```
 
-Requires `metrics-server` in the cluster. A replica the autoscaler adds is kept out
+Requires `metrics-server` in the cluster. The utilization target is measured
+against `resources.requests.cpu`, which the chart does not default, so the render
+fails without it (likewise `resources.requests.memory` for a memory target). The
+numbers above are placeholders — size them from your own traffic, and keep
+`config.proxy.workers` equal to the CPUs you request. A replica the autoscaler adds is kept out
 of the Service until its readiness probe passes, which happens only after it has
 loaded its configuration from the control plane — so a scaling event never routes
 traffic to a gateway that cannot serve it.
@@ -332,6 +355,17 @@ keda:
 A streamed request is counted in `aisix_llm_requests_total` when the stream
 ends, not when it starts, so during a burst of long streams this signal lags by
 roughly one stream length. The steady-state rate is unaffected.
+
+KEDA has no default `metricType` for a `cpu` or `memory` trigger, so when a
+trigger omits it the chart writes `metricType: Utilization` into the
+ScaledObject (or the value of the legacy `metadata.type`, when the trigger still
+sets one). A `Utilization` trigger is measured against the matching
+`resources.requests` entry, which the chart does not default, so the render fails
+without it. Whatever the `metricType`, KEDA admits a `cpu` or `memory` trigger only
+when the container has a matching request or limit, or the namespace has a
+LimitRange that supplies a default. The chart cannot see a LimitRange, so it does
+not check this for `metricType: AverageValue`: set `resources` or have such a
+LimitRange in place.
 
 `autoscaling` and `keda` are mutually exclusive — enabling both fails the render
 rather than letting two controllers fight over the replica count.
