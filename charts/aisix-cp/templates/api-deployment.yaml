@@ -83,10 +83,10 @@ spec:
               port: http
             initialDelaySeconds: 10
             periodSeconds: 10
-          # /readyz, not /healthz: it fails once a newer cp-api has
-          # migrated the database during a rolling upgrade, so this pod
-          # leaves the Service while liveness keeps it from restarting
-          # (a restart would boot the old release on the new schema).
+          # Once a newer cp-api has migrated the database during a rolling
+          # upgrade, this pod stays ready and answers /api 503 CP_UPGRADING
+          # until the rollout replaces it; neither probe fails, so it is not
+          # restarted into the old release on the new schema.
           readinessProbe:
             httpGet:
               path: /readyz
