@@ -291,6 +291,23 @@ from the bundle Secret (which extraEnvVars then overrides), and no file keys.
 {{- end }}
 
 {{/*
+The gateway container's envFrom: a ConfigMap named by `extraEnvVarsCM`, then a
+Secret named by `extraEnvVarsSecret`. A later source wins on a repeated key, so
+the Secret wins over the ConfigMap. `env` is applied after every `envFrom`
+source, so the chart's own variables and `extraEnvVars` still win over both.
+*/}}
+{{- define "aisix.envFrom" -}}
+{{- with .Values.extraEnvVarsCM }}
+- configMapRef:
+    name: {{ . }}
+{{- end }}
+{{- with .Values.extraEnvVarsSecret }}
+- secretRef:
+    name: {{ . }}
+{{- end }}
+{{- end }}
+
+{{/*
 The gateway container's env: the chart's own variables, then `extraEnvVars`,
 whose entries win on a repeated name. The chart leaves out its own entry for a
 name `extraEnvVars` also sets — a repeated name breaks `helm upgrade` after a

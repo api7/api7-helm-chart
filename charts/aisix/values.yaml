@@ -622,6 +622,20 @@ preStopSleepSeconds: 30
 # or under `config`
 extraEnvVars: []
 
+# -- Name of an existing Secret whose keys are imported into the gateway
+# container as environment variables (`envFrom`), instead of listing each one
+# under `extraEnvVars`. Every key must be a valid environment variable name.
+# The chart's own variables and `extraEnvVars` still win over a key of the same
+# name, because Kubernetes applies `env` after `envFrom`. Editing the Secret
+# does not roll the pods; restart the Deployment after changing it
+extraEnvVarsSecret: ""
+
+# -- Name of an existing ConfigMap whose keys are imported into the gateway
+# container as environment variables (`envFrom`). Rendered before
+# `extraEnvVarsSecret`, so the Secret wins on a key both define. Same rules as
+# `extraEnvVarsSecret`
+extraEnvVarsCM: ""
+
 # -- Extra volumes for the gateway pod
 extraVolumes: []
 # -- Extra volume mounts for the gateway container

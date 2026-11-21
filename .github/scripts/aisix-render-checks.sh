@@ -78,6 +78,17 @@ check "1.5.0 never rendered control-plane names in standalone mode, so none repe
 check "configSecrets becomes a secretKeyRef env var" \
   query 'env["AISIX_CACHE__REDIS__PASSWORD"]["valueFrom"]["secretKeyRef"] == {"name": "redis-auth", "key": "password"}' \
   --set 'configSecrets.cache\.redis\.password.secretName=redis-auth' --set 'configSecrets.cache\.redis\.password.key=password'
+check "the default render has no envFrom" \
+  query '"envFrom" not in pod["containers"][0]'
+check "extraEnvVarsSecret imports every key of that Secret through envFrom" \
+  query 'pod["containers"][0]["envFrom"] == [{"secretRef": {"name": "gateway-env"}}]' \
+  --set extraEnvVarsSecret=gateway-env
+check "extraEnvVarsCM renders before extraEnvVarsSecret, so the Secret wins a repeated key" \
+  query 'pod["containers"][0]["envFrom"] == [{"configMapRef": {"name": "gateway-env"}}, {"secretRef": {"name": "gateway-env-secret"}}]' \
+  --set extraEnvVarsCM=gateway-env --set extraEnvVarsSecret=gateway-env-secret
+check "extraEnvVars still renders its own env entries alongside an envFrom secret" \
+  query 'env["TZ"] == {"name": "TZ", "value": "UTC"} and pod["containers"][0]["envFrom"] == [{"secretRef": {"name": "gateway-env"}}]' \
+  --set extraEnvVarsSecret=gateway-env --set 'extraEnvVars[0].name=TZ' --set 'extraEnvVars[0].value=UTC'
 check "config values land in the file, list-typed ones included" \
   query 'cfg["observability"]["heap_profiling"]["auto_dump"]["thresholds"] == [0.7, 0.95] and cfg["proxy"]["request_id"]["accept_headers"] == ["x-aisix-request-id", "x-request-id"]' \
   -f "$chart/ci/config-values.yaml"

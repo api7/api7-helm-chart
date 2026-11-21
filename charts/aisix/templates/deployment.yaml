@@ -86,6 +86,10 @@ spec:
               containerPort: {{ .Values.containerPorts.admin }}
               protocol: TCP
             {{- end }}
+          {{- with (include "aisix.envFrom" . | trim) }}
+          envFrom:
+            {{- . | nindent 12 }}
+          {{- end }}
           env:
             {{- include "aisix.env" . | nindent 12 }}
           {{- if .Values.startupProbe.enabled }}
