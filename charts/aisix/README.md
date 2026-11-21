@@ -100,7 +100,8 @@ chart-managed Secret — a Secret rather than a ConfigMap because provider keys 
 credentials. Credentials do not have to live in your values file even so: a
 `${VAR}` reference is resolved from the container's environment when the file
 loads, so the value itself can come from `extraEnvVars` or from a Secret you
-manage separately.
+manage separately — point `extraEnvVarsSecret` at it and every key arrives as an
+environment variable.
 
 ```yaml
 controlPlane:
@@ -543,6 +544,21 @@ configSecrets:
 the variables a standalone resources file references. An `AISIX_*` variable set
 there still overrides the file, as it always has.
 
+When the variables already live in a Secret, name it with `extraEnvVarsSecret`
+instead of listing each key under `extraEnvVars`:
+
+```yaml
+extraEnvVarsSecret: aisix-runtime-env
+```
+
+Every key of that Secret is imported into the container with `envFrom`, so the
+keys must be valid environment variable names. `extraEnvVarsCM` does the same
+for a ConfigMap; it is rendered before the Secret, so the Secret wins on a key
+both define. The chart's own variables and `extraEnvVars` still win over a key
+of the same name, because Kubernetes applies `env` after `envFrom`. Editing the
+Secret or ConfigMap does not roll the pods — restart the Deployment to pick up
+a change.
+
 Overriding a variable the chart sets itself through `extraEnvVars` is only a
 compatibility path for existing deployments, and the `extraEnvVars` value still
 wins. For a name chart 1.5.0 set (such as `AISIX_MANAGED__CP_BASE_URL` or
@@ -645,6 +661,8 @@ rejects. New installs set the value in its own key in `values.yaml` or under
 | controlPlane.etcdEndpoint | string | `""` | Control-plane etcd endpoint as bare `host:port`. Leave empty unless the control plane publishes an etcd endpoint distinct from `baseURL` |
 | controlPlane.heartbeatIntervalSeconds | int | `15` | Heartbeat interval in seconds. The control plane marks a gateway connected on its first heartbeat. Clamped to [5, 300] by the gateway |
 | extraEnvVars | list | `[]` | Extra environment variables for the gateway container: system-level environment variables (such as `TZ`) and variables referenced by the resources file. Gateway settings belong in `config`. Overriding a variable the chart sets itself is only a compatibility path for existing deployments: for a name chart 1.5.0 set, the rendered container then lists it twice, which Helm 4 server-side apply rejects. New installs set the value in its own key or under `config` |
+| extraEnvVarsCM | string | `""` | Name of an existing ConfigMap whose keys are imported into the gateway container as environment variables (`envFrom`). Rendered before `extraEnvVarsSecret`, so the Secret wins on a key both define. Same rules as `extraEnvVarsSecret` |
+| extraEnvVarsSecret | string | `""` | Name of an existing Secret whose keys are imported into the gateway container as environment variables (`envFrom`), instead of listing each one under `extraEnvVars`. Every key must be a valid environment variable name. The chart's own variables and `extraEnvVars` still win over a key of the same name, because Kubernetes applies `env` after `envFrom`. Editing the Secret does not roll the pods; restart the Deployment after changing it |
 | extraVolumeMounts | list | `[]` | Extra volume mounts for the gateway container |
 | extraVolumes | list | `[]` | Extra volumes for the gateway pod |
 | fullnameOverride | string | `""` | Override the fully qualified resource name prefix |
