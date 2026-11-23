@@ -88,6 +88,7 @@ A Helm chart for Kubernetes
 | dashboard_configuration.server.listen.disable | bool | `true` |  |
 | dashboard_configuration.server.listen.host | string | `"0.0.0.0"` |  |
 | dashboard_configuration.server.listen.port | int | `7080` |  |
+| dashboard_configuration.server.max_request_body_size | int | `33554432` |  |
 | dashboard_configuration.server.pprof.enable | bool | `true` |  |
 | dashboard_configuration.server.pprof.host | string | `"127.0.0.1"` |  |
 | dashboard_configuration.server.pprof.port | int | `6060` |  |
@@ -155,6 +156,7 @@ A Helm chart for Kubernetes
 | developer_portal_configuration.server.listen.tls.cert_file | string | `""` |  |
 | developer_portal_configuration.server.listen.tls.enabled | bool | `true` |  |
 | developer_portal_configuration.server.listen.tls.key_file | string | `""` |  |
+| developer_portal_configuration.server.max_request_body_size | int | `33554432` |  |
 | developer_portal_configuration.server.pprof.enable | bool | `true` |  |
 | developer_portal_configuration.server.pprof.host | string | `"127.0.0.1"` |  |
 | developer_portal_configuration.server.pprof.port | int | `6060` |  |
