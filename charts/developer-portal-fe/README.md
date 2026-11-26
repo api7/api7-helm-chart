@@ -1,6 +1,6 @@
 # developer-portal-fe
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.5.7](https://img.shields.io/badge/AppVersion-0.5.7-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.5.7](https://img.shields.io/badge/AppVersion-0.5.7-informational?style=flat-square)
 
 A Helm chart for API7 Developer Portal Frontend
 
@@ -34,7 +34,7 @@ A Helm chart for API7 Developer Portal Frontend
 | developerPortal.extraVolumes | list | `[]` |  |
 | developerPortal.image.pullPolicy | string | `"IfNotPresent"` |  |
 | developerPortal.image.repository | string | `"api7/api7-ee-developer-portal-fe"` |  |
-| developerPortal.image.tag | string | `"v0.5.7"` |  |
+| developerPortal.image.tag | string | `"0.5.7"` |  |
 | developerPortal.livenessProbe.failureThreshold | int | `10` |  |
 | developerPortal.livenessProbe.initialDelaySeconds | int | `30` |  |
 | developerPortal.livenessProbe.path | string | `"/"` |  |

@@ -9,7 +9,7 @@ developerPortal:
   image:
     repository: api7/api7-ee-developer-portal-fe
     pullPolicy: IfNotPresent
-    tag: "v0.5.7"
+    tag: "0.5.7"
 
   # Resource limits and requests
   resources: {}
